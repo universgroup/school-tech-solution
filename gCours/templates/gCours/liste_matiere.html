@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block titre_page %} {% endblock %}
+{% block titre_cadre %}
+    LISTE DES MATIERES DISPONIBLES
+{% endblock %}
+
+{% block formulaire %}
+
+<div class="table-responsive">
+
+    <table id="bootstrapdatatable" class="table table-striped table-bordered" width="100%">
+        <thead>
+            <tr>
+                <th>Nom de la matière</th>
+                <th>Coefficient</th>
+                <th>ID Matière</th>
+                <th>Actions</th>
+             </tr>
+        </thead>
+        <tbody>
+            {% for m in mat %}
+            <tr>
+                <td>{{m.nom_matiere}}</td>
+                <td>{{m.coeff}}</td>
+                <td>{{m.id}}</td>
+                <td>
+                    <a class="btn btn-sm btn-primary" href="/afficherdetailsmatiere/{{m.id}}"><span class="glyphicon glyphicon-eye-open"></span>Voir</a>
+                    <a class="btn btn-sm btn-info" href="/editionmatiere/{{m.id}}"><span class="glyphicon glyphicon-pencil"></span>Modifier</a>
+                    <a class="btn btn-sm btn-danger" href="/suppmatiere/{{m.id}}"><span class="glyphicon glyphicon-remove"></span>Supprimer</a>
+                </td>
+
+            </tr>
+
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="pagination">
+        <span class="step-links">
+            {% if mat.has_previous %}
+                <a href="?page=1">&laquo; 1</a>
+                <a href="?page={{ mat.previous_page_number }}"><span class="glyphicon glyphicon-backward"></span>Précédent</a>
+            {% endif %}
+
+            <span class="current">
+                Page {{ mat.number }} sur {{ mat.paginator.num_pages }}
+            </span>
+
+            {% if mat.has_next %}
+                <a href="?page={{ mat.next_page_number }}"><span class="glyphicon glyphicon-forward"></span>Suivant</a>
+                <a href="?page={{ mat.paginator.num_pages }}">Dernier &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+
+
+</div>
+
+{% endblock %}

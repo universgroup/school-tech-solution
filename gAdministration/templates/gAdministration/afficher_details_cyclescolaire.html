@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block titre_page %} CONSULTATION {% endblock %}
+{% block titre_cadre %}
+DETAILS D'UN CYCLE SCOLAIRE
+{% endblock %}
+
+{% block formulaire %}
+
+        <form class="form-horizontal" action="" method="POST">
+
+                        {% csrf_token %}
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="IDCycle">ID Cycle</label>
+                                    <input type="text" id="IDCycle" maxlength="10" value="{{cycle.id}}" class="form-control" readonly>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="id_ncycle">Cycle scolaire</label>
+                                    <input type="text" name="nom_cycle" id="id_ncycle" maxlength="15"  value="{{cycle.cycle}}" class="form-control" readonly>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="text-center">
+                                    <a href="{% url 'listecycle' %}" target="_self" class="btn btn-sm btn-primary">Retour &nbsp;<i class="fa fa-arrow-circle-left"></i></a>
+                                </div>
+                            </div>
+                        </div>
+
+        </form>
+
+{% endblock %}

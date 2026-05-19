@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block titre_page %} GESTION DES CLASSES {% endblock %}
+{% load crispy_forms_tags %}
+
+ {% block titre_cadre %}
+ENREGISTREMENT DES CLASSES
+ {% endblock %}
+
+ {% block formulaire %}
+
+     <form action="" method="POST" class="form-horizontal">
+
+                    {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            {{form.nom_classe|as_crispy_field}}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            {{form.frais_inscription|as_crispy_field}}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            {{ form.frais_reinscription|as_crispy_field}}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            {{ form.tranche1|as_crispy_field}}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            {{ form.idcycle|as_crispy_field }}
+                        </div>
+                    </div>
+                </div>
+
+
+               <div class="row">
+                        <div class="col-md-12">
+                            <div class="text-center">
+                            <button type="submit" class="btn btn-success btn-sm">Enregistrer &nbsp;<i class="fa fa-save"></i></button>
+                            <button type="reset" class="btn btn-warning btn-sm">Annuler &nbsp;<i class="fa fa-refresh"></i></button>
+                            <a href="{% url 'listeclasse' %}" target="_self" class="btn btn-primary btn-sm">Retour &nbsp;<i class="fa fa-arrow-circle-right"></i></a>
+                            </div>
+                        </div>
+               </div>
+     </form>
+
+ {% endblock %}

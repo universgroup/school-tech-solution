@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+{% block titre_page %} CONSULTATION {% endblock %}
+{% block titre_cadre %}
+DETAILS DE L'INSCRIPTION D'UN ELEVE
+{% endblock %}
+
+{% block formulaire %}
+
+    <form class="form-horizontal" action="" method="POST">
+
+                {% csrf_token %}
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="IDInscrip">ID</label>
+                            <input type="text" id="IDInscrip" value="{{ins.id}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_dateins">Date inscription</label>
+                            <input type="text" name="date_inscription" id="id_dateins" value="{{ins.date_inscription|date:'j-n-Y'}}" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_ansco">Année scolaire</label>
+                            <input type="text" name="ansco" id="id_ansco" value="{{ins.annee_scolaire}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_cycle">Cycle</label>
+                            <input type="text" name="cycle" id="id_cycle" value="{{ins.idcycle}}" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_classe">Classe</label>
+                            <input type="text" name="classe" id="id_classe" value="{{ins.idclasse}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="id_mat">Matricule</label>
+                            <input type="text" name="matricule" id="id_mat" value="{{ins.mateleve}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                          <label for="id_nom">Nom Famille</label>
+                          <input type="text" name="nom" id="id_nom" value="{{ins.mateleve.nom}}" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_prenom">Prénom(s)</label>
+                            <input type="text" name="prenom" id="id_prenom" value="{{ins.mateleve.prenom}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="id_sexe">Sexe</label>
+                            <input type="text" name="sexe_eleve" id="id_sexe" value="{{ins.mateleve.sexe_eleve}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_pere">Prénom(s) du Père</label>
+                            <input type="text" name="pere" id="id_pere" value="{{ins.mateleve.pere}}" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_mere">Nom & Prénom(s) mère</label>
+                            <input type="text" name="mere" id="id_mere" value="{{ins.mateleve.mere}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_tuteur">Nom & Prénom(s) tuteur</label>
+                            <input type="text" name="tuteur" id="id_tuteur" value="{{ins.mateleve.tuteur}}" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_contact">Contact tuteur</label>
+                            <input type="text" name="contact" id="id_contact" value="{{ins.mateleve.contact_parent}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_adresse">Adresse</label>
+                            <input type="text" name="adresse" id="id_adresse" value="{{ins.mateleve.adresse}}" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_ecole">Ecole origine</label>
+                            <input type="text" name="ecole_origine" id="id_ecole" value="{{ins.mateleve.ecole_origine}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_datenais">Date naissance</label>
+                            <input type="text" name="datenaiss" id="id_datenais" value="{{ins.mateleve.datenaissance|date:'j-n-Y'}}" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_lieunais">Lieu naissance</label>
+                            <input type="text" name="lieunais" id="id_lieunais" value="{{ins.mateleve.lieu_naissance}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_date_entree">Date entrée</label>
+                            <input type="text" name="date_entree" id="id_date_entree" value="{{ins.mateleve.date_arrivee|date:'j-n-Y'}}" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_pays">Pays naissance</label>
+                            <input type="text" name="pays_naiss" id="id_pays" value="{{ins.mateleve.pays_naissance}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            {% if ins.mateleve.photo_eleve %}
+                                <a href="{{ins.mateleve.photo_eleve.url}}" title="Photo ID">
+                                    <img src="{{ins.mateleve.photo_eleve.url}}" width="150px">
+                                </a>
+                            {% else %}
+                                <label>Photo indisponible</label>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="text-center">
+                            <a href="{% url 'chargeranneecourante' %}" target="_self" class="btn-secondary btn-sm" title="Retour la liste des inscrits">Retour &nbsp;<i class="fa fa-arrow-circle-left"></i></a>
+                        </div>
+                    </div>
+
+                </div>
+
+    </form>
+
+
+{% endblock %}

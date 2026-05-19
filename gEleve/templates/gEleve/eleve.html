@@ -1,0 +1,129 @@
+{% extends "base_eleve.html" %}
+{% load crispy_forms_tags %}
+
+{% block titre_page %} GESTION DES INSCRIPTIONS {% endblock %}
+
+		 <!-- Progress Indicator -->
+		<div class="progress-indicator">
+            <div class="progress-step active" id="step1">1</div>
+            <div class="progress-step" id="step2">2</div>
+            <div class="progress-step" id="step3">3</div>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="tab-navigation">
+            <button class="tab-btn active" onclick="switchTab('infos_personnel')">Informations Personnelles</button>
+            <button class="tab-btn" onclick="switchTab('adresse_personnelle')">Adresse Personnelle</button>
+            <button class="tab-btn" onclick="switchTab('inscription')">Inscription</button>
+        </div>
+
+        <form  action="" method="POST"  enctype="multipart/form-data">
+
+        	{% csrf_token %}
+
+           {% block infos_eleve %}
+
+        		<div class="form-row">
+                    <div class="form-group">
+                        {{form.nom|as_crispy_field}}
+                    </div>
+                    
+                    <div class="form-group">
+                        {{form.prenom|as_crispy_field}}
+                    </div>
+                </div>
+
+                <div class="form-row">
+	                <div class="form-group">
+	                    {{form.pere|as_crispy_field}}
+	                </div>
+
+	                <div class="form-group">
+	                    {{form.mere|as_crispy_field}}
+	                </div>
+	            </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        {{form.tuteur|as_crispy_field}}
+                    </div>
+                    
+                    <div class="form-group">
+                        {{form.contact_parent|as_crispy_field}}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    {{form.sexe_eleve|as_crispy_field}}
+                </div>
+
+                <!-- Navigation Buttons for Tab 1 -->
+                <div class="nav-buttons right">
+                    <button type="button" class="btn btn-primary" onclick="nextTab()">
+                        Suivant &nbsp;<i class="fa fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+
+
+        	{% endblock %}
+
+        	{% block adresse_perso %}
+
+        		<div class="form-row">
+	        		<div class="form-group">
+	                    {{form.adresse|as_crispy_field}}
+	                </div>
+
+	                <div class="form-group">
+	                    {{form.ecole_origine|as_crispy_field}}
+	                </div>
+	            </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        {{form.datenaissance|as_crispy_field}}
+                    </div>
+                    
+                    <div class="form-group">
+                        {{form.lieu_naissance|as_crispy_field}}
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        {{form.date_arrivee|as_crispy_field}}
+                    </div>
+                    
+                    <div class="form-group">
+                        {{form.pays_naissance|as_crispy_field}}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    {{form.photo_eleve|as_crispy_field}}
+                </div>
+
+                <!-- Navigation Buttons for Tab 2 -->
+                <div class="nav-buttons between">
+                    <button type="button" class="btn btn-secondary" onclick="previousTab()">
+                        Précédent &nbsp; <i class="fa fa-solid fa-arrow-left"></i> 
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="nextTab()">
+                        Suivant &nbsp;<i class="fa fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+
+        	{% endblock %}
+
+            <!-- Navigation Buttons for Tab 3 -->
+            <div class="nav-buttons between">
+                <button type="button" class="btn btn-secondary" onclick="previousTab()">
+                    Précédent &nbsp; <i class="fa fa-solid fa-arrow-left"></i>
+                </button>
+                <div>
+                    <button type="submit" class="btn btn-success btn-sm" title="Cliquez ici pour valider l'inscription de l'élève">Valider</button>
+                    <button type="reset" class="btn btn-warning btn-sm" title="Cliquez ici pour annuler l'inscription">Actualiser</button>
+                </div>
+            </div>
+
+        </form>

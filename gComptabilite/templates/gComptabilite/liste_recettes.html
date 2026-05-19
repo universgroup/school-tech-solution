@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    {% load static %}
+	<meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>SITUATION GLOBALE DES RECETTES DE L'ANNEE SCOLAIRE COURANTE</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="shortcut icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css'%}">
+    <link href="{% static 'fontawesomefree/css/all.min.css' %}" rel="stylesheet" type="text/css">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+    <script type="text/javascript" src="{% static 'scripts/bootstrap.min.js' %}"></script>
+    <script src="{% static 'fontawesomefree/js/all.min.js' %}"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+
+
+    <!-- Reférences vers les élements de menu principal haut et de la barre latérale gauche -->
+
+	<script src="{% static 'assets/plugins/jquery/jquery.min.js' %}"></script>
+    <style>
+
+        table {
+            white-space: nowrap;
+            width: 100%;
+        }
+
+        td {
+            border: 1px solid black;
+        }
+
+        td {
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        td.fit {
+            width: 0;
+            min-width: fit-content;
+        }
+
+        .marge-titre-tableau
+        {
+            margin-top: 80px;
+            margin-bottom: 10px;
+            text-align: center;
+            font-size: large;
+            font-weight: bold;
+        }
+
+        .marge-entete-tableau
+        {
+            margin-top: 1px;
+        }
+       
+
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="shadow p-4 mb-4 bg-body rounded">
+        
+            <h5 style="text-align: left;font-size: larger;font-weight: bold;">Filtrez la situation des recettes</h5>
+            
+            <form action="{% url 'rechercherrecette' %}" method="GET" class="form-horizontal">
+                            
+                                              
+                            <div class="row">
+                                  <div class="col-md-12">
+                                      <div class="form-group">
+                                            <label for="idannee">Année scolaire</label>
+                                            <select class="form-control" name="nom_annee" id="idannee">
+                                                <option value="" selected>Sélectionnez</option>
+                                                {% for an in annee %}
+                                                <option value="{{ an.id }}">{{ an.descript_annee }}</option>
+                                                {% endfor %}
+                                            </select>
+                                      </div>                                      
+                                  </div>
+                            </div>
+
+                            <div class="row">
+                                  <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="datedebut">Période du : </label>
+                                        <input type="date" id="datedebut" name="ddebut" class="form-control">
+                                    </div>
+                                  </div> 
+                                  <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="datefin">au : </label>
+                                        <input type="date" id="datefin" name="dfin" class="form-control">
+                                    </div>
+                                  </div>                                 
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <div class="text-center">
+                                            <button type="submit" class="btn btn-primary btn-sm" title="Filtrer la liste des recettes par année scolaire et/ou période">Rechercher &nbsp; <i class="fa fa-search"></i></button>
+                                            <a href="{% url 'listerecette' %}" target="_self" title="Actualiser la liste des recettes" class="btn btn-warning btn-sm">Actualiser &nbsp;<i class="fa fa-refresh"></i></a>
+                                        </div>
+                                         
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                      {% if cais %}
+                                      <h5 class="marge-titre-tableau">Situation globale du mois de &nbsp; : &nbsp;{{mois_actuel}}</h5>
+                                      {% elif recette %}
+                                      <h5 class="marge-titre-tableau">Situation globale de la période du &nbsp; : &nbsp;{{ddebut|date:'j-n-Y'}} &nbsp; au &nbsp;: &nbsp; {{dfin|date:'j-n-Y'}}</h5>  
+                                      {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="totalrecu">Total entrée</label>
+                                                {% if total_entree %}
+                                                <input type="text" id="totalrecu" name="total_recette" value="{{ total_entree | floatformat:'2g' }}" class="form-control" readonly style="color:red;font-weight: bold; font-size: 12pt;">
+                                                {% else %}
+                                                <input type="text" name="total_recette" value="0" class="form-control" size="30px" readonly style="color:red;font-weight: bold; font-size: 12pt;">
+                                                {% endif %}
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="totaldep">Total sortie</label>
+                                                {% if total_sortie %}
+                                                <input type="text" id="totaldep" name="total_depense" value="{{ total_sortie|floatformat:'2g' }}" class="form-control" readonly style="color:red;font-weight: bold; font-size: 12pt;">
+                                                {% else %}
+                                                <input type="text"  name="total_depense" value="0" class="form-control" readonly style="color:red;font-weight: bold; font-size: 12pt;">
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                            </div>
+
+                            <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="totalsolde">Solde disponible</label>
+                                            {% if solde_dispo %}
+                                            <input type="text" id="totalsolde" name="total_solde" value="{{ solde_dispo | floatformat:'2g' }}" class="form-control" readonly style="color:red;font-weight: bold; font-size: 12pt;">
+                                            {% else %}
+                                            <input type="text" name="total_solde" value="0" class="form-control" readonly style="color:red;font-weight: bold; font-size: 12pt;">
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                            </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="text-center">
+            <a href="{% url 'enregistrercaisserecette' %}" class="btn btn-success btn-md marge-entete-tableau" target="_self" title="Cliquez ici pour enregistrer une opération">Enregistrer une entrée &nbsp;<i class="fa fa-solid fa-save"></i></a>
+        </div>
+    </div>
+
+     <div class="container-fluid">
+          <div class="card shadow mb-4">
+            <div class="table-responsive">
+                {% if cais %}
+                        <table id="recette_derniere_annee" class="table table-striped table-bordered">
+                            <thead class="table-success">
+                                <tr>
+                                    <th>Catégorie recette</th>
+                                    <th>Date opération</th>
+                                    <th>Désignation</th>
+                                    <th>Montant</th>
+                                    <th>Type opération</th>
+                                    <th>Solde progressif</th>
+                                    <th>Observation/Mémo</th>
+                                    <th>Année scolaire</th>
+                                    <th>ID</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for c in cais %}
+                                <tr>
+                                    <td class="fit">{{c.categ_depense}}</td>
+                                    <td class="fit">{{c.date_operation | date:'j-n-Y' }}</td>
+                                    <td class="fit">{{c.libelle_operation }}</td>
+                                    <td class="fit">{{c.montant_encaisse | floatformat:'2g' }}</td>
+                                    <td class="fit">{{c.type_operation }}</td>
+                                    <td class="fit">{{c.solde_actuel|floatformat:'2g' }}</td>
+                                    <td class="fit">{{c.observ }}</td>
+                                    <td class="fit">{{c.anscolaire }}</td>
+                                    <td class="fit">{{c.id}}</td>
+                                    <td class="fit">
+                                        <a class="btn btn-primary" href="{% url 'afficherdetailscaisserecette' c.id %}" title="Voir/Afficher" target="_self"><i class="fa-solid fa-eye fa-sm"></i></a>
+                                        <a class="btn btn-info" href="{% url 'editioncaisserecette' c.id %}" title="Modifier/Editer" target="_self"><i class="fa-solid fa-edit fa-sm"></i></a>
+                                        <a class="btn btn-danger" href="{% url 'supprimecaisserecette' c.id %}" title="Supprimer" target="_self"><i class="fa-solid fa-remove fa-sm"></i></a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="text-center">
+
+                                    <nav aria-label="">
+                                        <ul class="pagination">
+
+                                            {% if cais.has_previous %}
+
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page=1">1</a>
+                                            </li>
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page={{ cais.previous_page_number }}"><i class="fa-solid fa-backward fa-sm"></i>&nbsp; Précédent</a>
+                                            </li>
+
+                                            {% endif %}
+
+                                            <li class="page-item active" aria-current="page">
+                                                <a class="page-link" href="#">
+                                                    Page {{ cais.number }} sur {{ cais.paginator.num_pages }}
+                                                </a>
+                                            </li>
+
+                                            {% if cais.has_next %}
+
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page={{ cais.next_page_number }}"><i class="fa-solid fa-forward fa-sm"></i>&nbsp; Suivant</a>
+                                            </li>
+
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page={{ cais.paginator.num_pages }}"><i class="fa-solid fa-step-forward fa-sm"></i>&nbsp; Dernier</a>
+                                            </li>
+
+                                            {% endif %}
+
+                                        </ul>
+                                    </nav>
+                                </div>
+                            </div>
+                        </div>
+                {% elif recette %}
+
+                        <table id="recette_annee_select" class="table table-striped table-bordered">
+                            <thead class="table-success">
+                                <tr>
+                                    <th>Catégorie recette</th>
+                                    <th>Date opération</th>
+                                    <th>Désignation</th>
+                                    <th>Montant</th>
+                                    <th>Type opération</th>
+                                    <th>Solde progressif</th>
+                                    <th>Observation/Mémo</th>
+                                    <th>Année scolaire</th>
+                                    <th>ID</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for r in recette %}
+                                <tr>
+                                    <td class="fit">{{r.categ_depense}}</td>
+                                    <td class="fit">{{r.date_operation | date:'j-n-Y' }}</td>
+                                    <td class="fit">{{r.libelle_operation }}</td>
+                                    <td class="fit">{{r.montant_encaisse | floatformat:'2g' }}</td>
+                                    <td class="fit">{{r.type_operation }}</td>
+                                    <td class="fit">{{r.solde_actuel|floatformat:'2g' }}</td>
+                                    <td class="fit">{{r.observ }}</td>
+                                    <td class="fit">{{r.anscolaire }}</td>
+                                    <td class="fit">{{r.id}}</td>
+                                    <td class="fit">
+                                        <a class="btn btn-primary" href="{% url 'afficherdetailscaisserecette' r.id %}" title="Voir/Afficher" target="_self"><i class="fa-solid fa-eye fa-sm"></i></a>
+                                        <a class="btn btn-info" href="{% url 'editioncaisserecette' r.id %}" title="Modifier/Editer" target="_self"><i class="fa-solid fa-edit fa-sm"></i></a>
+                                        <a class="btn btn-danger" href="{% url 'supprimecaisserecette' r.id %}" title="Supprimer" target="_self"><i class="fa-solid fa-remove fa-sm"></i></a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="text-center">
+                                    <nav aria-label="">
+                                        <ul class="pagination">
+
+                                            {% if recette.has_previous %}
+
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page=1">1</a>
+                                            </li>
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page={{ recette.previous_page_number }}"><i class="fa-solid fa-backward fa-sm"></i>&nbsp; Précédent</a>
+                                            </li>
+
+                                            {% endif %}
+
+                                            <li class="page-item active" aria-current="page">
+                                                <a class="page-link" href="#">
+                                                    Page {{ recette.number }} sur {{ recette.paginator.num_pages }}
+                                                </a>
+                                            </li>
+
+                                            {% if recette.has_next %}
+
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page={{ recette.next_page_number }}"><i class="fa-solid fa-forward fa-sm"></i>&nbsp; Suivant</a>
+                                            </li>
+
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page={{ recette.paginator.num_pages }}"><i class="fa-solid fa-step-forward fa-sm"></i>&nbsp; Dernier</a>
+                                            </li>
+
+                                            {% endif %}
+
+                                        </ul>
+                                    </nav>
+                                </div>
+                            </div>
+                        </div>
+
+                {% endif %}
+
+            </div>
+          </div>
+     </div>
+</body>
+</html>
+

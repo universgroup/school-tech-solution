@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block titre_page %} LISTE GENERALE DU PERSONNEL {% endblock %}
+{% block titre_cadre %}
+    LISTE DU PERSONNEL
+{% endblock %}
+
+{% block formulaire %}
+
+<div class="table-responsive">
+        <table id="bootstrapdatatable" class="table table-striped table-bordered" width="100%">
+        <thead>
+            <tr>
+                <th>ID Employé</th>
+                <th>Nom Famille</th>
+                <th>Prénom(s) personnel</th>
+                <th>Civilité</th>
+                <th>Date naissance</th>
+                <th>Niveau étude</th>
+                <th>Catégorie</th>
+                <th>Adresse</th>
+                <th>Contact</th>
+                <th>Fonction</th>
+                <th>Email</th>
+                <th>Genre</th>
+                <th>Salaire</th>
+                <th>Année experience</th>
+                <th>Contrat</th>
+                <th>Diplôme obtenu</th>
+                <th>Date embauche</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in pers %}
+            <tr>
+                <td>{{p.id}}</td>
+                <td>{{p.nom_personnel|upper}}</td>
+                <td>{{p.prenom_personnel}}</td>
+                <td>{{p.civilite}}</td>
+                <td>{{p.date_naissance|date:'j-n-Y'}}</td>
+                <td>{{p.niveau_etude}}</td>
+                <td>{{p.type_personnel}}</td>
+                <td>{{p.adresse_personnel}}</td>
+                <td>{{p.contact_personnel}}</td>
+                <td>{{p.fonction_personnel}}</td>
+                <td>{{p.email_personnel}}</td>
+                <td>{{p.sexe_personnel}}</td>
+                <td>{{p.salbase|floatformat:'2g'}}</td>
+                <td>{{p.annee_experience}}</td>
+                <td>{{p.contrat_type}}</td>
+                <td>{{p.diplome}}</td>
+                <td>{{p.date_embauche|date:'j-n-Y'}}</td>
+
+                <td>
+                    <a class="btn btn-sm btn-primary" href="/afficherdetailspersonnel/{{p.id}}"><span class="glyphicon glyphicon-eye-open">Voir</span></a>
+                    <a class="btn btn-sm btn-info" href="/editionpersonnel/{{p.id}}"><span class="glyphicon glyphicon-pencil">Modifier</span></a>
+                    <a class="btn btn-sm btn-danger" href="/supppersonnel/{{p.id}}"><span class="glyphicon glyphicon-remove">Supprimer</span></a>
+                </td>
+
+            </tr>
+
+            {% endfor %}
+        </tbody>
+    </table>
+
+        <div class="pagination">
+        <span class="step-links">
+            {% if pers.has_previous %}
+                <a href="?page=1">&laquo; 1</a>
+                <a href="?page={{ pers.previous_page_number }}"><span class="glyphicon glyphicon-backward"></span>Précédent</a>
+            {% endif %}
+
+            <span class="current">
+                Page {{ pers.number }} sur {{ pers.paginator.num_pages }}
+            </span>
+
+            {% if pers.has_next %}
+                <a href="?page={{ pers.next_page_number }}"><span class="glyphicon glyphicon-forward"></span>Suivant</a>
+                <a href="?page={{ pers.paginator.num_pages }}">Dernier &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+
+
+</div>
+
+
+{% endblock %}

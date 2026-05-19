@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block titre_page %} GESTION DES INSCRIPTIONS {% endblock %}
+
+ {% block titre_cadre %}
+TERMINER L'INSCRIPTION
+ {% endblock %}
+
+ 
+ {% block formulaire %}
+
+
+     <form action="{% url 'inscriptioneleve' mateleve %}" method="POST" id="finscription" data-classe-url="{% url 'chargerlisteclasse' %}">
+
+                    {% csrf_token %}
+                    {{form|crispy}}
+                                        
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="text-center">
+
+                                <button type="submit" name="envoi" value="yes" class="btn btn-success btn-sm" title="Cliquez ici pour valider l'inscription de l'élève">Terminer &nbsp;<i class="fa fa-check"></i></button>
+                                <a href="{% url 'enregistrereleve' %}" target="_self" class="btn btn-secondary btn-sm" title="Retour à la page d'enregistrement">Retour &nbsp;<i class="fa fa-circle-arrow-left"></i></a>
+                                <a href="{% url 'chargeranneecourante' %}" target="_self" class="btn btn-primary btn-sm">Liste Elèves Inscrits &nbsp;<i class="fa fa-circle-chevron-right"></i></a>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+     </form>
+
+ {% endblock %}
+
+
+ {% block javascript %}
+ 
+ <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+ <script>
+    // Cette fonction javascript (JQuery) m'a permis de filtrer les classes selon le cycle choisi
+    $("#id_cycle").change(function(){
+        var url = $("#finscription").attr("data-classe-url");
+        var idcycle = $(this).val();
+
+        $.ajax({
+            url:url,
+            data:{
+                'idcycle':idcycle
+            },
+            success:function(data){
+                $("#id_classe").html(data);
+            }
+
+
+        });
+    });
+    
+
+ </script>
+
+ {% endblock %}

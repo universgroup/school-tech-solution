@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block titre_page %} GESTION DES CYCLES SCOLAIRES {% endblock %}
+{% load crispy_forms_tags %}
+
+ {% block titre_cadre %}
+AJOUT DES CYCLES SCOLAIRES
+ {% endblock %}
+ {% block formulaire %}
+        
+        <form action="" method="POST" class="form-horizontal">
+
+                        {% csrf_token %}
+                        {{form|crispy}}
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <button type="submit" class="btn btn-success btn-sm">Ajouter &nbsp;<i class="fa fa-add"></i></button>
+                                <button type="reset" class="btn btn-warning btn-sm">Annuler &nbsp;<i class="fa fa-refresh"></i></button>
+                                <a href="{% url 'listecycle' %}" class="btn btn-primary btn-sm" title="Afficher/Voir la liste des cycles" target="_self">Retour &nbsp;<i class="fa fa-arrow-circle-left"></i></a>
+                            </div>
+                        </div>
+        </form>
+
+{% endblock %}

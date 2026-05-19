@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    {% load static %}
+	<meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>DETAILS DES INFORMATIONS DE L'ECOLE</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="shortcut icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css'%}">
+    <link href="{% static 'fontawesomefree/css/all.min.css' %}" rel="stylesheet" type="text/css">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+    <script type="text/javascript" src="{% static 'scripts/bootstrap.min.js' %}"></script>
+    <script src="{% static 'fontawesomefree/js/all.min.js' %}"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+
+	<script src="{% static 'assets/plugins/jquery/jquery.min.js' %}"></script>
+    <style>
+
+        table {
+            white-space: nowrap;
+            width: 100%;
+        }
+
+        td {
+            border: 1px solid black;
+        }
+        td {
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        td.fit {
+            width: 0;
+            min-width: fit-content;
+        }
+
+        .marge-titre-tableau
+        {
+            margin-top: 80px;
+            margin-bottom: 2px;
+        }
+
+        .marge-entete-tableau
+        {
+            margin-top: 1px;
+        }
+
+    </style>
+</head>
+<body>
+
+ <div class="container-fluid">
+      <div class="table-responsive">
+            <h5 class="text-center marge-titre-tableau">INFORMATIONS DE L'ECOLE</h5>
+
+                <div class="form-group">
+                    <div class="text-right">
+                        <a href="{% url 'ajoutinfosecole' %}" class="btn btn-success btn-md marge-entete-tableau" target="_self" title="Cliquez ici pour ajouter les informations de l'ecole">Enregistrer votre école &nbsp;<i class="fa fa-solid fa-plus-circle"></i></a>
+                    </div>
+                </div>
+
+            <table id="infosecole" class="table table-striped table-bordered">
+                        <thead class="table-success">
+                            <tr>
+                                <th>Nom/Raison sociale</th>
+                                <th>IRE</th>
+                                <th>DCE/DPE</th>
+                                <th>DSEE</th>
+                                <th>Contact 1</th>
+                                <th>Contact 2</th>
+                                <th>N°agrement</th>
+                                <th>BP</th>
+                                <th>Email</th>
+                                <th>Site web</th>
+                                <th>Devise/Slogan</th>
+                                <th>DG</th>
+                                <th>Coordinateur Primaire</th>
+                                <th>Coordinateur Secondaire</th>
+                                <th>Comptable</th>
+                                <th>Logo</th>
+                                <th>Signature DG</th>
+                                <th>Signature DE</th>
+                                <th>ID</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                                {% for ec in ecole %}
+                                    <tr>
+                                        <td class="fit">{{ec.nom_ecole|upper}}</td>
+                                        <td class="fit">{{ec.ville_ecole}}</td>
+                                        <td class="fit">{{ec.prefect_commune}}</td>
+                                        <td class="fit">{{ec.dsee}}</td>
+                                        <td class="fit">{{ec.telephone1}}</td>
+                                        <td class="fit">{{ec.telephone2}}</td>
+                                        <td class="fit">{{ec.agrement_ecole}}</td>
+                                        <td class="fit">{{ec.bp_ecole}}</td>
+                                        <td class="fit">{{ec.email_ecole}}</td>
+                                        <td class="fit">{{ec.site_internet}}</td>
+                                        <td class="fit">{{ec.devise_ecole}}</td>
+                                        <td class="fit">{{ec.dg}}</td>
+                                        <td class="fit">{{ec.coordo_primaire}}</td>
+                                        <td class="fit">{{ec.coordo_secondaire}}</td>
+                                        <td class="fit">{{ec.comptable}}</td>
+
+                                        {% if ec.logo_ecole %}
+                                        <td class="fit"><img src="{{ec.logo_ecole.url}}" width="60px"></td>
+                                        {% else %}
+                                        <td class="fit">Logo non disponible</td>
+                                        {% endif %}
+
+                                        {% if ec.signa_dg %}
+                                        <td class="fit"><img src="{{ec.signa_dg.url}}" width="60px"></td>
+                                        {% else %}
+                                        <td class="fit">Signature non disponible</td>
+                                        {% endif %}
+
+                                        {% if ec.signa_de %}
+                                        <td class="fit"><img src="{{ec.signa_de.url}}" width="60px"></td>
+                                        {% else %}
+                                        <td class="fit">Signature non disponible</td>
+                                        {% endif %}
+
+                                        <td>{{ec.id}}</td>
+                                        <td class="fit">
+                                            <a class="btn btn-primary" href=" {% url 'afficherdetailsecole' ec.id %}" title="Voir/Afficher" target="_self"><i class="fa-solid fa-eye fa-sm"></i></a>
+                                            <a class="btn btn-info" href="{% url 'editioninfosecole' ec.id %}" title="Modifier/Editer" target="_self"><i class="fa-solid fa-edit fa-sm"></i></a>
+                                        </td>
+
+                                    </tr>
+
+                                {% endfor %}
+                        </tbody>
+                 </table>
+
+                    <div class="row">
+                        <div class="col-md-8">
+                                <nav aria-label="">
+                                    <ul class="pagination">
+
+                                        {% if ecole.has_previous %}
+
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page=1">1</a>
+                                        </li>
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ ecole.previous_page_number }}"><i class="fa-solid fa-backward fa-sm"></i>&nbsp; Précédent</a>
+                                        </li>
+
+                                        {% endif %}
+
+                                        <li class="page-item active" aria-current="page">
+                                            <a class="page-link" href="#">
+                                                Page {{ ecole.number }} sur {{ ecole.paginator.num_pages }}
+                                            </a>
+                                        </li>
+
+                                        {% if ecole.has_next %}
+
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ ecole.next_page_number }}"><i class="fa-solid fa-forward fa-sm"></i>&nbsp; Suivant</a>
+                                        </li>
+
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ ecole.paginator.num_pages }}"><i class="fa-solid fa-step-forward fa-sm"></i>&nbsp; Dernier</a>
+                                        </li>
+
+                                        {% endif %}
+
+                                    </ul>
+                                </nav>
+                        </div>
+                 </div>
+        </div>
+    </div>
+</body>
+</html>

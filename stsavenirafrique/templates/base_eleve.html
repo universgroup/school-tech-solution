@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block titre_page %} {% endblock titre_page %}</title>
+    <link rel="stylesheet" href="{% static 'css/inscription.css'%}">
+    <script src="{% static 'scripts/inscription.js' %}"></script>
+
+</head>
+<body>
+    <div class="container">                       
+        <!-- Tab Content -->
+        <div class="tab-content">
+
+            <!-- Tab 1: Informations Personnelles -->
+            <div id="infos_personnel" class="tab-pane active">
+                <div class="section-title">Informations Personnelles</div>
+                
+
+                {% block infos_eleve %}
+
+                {% endblock infos_eleve %}
+                
+            </div>
+
+            
+
+            <!-- Tab 2: Adresse Personnelle -->
+            <div id="adresse_personnelle" class="tab-pane">
+                <div class="section-title">Adresse Personnelle</div>
+                
+                {% block adresse_perso %}
+
+                {% endblock adresse_perso %}
+
+            </div>
+
+            
+
+            <!-- Tab 3: Inscription et Validation -->
+            <div id="inscription" class="tab-pane">
+                <div class="section-title">Inscription</div>
+                
+                {% block inscription_eleve %}
+                
+                {% endblock inscription_eleve %}
+                
+            </div>
+            
+
+        </div>
+    </div>
+
+    
+
+</body>
+</html>

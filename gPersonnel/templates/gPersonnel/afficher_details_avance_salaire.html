@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block titre_page %} EDITION D'UNE AVANCE SUR SALAIRE {% endblock %}
+{% block titre_cadre %}
+DETAILS D'UNE AVANCE SUR SALAIRE
+{% endblock %}
+
+{% block formulaire %}
+
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card m-b-30">
+            <form class="post-form" action="" method="POST">
+
+                {% csrf_token %}
+
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="card m-b-30">
+                            <label for="Idavsal">ID Avance</label>
+                            <input type="text" id="Idavsal" maxlength="10" value="{{avsal.id}}" class="form-control" readonly>
+                            
+                            <label for="id_intitule">Intitulé</label>
+                            <input type="text" name="intitule" id="id_intitule" maxlength="30"  value="{{avsal.intitule}}" class="form-control" readonly>
+
+                            <label for="id_mntavance">Montant Avance</label>
+                            <input type="text" name="montant_avance" id="id_mntavance" maxlength="30"  value="{{avsal.montant_avance|floatformat:'2g'}}" class="form-control" readonly>
+                                                     
+                            <label for="id_moisavance">Mois Avance</label>
+                            <input type="text" name="mois_avance" id="id_moisavance" maxlength="15"  value="{{avsal.mois_avance}}" class="form-control" readonly>
+                          
+                            <label for="id_dateavance">Date Avance</label>
+                            <input type="text" name="date_avance" id="id_dateavance" maxlength="10"  value="{{avsal.date_avance|date:'j-n-Y'}}" class="form-control" readonly>
+                            
+                            <label for="id_anneescolaire">Année Scolaire</label>
+                            <input type="text" name="annee_scolaire" id="id_type_pers" maxlength="15"  value="{{avsal.anscolaire}}" class="form-control" readonly>
+                            
+                            <label for="id_pers">Employé</label>
+                            <input type="text" name="idpersonnel" id="id_pers" maxlength="15"  value="{{avsal.idpersonnel}}" class="form-control" readonly>
+
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-6">
+                        <a href="/ajouteravancesalaire/" target="_self" class="btn btn-secondary"><span class="glyphicon glyphicon-arrow-left">Retour</span></a>
+                    </div>
+
+                </div>
+
+
+            </form>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

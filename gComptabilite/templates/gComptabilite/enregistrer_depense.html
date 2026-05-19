@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block titre_page %} GESTION DES DEPENSES {% endblock %}
+{% load crispy_forms_tags %}
+
+ {% block titre_cadre %}
+  DEPENSES JOURNALIERES
+ {% endblock %}
+
+ {% block formulaire %}
+
+  <form action="" method="POST" class="form-horizontal" enctype="multipart/form-data" autocomplete="on">
+
+                    {% csrf_token %}
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{form.anscolaire|as_crispy_field}}
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{form.type_operation|as_crispy_field}}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                {{form.libelle_operation|as_crispy_field}}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                {{form.categ_depense|as_crispy_field}}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{ form.qte|as_crispy_field }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{ form.pua|as_crispy_field }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{ form.provient|as_crispy_field }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{ form.destine|as_crispy_field }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                {{form.observ|as_crispy_field}}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                {{form.piece_jointe|as_crispy_field}}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-success btn-sm">Valider &nbsp;<i class="fa fa-check-circle"></i></button>
+                                <button type="reset" class="btn btn-warning btn-sm">Annuler &nbsp;<i class="fa fa-refresh"></i></button>
+                                <a href="{% url 'listedepense' %}" target="_self" class="btn btn-primary btn-sm">Situation globale dépenses &nbsp;<i class="fa fa-arrow-circle-left"></i></a>
+                            </div>
+                        </div>
+                    </div>
+  </form>
+
+ {% endblock %}
+
+{% block javascript %}
+
+{% endblock %}

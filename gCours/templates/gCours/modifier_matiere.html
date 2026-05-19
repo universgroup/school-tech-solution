@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block titre_page %} {% endblock %}
+{% block titre_cadre %}
+EDITION DES INFORMATIONS D'UNE MATIERE
+{% endblock %}
+
+{% block formulaire %}
+
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card m-b-30">
+            <form class="post-form" action="/modifiematiere/{{mat.id}}" method="POST">
+
+                {% csrf_token %}
+
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="card m-b-30">
+
+                            <label for="IDmatiere">ID Matière</label>
+                            <input type="text" id="IDmatiere" maxlength="10" value="{{mat.id}}" class="form-control" required readonly>
+
+                            <label for="id_nommatiere">Nom de la matière</label>
+                            <input type="text" name="nom_matiere" id="id_nommatiere" maxlength="50"  value="{{mat.nom_matiere}}" class="form-control" required>
+
+                            <label for="id_coeff">Coefficient</label>
+                            <input type="number" name="coeff" id="id_coeff" value="{{mat.coeff}}" class="form-control" required>
+
+                        </div>
+                    </div>
+
+                </div>
+
+
+
+                <div class="row">
+                    <div class="col-lg-6">
+                        <button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-pencil"></span>Modifier</button>
+                        <a href="/listematiere/" target="_self" class="btn btn-sm btn-secondary"><span class="glyphicon glyphicon-arrow-left"></span>Retour</a>
+                    </div>
+
+                </div>
+
+
+            </form>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

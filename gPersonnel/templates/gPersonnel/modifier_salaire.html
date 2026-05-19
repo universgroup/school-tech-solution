@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block titre_page %} EDITION DES SALAIRES {% endblock %}
+{% block titre_cadre %}
+EDITION DU SALAIRE D'UN EMPLOYE
+{% endblock %}
+
+{% block formulaire %}
+
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card m-b-30">
+            <form class="post-form" action="/modifiersalaire/{{sal.id}}" method="POST">
+
+                {% csrf_token %}
+
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="card m-b-30">
+
+                            <label for="IDsal">ID Salaire</label>
+                            <input type="text" id="IDsal" maxlength="10" value="{{sal.id}}" class="form-control" required readonly>
+
+                            <label for="id_nbre_heure">Nombre heure</label>
+                            <input type="number" name="nbre_heure" id="id_nbre_heure" maxlength="10"  value="{{sal.nbre_heure}}" class="form-control" required>
+
+                            <label for="id_taux_horaire">Taux horaire</label>
+                            <input type="number" name="taux_horaire" id="id_taux_horaire" maxlength="10"  value="{{sal.taux_horaire}}" class="form-control" required>
+
+                            <label for="id_mois_paie">Mois Payé</label>
+                            <input type="text" name="mois_paie" id="id_mois_paie" maxlength="10"  value="{{sal.mois_paie}}" class="form-control" required>
+
+                            <label for="id_detail_paie">Details paiement</label>
+                            <input type="text" name="detail_paiement" id="id_detail_paie" maxlength="50"  value="{{sal.detail_paiement}}" class="form-control" required>
+
+                            <label for="id_avance_paie">Montant des avances</label>
+                            <input type="number" name="avance_paie" id="id_avance_paie" maxlength="15"  value="{{sal.avance_paie}}" class="form-control" required>
+
+                            <label for="id_prime">Montant des primes</label>
+                            <input type="number" name="primes" id="id_prime" maxlength="15"  value="{{sal.primes}}" class="form-control" required>
+
+                            <label for="id_nb_hsupp">Nbre heure supp</label>
+                            <input type="text" name="nb_hsupp" id="id_nb_hsupp" maxlength="15"  value="{{sal.nb_hsupp}}" class="form-control" required>
+
+                            <label for="id_mnt_hsupp">Montant heure supp</label>
+                            <input type="text" name="mont_hsupp" id="id_mnt_hsupp" maxlength="15"  value="{{sal.mont_hsupp}}" class="form-control" required>
+
+
+                        </div>
+                    </div>
+
+                </div>
+
+
+
+                <div class="row">
+                    <div class="col-lg-6">
+                        <button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-pencil">Modifier</span></button>
+                        <a href="/ajoutersalaire/" target="_self" class="btn btn-secondary"><span class="glyphicon glyphicon-arrow-left">Retour</span></a>
+                    </div>
+
+                </div>
+
+
+            </form>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

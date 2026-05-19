@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+{% block titre_page %} MIS A JOUR {% endblock %}
+{% block titre_cadre %}
+EDITION DES INFORMATIONS DE L'ECOLE
+{% endblock %}
+
+{% block formulaire %}
+
+  <form class="form-horizontal" action="{% url 'modifieinfosecole' ecole.id %}" method="POST" enctype="multipart/form-data">
+
+                {% csrf_token %}
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="IDecole">ID</label>
+                            <input type="text" id="IDecole" value="{{ecole.id}}" class="form-control" maxlength="10" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                   <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="id_nom_ecole">Nom/Raison sociale</label>
+                            <input type="text" name="nom_ecole" id="id_nom_ecole" value="{{ecole.nom_ecole|upper}}" class="form-control" maxlength="100">
+                        </div>
+                   </div>
+                </div>
+                <div class="row">
+                   <div class="col-md-12">
+                       <div class="form-group">
+                            <label for="id_ville_ecole">IRE</label>
+                            <input type="text" name="ire" id="id_ville_ecole" value="{{ecole.ville_ecole}}" class="form-control" maxlength="40">
+                       </div>
+                   </div>
+                </div>
+                <div class="row">
+                   <div class="col-md-6">
+                       <div class="form-group">
+                            <label for="id_dce">DCE/DPE</label>
+                            <input type="text" name="dce" id="id_dce" value="{{ecole.prefect_commune}}" class="form-control" maxlength="40">
+                       </div>
+                   </div>
+                   <div class="col-md-6">
+                       <div class="form-group">
+                            <label for="id_dsee">DSEE</label>
+                            <input type="text" name="dsee" id="id_dsee" value="{{ecole.dsee}}" class="form-control" maxlength="40">
+                       </div>
+                   </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_tel1">Contact 1</label>
+                            <input type="tel" name="tel1" id="id_tel1" value="{{ecole.telephone1}}" class="form-control" pattern="^6(1|2|3|4|5|6)[0-9]{7}" min="600000000" max="699999999" title="Entrez un numéro de téléphone guinéen">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_tel2">Contact 2</label>
+                            <input type="tel" name="tel2" id="id_tel2" value="{{ecole.telephone2}}" class="form-control" pattern="^6(1|2|3|4|5|6)[0-9]{7}" min="600000000" max="699999999" title="Entrez un numéro de téléphone guinéen">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_agrement">N°agrement</label>
+                            <input type="text" name="num_agrement" id="id_agrement" value="{{ecole.agrement_ecole}}" class="form-control" maxlength="15">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_bp">BP</label>
+                            <input type="text" name="bp" id="id_bp" value="{{ecole.bp_ecole}}" class="form-control" maxlength="15">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                                <label for="id_mail">Email</label>
+                                <input type="email" name="email_ecole" id="id_mail" value="{{ecole.email_ecole}}" class="form-control" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" title="Entrez un email correct">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_site_web">Site web</label>
+                            <input type="url" name="site_web" id="id_site_web" value="{{ecole.site_internet}}" class="form-control" pattern="^(http(s)?:\/\/)+[\w\-\._~:\/?#[\]@!\$&'\(\)\*\+,;=.]+$" title="Entrez une URL correcte du site web">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="id_devise">Devise/Slogan</label>
+                            <input type="text" name="devise" id="id_devise" value="{{ecole.devise_ecole}}" class="form-control" maxlength="60">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_dg">Directeur général</label>
+                            <input type="text" name="dg" id="id_dg" value="{{ecole.dg}}" class="form-control" maxlength="35">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_coordo_primaire">Coordinateur Primaire</label>
+                            <input type="text" name="coordop" id="id_coordo_primaire" value="{{ecole.coordo_primaire}}" class="form-control" maxlength="50">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_coordo_second">Coordinateur Secondaire</label>
+                            <input type="text" name="coordos" id="id_coordo_second" value="{{ecole.coordo_secondaire}}" class="form-control" maxlength="50">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_comptable">Comptable</label>
+                            <input type="text" name="comptable" id="id_comptable" value="{{ecole.comptable}}" class="form-control" maxlength="50">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <div class="text-center">
+                                {% if ecole.logo_ecole %}
+                                <img src="{{ecole.logo_ecole.url}}" width="90px" title="Logo ecole" name="logo_old">
+                                {% endif %}
+                                <input type="file" accept="image/jpeg, image/png" name="logo_new">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <div class="text-left">
+                                {% if ecole.signa_dg %}
+                                <img src="{{ecole.signa_dg.url}}" width="90px" title="Signature du DG" name="signe_dg_old">
+                                {% endif %}
+                                <input type="file" accept="image/jpeg, image/png" name="signe_dg">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                           <div class="text-left"> 
+                                {% if ecole.signa_de %}
+                                <img src="{{ecole.signa_de.url}}" width="90px" title="Signature du DE" name="signe_de_old">
+                                {% endif %}
+                                <input type="file" accept="image/jpeg, image/png" name="signe_de">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-success btn-sm">Modifier &nbsp;<i class="fa fa-edit"></i></button>
+                            <a href="{% url 'listeinfos' %}" target="_self" class="btn btn-secondary btn-sm ">&nbsp; Retour <i class="fa fa-arrow-circle-left"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+  </form>
+
+{% endblock %}

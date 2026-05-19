@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+{% block titre_page %} PARAMETRAGE DES INFORMATIONS DE L'ECOLE {% endblock %}
+{% load crispy_forms_tags %}
+
+ {% block titre_cadre %}
+ENREGISTREMENT DES INFORMATIONS DE L'ECOLE
+ {% endblock %}
+
+
+ {% block formulaire %}
+
+    <form action="" method="POST" enctype="multipart/form-data" class="form-horizontal">
+
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                {{form.nom_ecole|as_crispy_field}}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{form.ville_ecole|as_crispy_field}}
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{form.prefect_commune|as_crispy_field}}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                {{form.dsee|as_crispy_field}}                                
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{form.telephone1|as_crispy_field}}
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{form.telephone2|as_crispy_field}}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{form.agrement_ecole|as_crispy_field}}
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{form.bp_ecole|as_crispy_field}}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{form.email_ecole|as_crispy_field}}
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{form.site_internet|as_crispy_field}}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                {{form.devise_ecole|as_crispy_field}}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                {{form.dg|as_crispy_field}}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{form.coordo_primaire|as_crispy_field}}
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{form.coordo_secondaire|as_crispy_field}}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                {{form.comptable|as_crispy_field}}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                {{form.logo_ecole|as_crispy_field}}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                {{form.signa_dg|as_crispy_field}}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                {{form.signa_de|as_crispy_field}}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="text-center">
+
+                                <button type="submit" class="btn btn-success btn-sm">Enregistrer &nbsp; <i class="fa fa-save"></i></button>
+                                <button type="reset" class="btn btn-warning btn-sm">Annuler &nbsp; <i class="fa fa-refresh"></i></button>
+                                <a href="{% url 'listeinfos' %}" class="btn btn-primary btn-sm" target="_self" title="Afficher les détails des informations de l'école">Retour &nbsp; <i class="fa fa-arrow-circle-right"></i></a>
+
+                            </div>
+                            
+                        </div>
+
+                    </div>
+
+    </form>
+
+{% endblock %}

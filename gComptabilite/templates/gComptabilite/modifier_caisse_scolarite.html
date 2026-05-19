@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block titre_page %} MIS A JOUR {% endblock %}
+{% block titre_cadre %}
+EDITION D'UNE LIGNE DE RECETTE
+{% endblock %}
+
+{% block formulaire %}
+
+   <form class="form-horizontal" action="{% url 'modifiecaisserecette' cais.id %}" method="POST">
+
+                {% csrf_token %}
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="IDcaisse">ID</label>
+                            <input type="text" id="IDcaisse" value="{{cais.id}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_categ">Catégorie recette</label>
+                            <input type="text" name="categorie" id="id_categ" value="{{cais.categ_depense}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_date_op">Date opération</label>
+                            <input type="text" name="date_operation" id="id_date_op" value="{{cais.date_operation|date:'j-n-Y'}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="id_libelle">Désignation</label>
+                            <input type="text" name="libelle_operation" id="id_libelle" value="{{cais.libelle_operation}}" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_type_op">Type opération</label>
+                            <input type="text" name="type_operation" id="id_type_op" value="{{cais.type_operation}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_montant">Montant encaissé</label>
+                            <input type="text" name="montant_encaisse" id="id_montant" value="{{cais.montant_encaisse|floatformat:'2g'}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="id_memo">Observation/Mémo</label>
+                            <input type="text" name="observ" id="id_memo" value="{{cais.observ}}" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="id_annee">Année Scolaire</label>
+                            <input type="text" name="anscolaire" id="id_annee" value="{{cais.anscolaire}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-success btn-sm">Modifier &nbsp;<i class="fa fa-edit"></i></button>
+                            <a href="{% url 'listerecette' %}" target="_self" class="btn btn-primary btn-sm">Retour &nbsp;<i class="fa fa-arrow-circle-left"></i></a>
+                        </div>
+                    </div>
+              </div>
+
+   </form>
+
+
+{% endblock %}

@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% block titre_page %} GESTION DU PERSONNEL {% endblock %}
+{% load crispy_forms_tags %}
+
+ {% block titre_cadre %}
+ENREGISTRER UN EMPLOYE
+ {% endblock %}
+ {% block formulaire %}
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="card m-b-30">
+                <form action="" method="POST">
+
+                    {% csrf_token %}
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{form.nom_personnel|as_crispy_field}}
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{form.prenom_personnel|as_crispy_field}}
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{form.civilite|as_crispy_field}}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{form.date_naissance|as_crispy_field}}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{form.niveau_etude|as_crispy_field}}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{form.type_personnel|as_crispy_field}}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{form.adresse_personnel|as_crispy_field}}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{form.contact_personnel|as_crispy_field}}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{form.fonction_personnel|as_crispy_field}}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{form.email_personnel|as_crispy_field}}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{form.sexe_personnel|as_crispy_field}}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{form.salbase|as_crispy_field}}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{form.annee_experience|as_crispy_field}}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{form.contrat_type|as_crispy_field}}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{form.diplome|as_crispy_field}}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{form.date_embauche|as_crispy_field}}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-success btn-lg"><span class="glyphicon glyphicon-plus"></span>Enregistrer</button>
+                                <button type="reset" class="btn btn-warning btn-lg"><span class="glyphicon glyphicon-refresh"></span>Annuler</button>
+                                <a href="/listegeneralepersonnel/" target="_blank" class="btn btn-secondary btn-lg"><span class="glyphicon glyphicon-arrow-right"></span>Liste Générale Personnel</a>
+                           </div>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+
+        </div>
+    </div>
+
+ {% endblock %}

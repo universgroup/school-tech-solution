@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block titre_page %} CONSULTATION {% endblock %}
+{% block titre_cadre %}
+DETAILS DES INFORMATIONS D'UNE CLASSE
+{% endblock %}
+
+{% block formulaire %}
+
+    <form class="form-horizontal" action="" method="POST">
+
+                {% csrf_token %}
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="IDclasse">ID Classe</label>
+                            <input type="text" id="IDclasse" maxlength="10" value="{{clas.id}}" class="form-control" readonly>
+                        </div>
+                     </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="id_nomclasse">Nom de la classe</label>
+                            <input type="text" name="nom_classe" id="id_nomclasse" maxlength="20"  value="{{clas.nom_classe}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_frais_inscrip">Frais inscription</label>
+                            <input type="text" name="frais_inscription" id="id_frais_inscrip" value="{{clas.frais_inscription|floatformat:'2g'}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_frais_reinscrip">Frais reinscription</label>
+                            <input type="text" name="frais_reinscription" id="id_frais_reinscrip" value="{{clas.frais_reinscription|floatformat:'2g'}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="id_tranche1">Mensualité</label>
+                            <input type="text" name="tranche1" id="id_tranche1" value="{{clas.tranche1|floatformat:'2g'}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="text-center">
+                            <a href="{% url 'listeclasse' %}" target="_self" class="btn btn-sm btn-secondary">Retour &nbsp;<i class="fa fa-arrow-circle-left"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+    </form>
+
+{% endblock %}

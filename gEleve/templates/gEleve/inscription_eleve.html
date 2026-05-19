@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block titre_page %} GESTION DES INSCRIPTIONS {% endblock %}
+
+{% block titre_cadre %}
+INSCRIPTION DES ELEVES
+{% endblock %}
+
+ {% block formulaire %}
+
+   <form  action="" method="POST"  enctype="multipart/form-data">
+
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{form.nom|as_crispy_field}}
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{form.prenom|as_crispy_field}}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                {{form.sexe_eleve|as_crispy_field}}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{form.pere|as_crispy_field}}
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{form.mere|as_crispy_field}}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{form.tuteur|as_crispy_field}}
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{form.contact_parent|as_crispy_field}}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                {{form.email_parent|as_crispy_field}}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{form.adresse|as_crispy_field}}
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{form.ecole_origine|as_crispy_field}}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                {{form.photo_eleve|as_crispy_field}}
+                            </div>
+                        </div>
+                   </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{form.datenaissance|as_crispy_field}}
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{form.lieu_naissance|as_crispy_field}}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{form.date_arrivee|as_crispy_field}}
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{form.pays_naissance|as_crispy_field}}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="text-center">
+
+                                <button type="submit" class="btn btn-success btn-sm" title="Aller à la page suivante pour terminer l'inscription">Suivant &nbsp;<i class="fa fa-circle-check"></i></button>
+                                <button type="reset" class="btn btn-warning btn-sm">Annuler &nbsp; <i class="fa fa-refresh"></i></button>
+
+                            </div>
+                        </div>
+
+                    </div>
+
+   </form>
+
+{% endblock %}
+

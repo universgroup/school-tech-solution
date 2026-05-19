@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block titre_page %} EDITION DES INFORMATIONS D'UN EMPLOYE {% endblock %}
+{% block titre_cadre %}
+DETAILS DES INFOS D'UN PERSONNEL
+{% endblock %}
+
+{% block formulaire %}
+
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card m-b-30">
+            <form class="post-form" action="" method="GET">
+
+                {% csrf_token %}
+
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="card m-b-30">
+                            <label for="IDperso">ID Personnel</label>
+                            <input type="text" id="IDperso" maxlength="10" value="{{pers.id}}" class="form-control" required readonly>
+
+                            <label for="id_nompers">Nom famille</label>
+                            <input type="text" name="nom_personnel" id="id_nompers" maxlength="15"  value="{{pers.nom_personnel}}" class="form-control" required readonly>
+
+                            <label for="id_prenompers">Prénom(s) personnel</label>
+                            <input type="text" name="prenom_personnel" id="id_prenompers" maxlength="30"  value="{{pers.prenom_personnel}}" class="form-control" required readonly>
+
+                            <label for="id_civilite">Civilité</label>
+                            <input type="text" name="civilite" id="id_civilite" maxlength="15"  value="{{pers.civilite}}" class="form-control" required readonly>
+
+                            <label for="id_date_naissance">Date naissance</label>
+                            <input type="text" name="date_naissance" id="id_date_naissance" maxlength="10"  value="{{pers.date_naissance|date:'j-n-Y'}}" class="form-control" required readonly>
+
+                            <label for="id_niveau_etude">Niveau étude</label>
+                            <input type="text" name="niveau_etude" id="id_niveau_etude" maxlength="15"  value="{{pers.niveau_etude}}" class="form-control" required readonly>
+
+                            <label for="id_type_pers">Type Personnel</label>
+                            <input type="text" name="type_personnel" id="id_type_pers" maxlength="15"  value="{{pers.type_personnel}}" class="form-control" required readonly>
+
+                            <label for="id_adrpers">Adresse</label>
+                            <input type="text" name="adresse_personnel" id="id_adrpers" maxlength="15"  value="{{pers.adresse_personnel}}" class="form-control" required readonly>
+
+                            <label for="id_contactpers">Contact</label>
+                            <input type="text" name="contact_personnel" id="id_contactpers" maxlength="15"  value="{{pers.contact_personnel}}" class="form-control" required readonly>
+
+                            <label for="id_fonctpers">Fonction</label>
+                            <input type="text" name="fonction_personnel" id="id_fonctpers" maxlength="25"  value="{{pers.fonction_personnel}}" class="form-control" required readonly>
+
+                            <label for="id_emailpers">Email</label>
+                            <input type="text" name="email_personnel" id="id_emailpers" maxlength="25"  value="{{pers.email_personnel}}" class="form-control" required readonly>
+
+                            <label for="id_sexe">Genre</label>
+                            <input type="text" name="sexe_personnel" id="id_sexe" maxlength="15"  value="{{pers.sexe_personnel}}" class="form-control" required readonly>
+
+                            <label for="id_salbaspers">Salaire base</label>
+                            <input type="text" name="salaire_base" id="id_salbaspers" maxlength="15"  value="{{pers.salbase|floatformat:'2g'}}" class="form-control" required readonly>
+
+                            <label for="id_anne_exp">Année experience</label>
+                            <input type="text" name="annee_experience" id="id_anne_exp" maxlength="15"  value="{{pers.annee_experience}}" class="form-control" required readonly>
+
+                            <label for="id_type_contrat">Type Contrat</label>
+                            <input type="text" name="type_contrat" id="id_type_contrat" maxlength="15"  value="{{pers.contrat_type}}" class="form-control" required readonly>
+
+                            <label for="id_diplome">Diplôme obtenu</label>
+                            <input type="text" name="diplome_personnel" id="id_diplome" maxlength="20"  value="{{pers.diplome}}" class="form-control" required readonly>
+
+                            <label for="id_date_emb">Date embauche</label>
+                            <input type="text" name="date_embauche" id="id_date_emb" maxlength="15"  value="{{pers.date_embauche|date:'j-n-Y'}}" class="form-control" required readonly>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-6">
+                        <a href="/listegeneralepersonnel/" target="_self" class="btn btn-secondary"><span class="glyphicon glyphicon-arrow-left">Retour</span></a>
+                    </div>
+
+                </div>
+
+
+            </form>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

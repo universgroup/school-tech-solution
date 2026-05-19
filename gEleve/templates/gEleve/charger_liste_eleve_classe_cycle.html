@@ -1,0 +1,4 @@
+<option value="" selected>Selectionnez</option>
+{% for ele in eleve %}
+<option value="{{ele.mateleve}}">{{ele.mateleve.nom}} | {{ele.mateleve.prenom}} | {{ele.mateleve.contact_parent}}</option>
+{% endfor %}

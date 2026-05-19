@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    {% load static %}
+	<meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>SITUATION GLOBALE DES INSCRITS DE L'ANNEE SCOLAIRE COURANTE</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="shortcut icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css'%}">
+    <link href="{% static 'fontawesomefree/css/all.min.css' %}" rel="stylesheet" type="text/css">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+    <script type="text/javascript" src="{% static 'scripts/bootstrap.min.js' %}"></script>
+    <script src="{% static 'fontawesomefree/js/all.min.js' %}"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+
+
+    <!-- Reférences vers les élements de menu principal haut et de la barre latérale gauche -->
+
+	<script src="{% static 'assets/plugins/jquery/jquery.min.js' %}"></script>
+    <style>
+
+        .form-center
+        {
+            width: 400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: start;
+            min-height: 100vh;
+        }
+        form{
+            width: 100%;
+        }
+
+        table {
+            white-space: nowrap;
+            width: 100%;
+        }
+
+        td {
+            border: 1px solid black;
+        }
+        td {
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        td.fit {
+            width: 0;
+            min-width: fit-content;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="form-center">
+        <div class="shadow p-4 mb-4 bg-body rounded">
+
+            <form action="{% url 'filtrerlisteinscrits' %}" method="GET" id="flisteinscrits" data-classe-url="{% url 'chargerlisteclasse' %}">
+
+                            {% csrf_token %}
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                      <label for="cboannee">Année scolaire</label>
+                                      <select class="form-control" name="annee_scolaire" id="cboannee">
+                                          <option value="" selected>Selectionnez</option>
+                                          {% for an in ans %}
+                                            <option value="{{an.annee_scolaire.id}}">{{an.annee_scolaire.descript_annee}}</option>
+                                          {% endfor %}
+                                      </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="cbocycle">Cycle</label>
+                                    <select class="form-control" name="cycle" id="cbocycle">
+                                          <option value="" selected>Selectionnez</option>
+                                          {% for cl in cycles %}
+                                            <option value="{{cl.id}}">{{cl.cycle}}</option>
+                                          {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="cboclasse">Classe</label>
+                                    <select class="form-control" name="id_classe" id="cboclasse">
+
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="text-center">
+                                    <button type="submit" id="btn_rechercher" class="btn btn-primary btn-sm">Rechercher &nbsp;<i class="fa fa-search"></i></button>
+                                    <a href="{% url  'chargeranneecourante' %}" target="_self" class="btn btn-warning btn-sm">Actualiser &nbsp;<i class="fa fa-refresh"></i></a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                          <div class="col-md-12">
+                              <div class="form-group">
+                                  <label for="efftotal">Effectif total</label>
+                                  {% if effectif_total %}
+                                  <input type="text" id="efftotal" name="effectif_total" value="{{ effectif_total }}" maxlength="25" class="form-control" readonly style="color:red;">
+                                  {% else %}
+                                  <input type="text" name="effectif_total" value="0" maxlength="25" class="form-control" readonly style="color:red;">
+                                  {% endif %}
+                              </div>
+                          </div>
+                       </div>
+
+                      <div class="row">
+                        <div class="col-md-6">
+                              <div class="form-group">
+                                  <label for="effgarcons">Effectif total garçons</label>
+                                  {% if effectif_total_garcons %}
+                                  <input type="text" id="effgarcons" name="effectif_total_garcons" value="{{ effectif_total_garcons }}" maxlength="25" class="form-control" readonly style="color:red">
+                                  {% else %}
+                                  <input type="text" name="effectif_total_garcons" value="0" maxlength="25" class="form-control" readonly style="color:red">
+                                  {% endif %}
+                              </div>
+                        </div>
+
+                        <div class="col-md-6">
+                              <div class="form-group">
+                                  <label for="eff_filles">Effectif total filles</label>
+                                  {% if effectif_total_filles %}
+                                  <input type="text" id="eff_filles" name="effectif_total_filles" value="{{ effectif_total_filles }}" maxlength="25" class="form-control" readonly style="color:red">
+                                  {% else %}
+                                  <input type="text" name="effectif_total_filles" value="0" maxlength="25" class="form-control" readonly style="color:red">
+                                  {% endif %}
+                              </div>
+                        </div>
+                     </div>
+            </form>
+        </div>
+    </div>
+    <br>
+
+    <div class="container-fluid">
+        <div class="table-responsive">
+
+                {% if listeinscrits %}
+                     <table id="listeinscritsannee" class="table table-bordered table-striped">
+                         <thead class="table-success">
+                                  <tr>
+                                      <th>Statut</th>
+                                      <th>Regime</th>
+                                      <th>Matricule</th>
+                                      <th>Nom Famille</th>
+                                      <th>Prénom(s)</th>
+                                      <th>Sexe</th>
+                                      <th>Prénom(s) Père</th>
+                                      <th>Nom et Prénom(s) Mère</th>
+                                      <th>Nom et Prénom(s) Tuteur</th>
+                                      <th>Contact tuteur</th>
+                                      <th>Adresse</th>
+                                      <th>Ecole d'origine</th>
+                                      <th>Photo ID</th>
+                                      <th>Date naissance</th>
+                                      <th>Lieu naissance</th>
+                                      <th>Date entrée</th>
+                                      <th>Pays naissance</th>
+                                      <th>Classe</th>
+                                      <th>Cycle</th>
+                                      <th>Année scolaire</th>
+                                      <th>Date inscription</th>
+                                      <th>ID Inscription</th>
+                                      <th>Actions</th>
+                                  </tr>
+                         </thead>
+                          <tbody>
+                                      {% for le in listeinscrits %}
+                                          <tr>
+                                              <td class="fit">{{le.etat_inscription}}</td>
+                                              <td class="fit">{{le.regime_coran}}</td>
+                                              <td class="fit">{{le.mateleve}}</td>
+                                              <td class="fit">{{le.mateleve.nom|upper}}</td>
+                                              <td class="fit">{{le.mateleve.prenom}}</td>
+                                              <td class="fit">{{le.mateleve.sexe_eleve}}</td>
+                                              <td class="fit">{{le.mateleve.pere}}</td>
+                                              <td class="fit">{{le.mateleve.mere}}</td>
+                                              <td class="fit">{{le.mateleve.tuteur}}</td>
+                                              <td class="fit">{{le.mateleve.contact_parent}}</td>
+                                              <td class="fit">{{le.mateleve.adresse}}</td>
+                                              <td class="fit">{{le.mateleve.ecole_origine}}</td>
+
+                                              {% if le.mateleve.photo_eleve %}
+                                              <td class="fit">
+                                                    <a href="{{ le.mateleve.photo_eleve.url }}" target="_blank" title="Agrandir la photo de l'élève">
+                                                        <img src="{{le.mateleve.photo_eleve.url}}" width="40px">
+                                                    </a>
+                                              </td>
+                                              {% else %}
+                                              <td>Photo indisponible</td>
+                                              {% endif %}
+
+                                              <td class="fit">{{le.mateleve.datenaissance|date:'j-n-Y'}}</td>
+                                              <td class="fit">{{le.mateleve.lieu_naissance}}</td>
+                                              <td class="fit">{{le.mateleve.date_arrivee|date:'j-n-Y'}}</td>
+                                              <td class="fit">{{le.mateleve.pays_naissance}}</td>
+                                              <td class="fit">{{le.idclasse}}</td>
+                                              <td class="fit">{{le.idcycle}}</td>
+                                              <td class="fit">{{le.annee_scolaire}}</td>
+                                              <td class="fit">{{le.date_inscription|date:'j-n-Y'}}</td>
+                                              <td class="fit">{{le.id}}</td>
+                                              <td class="fit">
+                                                  <a class="btn btn-primary" href="{% url 'afficherdetailsinscription' le.id %}" title="Voir/Afficher"><i class="fa fa-eye fa-sm"></i></a>
+                                                  <a class="btn btn-info" href="{% url 'editioninscription' le.id %}" title="Modifier/Editer"><i class="fa fa-edit fa-sm"></i></a>
+                                                  <a class="btn btn-danger" href=" {% url 'suppinscription' le.id %}" title="Supprimer"><i class="fa fa-remove fa-sm"></i></a>
+                                                  <a class="btn btn-secondary" target="_blank" href="{% url 'imprimerecuinscription' le.id %}" title="Imprimer le recu d'inscription"><i class="fa fa-print fa-sm"></i></a>
+                                              </td>
+
+                                          </tr>
+
+                                      {% endfor %}
+                          </tbody>
+                     </table>
+
+                    <div class="row">
+                            <div class="col-md-8">
+                                    <nav aria-label="">
+                                        <ul class="pagination">
+
+                                            {% if listeinscrits.has_previous %}
+
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page=1">1</a>
+                                            </li>
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page={{ listeinscrits.previous_page_number }}"><i class="fa-solid fa-backward fa-sm"></i>&nbsp; Précédent</a>
+                                            </li>
+
+                                            {% endif %}
+
+                                            <li class="page-item active" aria-current="page">
+                                                <a class="page-link" href="#">
+                                                    Page {{ listeinscrits.number }} sur {{ listeinscrits.paginator.num_pages }}
+                                                </a>
+                                            </li>
+
+                                            {% if listeinscrits.has_next %}
+
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page={{ listeinscrits.next_page_number }}"><i class="fa-solid fa-forward fa-sm"></i>&nbsp; Suivant</a>
+                                            </li>
+
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page={{ listeinscrits.paginator.num_pages }}"><i class="fa-solid fa-step-forward fa-sm"></i>&nbsp; Dernier</a>
+                                            </li>
+
+                                            {% endif %}
+
+                                        </ul>
+                                   </nav>
+                           </div>
+                    </div>
+
+                {% endif %}
+            </div>
+    </div>
+
+</body>
+</html>
+
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+ <script>
+    // Cette fonction javascript (JQuery) m'a permis de filtrer les classes selon le cycle choisi
+    $("#cbocycle").change(function(){
+        var url = $("#flisteinscrits").attr("data-classe-url");
+        var idcycle = $(this).val();
+
+        $.ajax({
+            url:url,
+            data:{
+                'idcycle':idcycle
+            },
+            success:function(data){
+                $("#cboclasse").html(data);
+            }
+
+
+        });
+    });
+
+    // Cette fonction javascript (JQuery) m'a permis de masquer le tableau d'affichage au chargement de la page
+    $("window").on("load",function(){
+        $('#listeinscritsannee').hide();
+    });
+
+    // Cette fonction me permet d'afficher le tableau d'affichage auparavant masqué lors du chargement
+  $("#btn_rechercher").click(function(){
+    $('#listeinscritsannee').show();
+  });
+
+ </script>
+
+
+

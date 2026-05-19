@@ -1,0 +1,12 @@
+asgiref==3.11.1
+charset-normalizer==3.4.4
+Django==6.0.2
+django-adminlte3==0.1.6
+django-crispy-forms==1.12.0
+fontawesomefree==6.6.0
+pillow==12.1.1
+postgres==4.0
+psycopg2-binary==2.9.11
+psycopg2-pool==1.2
+reportlab==4.4.10
+sqlparse==0.5.5

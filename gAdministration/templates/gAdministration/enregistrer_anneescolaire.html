@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block titre_page %} GESTION DES ANNEES SCOLAIRES {% endblock %}
+{% load crispy_forms_tags %}
+
+ {% block titre_cadre %}
+AJOUT DE L'ANNEE SCOLAIRE
+ {% endblock %}
+ {% block formulaire %}
+
+     <form action="" method="POST" class="form-horizontal">
+
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        {{form|crispy}}
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="text-center">
+                            <button type="submit" class="btn btn-success btn-sm">Ajouter &nbsp;<i class="fa fa-add"></i></button>
+                            <button type="reset" class="btn btn-warning btn-sm">Annuler &nbsp;<i class="fa fa-refresh"></i></button>
+                            <a href="{% url 'listeanneescolaire' %}" class="btn btn-primary btn-sm" title="Afficher/Voir la liste" target="_self">Retour &nbsp;<i class="fa fa-arrow-circle-right"></i></a>
+                    </div>
+                </div>
+            </div>
+     </form>
+{% endblock %}

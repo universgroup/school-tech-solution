@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block titre_page %} CONSULTATION {% endblock %}
+{% block titre_cadre %}
+DETAILS D'UNE LIGNE DE DEPENSE
+{% endblock %}
+
+{% block formulaire %}
+
+   <form class="form-horizontal" action="" method="POST">
+
+                {% csrf_token %}
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="IDcaisse">ID</label>
+                            <input type="text" id="IDcaisse" value="{{depense.id}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_categ">Catégorie dépense</label>
+                            <input type="text" name="categorie" id="id_categ" value="{{depense.categ_depense}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_date_op">Date opération</label>
+                            <input type="text" name="date_operation" id="id_date_op" value="{{depense.date_operation|date:'j-n-Y'}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="id_libelle">Désignation</label>
+                            <input type="text" name="libelle_operation" id="id_libelle" value="{{depense.libelle_operation}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_qte">Quantité</label>
+                            <input type="number" name="qte_depense" id="id_qte" value="{{depense.qte}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_pua">Prix unitaire</label>
+                            <input type="number" name="prix_unitaire" id="id_pua" value="{{depense.pua}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_provenance">Provient de</label>
+                            <input type="text" name="provient" id="id_provenance" value="{{depense.provient}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_destination">Destiné à </label>
+                            <input type="text" name="destine" id="id_destination" value="{{depense.destine}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_type_op">Type opération</label>
+                            <input type="text" name="type_operation" id="id_type_op" value="{{depense.type_operation}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_montant">Montant encaissé</label>
+                            <input type="text" name="montant_encaisse" id="id_montant" value="{{depense.montant_encaisse|floatformat:'2g'}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="id_memo">Observation/Mémo</label>
+                            <input type="text" name="observ" id="id_memo" value="{{depense.observ}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="id_annee">Année Scolaire</label>
+                            <input type="text" name="anscolaire" id="id_annee" value="{{depense.anscolaire}}" class="form-control" readonly>
+                      </div>
+                    </div>
+                </div>
+       
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="text-center">
+                            {% if depense.piece_jointe %}
+                            <img src="{{ depense.piece_jointe.url }}" width="80px" height="80px">
+                            {% else %}
+                            <label>Pièce indisponible</label>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="text-center">
+                            <a href="{% url 'listedepense' %}" target="_self" class="btn btn-primary btn-sm">Retour &nbsp;<i class="fa fa-arrow-circle-left"></i></a>
+                        </div>
+                    </div>
+              </div>
+
+   </form>
+
+{% endblock %}

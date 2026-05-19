@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block titre_page %} {% endblock %}
+{% load crispy_forms_tags %}
+
+ {% block titre_cadre %}
+AJOUT DES MATIERES
+ {% endblock %}
+ {% block formulaire %}
+    <div class="row mb-3">
+        <div class="col-lg-6">
+            <div class="card m-b-30">
+                <form action="" method="POST">
+
+                    {% csrf_token %}
+                    {{form|crispy}}
+
+                    <div class="row">
+                        <div class="col-lg-10">
+                            <button type="submit" class="btn btn-success waves-effect waves-light"><span class="glyphicon glyphicon-ok"></span>Enregistrer</button>
+                            <button type="reset" class="btn btn-warning waves-effect waves-light"><span class="glyphicon glyphicon-refresh"></span>Annuler</button>
+                            <a href="/listematiere/" target="_blank" class="btn btn-secondary waves-effect waves-light"><span class="glyphicon glyphicon-arrow-right"></span>Liste des Matières</a>
+                        </div>
+
+                    </div>
+
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+ {% endblock %}

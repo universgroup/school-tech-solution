@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block titre_page %} GESTION DES REINSCRIPTIONS {% endblock %}
+
+ {% block titre_cadre %}
+REINSCRIPTION DES ELEVES
+ {% endblock %}
+
+ 
+ {% block formulaire %}
+
+     <form action="{% url 'validerreinscription' %}" method="POST" id="finscription" data-classe-url="{% url 'chargerlisteclasse' %}" data-eleve-classe-url="{% url 'chargerlisteeleveclasse' %}">
+
+                    {% csrf_token %}
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                              <label for="cboanneold">Année scolaire antérieure<strong style="color:red">*</strong></label>
+                              <select class="form-control" name="annee_scolaire" id="cboanneold">
+                                  <option value="" selected>Selectionnez</option>
+                                  {% for an in ans %}
+                                    <option value="{{an.annee_scolaire.id}}">{{an.annee_scolaire.descript_annee}}</option>
+                                  {% endfor %}
+                              </select>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="row">
+                        <div class="col-md-6">
+                          <div class="form-group">
+                              <label for="cbocycle">Cycle<strong style="color:red">*</strong></label>
+                              <select class="form-control" name="cycle" id="cbocycle">
+                                  <option value="" selected>Selectionnez</option>
+                                  {% for cl in cycles %}
+                                    <option value="{{cl.id}}">{{cl.cycle}}</option>
+                                  {% endfor %}
+                              </select>
+                          </div>
+                        </div>
+
+                        <div class="col-md-6">
+                          <div class="form-group">
+                              <label for="cboclassepasse">Classe antérieure<strong style="color:red">*</strong></label>
+                              <select class="form-control" name="id_classe_old" id="cboclassepasse">
+
+                              </select>
+                          </div>
+                        </div>
+
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                  <label for="cbomateleve">Elève<strong style="color:red">*</strong></label>
+                                  <select class="form-control" name="matricule" id="cbomateleve">
+
+                                  </select>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="row">
+                        <div class="col-md-6">
+                           <div class="form-group">
+                                  <label for="cboannenew">Année scolaire courante<strong style="color:red">*</strong></label>
+                                  <select class="form-control" name="annee_scolaire_new" id="cboannenew">
+                                      <option value="" selected>Selectionnez</option>
+                                      {% for an in ane %}
+                                        <option value="{{an.id}}">{{an.descript_annee}}</option>
+                                      {% endfor %}
+                                  </select>
+                           </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="cboclassenew">Classe supérieure<strong style="color:red">*</strong></label>
+                                <select class="form-control" name="id_classe_new" id="cboclassenew">
+                                    <option value="" selected>Selectionnez</option>
+                                      {% for cla in clas %}
+                                        <option value="{{cla.id}}">{{cla.nom_classe}}</option>
+                                      {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <br>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-success btn-sm">Valider &nbsp;<i class="fa fa-circle-check"></i></button>
+                                <button type="reset" class="btn btn-warning btn-sm">Annuler &nbsp;<i class="fa fa-refresh"></i></button>
+                                <a href="{% url 'reinscriptioneleve' %}" target="_blank" class="btn btn-secondary btn-sm">Liste Elèves Reinscrits &nbsp;<i class="fa fa-circle-arrow-right"></i></a>
+                           </div>
+                        </div>
+                    </div>
+
+     </form>
+
+ {% endblock %}
+
+
+ {% block javascript %}
+ 
+ <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+ <script>
+    // Cette fonction javascript (JQuery) m'a permis de filtrer les classes selon le cycle choisi
+    $("#cbocycle").change(function(){
+        var url = $("#finscription").attr("data-classe-url");
+        var idcycle = $(this).val();
+
+        $.ajax({
+            url:url,
+            data:{
+                'idcycle':idcycle
+            },
+            success:function(data){
+                $("#cboclassepasse").html(data);
+            }
+
+
+        });
+    });
+    
+
+ </script>
+
+
+<script>
+
+    // Cette fonction javascript (JQuery) m'a permis de filtrer les eleves selon la classe et l'annee scolaire choisies
+    $("#cboclassepasse").change(function(){
+        var url = $("#finscription").attr("data-eleve-classe-url");
+        var id_annee = $('#cboanneold').val(); // Je recupère ici la valeur (ID) de l'année scolaire
+        var idclasse = $(this).val(); // Je recupère ici la valeur (ID) de la classe selectionnée
+
+        $.ajax({
+            url:url,
+            data:{
+                'anneesco':id_annee,
+                'id_classe':idclasse
+                },
+            success:function(data){
+                $("#cbomateleve").html(data);
+            }
+
+
+        });
+      
+    });
+
+</script>
+
+{% endblock %}
