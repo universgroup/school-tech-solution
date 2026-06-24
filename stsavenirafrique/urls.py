@@ -31,4 +31,4 @@ urlpatterns = [
                   path('personnel/', include('gPersonnel.urls'), name='personnel'),
                   # path('utilisateurs/', include('gUsers.urls'), name='utilisateurs')
 
-              ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+              ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -81,14 +81,16 @@ def enregistrerclasse(request):
                 id=c)  # Je fais une requete sur la table CycleScolaire pour recuperer l'ID Cycle concerné
             fi = Decimal(request.POST['frais_inscription'])
             fr = Decimal(request.POST['frais_reinscription'])
-            mens = Decimal(request.POST['tranche1'])
-            fs = Decimal(mens * 9)
+            tr1 = Decimal(request.POST['tranche1'])
+            tr2 = Decimal(request.POST['tranche2'])
+            fs = Decimal(tr1 + tr2) # La scolarité est la somme des deux tranches
+
             existeclasse = Classe.objects.filter(
                 nom_classe__exact=nc)  # Ici je cherche à gerer les doublons dans la saisie des noms de classe
             if existeclasse.exists():
                 messages.error(request, 'Cette classe existe déjà')
             else:
-                cls = Classe(nom_classe=nc, idcycle=cy, frais_inscription=fi, frais_reinscription=fr, tranche1=mens,
+                cls = Classe(nom_classe=nc, idcycle=cy, frais_inscription=fi, frais_reinscription=fr, tranche1=tr1, tranche2=tr2,
                              frais_scolarite=fs)
                 cls.save()
                 formclasse = FormClasse()  # je vide ensuite le formulaire

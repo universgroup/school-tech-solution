@@ -21,12 +21,13 @@ class FormClasse(ModelForm):
     class Meta:
         model = Classe
         fields = (
-            'nom_classe', 'frais_inscription', 'frais_reinscription', 'tranche1', 'idcycle')
+            'nom_classe', 'frais_inscription', 'frais_reinscription', 'tranche1','tranche2','idcycle')
         labels = {
             'nom_classe': 'Nom classe',
             'frais_inscription': 'Frais inscription',
             'frais_reinscription': 'Frais reinscription',
-            'tranche1': 'Mensualité',
+            'tranche1': 'Première tranche',
+            'tranche2':'Deuxième tranche',
             'idcycle': 'Cycle'
         }
 
@@ -38,8 +39,9 @@ class FormClasse(ModelForm):
             'frais_reinscription': forms.NumberInput(
                 attrs={'class': 'form-control', 'placeholder': 'Frais reinscription',
                        'title': 'Saisissez le frais de réinscription'}),
-            'tranche1': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Mensualité',
-                                                 'title': 'Saisissez le montant de la mensualité'}),
+            'tranche1': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Tranche 1',
+                                                 'title': 'Saisissez le montant de la première tranche'}),
+            'tranche2': forms.NumberInput(attrs={'class':'form-control','placeholder':'Tranche 2','title':'Saisissez le montant de la deuxième tranche'}),
             'idcycle': forms.Select(attrs={'class': 'form-control', 'selected': 'Selectionnez',
                                            'title': 'Sélectionnez le cycle associé à la classe'})
         }

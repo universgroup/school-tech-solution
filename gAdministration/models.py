@@ -38,8 +38,8 @@ class Classe(models.Model):
     frais_reinscription = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     frais_scolarite = models.DecimalField(max_digits=20, decimal_places=2, default=0)
     tranche1 = models.DecimalField(max_digits=15, decimal_places=2, default=0)
-    tranche2 = models.DecimalField(max_digits=10, decimal_places=2, null=True, default=0)
-    tranche3 = models.DecimalField(max_digits=10, decimal_places=2, null=True, default=0)
+    tranche2 = models.DecimalField(max_digits=15, decimal_places=2, null=True, default=0)
+    tranche3 = models.DecimalField(max_digits=15, decimal_places=2, null=True, default=0)
     idcycle = models.ForeignKey(CycleScolaire, on_delete=models.CASCADE)
 
     def __str__(self):

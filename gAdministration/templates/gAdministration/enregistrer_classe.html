@@ -2,62 +2,48 @@
 {% block titre_page %} GESTION DES CLASSES {% endblock %}
 {% load crispy_forms_tags %}
 
+{% block titre_formulaire %} PARAMETRAGES DES FRAIS DE SCOLARITE {% endblock %}
+
  {% block titre_cadre %}
-ENREGISTREMENT DES CLASSES
+Enregistrement des classes
  {% endblock %}
 
  {% block formulaire %}
 
-     <form action="" method="POST" class="form-horizontal">
+    <form action="" method="post" class="needs-validation" novalidate>
 
                     {% csrf_token %}
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            {{form.nom_classe|as_crispy_field}}
-                        </div>
-                    </div>
-                </div>
 
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            {{form.frais_inscription|as_crispy_field}}
+                    <div class="card-body">
+                     <div class="row g-3">
+                        <div class="col-md-6">
+                          {{form.nom_classe|as_crispy_field}}
                         </div>
+                        <div class="col-md-6">
+                          {{form.frais_inscription|as_crispy_field}}
+                        </div>
+                        <div class="col-md-6">
+                          <div class="input-group has-validation">
+                            {{form.frais_reinscription|as_crispy_field}}
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                          {{form.tranche1|as_crispy_field}}
+                        </div>
+                        <div class="col-md-6">
+                          {{form.tranche2|as_crispy_field}}
+                        </div>
+                        <div class="col-md-6">
+                          {{form.idcycle|as_crispy_field }}
+                        </div>
+                        
+                      </div>
                     </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            {{ form.frais_reinscription|as_crispy_field}}
-                        </div>
+                    <div class="card-footer">
+                      <button type="submit" class="btn btn-success btn-sm">Enregistrer &nbsp;<i class="fa fa-save"></i></button>
+                      <button type="reset" class="btn btn-warning btn-sm">Annuler &nbsp;<i class="fa fa-refresh"></i></button>
+                      <a href="{% url 'listeclasse' %}" target="_self" class="btn btn-primary btn-sm">Retour &nbsp;<i class="fa fa-arrow-circle-right"></i></a>
                     </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            {{ form.tranche1|as_crispy_field}}
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            {{ form.idcycle|as_crispy_field }}
-                        </div>
-                    </div>
-                </div>
-
-
-               <div class="row">
-                        <div class="col-md-12">
-                            <div class="text-center">
-                            <button type="submit" class="btn btn-success btn-sm">Enregistrer &nbsp;<i class="fa fa-save"></i></button>
-                            <button type="reset" class="btn btn-warning btn-sm">Annuler &nbsp;<i class="fa fa-refresh"></i></button>
-                            <a href="{% url 'listeclasse' %}" target="_self" class="btn btn-primary btn-sm">Retour &nbsp;<i class="fa fa-arrow-circle-right"></i></a>
-                            </div>
-                        </div>
-               </div>
-     </form>
+    </form>
 
  {% endblock %}
