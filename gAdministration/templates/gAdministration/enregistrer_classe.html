@@ -10,36 +10,41 @@ Enregistrement des classes
 
  {% block formulaire %}
 
-    <form action="" method="post" class="needs-validation" novalidate>
+    <form action="" method="post" class="needs-validation">
 
                     {% csrf_token %}
 
                     <div class="card-body">
                      <div class="row g-3">
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                           {{form.nom_classe|as_crispy_field}}
                         </div>
+                     </div>
+                     <div class="row g-3">
                         <div class="col-md-6">
                           {{form.frais_inscription|as_crispy_field}}
                         </div>
                         <div class="col-md-6">
-                          <div class="input-group has-validation">
-                            {{form.frais_reinscription|as_crispy_field}}
-                          </div>
+                          {{form.frais_reinscription|as_crispy_field}}
                         </div>
+                      </div>
+                      <div class="row g-3">
                         <div class="col-md-6">
                           {{form.tranche1|as_crispy_field}}
                         </div>
                         <div class="col-md-6">
                           {{form.tranche2|as_crispy_field}}
                         </div>
-                        <div class="col-md-6">
+                       </div>
+                      <div class="row g-3"> 
+                        <div class="col-md-12">
                           {{form.idcycle|as_crispy_field }}
                         </div>
+                      </div>  
                         
-                      </div>
                     </div>
-                    <div class="card-footer">
+                    
+                    <div class="card-footer text-center">
                       <button type="submit" class="btn btn-success btn-sm">Enregistrer &nbsp;<i class="fa fa-save"></i></button>
                       <button type="reset" class="btn btn-warning btn-sm">Annuler &nbsp;<i class="fa fa-refresh"></i></button>
                       <a href="{% url 'listeclasse' %}" target="_self" class="btn btn-primary btn-sm">Retour &nbsp;<i class="fa fa-arrow-circle-right"></i></a>

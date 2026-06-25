@@ -132,7 +132,8 @@ def modifierclasse(request, idclasse):
         clas.frais_inscription = Decimal(request.POST['frais_inscription'])
         clas.frais_reinscription = Decimal(request.POST['frais_reinscription'])
         clas.tranche1 = Decimal(request.POST['tranche1'])
-        clas.frais_scolarite = Decimal(clas.tranche1 * 9)
+        clas.tranche2 = Decimal(request.POST['tranche2'])
+        clas.frais_scolarite = Decimal(clas.tranche1 + clas.tranche2)
         clas.save()
         return redirect('../listeclasse/')
     else:

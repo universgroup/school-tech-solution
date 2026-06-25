@@ -1,16 +1,18 @@
 {% extends "base.html" %}
 {% block titre_page %} MIS A JOUR {% endblock %}
+{% block titre_formulaire %} DETAILS DES INFORMATIONS D'UNE CLASSE {% endblock%}
 {% block titre_cadre %}
 EDITION D'UNE CLASSE
 {% endblock %}
 
 {% block formulaire %}
 
-   <form class="form-horizontal" action="{% url 'modifieclasse' clas.id %}" method="POST">
+   <form action="{% url 'modifieclasse' clas.id %}" method="POST" class="needs-validation">
 
                 {% csrf_token %}
 
-                <div class="row">
+            <div class="card-body">    
+                <div class="row g-3">
                     <div class="col-md-12">
                         <div class="form-group">
                             <label for="IDclasse">ID Classe</label>
@@ -19,7 +21,7 @@ EDITION D'UNE CLASSE
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-12">
                         <div class="form-group">
                             <label for="id_nomclasse">Nom de la classe</label>
@@ -27,7 +29,7 @@ EDITION D'UNE CLASSE
                         </div>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="id_frais_inscrip">Frais inscription</label>
@@ -41,23 +43,27 @@ EDITION D'UNE CLASSE
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-md-12">
+                <div class="row g-3">
+                    <div class="col-md-6">
                         <div class="form-group">
-                            <label for="id_tranche1">Mensualité</label>
+                            <label for="id_tranche1">Première tranche</label>
                             <input type="number" name="tranche1" id="id_tranche1" value="{{clas.tranche1}}" class="form-control" required>
                         </div>
                     </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="text-center">
-                            <button type="submit" class="btn btn-success btn-sm">Modifier &nbsp; <i class="fa fa-edit"></i></button>
-                            <a href="{% url 'listeclasse' %}" target="_self" class="btn btn-secondary btn-sm">Retour &nbsp;<i class="fa fa-arrow-circle-left"></i></a>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_tranche2">Deuxième tranche</label>
+                            <input type="number" name="tranche2" id="id_tranche2" value="{{clas.tranche2}}" class="form-control" required>
                         </div>
                     </div>
                 </div>
+            </div>
+             
+            <div class="card-footer text-center">
+                <button type="submit" class="btn btn-success btn-sm">Modifier &nbsp; <i class="fa fa-edit"></i></button>
+                <a href="{% url 'listeclasse' %}" target="_self" class="btn btn-secondary btn-sm">Retour &nbsp;<i class="fa fa-arrow-circle-left"></i></a>
+            </div>
+        
    </form>
 
 {% endblock %}
