@@ -19,9 +19,11 @@
 
   <!--begin::Third Party Plugin(OverlayScrollbars)-->
   <link rel="stylesheet" href="{% static 'assets/plugins/overlayScrollbars/css/OverlayScrollbars.min.css' %}"/>
+  <link href="{% static 'fontawesomefree/css/all.min.css' %}" rel="stylesheet" type="text/css">
 
   <!--begin::Third Party Plugin(Bootstrap Icons)-->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"/>
+
 
 </head>
 <body class="hold-transition sidebar-mini">
@@ -48,37 +50,111 @@
 
               <!-- Level two dropdown-->
               <li class="dropdown-submenu dropdown-hover">
-                <a id="dropdownSubMenu2" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-item dropdown-toggle">Hover for action</a>
+                <a id="dropdownSubMenu2" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-item dropdown-toggle">Gestion des cours</a>
                 <ul aria-labelledby="dropdownSubMenu2" class="dropdown-menu border-0 shadow">
-                  <li>
-                    <a tabindex="-1" href="#" class="dropdown-item">level 2</a>
-                  </li>
-
-                  <!-- Level three dropdown-->
-                  <li class="dropdown-submenu">
-                    <a id="dropdownSubMenu3" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-item dropdown-toggle">level 2</a>
-                    <ul aria-labelledby="dropdownSubMenu3" class="dropdown-menu border-0 shadow">
-                      <li><a href="#" class="dropdown-item">3rd level</a></li>
-                      <li><a href="#" class="dropdown-item">3rd level</a></li>
-                    </ul>
-                  </li>
-                  <!-- End Level three -->
-
-                  <li><a href="#" class="dropdown-item">level 2</a></li>
-                  <li><a href="#" class="dropdown-item">level 2</a></li>
+                  <li><a tabindex="-1" href="#" class="dropdown-item">Ajouter une année scolaire</a></li>
+                  <li><a href="#" class="dropdown-item">Ajouter une classe</a></li>
+                  <li><a href="#" class="dropdown-item">Ajouter une matière</a></li>
                 </ul>
               </li>
               <!-- End Level two -->
             </ul>
-          </li>
+      </li>
 
+      <li class="nav-item dropdown">
+            <a id="dropdownSubMenu3" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle">Elèves</a>
+            <ul aria-labelledby="dropdownSubMenu3" class="dropdown-menu border-0 shadow">
+              <li><a href="#" class="dropdown-item">Inscription</a></li>
+              <li><a href="#" class="dropdown-item">Reinscription</a></li>
+              <li><a href="#" class="dropdown-item">Etat des paiements</a></li>
+              <li><a href="#" class="dropdown-item">Etat des inscriptions/reinscriptions</a></li>
+              <li><a href="#" class="dropdown-item">Liste des élèves par classe</a></li>
+              <li><a href="#" class="dropdown-item">Registre de matriculation</a></li>
+            </ul>
+      </li>
+
+      <li class="nav-item dropdown">
+            <a id="dropdownSubMenu4" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle">Comptabilité</a>
+            <ul aria-labelledby="dropdownSubMenu4" class="dropdown-menu border-0 shadow">
+              <li><a href="#" class="dropdown-item">Paiement de la scolarité</a></li>
+              <li><a href="#" class="dropdown-item">Situation de la scolarité</a></li>
+              <li><a href="#" class="dropdown-item">Situation de la cantine scolaire</a></li>
+              <li><a href="#" class="dropdown-item">Situation des activités extra scolaires</a></li>
+              <li><a href="#" class="dropdown-item">Situation des dépenses</a></li>
+              
+              <li class="dropdown-divider"></li>
+              
+              <li class="dropdown-submenu dropdown-hover">
+                <a id="dropdownSubMenu5" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-item dropdown-toggle">Rapports</a>
+                <ul aria-labelledby="dropdownSubMenu5" class="dropdown-menu border-0 shadow">
+                  <li><a tabindex="-1" href="#" class="dropdown-item">Rapport périodique des recettes</a></li>
+                  <li><a href="#" class="dropdown-item">Rapport périodique des dépenses</a></li>
+                  <li><a href="#" class="dropdown-item">Rapport global par période</a></li>
+                  <li><a href="#" class="dropdown-item">Rapport global par année scolaire</a></li>
+                </ul>
+              </li>
+
+            </ul>
+      </li>
+
+      <li class="nav-item dropdown">
+            <a id="dropdownSubMenu6" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle">Personnel</a>
+            <ul aria-labelledby="dropdownSubMenu6" class="dropdown-menu border-0 shadow">
+              <li><a href="#" class="dropdown-item">Enregistrer un employé</a></li>
+              <li><a href="#" class="dropdown-item">Enregistrer une avance sur salaire</a></li>
+              <li><a href="#" class="dropdown-item">Paiement des salaires</a></li>
+              <li><a href="#" class="dropdown-item">Suivi des absences</a></li>
+              <li><a href="#" class="dropdown-item">Liste des employés</a></li>
+            </ul>
+      </li>
+
+      <li class="nav-item dropdown">
+            <a id="dropdownSubMenu7" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle">Evaluation</a>
+            <ul aria-labelledby="dropdownSubMenu7" class="dropdown-menu border-0 shadow">
+              
+              <li class="dropdown-submenu dropdown-hover">
+                <a id="dropdownSubMenu8" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-item dropdown-toggle">Saisie des notes</a>
+                <ul aria-labelledby="dropdownSubMenu8" class="dropdown-menu border-0 shadow">
+                  <li><a tabindex="-1" href="#" class="dropdown-item">Par classe</a></li>
+                  <li><a href="#" class="dropdown-item">Par élève</a></li>
+                </ul>
+              </li>
+
+              <li class="dropdown-submenu dropdown-hover">
+                <a id="dropdownSubMenu9" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-item dropdown-toggle">Resultats</a>
+                <ul aria-labelledby="dropdownSubMenu9" class="dropdown-menu border-0 shadow">
+                  <li><a tabindex="-1" href="#" class="dropdown-item">Par période</a></li>
+                  <li><a href="#" class="dropdown-item">Par trimestre/semestre</a></li>
+                  <li><a href="#" class="dropdown-item">Par année scolaire</a></li>
+                </ul>
+              </li>
+
+              <li class="dropdown-submenu dropdown-hover">
+                <a id="dropdownSubMenu10" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-item dropdown-toggle">Bulletin de notes</a>
+                <ul aria-labelledby="dropdownSubMenu10" class="dropdown-menu border-0 shadow">
+                  <li><a tabindex="-1" href="#" class="dropdown-item">Par période</a></li>
+                  <li><a href="#" class="dropdown-item">Par trimestre/semestre</a></li>
+                  <li><a href="#" class="dropdown-item">Par année scolaire</a></li>
+                </ul>
+              </li>
+                            
+            </ul>
+      </li>
+
+      <li class="nav-item dropdown">
+            <a id="dropdownSubMenu11" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle">Services</a>
+            <ul aria-labelledby="dropdownSubMenu11" class="dropdown-menu border-0 shadow">
+              <li><a href="#" class="dropdown-item">Cantine</a></li>
+              <li><a href="#" class="dropdown-item">Activités extra scolaires</a></li>              
+            </ul>
+      </li>
 
     </ul>
 
     <!-- SEARCH FORM -->
     <form class="form-inline ml-3">
       <div class="input-group input-group-sm">
-        <input class="form-control form-control-navbar" type="search" placeholder="Search" aria-label="Search">
+        <input class="form-control form-control-navbar" type="search" placeholder="Rechercher..." aria-label="Search">
         <div class="input-group-append">
           <button class="btn btn-navbar" type="submit">
             <i class="fas fa-search"></i>
@@ -187,11 +263,11 @@
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
     <a href="../../index3.html" class="brand-link">
-      <img src="{% static 'assets/dist/img/LogoUTG.png' %}"
-           alt="Logo UTG"
+      <img src="{% static 'assets/dist/img/LogoEC.png' %}"
+           alt="Logo Ecole les Champions"
            class="brand-image img-circle elevation-3"
            style="opacity: .8">
-      <span class="brand-text font-weight-light">UTG</span>
+      <span class="brand-text font-weight-light">Ecole les Champions</span>
     </a>
 
     <!-- Sidebar -->
@@ -199,10 +275,10 @@
       <!-- Sidebar user (optional) -->
       <div class="user-panel mt-3 pb-3 mb-3 d-flex">
         <div class="image">
-          <img src="{% static 'assets/dist/img/user2-160x160.jpg' %}" class="img-circle elevation-2" alt="User Image">
+          <img src="{% static 'assets/dist/img/user7-128x128.jpg' %}" class="img-circle elevation-2" alt="User Image">
         </div>
         <div class="info">
-          <a href="#" class="d-block">Abdoulaye Alpha Yattara</a>
+          <a href="#" class="d-block">Mme Djénabou DIALLO</a>
         </div>
       </div>
 
@@ -211,530 +287,340 @@
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
           <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
+
+               <!--Debut du menu Administration -->
           <li class="nav-item has-treeview">
-            <a href="#" class="nav-link">
-              <i class="nav-icon fas fa-tachometer-alt"></i>
+            <a href="#" class="nav-link active" title="Permet de parametrer les données de base de l'application">
+              <i class="nav-icon fas fa-wrench"></i>
               <p>
-                Dashboard
+                Administration
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet de saisir les renseignements de l'école">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Paramères de l'école &nbsp;</p>
+                  <i class=" fas fa-gears"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet d'éditer le certificat de scolarité d'un élève">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Certificat de scolarité &nbsp;</p>
+                  <i class="fas fa-award"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet d'éditer le contrat de travail d'un employé de l'école">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Contrat de travail &nbsp;</p>
+                  <i class="fas fa-file-signature"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet d'ajouter de nouvelles années scolaires">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Créer une année scolaire &nbsp;</p>
+                  <i class="fas fa-calendar-plus"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet d'ajouter de nouvelles classes dans le système">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Créer une classe &nbsp;</p>
+                  <i class="fas fa-school"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet d'ajouter de nouvelles matières et leurs coefficients respectifs">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Créer une matière &nbsp;</p>
+                  <i class="fas fa-book-skull"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet de créer un compte utilisateur pour le personnel ou les parents d'élèves">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Créer un utilisateur &nbsp;</p>
+                  <i class="fas fa-user-plus"></i>
+                </a>
+              </li>
+
+            </ul>
+          </li>
+          
+          <li class="nav-item has-treeview">
+            <a href="#" class="nav-link" title="Permet de gérer les élèves de l'école">
+              <i class="nav-icon fas fa-children"></i>
+              <p>
+                Elèves
+                <i class="fas fa-angle-left right"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet d'effectuer les inscriptions des nouvels élèves">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Inscription &nbsp;</p>
+                  <i class="fas fa-info"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet d'effectuer la reinscription des anciens élèves">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Reinscription &nbsp;</p>
+                  <i class="fas fa-registered"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet de consulter l'état des paiements de la scolarité">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Etat des paiements &nbsp;</p>
+                  <i class="fas fa-file-invoice-dollar"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet de consulter l'état des paiements des inscriptions/reinscriptions">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Etat inscriptions &nbsp;</p>
+                  <i class="fas fa-file-invoice"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet de consulter la liste des élèves par classe et par cycle scolaire">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Liste par classe &nbsp;</p>
+                  <i class="fas fa-list"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet de consulter le registre de matriculation de l'école">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Registre de matricule &nbsp;</p>
+                  <i class="fas fa-list-ol"></i>
+                </a>
+              </li>
+              
+            </ul>
+          </li>
+
+          <li class="nav-item has-treeview">
+            <a href="#" class="nav-link" title="Permet d'acceder à toutes les opérations de la comptabilité ou de la caisse">
+              <i class="nav-icon fas fa-calculator"></i>
+              <p>
+                Comptabilité
                 <i class="right fas fa-angle-left"></i>
               </p>
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="../../index.html" class="nav-link">
+                <a href="#" class="nav-link" title="Permet de procéder au paiement des frais de scolarité">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Dashboard v1</p>
+                  <p>Paiement scolarité &nbsp;</p>
+                  <i class="fa-brands fa-cc-visa"></i>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="../../index2.html" class="nav-link">
+                <a href="#" class="nav-link" title="Permet de gérer la situation des recettes générées par le paiement des frais à la scolarité">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Dashboard v2</p>
+                  <p>Recettes scolarité &nbsp;</p>
+                  <i class="fa-brands fa-cc-mastercard"></i>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="../../index3.html" class="nav-link">
+                <a href="#" class="nav-link" title="Permet de gérer la situation des recettes générées par le paiement des frais de cantine">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Dashboard v3</p>
-                </a>
-              </li>
-            </ul>
-          </li>
-          <li class="nav-item">
-            <a href="../widgets.html" class="nav-link">
-              <i class="nav-icon fas fa-th"></i>
-              <p>
-                Widgets
-                <span class="right badge badge-danger">New</span>
-              </p>
-            </a>
-          </li>
-          <li class="nav-item has-treeview">
-            <a href="#" class="nav-link">
-              <i class="nav-icon fas fa-copy"></i>
-              <p>
-                Layout Options
-                <i class="fas fa-angle-left right"></i>
-                <span class="badge badge-info right">6</span>
-              </p>
-            </a>
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="../layout/top-nav.html" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Top Navigation</p>
+                  <p>Recettes cantine &nbsp;</p>
+                  <i class="fas fa-cash-register"></i>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="../layout/top-nav-sidebar.html" class="nav-link">
+                <a href="#" class="nav-link" title="Permet de gérer la situation des recettes générées par le paiement des activités extra scolaires">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Top Navigation + Sidebar</p>
+                  <p>Recettes extra scolaires &nbsp;</p>
+                  <i class="fas fa-person-swimming"></i>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="../layout/boxed.html" class="nav-link">
+                <a href="#" class="nav-link" title="Permet de gérer la situation des dépenses quotidiennes">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Boxed</p>
+                  <p>Gestion dépenses &nbsp;</p>
+                  <i class="fas fa-credit-card"></i>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="../layout/fixed-sidebar.html" class="nav-link">
+                <a href="#" class="nav-link" title="Permet d'imprimer le rapport des recettes générées durant une période donnée">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Fixed Sidebar</p>
+                  <p>Rapport recettes &nbsp;</p>
+                  <i class="fas fa-chart-pie"></i>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="../layout/fixed-topnav.html" class="nav-link">
+                <a href="#" class="nav-link" title="Permet d'imprimer le rapport des dépenses réalisées durant une période donnée">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Fixed Navbar</p>
+                  <p>Rapport dépenses &nbsp;</p>
+                  <i class="fas fa-chart-area"></i>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="../layout/fixed-footer.html" class="nav-link">
+                <a href="#" class="nav-link" title="Permet d'imprimer le rapport global des recettes et dépenses durant une période donnée">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Fixed Footer</p>
+                  <p>Rapport global période &nbsp;</p>
+                  <i class="fas fa-table"></i>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="../layout/collapsed-sidebar.html" class="nav-link">
+                <a href="#" class="nav-link" title="Permet d'imprimer le rapport global des recettes et dépenses durant l'année scolaire">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Collapsed Sidebar</p>
+                  <p>Rapport global annuel &nbsp;</p>
+                  <i class="fas fa-file-pdf"></i>
                 </a>
               </li>
             </ul>
           </li>
           <li class="nav-item has-treeview">
-            <a href="#" class="nav-link">
-              <i class="nav-icon fas fa-chart-pie"></i>
+            <a href="#" class="nav-link" title="Permet de gérer le personnel de l'école">
+              <i class="nav-icon fas fa-user-tie"></i>
               <p>
-                Charts
-                <i class="right fas fa-angle-left"></i>
-              </p>
-            </a>
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="../charts/chartjs.html" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>ChartJS</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="../charts/flot.html" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Flot</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="../charts/inline.html" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Inline</p>
-                </a>
-              </li>
-            </ul>
-          </li>
-          <li class="nav-item has-treeview">
-            <a href="#" class="nav-link">
-              <i class="nav-icon fas fa-tree"></i>
-              <p>
-                UI Elements
+                Personnel
                 <i class="fas fa-angle-left right"></i>
               </p>
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="../UI/general.html" class="nav-link">
+                <a href="#" class="nav-link" title="Permet d'enregistrer les informations de chaque employé de l'école">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>General</p>
+                  <p>Ajouter un employé &nbsp;</p>
+                  <i class="fas fa-user-check"></i>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="../UI/icons.html" class="nav-link">
+                <a href="#" class="nav-link" title="Permet de saisir les avances sur salaire accordées aux employés">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Icons</p>
+                  <p>Ajouter bon paiement &nbsp;</p>
+                  <i class="fas fa-sack-dollar"></i>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="../UI/buttons.html" class="nav-link">
+                <a href="#" class="nav-link" title="Permet de saisir les salaires mensuels versés aux employés">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Buttons</p>
+                  <p>Paiement salaires &nbsp;</p>
+                  <i class="fas fa-hand-holding-dollar"></i>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="../UI/sliders.html" class="nav-link">
+                <a href="#" class="nav-link" title="Permet d'enregistrer les absences du personnel enseignant">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Sliders</p>
+                  <p>Suivi absences &nbsp;</p>
+                  <i class="fas fa-person-chalkboard"></i>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="../UI/modals.html" class="nav-link">
+                <a href="#" class="nav-link" title="Permet d'imprimer la liste générale du personnel">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Modals & Alerts</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="../UI/navbar.html" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Navbar & Tabs</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="../UI/timeline.html" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Timeline</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="../UI/ribbons.html" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Ribbons</p>
+                  <p>Liste employés &nbsp;</p>
+                  <i class="fa-solid fa-users"></i>
                 </a>
               </li>
             </ul>
-          </li>
-          <li class="nav-item has-treeview menu-open">
-            <a href="#" class="nav-link active">
-              <i class="nav-icon fas fa-edit"></i>
-              <p>
-                Forms
-                <i class="fas fa-angle-left right"></i>
-              </p>
-            </a>
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="../forms/general.html" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>General Elements</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="../forms/advanced.html" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Advanced Elements</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="../forms/editors.html" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Editors</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="../forms/validation.html" class="nav-link active">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Validation</p>
-                </a>
-              </li>
-            </ul>
-          </li>
+          </li>    
           <li class="nav-item has-treeview">
-            <a href="#" class="nav-link">
-              <i class="nav-icon fas fa-table"></i>
-              <p>
-                Tables
-                <i class="fas fa-angle-left right"></i>
-              </p>
-            </a>
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="../tables/simple.html" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Simple Tables</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="../tables/data.html" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>DataTables</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="../tables/jsgrid.html" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>jsGrid</p>
-                </a>
-              </li>
-            </ul>
-          </li>
-          <li class="nav-header">EXAMPLES</li>
-          <li class="nav-item">
-            <a href="../calendar.html" class="nav-link">
-              <i class="nav-icon far fa-calendar-alt"></i>
-              <p>
-                Calendar
-                <span class="badge badge-info right">2</span>
-              </p>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a href="../gallery.html" class="nav-link">
-              <i class="nav-icon far fa-image"></i>
-              <p>
-                Gallery
-              </p>
-            </a>
-          </li>
-          <li class="nav-item has-treeview">
-            <a href="#" class="nav-link">
-              <i class="nav-icon far fa-envelope"></i>
-              <p>
-                Mailbox
-                <i class="fas fa-angle-left right"></i>
-              </p>
-            </a>
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="../mailbox/mailbox.html" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Inbox</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="../mailbox/compose.html" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Compose</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="../mailbox/read-mail.html" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Read</p>
-                </a>
-              </li>
-            </ul>
-          </li>
-          <li class="nav-item has-treeview">
-            <a href="#" class="nav-link">
+            <a href="#" class="nav-link" title="Permet de gerer les évaluations des élèves par cycle et classe">
               <i class="nav-icon fas fa-book"></i>
               <p>
-                Pages
+                Evaluation
                 <i class="fas fa-angle-left right"></i>
               </p>
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="../examples/invoice.html" class="nav-link">
+                <a href="#" class="nav-link" title="Permet de faire la saisie des notes par classe">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Invoice</p>
+                  <p>Saisie par classe &nbsp;</p>
+                  <i class="fas fa-chalkboard-user"></i>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="../examples/profile.html" class="nav-link">
+                <a href="#" class="nav-link" title="Permet de faire la saisie des notes par élève">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Profile</p>
+                  <p>Saisie par élève &nbsp;</p>
+                  <i class="fas fa-child"></i>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="../examples/e-commerce.html" class="nav-link">
+                <a href="#" class="nav-link" title="Permet de consulter et imprimer les résultats d'une classe aucours d'une période donnée">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>E-commerce</p>
+                  <p>Résultat périodique &nbsp;</p>
+                  <i class="fas fa-file-pdf"></i>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="../examples/projects.html" class="nav-link">
+                <a href="#" class="nav-link" title="Permet de consulter et imprimer les résultats d'une classe aucours d'un trimestre ou semestre">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Projects</p>
+                  <p>Résultat trimestriel &nbsp;</p>
+                  <i class="fas fa-file-lines"></i>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="../examples/project-add.html" class="nav-link">
+                <a href="#" class="nav-link" title="Permet de consulter et imprimer les résultats d'une classe aucours d'une année scolaire">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Project Add</p>
+                  <p>Résultat annuel &nbsp;</p>
+                  <i class="fas fa-newspaper"></i>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="../examples/project-edit.html" class="nav-link">
+                <a href="#" class="nav-link" title="Permet de consulter et imprimer les bulletins d'une classe aucours d'une période donnée">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Project Edit</p>
+                  <p>Bulletin périodique &nbsp;</p>
+                  <i class="fas fa-address-card"></i>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="../examples/project-detail.html" class="nav-link">
+                <a href="#" class="nav-link" title="Permet de consulter et imprimer les bulletins d'une classe aucours d'un trimestre ou semestre">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Project Detail</p>
+                  <p>Bulletin trimestriel &nbsp;</p>
+                  <i class="fas fa-id-badge"></i>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="../examples/contacts.html" class="nav-link">
+                <a href="#" class="nav-link" title="Permet de consulter et imprimer les bulletins d'une classe aucours d'une année scolaire">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Contacts</p>
+                  <p>Bulletin annuel &nbsp;</p>
+                  <i class="fas fa-layer-group"></i>
                 </a>
               </li>
             </ul>
           </li>
+
           <li class="nav-item has-treeview">
-            <a href="#" class="nav-link">
-              <i class="nav-icon far fa-plus-square"></i>
+            <a href="#" class="nav-link" title="Permet de gérer les services extra scolaires : Natation, Football, Karaté, Cantine, etc.">
+              <i class="nav-icon fas fa-table"></i>
               <p>
-                Extras
+                Services
                 <i class="fas fa-angle-left right"></i>
               </p>
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="../examples/login.html" class="nav-link">
+                <a href="#" class="nav-link" title="Permet de gérer les opérations de paiement des frais de cantine">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Login</p>
+                  <p>Gestion cantine &nbsp;</p>
+                  <i class="fas fa-utensils"></i>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="../examples/register.html" class="nav-link">
+                <a href="#" class="nav-link" title="Permet de gérer les activités extra scolaires comme le Karaté, la Natation, le Football, etc.">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Register</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="../examples/forgot-password.html" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Forgot Password</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="../examples/recover-password.html" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Recover Password</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="../examples/lockscreen.html" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Lockscreen</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="../examples/legacy-user-menu.html" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Legacy User Menu</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="../examples/language-menu.html" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Language Menu</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="../examples/404.html" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Error 404</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="../examples/500.html" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Error 500</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="../examples/pace.html" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Pace</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="../examples/blank.html" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Blank Page</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="../../starter.html" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Starter Page</p>
+                  <p>Activités extra scolaires &nbsp;</p>
+                  <i class="fas fa-futbol"></i>
                 </a>
               </li>
             </ul>
           </li>
-          <li class="nav-header">MISCELLANEOUS</li>
-          <li class="nav-item">
-            <a href="https://adminlte.io/docs/3.0" class="nav-link">
-              <i class="nav-icon fas fa-file"></i>
-              <p>Documentation</p>
-            </a>
-          </li>
-          <li class="nav-header">MULTI LEVEL EXAMPLE</li>
-          <li class="nav-item">
-            <a href="#" class="nav-link">
-              <i class="fas fa-circle nav-icon"></i>
-              <p>Level 1</p>
-            </a>
-          </li>
-          <li class="nav-item has-treeview">
-            <a href="#" class="nav-link">
-              <i class="nav-icon fas fa-circle"></i>
-              <p>
-                Level 1
-                <i class="right fas fa-angle-left"></i>
-              </p>
-            </a>
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="#" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Level 2</p>
-                </a>
-              </li>
-              <li class="nav-item has-treeview">
-                <a href="#" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>
-                    Level 2
-                    <i class="right fas fa-angle-left"></i>
-                  </p>
-                </a>
-                <ul class="nav nav-treeview">
-                  <li class="nav-item">
-                    <a href="#" class="nav-link">
-                      <i class="far fa-dot-circle nav-icon"></i>
-                      <p>Level 3</p>
-                    </a>
-                  </li>
-                  <li class="nav-item">
-                    <a href="#" class="nav-link">
-                      <i class="far fa-dot-circle nav-icon"></i>
-                      <p>Level 3</p>
-                    </a>
-                  </li>
-                  <li class="nav-item">
-                    <a href="#" class="nav-link">
-                      <i class="far fa-dot-circle nav-icon"></i>
-                      <p>Level 3</p>
-                    </a>
-                  </li>
-                </ul>
-              </li>
-              <li class="nav-item">
-                <a href="#" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Level 2</p>
-                </a>
-              </li>
-            </ul>
-          </li>
-          <li class="nav-item">
-            <a href="#" class="nav-link">
-              <i class="fas fa-circle nav-icon"></i>
-              <p>Level 1</p>
-            </a>
-          </li>
-          <li class="nav-header">LABELS</li>
-          <li class="nav-item">
-            <a href="#" class="nav-link">
-              <i class="nav-icon far fa-circle text-danger"></i>
-              <p class="text">Important</p>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a href="#" class="nav-link">
-              <i class="nav-icon far fa-circle text-warning"></i>
-              <p>Warning</p>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a href="#" class="nav-link">
-              <i class="nav-icon far fa-circle text-info"></i>
-              <p>Informational</p>
-            </a>
-          </li>
+     
         </ul>
       </nav>
       <!-- /.sidebar-menu -->
