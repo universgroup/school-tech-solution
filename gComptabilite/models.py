@@ -26,8 +26,8 @@ CATEGORIE_DEPENSE_CHOICES = (
 CATEGORIE_RECETTE_CHOICES = (
     ('Selectionnez', 'Sélectionnez'),  # 0
     ('Scolarité', 'Scolarité'),  # 1
-    ('Cours Revision', 'Cours révision'),  # 2
-    ('Cours Coraniques', 'Cours coraniques'),  # 3
+    ('Cantine', 'Cantine'),  # 2
+    ('Extra scolaire', 'Extra scolaire'),  # 3
     ('Arriere Scolaire', 'Arriere scolaire'),  # 4
     ('Remboursement Prêt', 'Remboursement prêt'),  # 5
     ('Autres Recettes', 'Autres recettes')  # 6
@@ -63,7 +63,7 @@ class Caisse(models.Model):
     libelle_operation = models.TextField()
     montant_encaisse = models.DecimalField(max_digits=20, decimal_places=2)
     type_operation = models.CharField(max_length=15, default=TYPE_OPERATION_CAISSE_CHOICES[0][0], choices=TYPE_OPERATION_CAISSE_CHOICES)
-    date_operation = models.DateField(auto_now=True)
+    date_operation = models.DateField(null=True) # Il se peut qu'en pratique l'opération soit effectuée avant la date du jour. Donc, l'utilisateur a besoin de saisir
     solde_actuel = models.DecimalField(max_digits=20, decimal_places=2, default=0)
     heure_operation = models.TimeField(auto_now=True)
     qte = models.IntegerField(null=True, default=0)
@@ -76,7 +76,7 @@ class Caisse(models.Model):
     categ_depense = models.CharField(max_length=100, default=CATEGORIE_DEPENSE_CHOICES[0][0])
 
     def __str__(self):
-        return '{} {} {} '.format(self.libelle_operation, str(self.montant_encaisse), self.type_operation)
+        return '{} {} {} {}'.format(self.date_operation,self.libelle_operation, str(self.montant_encaisse), self.type_operation)
 
     @property
     def annee(self):

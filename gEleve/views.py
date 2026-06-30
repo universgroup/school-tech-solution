@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.core.paginator import Paginator  # Utilisé dans la gestion des paginations des différentes listes de données
 from django.utils.datastructures import MultiValueDictKeyError
 
-from datetime import datetime  # Utilisé pour recuperer l'année courante dans la generation des matricules des élèves
+from datetime import datetime, date  # Utilisé pour recuperer l'année courante dans la generation des matricules des élèves
 from django.db.models import Q, Max, \
     Sum  # Permet de faire des requêtes avec les opérateurs And (,) et les opérateurs OR (|)
 import io  # Librairie contenant les methodes utilisant les péripheriques d'entrées/sorties
@@ -19,6 +19,8 @@ from PIL import Image
 from django.urls import reverse
 from django.core.mail import EmailMessage
 from django.conf import settings
+import socket
+from smtplib import SMTPException
 
 from .models import *
 from .forms import *
@@ -36,8 +38,9 @@ def enregistrereleve(request):
     pren_eleve = ''
     
     if request.method == 'POST':
-        formeleve = FormEleve(request.POST)
 
+        # 1ère Partie du formulaire (Tabpage 1) : Validation des données personnelles de l'élève
+        formeleve = FormEleve(request.POST)
         if formeleve.is_valid():
             # Ici j'enregistre les informations personnelles de l'élève à inscrire
             ansco = datetime.now().strftime('%Y')  # Je recupère uniquement l'année de la date courante
@@ -101,10 +104,11 @@ def enregistrereleve(request):
             eleve.adresse = request.POST['adresse']
             eleve.ecole_origine = request.POST['ecole_origine']
             
-            try:
-                eleve.photo_eleve = request.FILES.get('photo_eleve')
-            except MultiValueDictKeyError:
-                pass
+            #try:
+            if request.FILES.get('photo_eleve'):
+                    eleve.photo_eleve = request.FILES.get('photo_eleve')
+            #except MultiValueDictKeyError:
+            #    pass
 
             eleve.datenaissance = request.POST['datenaissance']
             eleve.lieu_naissance = request.POST['lieu_naissance']
@@ -114,12 +118,80 @@ def enregistrereleve(request):
             
             eleve.save()  # Permet de valider l'enregistrement des informations de l'élève
 
-            messages.success(request, 'Informations élève validées avec succès')
-            return redirect('inscriptioneleve', mat=mateleve)
+            # messages.success(request, 'Informations élève validées avec succès')
+            #return redirect('inscriptioneleve', mat=mateleve)
+
+        # 2ème Partie (Tabpage 2) : Validation de l'inscription de l'élève
+        forminscrip = FormInscription(request.POST)
+        if forminscrip.is_valid():
+                ansco = request.POST.get('annee_scolaire')  # Je recupère ici l'ID de l'année scolaire selectionnée
+                idclas = request.POST.get('idclasse')  # Ici l'ID de la Classe selectionnée
+                idcy = request.POST.get('idcycle')  # Ici l'ID du cycle selectionné
+                
+
+                # Je fais ensuite des requêtes sur les quatre tables en vue de recuperer les identifiants à inserer dans
+                # la table inscription
+                an = AnneeScolaire.objects.get(id=ansco)
+                cl = Classe.objects.get(id=idclas)
+                cy = CycleScolaire.objects.get(id=idcy)
+                el = Eleve.objects.get(matricule=mateleve)
+
+                # Je valide enfin l'inscription de l'elève enregistré
+                inscrip = Inscription(annee_scolaire=an, mateleve=el, idclasse=cl, idcycle=cy)
+                inscrip.save()
+
+                # Ici je vais recuperer les frais d'inscription de la classe selectionnée
+                frais = cl.frais_inscription
+                # Et la je vais actualiser le dernier solde caisse en appellant la fonction affichersoldecaisse
+                soldecaisse = affichersoldecaisse()
+                # Je vais enregistrer ensuite l'opération dans la table caisse
+                cais = Caisse()
+                cais.type_operation = TYPE_OPERATION_CAISSE_CHOICES[1][1]
+                cais.libelle_operation = 'Paiement des frais inscription de l\'élève:  {},  {} , {} '.format(
+                    el.matricule, el.nom, el.prenom)
+                cais.montant_encaisse = Decimal(frais)
+                cais.anscolaire = an
+                cais.categ_depense = CATEGORIE_RECETTE_CHOICES[1][1]
+                cais.solde_actuel = Decimal(soldecaisse) + Decimal(frais)
+                cais.date_operation = date.today() # Recupère la date du système en YYYY-MM-dd
+                cais.save()
+                # Ici je vais enregistrer les frais d'inscription de l'élève dans son etat de paiement de la scolarité
+                etatscol = EtatPaiementScolarite()
+                etatscol.anneescolaire = an
+                etatscol.idclasse = cl
+                etatscol.mateleve = el
+                etatscol.inscription = Decimal(frais)
+                etatscol.save()
+                # Ici je vais enregistrer l'evenement dans la table Historique
+                his = Historique()
+                his.nature_operation = 'Inscription'
+                his.detail_operation = 'Inscription de l\'élève de matricule : {}, {}, {}'.format(
+                    el.matricule, el.nom, el.prenom)
+                his.user_login = 'contact@universtechg'
+                his.save()
+
+                messages.success(request, 'Inscription validée avec succès')
+
+                # Je vide les champs après validation
+
+                formeleve = FormEleve()
+                forminscrit = FormInscription()
+
+                # Ici je vais recuperer le dernier ID validé de l'Inscription
+                idi = Inscription.objects.latest(
+                'id')  # Cette instruction permet de recuperer le dernier record suivant l'id
+                lastid = idi.id  # Permet de recuperer l'ID de ce dernier record
+                return HttpResponseRedirect(reverse('recuinscription',
+                                                args=(
+                                                    lastid,)))  # Je redirige l'utilisateur vers l'impression du recu d'inscription (PDF)
+           
 
     else:
+        # Ici je renvoie dans le template les deux formulaires de saisie qui étaient jusque là separés au demarrage de celui-ci.
+        # La raison est simple: Utiliser un tabpage pour gérer la saisie des données personnelles de l'élève et la validation de l'inscription
         formeleve = FormEleve()
-    return render(request, 'gEleve/inscription_eleve.html', dict(form=formeleve))
+        forminscrit = FormInscription()
+    return render(request, 'gEleve/inscription_eleve.html', dict(form=formeleve,form_inscrit=forminscrit))
 
 
 # La fonction chargerlisteclasse m'a permis de gerer l'affichage des classes selon le cycle selectionné lors de
@@ -129,69 +201,6 @@ def chargerlisteclasse(request):
     clas = Classe.objects.filter(idcycle=cy).all()
     context = {'clas': clas}
     return render(request, 'gEleve/charger_liste_classe_cycle.html', context)
-
-
-def validerinscription(request, mat):
-    if request.method == 'POST':
-        forminscrip = FormInscription(request.POST)
-        if forminscrip.is_valid():
-            ansco = request.POST.get('annee_scolaire')  # Je recupère ici l'ID de l'année scolaire selectionnée
-            idclas = request.POST.get('idclasse')  # Ici l'ID de la Classe selectionnée
-            idcy = request.POST.get('idcycle')  # Ici l'ID du cycle selectionné
-            
-
-            # Je fais ensuite des requêtes sur les quatre tables en vue de recuperer les identifiants à inserer dans
-            # la table inscription
-            an = AnneeScolaire.objects.get(id=ansco)
-            cl = Classe.objects.get(id=idclas)
-            cy = CycleScolaire.objects.get(id=idcy)
-            el = Eleve.objects.get(matricule=mat)
-
-            # Je valide enfin l'inscription de l'elève enregistré
-            inscrip = Inscription(annee_scolaire=an, mateleve=el, idclasse=cl, idcycle=cy)
-            inscrip.save()
-
-            # Ici je vais recuperer les frais d'inscription de la classe selectionnée
-            frais = cl.frais_inscription
-            # Et la je vais actualiser le dernier solde caisse en appellant la fonction affichersoldecaisse
-            soldecaisse = affichersoldecaisse()
-            # Je vais enregistrer ensuite l'opération dans la table caisse
-            cais = Caisse()
-            cais.type_operation = TYPE_OPERATION_CAISSE_CHOICES[1][1]
-            cais.libelle_operation = 'Paiement des frais inscription de l\'élève:  {},  {} , {} '.format(
-                el.matricule, el.nom, el.prenom)
-            cais.montant_encaisse = Decimal(frais)
-            cais.anscolaire = an
-            cais.categ_depense = CATEGORIE_RECETTE_CHOICES[1][1]
-            cais.solde_actuel = Decimal(soldecaisse) + Decimal(frais)
-            cais.save()
-            # Ici je vais enregistrer les frais d'inscription de l'élève dans son etat de paiement de la scolarité
-            etatscol = EtatPaiementScolarite()
-            etatscol.anneescolaire = an
-            etatscol.idclasse = cl
-            etatscol.mateleve = el
-            etatscol.inscription = Decimal(frais)
-            etatscol.save()
-            # Ici je vais enregistrer l'evenement dans la table Historique
-            his = Historique()
-            his.nature_operation = 'Inscription'
-            his.detail_operation = 'Inscription de l\'élève de matricule : {}, {}, {}'.format(
-                el.matricule, el.nom, el.prenom)
-            his.user_login = 'contact@universtechg'
-            his.save()
-
-            messages.success(request, 'Inscription validée avec succès')
-
-            # Ici je vais recuperer le dernier ID validé de l'Inscription
-            idi = Inscription.objects.latest(
-                'id')  # Cette instruction permet de recuperer le dernier record suivant l'id
-            lastid = idi.id  # Permet de recuperer l'ID de ce dernier record
-            return HttpResponseRedirect(reverse('recuinscription',
-                                                args=(
-                                                    lastid,)))  # Je redirige l'utilisateur vers l'impression du recu d'inscription (PDF)
-    else:
-        forminscrip = FormInscription()
-    return render(request, 'gEleve/terminer_inscription.html', dict(form=forminscrip, mateleve=mat))
 
 
 # Permet d'afficher la liste générale des élèves (registre de matriculation)
@@ -270,9 +279,9 @@ def filtrelistegenerale(request):
     listeins = []
     listeinsclasse = []
     listeinsnp = []
-    effectif_total = []
-    effectif_total_garcons = []
-    effectif_total_filles = []
+    effectif_total = 0
+    effectif_total_garcons = 0
+    effectif_total_filles = 0
 
     mat = request.GET.get('matricule')
     idclass = request.GET.get('classe')
@@ -385,7 +394,24 @@ def recuinscription(request, idinsc):
         # Affichage du logo de l'ecole
         try:
             logo = Image.open(data_ecole[5]) # Ici je tente d'ouvrir l'image stockee dans la BD en utilisant son path (voir dans la liste data_ecole[])
-            logo.thumbnail((60,60)) # Redimensionne l'image en format miniature avec comme taille (width=100,height=100), permet de gerer les ratios de l'image
+
+            # Redimensionner avec haute qualité au lieu de thumbnail
+            logo = logo.resize((90, 60), Image.LANCZOS)  # LANCZOS = meilleur algorithme de rééchantillonnage
+
+            if logo.mode in ('RGBA', 'P'):
+                logo = logo.convert('RGB') # PNG supporte la transparence
+            elif logo.mode != 'RGB':
+                logo = logo.convert('RGB')
+
+            # Je cree ici un buffer (fichier temporaire) pour stocker l'image recuperee
+            logo_buffer = io.BytesIO()
+            logo.save(logo_buffer, format='PNG', quality=95)  # qualité 95 au lieu de la valeur par défaut, PNG = sans perte
+            logo_buffer.seek(0)
+
+            # Ici je dessine l'image stockee dans le fichier temporaire a l'interieur du PDF
+            p.drawImage(ImageReader(logo_buffer), 245, 770, 90, 60)
+
+            """ logo.thumbnail((60,60)) # Redimensionne l'image en format miniature avec comme taille (width=100,height=100), permet de gerer les ratios de l'image
             if logo.mode in ('RGBA','P'): # Permet de verifier le type de couleur utilise dans l'image (RGBA == Red Green Blue + Alpha (transparent) pour PNG)
                 logo = logo.convert('RGB') # Transforme la couleur en format RGB standard
             
@@ -395,7 +421,7 @@ def recuinscription(request, idinsc):
             logo_buffer.seek(0)
             
             # Ici je dessine l'image stockee dans le fichier temporaire a l'interieur du PDF
-            p.drawImage(ImageReader(logo_buffer), 245, 770, 60, 60)
+            p.drawImage(ImageReader(logo_buffer), 245, 770, 90, 60) """
             
         except FileNotFoundError:
             p.drawString(data_ecole[5],245, 770)
@@ -570,16 +596,31 @@ def recuinscription(request, idinsc):
         
         buffer.seek(0)
         
-        
-        email = EmailMessage(
-        subject='Reçu d\'inscription',
-        body=f'Veuillez trouver votre reçu d\'inscription en pièce jointe.\n Cordialement. \n La Comptabilité : \n {data_ecole[8]}',
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        to=[data[8]], # data[8] correspond ici a l'email du parent/tuteur
-        )
-        email.attach(f'Recu_inscription {str(data[2])}.pdf', buffer.getvalue(), 'application/pdf')
-        email.send()
-        messages.success(request,'Email envoyé avec succès!')
+        try:
+            email = EmailMessage(
+            subject='Reçu d\'inscription',
+            body=f'Veuillez trouver votre reçu d\'inscription en pièce jointe.\n Cordialement. \n La Comptabilité : \n {data_ecole[8]}',
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            to=[data[8]], # data[8] correspond ici a l'email du parent/tuteur
+            )
+            email.attach(f'Recu_inscription {str(data[2])}.pdf', buffer.getvalue(), 'application/pdf')
+            email.send()
+            messages.success(request,'Email envoyé avec succès!')
+        except SMTPException:
+            # Erreur liée au serveur SMTP (authentification, configuration...)
+            messages.warning(request, 'Erreur SMTP : impossible d\'envoyer l\'email.')
+
+        except socket.gaierror:
+            # Pas de connexion internet ou serveur SMTP introuvable
+            messages.warning(request, 'Pas de connexion internet. Le reçu a été généré mais l\'email n\'a pas été envoyé.')
+
+        except TimeoutError:
+            # Connexion trop lente ou serveur SMTP qui ne répond pas
+            messages.warning(request, 'Délai de connexion dépassé. Email non envoyé.')
+
+        except Exception as e:
+            # Toute autre erreur imprévue
+            messages.warning(request, f'Erreur inattendue : {str(e)}')
 
         # FileResponse sets the Content-Disposition header so that browsers
         # present the option to save the file.
@@ -914,18 +955,33 @@ def recureinscription(request, idinsc):
         p.save()
 
         buffer.seek(0)
-    
-        email = EmailMessage(
+
+        try:
+            email = EmailMessage(
             subject='Reçu de reinscription',
             body=f'Veuillez trouver votre reçu de reinscription en pièce jointe.\n Cordialement. \n La Comptabilité : \n {data_ecole[8]}',
             from_email=settings.DEFAULT_FROM_EMAIL,
             to=[data[8]], # data[8] correspond ici a l'email du parent/tuteur
             )
-        email.attach(f'Recu_reinscription {str(data[2])}.pdf', buffer.getvalue(), 'application/pdf')
-        email.send()
-        messages.success(request,'Email envoyé avec succès!')
-    
-    
+            email.attach(f'Recu_reinscription {str(data[2])}.pdf', buffer.getvalue(), 'application/pdf')
+            email.send()
+            messages.success(request,'Email envoyé avec succès!')
+
+        except SMTPException:
+            # Erreur liée au serveur SMTP (authentification, configuration...)
+            messages.warning(request, 'Erreur SMTP : impossible d\'envoyer l\'email.')
+
+        except socket.gaierror:
+            # Pas de connexion internet ou serveur SMTP introuvable
+            messages.warning(request, 'Pas de connexion internet. Le reçu a été généré mais l\'email n\'a pas été envoyé.')
+
+        except TimeoutError:
+            # Connexion trop lente ou serveur SMTP qui ne répond pas
+            messages.warning(request, 'Délai de connexion dépassé. Email non envoyé.')
+
+        except Exception as e:
+            # Toute autre erreur imprévue
+            messages.warning(request, f'Erreur inattendue : {str(e)}')
     
         # FileResponse sets the Content-Disposition header so that browsers
         # present the option to save the file.
@@ -941,20 +997,22 @@ def imprimerecureinscription(request, idins):
 
 
 def chargeranneescolairecourante(request):
-    ans = Inscription.objects.all().distinct()
+    ans = Inscription.objects.all().distinct('annee_scolaire')
     cy = CycleScolaire.objects.all()
     return render(request, 'gEleve/liste_eleves_inscrits.html', dict(ans=ans, cycles=cy))
 
 
 def filtrelisteinscrits(request):
-    listeinsclasse = []
-    effectif_total = []
-    effectif_total_garcons = []
-    effectif_total_filles = []
+    listeinsclasse = {}
+    effectif_total = 0
+    effectif_total_garcons = 0
+    effectif_total_filles = 0
 
     idclass = request.GET.get('id_classe')
     idcy = request.GET.get('cycle')
     idansc = request.GET.get('annee_scolaire')
+    listeinsclasse = Inscription.objects.none()
+
 
     if (idclass != '' and idclass is not None) and (idcy != '' and idcy is not None) and (
             idansc != '' and idansc is not None):

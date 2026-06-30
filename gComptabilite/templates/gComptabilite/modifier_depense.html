@@ -1,16 +1,18 @@
 {% extends "base.html" %}
 {% block titre_page %} MIS A JOUR {% endblock %}
+{% block titre_formulaire %} DETAILS D'UNE LIGNE DE DEPENSE {% endblock %}
 {% block titre_cadre %}
 EDITION D'UNE LIGNE DE DEPENSE
 {% endblock %}
 
 {% block formulaire %}
 
-   <form class="form-horizontal" action="{% url 'modifiedepense' depense.id %}" method="POST" enctype="multipart/form-data">
+   <form class="needs-validation" action="{% url 'modifiedepense' depense.id %}" method="POST" enctype="multipart/form-data">
 
                 {% csrf_token %}
 
-                <div class="row">
+            <div class="card-body">    
+                <div class="row g-3">
                     <div class="col-md-12">
                         <div class="form-group">
                             <label for="IDcaisse">ID</label>
@@ -19,7 +21,7 @@ EDITION D'UNE LIGNE DE DEPENSE
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="id_categ">Catégorie recette</label>
@@ -29,12 +31,12 @@ EDITION D'UNE LIGNE DE DEPENSE
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="id_date_op">Date opération</label>
-                            <input type="text" name="date_operation" id="id_date_op" value="{{depense.date_operation|date:'j-n-Y'}}" class="form-control" readonly>
+                            <input type="text" name="date_operation" id="id_date_op" value="{{depense.date_operation|date:'j-n-Y'}}" class="form-control">
                         </div>
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-12">
                         <div class="form-group">
                             <label for="id_libelle">Désignation</label>
@@ -43,7 +45,7 @@ EDITION D'UNE LIGNE DE DEPENSE
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="id_qte">Quantité</label>
@@ -58,7 +60,7 @@ EDITION D'UNE LIGNE DE DEPENSE
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="id_provenance">Provient de</label>
@@ -73,7 +75,7 @@ EDITION D'UNE LIGNE DE DEPENSE
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="id_type_op">Type opération</label>
@@ -88,7 +90,7 @@ EDITION D'UNE LIGNE DE DEPENSE
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-12">
                         <div class="form-group">
                             <label for="id_memo">Observation/Mémo</label>
@@ -97,7 +99,7 @@ EDITION D'UNE LIGNE DE DEPENSE
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-12">
                         <div class="form-group">
                             <label for="id_annee">Année Scolaire</label>
@@ -106,7 +108,7 @@ EDITION D'UNE LIGNE DE DEPENSE
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-12">
                         <div class="text-center">
                             {% if depense.piece_jointe %}
@@ -119,18 +121,36 @@ EDITION D'UNE LIGNE DE DEPENSE
                         </div>
                     </div>
                 </div>
-                <br>
+            </div>
 
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="text-center">
-                            <button type="submit" class="btn btn-success btn-sm">Modifier &nbsp;<i class="fa fa-edit"></i></button>
-                            <a href="{% url 'listedepense' %}" target="_self" class="btn btn-primary btn-sm">Retour &nbsp;<i class="fa fa-arrow-circle-left"></i></a>
-                        </div>
-                    </div>
-              </div>
+            <div class="card-footer text-center">
+                <button type="submit" class="btn btn-success btn-sm">Modifier &nbsp;<i class="fa fa-edit"></i></button>
+                <a href="{% url 'listedepense' %}" target="_self" class="btn btn-primary btn-sm">Retour &nbsp;<i class="fa fa-arrow-circle-left"></i></a>
+            </div>
 
    </form>
 
 
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        $(document).ready(function () {
+            // Au clic sur le champ date, changer le type en "date" pour permettre la modification
+            $('#id_date_op').on('click', function () {
+                $(this).attr('type', 'date');
+                $(this).focus();
+            });
+
+            // Quand on quitte le champ, reformater en texte lisible
+            $('#id_date_op').on('blur', function () {
+                if ($(this).val() !== '') {
+                    //let date = new Date($(this).val());
+                    //let formatted = date.toLocaleDateString('fr-FR');
+                    $(this).attr('type', 'text');
+                    $(this).val(formatted);
+                }
+            });
+        });
+    </script>
 {% endblock %}

@@ -1,16 +1,18 @@
 {% extends "base.html" %}
 {% block titre_page %} CONSULTATION {% endblock %}
+{% block titre_formulaire %} DETAILS DES INFORMATIONS DE L'ECOLE {% endblock %}
 {% block titre_cadre %}
-DETAILS DES INFORMATIONS DE L'ECOLE
+DONNEES DE L'ECOLE
 {% endblock %}
 
 {% block formulaire %}
 
-  <form class="form-horizontal" action="" method="POST">
+  <form action="" method="get" class="needs-validation">
 
                 {% csrf_token %}
 
-                <div class="row">
+        <div class="card-body"> 
+                <div class="row g-3">
                     <div class="col-md-12">
                        <div class="form-group">
                             <label for="IDecole">ID</label>
@@ -18,7 +20,7 @@ DETAILS DES INFORMATIONS DE L'ECOLE
                        </div>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-12">
                         <div class="form-group">
                             <label for="id_nom_ecole">Nom/Raison sociale</label>
@@ -26,7 +28,7 @@ DETAILS DES INFORMATIONS DE L'ECOLE
                         </div>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-12">
                         <div class="form-group">
                             <label for="id_ville_ecole">IRE</label>
@@ -34,7 +36,7 @@ DETAILS DES INFORMATIONS DE L'ECOLE
                         </div>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="id_dce">DCE/DPE</label>
@@ -49,7 +51,7 @@ DETAILS DES INFORMATIONS DE L'ECOLE
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="id_tel1">Contact 1</label>
@@ -64,7 +66,7 @@ DETAILS DES INFORMATIONS DE L'ECOLE
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="id_agrement">N°agrement</label>
@@ -79,7 +81,7 @@ DETAILS DES INFORMATIONS DE L'ECOLE
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="id_mail">Email</label>
@@ -94,7 +96,7 @@ DETAILS DES INFORMATIONS DE L'ECOLE
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-12">
                         <div class="form-group">
                             <label for="id_devise">Devise/Slogan</label>
@@ -103,7 +105,7 @@ DETAILS DES INFORMATIONS DE L'ECOLE
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="id_dg">Directeur général</label>
@@ -118,7 +120,7 @@ DETAILS DES INFORMATIONS DE L'ECOLE
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="id_coordo_second">Coordinateur Secondaire</label>
@@ -133,7 +135,7 @@ DETAILS DES INFORMATIONS DE L'ECOLE
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-12">
                         <div class="form-group">
                             <div class="text-center">
@@ -147,7 +149,7 @@ DETAILS DES INFORMATIONS DE L'ECOLE
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-6">
                         <div class="form-group">
                             <div class="text-left">
@@ -171,13 +173,10 @@ DETAILS DES INFORMATIONS DE L'ECOLE
                         </div>
                     </div>
                 </div>
+         </div> 
 
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="text-center">
-                        <a href="{% url 'listeinfos' %}" target="_self" class="btn btn-sm btn-secondary">Retour &nbsp;<i class="fa fa-arrow-circle-left"></i></a>
-                        </div>
-                    </div>
+                <div class="card-footer text-center">
+                    <a href="{% url 'listeinfos' %}" target="_self" class="btn btn-sm btn-primary">Retour &nbsp;<i class="fa fa-arrow-circle-left"></i></a>
                 </div>
   </form>
 {% endblock %}

@@ -13,11 +13,11 @@ class FormEleve(ModelForm):
             'prenom': 'Prénoms',
             'sexe_eleve': 'Sexe',
             'pere': 'Prénoms du père',
-            'mere': 'Nom & Prénoms mère',
-            'tuteur': 'Nom & Prénoms tuteur',
-            'contact_parent': 'Contact tuteur',
-            'email_parent':'Email tuteur/parent',
-            'adresse': 'Adresse tuteur',
+            'mere': 'Prénoms & Nom de la mère',
+            'tuteur': 'Prénoms & Nom du tuteur',
+            'contact_parent': 'Contact du tuteur',
+            'email_parent':'Email du tuteur/parent',
+            'adresse': 'Adresse du tuteur',
             'ecole_origine': 'Ecole d\'origine',
             'photo_eleve': 'Photo identité',
             'datenaissance': 'Date naissance',
@@ -29,23 +29,21 @@ class FormEleve(ModelForm):
         widgets = {
             'nom': forms.TextInput(
                 attrs={'class': 'form-control', 'placeholder': 'Nom Famille', 'title': 'Saisissez le nom de famille',
-                       'id': 'majuscule'}),
+                       'id': 'idnom'}), # Cet idnom est utilisé dans le template par JQuery pour transformer le nom de famille saisi en majuscule
             'prenom': forms.TextInput(
                 attrs={'class': 'form-control', 'placeholder': 'Prénoms', 'title': 'Saisissez le prénom',
-                       'id': 'capitalletter'}),
+                       'id': 'idprenom'}),
             'sexe_eleve': forms.Select(attrs={'class': 'form-control', 'title': 'Sélectionnez le sexe_personnel'},
                                        choices=SEXE_ELEVE_CHOICES),
             'pere': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Prénoms du père',
                                            'title': 'Saisissez le prénom du père'}),
             'mere': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nom & Prénoms mère',
-                                           'title': 'Saisissez le nom et prénoms de la mère'}),
+                                           'title': 'Saisissez le prénoms et nom de la mère'}),
             'tuteur': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nom & Prénoms tuteur',
-                                             'title': 'Saisissez le nom et prénoms du tuteur'}),
+                                             'title': 'Saisissez le prénoms et nom du tuteur'}),
             'contact_parent': forms.TextInput(
-                attrs={'class': 'form-control', 'placeholder': 'Contact tuteur', 'type': 'tel',
-                       'pattern': '^6(1|3|2|4|6|5)[0-9]{7}', 'min': '600000000',
-                       'max': '699999999',
-                       'title': 'Saisissez un numéro de téléphone guinéen'}),
+                attrs={'class': 'form-control', 'placeholder': 'Contact du tuteur', 'type': 'tel',
+                       'pattern': '(\\+224)?[36][0-9]{8}','title': 'Saisissez un numéro de téléphone guinéen'}),
             'email_parent': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Ex: contact@universtechgroup.com',
                        'pattern': "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\'.[a-zA-Z]{2,}", 'title': 'Saisissez un email correct!'}),
             'adresse': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Adresse tuteur',
@@ -53,7 +51,7 @@ class FormEleve(ModelForm):
             'ecole_origine': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ecole d\'origine',
                                                     'title': 'Saisissez le nom de l\'école d\'origine'}),
             'photo_eleve': forms.FileInput(attrs={'class': 'form-control', 'accept': 'image/jpeg, image/png',
-                                                  'title': 'Importez la photo de l\'élève'}),
+                                                  'title': 'Importez la photo de l\'élève si disponible'}),
             'datenaissance': forms.DateInput(
                 attrs={'class': 'form-control', 'type': 'date', 'title': 'Sélectionnez la date de naissance'}),
             'lieu_naissance': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Lieu naissance',
@@ -93,6 +91,7 @@ class FormInscription(ModelForm):
         self.fields['idclasse'].queryset = Classe.objects.none()
         self.fields['annee_scolaire'].empty_label = 'Sélectionnez'
         self.fields['idcycle'].empty_label = 'Sélectionnez'
+        self.fields['idclasse'].empty_label = 'Sélectionnez'
 
         if 'idcycle' in self.data:
             try:

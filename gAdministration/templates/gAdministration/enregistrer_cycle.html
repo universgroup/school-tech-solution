@@ -1,24 +1,29 @@
 {% extends "base.html" %}
 {% block titre_page %} GESTION DES CYCLES SCOLAIRES {% endblock %}
 {% load crispy_forms_tags %}
-
+{% block titre_formulaire %} PARAMETRAGE DES CYCLES SCOLAIRES {% endblock %}
  {% block titre_cadre %}
 AJOUT DES CYCLES SCOLAIRES
  {% endblock %}
  {% block formulaire %}
         
-        <form action="" method="POST" class="form-horizontal">
+        <form action="" method="POST" class="needs-validation">
 
                         {% csrf_token %}
-                        {{form|crispy}}
 
-                        <div class="row">
-                            <div class="col-md-12">
-                                <button type="submit" class="btn btn-success btn-sm">Ajouter &nbsp;<i class="fa fa-add"></i></button>
-                                <button type="reset" class="btn btn-warning btn-sm">Annuler &nbsp;<i class="fa fa-refresh"></i></button>
-                                <a href="{% url 'listecycle' %}" class="btn btn-primary btn-sm" title="Afficher/Voir la liste des cycles" target="_self">Retour &nbsp;<i class="fa fa-arrow-circle-left"></i></a>
-                            </div>
-                        </div>
+                    <div class="card-body">
+                      <div class="row g-3">
+                          <div class="col-md-12">
+                            {{form|crispy}}
+                          </div>
+                      </div>
+                    </div>
+                    
+                    <div class="card-footer text-center">
+                        <button type="submit" class="btn btn-success btn-sm">Ajouter &nbsp;<i class="fa fa-add"></i></button>
+                        <button type="reset" class="btn btn-warning btn-sm">Annuler &nbsp;<i class="fa fa-refresh"></i></button>
+                        <a href="{% url 'listecycle' %}" class="btn btn-primary btn-sm" title="Afficher/Voir la liste des cycles" target="_self">Retour &nbsp;<i class="fa fa-arrow-circle-left"></i></a>
+                    </div>    
         </form>
 
 {% endblock %}

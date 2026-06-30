@@ -2,201 +2,747 @@
 <html lang="fr">
 <head>
     {% load static %}
-	<meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>SITUATION GLOBALE DES DEPENSES DE L'ANNEE SCOLAIRE COURANTE</title>
-    <meta name="description" content="">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="shortcut icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
-    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css'%}">
-    <link href="{% static 'fontawesomefree/css/all.min.css' %}" rel="stylesheet" type="text/css">
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-    
-    <script src="{% static 'scripts/bootstrap.min.js' %}"></script>
-    <script src="{% static 'fontawesomefree/js/all.min.js' %}"></script>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>SITUATION GLOBALE DES DEPENSES ANNUELLES</title>
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="{% static 'assets/plugins/fontawesome-free/css/all.min.css' %}">
+  <!-- Ionicons -->
+  <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="{% static 'assets/dist/css/adminlte.min.css' %}">
+  <!-- Google Font: Source Sans Pro -->
+  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
 
+  <!--begin::Third Party Plugin(OverlayScrollbars)-->
+  <link rel="stylesheet" href="{% static 'assets/plugins/overlayScrollbars/css/OverlayScrollbars.min.css' %}"/>
+  <link href="{% static 'fontawesomefree/css/all.min.css' %}" rel="stylesheet" type="text/css">
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <!-- DataTables -->
+  <link rel="stylesheet" href="{% static 'assets/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
+  <link rel="stylesheet" href="{% static 'assets/plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
+  <link rel="stylesheet" href="{% static 'assets/plugins/datatables-buttons/css/buttons.bootstrap4.min.css' %}">
 
-    <!-- Reférences vers les élements de menu principal haut et de la barre latérale gauche -->
+  <!--begin::Third Party Plugin(Bootstrap Icons)-->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"/>
 
-    <script src="{% static 'assets/plugins/jquery/jquery.min.js' %}"></script>
-
-    <style>
-
-        
-        table {
-            white-space: nowrap;
-            width: 100%;
-        }
-
-        td {
-            border: 1px solid black;
-        }
-        td {
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        td.fit {
-            width: 0;
-            min-width: fit-content;
-        }
-
-        .marge-titre-tableau
-        {
-            margin-top: 80px;
-            margin-bottom: 10px;
-            text-align: center;
-            font-size: large;
-            font-weight: bold;
-        }
-
-        .marge-entete-tableau
-        {
-            margin-top: 1px;
-        }
-
-    </style>
 </head>
-<body>
-    <div class="container-fluid">
-        <div class="shadow p-4 mb-4 bg-body rounded">
+<body class="hold-transition sidebar-mini">
+    
+    <div class="wrapper">
+  <!-- Navbar -->
+   <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+    <!-- Left navbar links -->
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+      </li>
+      <li class="nav-item d-none d-sm-inline-block">
+        <a href="#" class="nav-link">Accueil</a>
+      </li>
+      
+      <li class="nav-item dropdown">
+            <a id="dropdownSubMenu1" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle">Administration</a>
+            <ul aria-labelledby="dropdownSubMenu1" class="dropdown-menu border-0 shadow">
+              <li><a href="#" class="dropdown-item">Paramètres de l'école </a></li>
+              <li><a href="#" class="dropdown-item">Certificat de scolarité</a></li>
+              <li><a href="#" class="dropdown-item">Contrat de travail</a></li>
 
-            <h5 style="text-align: left;font-size: larger;font-weight: bold;">Filtrez la situation des dépenses</h5>
+              <li class="dropdown-divider"></li>
 
-                    <form action="{% url 'rechercherdepense' %}" method="GET" class="form-horizontal">
+              <!-- Level two dropdown-->
+              <li class="dropdown-submenu dropdown-hover">
+                <a id="dropdownSubMenu2" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-item dropdown-toggle">Gestion des cours</a>
+                <ul aria-labelledby="dropdownSubMenu2" class="dropdown-menu border-0 shadow">
+                  <li><a tabindex="-1" href="#" class="dropdown-item">Ajouter une année scolaire</a></li>
+                  <li><a href="#" class="dropdown-item">Ajouter une classe</a></li>
+                  <li><a href="#" class="dropdown-item">Ajouter une matière</a></li>
+                </ul>
+              </li>
+              <!-- End Level two -->
+            </ul>
+      </li>
+
+      <li class="nav-item dropdown">
+            <a id="dropdownSubMenu3" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle">Elèves</a>
+            <ul aria-labelledby="dropdownSubMenu3" class="dropdown-menu border-0 shadow">
+              <li><a href="#" class="dropdown-item">Inscription</a></li>
+              <li><a href="#" class="dropdown-item">Reinscription</a></li>
+              <li><a href="#" class="dropdown-item">Etat des paiements</a></li>
+              <li><a href="#" class="dropdown-item">Etat des inscriptions/reinscriptions</a></li>
+              <li><a href="#" class="dropdown-item">Liste des élèves par classe</a></li>
+              <li><a href="#" class="dropdown-item">Registre de matriculation</a></li>
+            </ul>
+      </li>
+
+      <li class="nav-item dropdown">
+            <a id="dropdownSubMenu4" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle">Comptabilité</a>
+            <ul aria-labelledby="dropdownSubMenu4" class="dropdown-menu border-0 shadow">
+              <li><a href="#" class="dropdown-item">Paiement de la scolarité</a></li>
+              <li><a href="#" class="dropdown-item">Situation de la scolarité</a></li>
+              <li><a href="#" class="dropdown-item">Situation de la cantine scolaire</a></li>
+              <li><a href="#" class="dropdown-item">Situation des activités extra scolaires</a></li>
+              <li><a href="#" class="dropdown-item">Situation des dépenses</a></li>
+              
+              <li class="dropdown-divider"></li>
+              
+              <li class="dropdown-submenu dropdown-hover">
+                <a id="dropdownSubMenu5" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-item dropdown-toggle">Rapports</a>
+                <ul aria-labelledby="dropdownSubMenu5" class="dropdown-menu border-0 shadow">
+                  <li><a tabindex="-1" href="#" class="dropdown-item">Rapport périodique des recettes</a></li>
+                  <li><a href="#" class="dropdown-item">Rapport périodique des dépenses</a></li>
+                  <li><a href="#" class="dropdown-item">Rapport global par période</a></li>
+                  <li><a href="#" class="dropdown-item">Rapport global par année scolaire</a></li>
+                </ul>
+              </li>
+
+            </ul>
+      </li>
+
+      <li class="nav-item dropdown">
+            <a id="dropdownSubMenu6" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle">Personnel</a>
+            <ul aria-labelledby="dropdownSubMenu6" class="dropdown-menu border-0 shadow">
+              <li><a href="#" class="dropdown-item">Enregistrer un employé</a></li>
+              <li><a href="#" class="dropdown-item">Enregistrer une avance sur salaire</a></li>
+              <li><a href="#" class="dropdown-item">Paiement des salaires</a></li>
+              <li><a href="#" class="dropdown-item">Suivi des absences</a></li>
+              <li><a href="#" class="dropdown-item">Liste des employés</a></li>
+            </ul>
+      </li>
+
+      <li class="nav-item dropdown">
+            <a id="dropdownSubMenu7" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle">Evaluation</a>
+            <ul aria-labelledby="dropdownSubMenu7" class="dropdown-menu border-0 shadow">
+              
+              <li class="dropdown-submenu dropdown-hover">
+                <a id="dropdownSubMenu8" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-item dropdown-toggle">Saisie des notes</a>
+                <ul aria-labelledby="dropdownSubMenu8" class="dropdown-menu border-0 shadow">
+                  <li><a tabindex="-1" href="#" class="dropdown-item">Par classe</a></li>
+                  <li><a href="#" class="dropdown-item">Par élève</a></li>
+                </ul>
+              </li>
+
+              <li class="dropdown-submenu dropdown-hover">
+                <a id="dropdownSubMenu9" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-item dropdown-toggle">Resultats</a>
+                <ul aria-labelledby="dropdownSubMenu9" class="dropdown-menu border-0 shadow">
+                  <li><a tabindex="-1" href="#" class="dropdown-item">Par période</a></li>
+                  <li><a href="#" class="dropdown-item">Par trimestre/semestre</a></li>
+                  <li><a href="#" class="dropdown-item">Par année scolaire</a></li>
+                </ul>
+              </li>
+
+              <li class="dropdown-submenu dropdown-hover">
+                <a id="dropdownSubMenu10" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-item dropdown-toggle">Bulletin de notes</a>
+                <ul aria-labelledby="dropdownSubMenu10" class="dropdown-menu border-0 shadow">
+                  <li><a tabindex="-1" href="#" class="dropdown-item">Par période</a></li>
+                  <li><a href="#" class="dropdown-item">Par trimestre/semestre</a></li>
+                  <li><a href="#" class="dropdown-item">Par année scolaire</a></li>
+                </ul>
+              </li>
                             
-                        <div class="row">
-                                  <div class="col-md-12">
-                                      <div class="form-group">
-                                            <label for="idannee">Année scolaire</label>
-                                            <select class="form-control" name="nom_annee" id="idannee">
-                                                <option value="" selected>Sélectionnez</option>
-                                                {% for an in annee %}
-                                                <option value="{{ an.id }}">{{ an.descript_annee }}</option>
-                                                {% endfor %}
-                                            </select>
-                                      </div>                                      
-                                  </div>
-                            </div>
+            </ul>
+      </li>
 
-                            <div class="row">
-                                  <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="datedebut">Période du : </label>
-                                        <input type="date" id="datedebut" name="ddebut" class="form-control">
-                                    </div>
-                                  </div> 
-                                  <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="datefin">au : </label>
-                                        <input type="date" id="datefin" name="dfin" class="form-control">
-                                    </div>
-                                  </div>                                 
-                            </div>
+      <li class="nav-item dropdown">
+            <a id="dropdownSubMenu11" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle">Services</a>
+            <ul aria-labelledby="dropdownSubMenu11" class="dropdown-menu border-0 shadow">
+              <li><a href="#" class="dropdown-item">Cantine</a></li>
+              <li><a href="#" class="dropdown-item">Activités extra scolaires</a></li>              
+            </ul>
+      </li>
 
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                        <div class="text-center">
-                                            <button type="submit" class="btn btn-primary btn-sm" title="Filtrer la liste des dépenses par année scolaire et/ou période">Rechercher &nbsp; <i class="fa fa-search"></i></button>
-                                            <a href="{% url 'listedepense' %}" target="_self" title="Actualiser la liste des dépenses" class="btn btn-warning btn-sm">Actualiser &nbsp;<i class="fa fa-refresh"></i></a>
-                                        </div>
-                                         
-                                    </div>
-                                </div>
-                            </div>
+    </ul>
 
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                      {% if cais %}
-                                      <h5 class="marge-titre-tableau">Situation globale du mois de &nbsp; : &nbsp;{{mois_actuel}}</h5>
-                                      {% elif depense %}
-                                      <h5 class="marge-titre-tableau">Situation globale de la période du &nbsp; : &nbsp;{{ddebut|date:'j-n-Y'}} &nbsp; au &nbsp;: &nbsp; {{dfin|date:'j-n-Y'}}</h5>  
-                                      {% endif %}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="totalrecu">Total entrée</label>
-                                                {% if total_entree %}
-                                                <input type="text" id="totalrecu" name="total_recette" value="{{ total_entree | floatformat:'2g' }}" class="form-control" readonly style="color:red;font-weight: bold; font-size: 12pt;">
-                                                {% else %}
-                                                <input type="text" name="total_recette" value="0" class="form-control" size="30px" readonly style="color:red;font-weight: bold; font-size: 12pt;">
-                                                {% endif %}
-                                            </div>
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="totaldep">Total sortie</label>
-                                                {% if total_sortie %}
-                                                <input type="text" id="totaldep" name="total_depense" value="{{ total_sortie|floatformat:'2g' }}" class="form-control" readonly style="color:red;font-weight: bold; font-size: 12pt;">
-                                                {% else %}
-                                                <input type="text"  name="total_depense" value="0" class="form-control" readonly style="color:red;font-weight: bold; font-size: 12pt;">
-                                                {% endif %}
-                                            </div>
-                                        </div>
-                            </div>
-
-                            <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="form-group">
-                                            <label for="totalsolde">Solde disponible</label>
-                                            {% if solde_dispo %}
-                                            <input type="text" id="totalsolde" name="total_solde" value="{{ solde_dispo | floatformat:'2g' }}" class="form-control" readonly style="color:red;font-weight: bold; font-size: 12pt;">
-                                            {% else %}
-                                            <input type="text" name="total_solde" value="0" class="form-control" readonly style="color:red;font-weight: bold; font-size: 12pt;">
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                            </div>      
-
-
-                    </form>
+    <!-- SEARCH FORM -->
+    <form class="form-inline ml-3">
+      <div class="input-group input-group-sm">
+        <input class="form-control form-control-navbar" type="search" placeholder="Rechercher..." aria-label="Search">
+        <div class="input-group-append">
+          <button class="btn btn-navbar" type="submit">
+            <i class="fas fa-search"></i>
+          </button>
         </div>
-    </div>
+      </div>
+    </form>
 
-    <div class="form-group">
-        <div class="text-center">
-            <a href="{% url 'enregistrerdepense' %}" class="btn btn-success btn-md marge-entete-tableau" target="_self" title="Cliquez ici pour enregistrer une opération">Enregistrer une dépense &nbsp;<i class="fa fa-solid fa-save"></i></a>
+    <!-- Right navbar links -->
+    <ul class="navbar-nav ml-auto">
+      <!-- Messages Dropdown Menu -->
+      <li class="nav-item dropdown">
+        <a class="nav-link" data-toggle="dropdown" href="#">
+          <i class="far fa-comments"></i>
+          <span class="badge badge-danger navbar-badge">3</span>
+        </a>
+        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+          <a href="#" class="dropdown-item">
+            <!-- Message Start -->
+            <div class="media">
+              <img src="{% static 'assets/dist/img/user1-128x128.jpg' %}" alt="User Avatar" class="img-size-50 mr-3 img-circle">
+              <div class="media-body">
+                <h3 class="dropdown-item-title">
+                  Brad Diesel
+                  <span class="float-right text-sm text-danger"><i class="fas fa-star"></i></span>
+                </h3>
+                <p class="text-sm">Call me whenever you can...</p>
+                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
+              </div>
+            </div>
+            <!-- Message End -->
+          </a>
+          <div class="dropdown-divider"></div>
+          <a href="#" class="dropdown-item">
+            <!-- Message Start -->
+            <div class="media">
+              <img src="{% static 'assets/dist/img/user8-128x128.jpg' %}" alt="Avatar utilisateur" class="img-size-50 img-circle mr-3">
+              <div class="media-body">
+                <h3 class="dropdown-item-title">
+                  John Pierce
+                  <span class="float-right text-sm text-muted"><i class="fas fa-star"></i></span>
+                </h3>
+                <p class="text-sm">I got your message bro</p>
+                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
+              </div>
+            </div>
+            <!-- Message End -->
+          </a>
+          <div class="dropdown-divider"></div>
+          <a href="#" class="dropdown-item">
+            <!-- Message Start -->
+            <div class="media">
+              <img src="{% static 'assets/dist/img/user3-128x128.jpg' %}" alt="Avatar utilisateur" class="img-size-50 img-circle mr-3">
+              <div class="media-body">
+                <h3 class="dropdown-item-title">
+                  Nora Silvester
+                  <span class="float-right text-sm text-warning"><i class="fas fa-star"></i></span>
+                </h3>
+                <p class="text-sm">The subject goes here</p>
+                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
+              </div>
+            </div>
+            <!-- Message End -->
+          </a>
+          <div class="dropdown-divider"></div>
+          <a href="#" class="dropdown-item dropdown-footer">See All Messages</a>
         </div>
-    </div>
+      </li>
+      <!-- Notifications Dropdown Menu -->
+      <li class="nav-item dropdown">
+        <a class="nav-link" data-toggle="dropdown" href="#">
+          <i class="far fa-bell"></i>
+          <span class="badge badge-warning navbar-badge">15</span>
+        </a>
+        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+          <span class="dropdown-item dropdown-header">15 Notifications</span>
+          <div class="dropdown-divider"></div>
+          <a href="#" class="dropdown-item">
+            <i class="fas fa-envelope mr-2"></i> 4 new messages
+            <span class="float-right text-muted text-sm">3 mins</span>
+          </a>
+          <div class="dropdown-divider"></div>
+          <a href="#" class="dropdown-item">
+            <i class="fas fa-users mr-2"></i> 8 friend requests
+            <span class="float-right text-muted text-sm">12 hours</span>
+          </a>
+          <div class="dropdown-divider"></div>
+          <a href="#" class="dropdown-item">
+            <i class="fas fa-file mr-2"></i> 3 new reports
+            <span class="float-right text-muted text-sm">2 days</span>
+          </a>
+          <div class="dropdown-divider"></div>
+          <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
+        </div>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button">
+          <i class="fas fa-th-large"></i>
+        </a>
+      </li>
+    </ul>
+  </nav>
+  <!-- /.navbar -->
 
-     <div class="container-fluid">
-          <div class="card shadow mb-4">
-            <div class="table-responsive">
-                {% if cais %}
-                        <table id="depense_derniere_annee" class="table table-striped table-bordered">
-                            <thead class="table-success">
-                                <tr>
-                                    <th>Catégorie recette</th>
-                                    <th>Date opération</th>
-                                    <th>Désignation</th>
-                                    <th>Quantité</th>
-                                    <th>Prix unitaire</th>
-                                    <th>Montant</th>
-                                    <th>Provient de</th>
-                                    <th>Destiné à</th>
-                                    <th>Type opération</th>
-                                    <th>Solde progressif</th>
-                                    <th>Observation/Mémo</th>
-                                    <th>Année scolaire</th>
-                                    <th>Pièce jointe</th>
-                                    <th>ID</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for c in cais %}
+  <!-- Main Sidebar Container -->
+  <aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <!-- Brand Logo -->
+    <a href="../../index3.html" class="brand-link">
+      <img src="{% static 'assets/dist/img/LogoEC.png' %}"
+           alt="Logo Ecole les Champions"
+           class="brand-image img-circle elevation-3"
+           style="opacity: .8">
+      <span class="brand-text font-weight-light">Ecole les Champions</span>
+    </a>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <!-- Sidebar user (optional) -->
+      <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+        <div class="image">
+          <img src="{% static 'assets/dist/img/user7-128x128.jpg' %}" class="img-circle elevation-2" alt="User Image">
+        </div>
+        <div class="info">
+          <a href="#" class="d-block">Mme Djénabou DIALLO</a>
+        </div>
+      </div>
+
+      <!-- Sidebar Menu -->
+      <nav class="mt-2">
+        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+          <!-- Add icons to the links using the .nav-icon class
+               with font-awesome or any other icon font library -->
+
+               <!--Debut du menu Administration -->
+          <li class="nav-item has-treeview">
+            <a href="#" class="nav-link active" title="Permet de parametrer les données de base de l'application">
+              <i class="nav-icon fas fa-wrench"></i>
+              <p>
+                Administration
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet de saisir les renseignements de l'école">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Paramères de l'école &nbsp;</p>
+                  <i class=" fas fa-gears"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet d'éditer le certificat de scolarité d'un élève">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Certificat de scolarité &nbsp;</p>
+                  <i class="fas fa-award"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet d'éditer le contrat de travail d'un employé de l'école">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Contrat de travail &nbsp;</p>
+                  <i class="fas fa-file-signature"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet d'ajouter de nouvelles années scolaires">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Créer une année scolaire &nbsp;</p>
+                  <i class="fas fa-calendar-plus"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet d'ajouter de nouvelles classes dans le système">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Créer une classe &nbsp;</p>
+                  <i class="fas fa-school"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet d'ajouter de nouvelles matières et leurs coefficients respectifs">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Créer une matière &nbsp;</p>
+                  <i class="fas fa-book-skull"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet de créer un compte utilisateur pour le personnel ou les parents d'élèves">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Créer un utilisateur &nbsp;</p>
+                  <i class="fas fa-user-plus"></i>
+                </a>
+              </li>
+
+            </ul>
+          </li>
+          
+          <li class="nav-item has-treeview">
+            <a href="#" class="nav-link" title="Permet de gérer les élèves de l'école">
+              <i class="nav-icon fas fa-children"></i>
+              <p>
+                Elèves
+                <i class="fas fa-angle-left right"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet d'effectuer les inscriptions des nouvels élèves">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Inscription &nbsp;</p>
+                  <i class="fas fa-info"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet d'effectuer la reinscription des anciens élèves">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Reinscription &nbsp;</p>
+                  <i class="fas fa-registered"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet de consulter l'état des paiements de la scolarité">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Etat des paiements &nbsp;</p>
+                  <i class="fas fa-file-invoice-dollar"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet de consulter l'état des paiements des inscriptions/reinscriptions">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Etat inscriptions &nbsp;</p>
+                  <i class="fas fa-file-invoice"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet de consulter la liste des élèves par classe et par cycle scolaire">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Liste par classe &nbsp;</p>
+                  <i class="fas fa-list"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet de consulter le registre de matriculation de l'école">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Registre de matricule &nbsp;</p>
+                  <i class="fas fa-list-ol"></i>
+                </a>
+              </li>
+              
+            </ul>
+          </li>
+
+          <li class="nav-item has-treeview">
+            <a href="#" class="nav-link" title="Permet d'acceder à toutes les opérations de la comptabilité ou de la caisse">
+              <i class="nav-icon fas fa-calculator"></i>
+              <p>
+                Comptabilité
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet de procéder au paiement des frais de scolarité">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Paiement scolarité &nbsp;</p>
+                  <i class="fa-brands fa-cc-visa"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet de gérer la situation des recettes générées par le paiement des frais à la scolarité">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Recettes scolarité &nbsp;</p>
+                  <i class="fa-brands fa-cc-mastercard"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet de gérer la situation des recettes générées par le paiement des frais de cantine">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Recettes cantine &nbsp;</p>
+                  <i class="fas fa-cash-register"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet de gérer la situation des recettes générées par le paiement des activités extra scolaires">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Recettes extra scolaires &nbsp;</p>
+                  <i class="fas fa-person-swimming"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet de gérer la situation des dépenses quotidiennes">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Gestion dépenses &nbsp;</p>
+                  <i class="fas fa-credit-card"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet d'imprimer le rapport des recettes générées durant une période donnée">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Rapport recettes &nbsp;</p>
+                  <i class="fas fa-chart-pie"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet d'imprimer le rapport des dépenses réalisées durant une période donnée">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Rapport dépenses &nbsp;</p>
+                  <i class="fas fa-chart-area"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet d'imprimer le rapport global des recettes et dépenses durant une période donnée">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Rapport global période &nbsp;</p>
+                  <i class="fas fa-table"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet d'imprimer le rapport global des recettes et dépenses durant l'année scolaire">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Rapport global annuel &nbsp;</p>
+                  <i class="fas fa-file-pdf"></i>
+                </a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-item has-treeview">
+            <a href="#" class="nav-link" title="Permet de gérer le personnel de l'école">
+              <i class="nav-icon fas fa-user-tie"></i>
+              <p>
+                Personnel
+                <i class="fas fa-angle-left right"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet d'enregistrer les informations de chaque employé de l'école">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Ajouter un employé &nbsp;</p>
+                  <i class="fas fa-user-check"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet de saisir les avances sur salaire accordées aux employés">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Ajouter bon paiement &nbsp;</p>
+                  <i class="fas fa-sack-dollar"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet de saisir les salaires mensuels versés aux employés">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Paiement salaires &nbsp;</p>
+                  <i class="fas fa-hand-holding-dollar"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet d'enregistrer les absences du personnel enseignant">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Suivi absences &nbsp;</p>
+                  <i class="fas fa-person-chalkboard"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet d'imprimer la liste générale du personnel">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Liste employés &nbsp;</p>
+                  <i class="fa-solid fa-users"></i>
+                </a>
+              </li>
+            </ul>
+          </li>    
+          <li class="nav-item has-treeview">
+            <a href="#" class="nav-link" title="Permet de gerer les évaluations des élèves par cycle et classe">
+              <i class="nav-icon fas fa-book"></i>
+              <p>
+                Evaluation
+                <i class="fas fa-angle-left right"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet de faire la saisie des notes par classe">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Saisie par classe &nbsp;</p>
+                  <i class="fas fa-chalkboard-user"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet de faire la saisie des notes par élève">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Saisie par élève &nbsp;</p>
+                  <i class="fas fa-child"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet de consulter et imprimer les résultats d'une classe aucours d'une période donnée">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Résultat périodique &nbsp;</p>
+                  <i class="fas fa-file-pdf"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet de consulter et imprimer les résultats d'une classe aucours d'un trimestre ou semestre">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Résultat trimestriel &nbsp;</p>
+                  <i class="fas fa-file-lines"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet de consulter et imprimer les résultats d'une classe aucours d'une année scolaire">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Résultat annuel &nbsp;</p>
+                  <i class="fas fa-newspaper"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet de consulter et imprimer les bulletins d'une classe aucours d'une période donnée">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Bulletin périodique &nbsp;</p>
+                  <i class="fas fa-address-card"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet de consulter et imprimer les bulletins d'une classe aucours d'un trimestre ou semestre">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Bulletin trimestriel &nbsp;</p>
+                  <i class="fas fa-id-badge"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet de consulter et imprimer les bulletins d'une classe aucours d'une année scolaire">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Bulletin annuel &nbsp;</p>
+                  <i class="fas fa-layer-group"></i>
+                </a>
+              </li>
+            </ul>
+          </li>
+
+          <li class="nav-item has-treeview">
+            <a href="#" class="nav-link" title="Permet de gérer les services extra scolaires : Natation, Football, Karaté, Cantine, etc.">
+              <i class="nav-icon fas fa-table"></i>
+              <p>
+                Services
+                <i class="fas fa-angle-left right"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet de gérer les opérations de paiement des frais de cantine">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Gestion cantine &nbsp;</p>
+                  <i class="fas fa-utensils"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet de gérer les activités extra scolaires comme le Karaté, la Natation, le Football, etc.">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Activités extra scolaires &nbsp;</p>
+                  <i class="fas fa-futbol"></i>
+                </a>
+              </li>
+            </ul>
+          </li>
+     
+        </ul>
+      </nav>
+      <!-- /.sidebar-menu -->
+    </div>
+    <!-- /.sidebar -->
+  </aside>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1>SITUATION DES DEPENSES REALISEES</h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="#">Accueil</a></li>
+              <li class="breadcrumb-item active">Situation des dépenses</li>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      
+        <div class="row">
+          <!-- left column -->
+          <div class="col-12">
+            <!-- jquery validation -->
+            <div class="card card-primary">
+              <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center"">
+                    
+                        <h2 class="card-title mb-0">Filtrez la situation des dépenses réalisées au quotidien</h2>
+                            
+                        <div class="d-flex align-items-center">
+
+                            <form class="form-inline ml-3" action="{% url 'rechercherdepense' %}" method="GET">
+
+                                <div class="d-flex align-items-center">
+                                    
+                                    <label for="idannee" class="mr-2 mb-0">Année scolaire</label>
+                                    <select class="form-control form-control-sm mr-3" name="nom_annee" id="idannee" title="Sélectionnez une année scolaire pour afficher les opérations effectuées">
+                                        <option value="" selected>Sélectionnez</option>
+                                        {% for an in annee %}
+                                        <option value="{{ an.id }}">{{ an.descript_annee }}</option>
+                                        {% endfor %}
+                                    </select>
+
+                                    <label for="datedebut" class="mr-2 mb-0">Période du : </label>
+                                    <input type="date" id="datedebut" name="ddebut" class="form-control form-control-sm mr-3">
+
+                                    <label for="datefin" class="mr-2 mb-0">au : </label>
+                                    <input type="date" id="datefin" name="dfin" class="form-control form-control-sm mr-3">
+ 
+                                    <button type="submit" class="btn btn-secondary btn-sm mr-2" title="Filtrer la liste des dépenses par année scolaire et/ou période">Rechercher &nbsp; <i class="fas fa-search"></i></button>
+                                    <a href="{% url 'listedepense' %}" target="_self" title="Actualiser la liste des dépenses" class="btn btn-warning btn-sm mr-3">Actualiser &nbsp;<i class="fas fa-refresh"></i></a>
+                                </div>
+
+                            </form>
+                        </div>
+
+                            <div class="text-right">
+                                <a href="{% url 'enregistrerdepense' %}" class="btn btn-success btn-sm" target="_self" title="Cliquez ici pour enregistrer une dépense">Enregistrer une sortie &nbsp;<i class="fa fa-solid fa-save"></i></a>
+                            </div>
+            
+                </div>
+
+                <div class="row mt-2">
+                    <div class="col-md-12 text-center">
+                        {% if cais %}
+                        <h5 class="text-center font-weight-bold text-white mt-2 mb-0">
+                            Situation globale du mois de &nbsp;: &nbsp;{{ mois_actuel }}
+                        </h5>
+                        {% elif depense %}
+                        <h5 class="text-center font-weight-bold text-white mt-2 mb-0">
+                            Situation globale de la période du &nbsp;: &nbsp;
+                            {{ ddebut|date:'j-n-Y' }} &nbsp; au &nbsp;: &nbsp; {{ dfin|date:'j-n-Y' }}
+                        </h5>
+                        {% endif %}
+                    </div>
+                </div>    
+
+            </div>
+              <!-- /.card-header -->
+
+        <div class="card-body">
+        {% if cais %}
+             <table id="depense_derniere_annee" class="table table-bordered table-striped">
+                    <thead class="table-success">
+                
+                        <tr>
+                                <th>Catégorie dépense</th>
+                                <th>Date opération</th>
+                                <th>Désignation</th>
+                                <th>Quantité</th>
+                                <th>Prix unitaire</th>
+                                <th>Montant</th>
+                                <th>Provient de</th>
+                                <th>Destiné à</th>
+                                <th>Type opération</th>
+                                <th>Solde progressif</th>
+                                <th>Observation/Mémo</th>
+                                <th>Année scolaire</th>
+                                <th>Pièce jointe</th>
+                                <th>ID</th>
+                                <th>Actions</th>
+                        </tr>
+
+                    </thead>
+                    <tbody>
+                    
+                        {% for c in cais %}
                                 <tr>
                                     <td class="fit">{{c.categ_depense}}</td>
                                     <td class="fit">{{ c.date_operation | date:'j-n-Y' }}</td>
@@ -226,73 +772,147 @@
                                         <a class="btn btn-danger" href="{% url 'supprimedepense' c.id %}" title="Supprimer" target="_self"><i class="fa-solid fa-remove fa-sm"></i></a>
                                     </td>
                                 </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                            {% endfor %}
 
-                        <div class="row">
-                            <div class="col-md-8">
-                                <div class="text-center">
-                                    <nav aria-label="">
-                                        <ul class="pagination">
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th>Catégorie dépense</th>
+                            <th>Date opération</th>
+                            <th>Désignation</th>
+                            <th>Quantité</th>
+                            <th>Prix unitaire</th>
+                            <th>Montant</th>
+                            <th>Provient de</th>
+                            <th>Destiné à</th>
+                            <th>Type opération</th>
+                            <th>Solde progressif</th>
+                            <th>Observation/Mémo</th>
+                            <th>Année scolaire</th>
+                            <th>Pièce jointe</th>
+                            <th>ID</th>
+                            <th>Actions</th>
+                        </tr>
+                   </tfoot>
+            </table>
 
-                                            {% if cais.has_previous %}
+            <div class="row mt-3 mb-2">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="totalrecu">Total entrée</label>
+                        {% if total_entree %}
+                        <input type="text" id="totalrecu" name="total_recette"
+                            value="{{ total_entree|floatformat:'2g' }}"
+                            class="form-control" readonly
+                            style="color:red; font-weight:bold; font-size:12pt;">
+                        {% else %}
+                        <input type="text" name="total_recette" value="0"
+                            class="form-control" readonly
+                            style="color:red; font-weight:bold; font-size:12pt;">
+                        {% endif %}
+                    </div>
+                </div>
+           
 
-                                            <li class="page-item">
-                                                <a class="page-link" href="?page=1">1</a>
-                                            </li>
-                                            <li class="page-item">
-                                                <a class="page-link" href="?page={{ cais.previous_page_number }}"><i class="fa-solid fa-backward fa-sm"></i>&nbsp; Précédent</a>
-                                            </li>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="totaldep">Total sortie</label>
+                        {% if total_sortie %}
+                        <input type="text" id="totaldep" name="total_depense"
+                            value="{{ total_sortie|floatformat:'2g' }}"
+                            class="form-control" readonly
+                            style="color:red; font-weight:bold; font-size:12pt;">
+                        {% else %}
+                        <input type="text" name="total_depense" value="0"
+                            class="form-control" readonly
+                            style="color:red; font-weight:bold; font-size:12pt;">
+                        {% endif %}
+                    </div>
+                </div>
 
-                                            {% endif %}
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="totalsolde">Solde disponible</label>
+                        {% if solde_dispo %}
+                        <input type="text" id="totalsolde" name="total_solde"
+                            value="{{ solde_dispo|floatformat:'2g' }}"
+                            class="form-control" readonly
+                            style="color:red; font-weight:bold; font-size:12pt;">
+                        {% else %}
+                        <input type="text" name="total_solde" value="0"
+                            class="form-control" readonly
+                            style="color:red; font-weight:bold; font-size:12pt;">
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
 
-                                            <li class="page-item active" aria-current="page">
-                                                <a class="page-link" href="#">
-                                                    Page {{ cais.number }} sur {{ cais.paginator.num_pages }}
-                                                </a>
-                                            </li>
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="text-center">
 
-                                            {% if cais.has_next %}
+                        <nav aria-label="">
+                            <ul class="pagination">
 
-                                            <li class="page-item">
-                                                <a class="page-link" href="?page={{ cais.next_page_number }}"><i class="fa-solid fa-forward fa-sm"></i>&nbsp; Suivant</a>
-                                            </li>
+                                {% if cais.has_previous %}
 
-                                            <li class="page-item">
-                                                <a class="page-link" href="?page={{ cais.paginator.num_pages }}"><i class="fa-solid fa-step-forward fa-sm"></i>&nbsp; Dernier</a>
-                                            </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1">1</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ cais.previous_page_number }}"><i class="fa-solid fa-backward fa-sm"></i>&nbsp; Précédent</a>
+                                </li>
 
-                                            {% endif %}
+                                {% endif %}
 
-                                        </ul>
-                                    </nav>
-                                </div>
-                            </div>
-                        </div>
-                {% elif depense %}
-                        <table id="depense_annee_select" class="table table-striped table-bordered">
-                            <thead class="table-success">
-                                <tr>
-                                    <th>Catégorie recette</th>
-                                    <th>Date opération</th>
-                                    <th>Désignation</th>
-                                    <th>Quantité</th>
-                                    <th>Prix unitaire</th>
-                                    <th>Montant</th>
-                                    <th>Provient de</th>
-                                    <th>Destiné à</th>
-                                    <th>Type opération</th>
-                                    <th>Solde progressif</th>
-                                    <th>Observation/Mémo</th>
-                                    <th>Année scolaire</th>
-                                    <th>Pièce jointe</th>
-                                    <th>ID</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for d in depense %}
+                                <li class="page-item active" aria-current="page">
+                                    <a class="page-link" href="#">
+                                        Page {{ cais.number }} sur {{ cais.paginator.num_pages }}
+                                    </a>
+                                </li>
+
+                                {% if cais.has_next %}
+
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ cais.next_page_number }}"><i class="fa-solid fa-forward fa-sm"></i>&nbsp; Suivant</a>
+                                </li>
+
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ cais.paginator.num_pages }}"><i class="fa-solid fa-step-forward fa-sm"></i>&nbsp; Dernier</a>
+                                </li>
+
+                                {% endif %}
+
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+
+        {% elif depense %}
+
+            <table id="depense_annee_select" class="table table-striped table-bordered">
+                    <thead class="table-success">
+                        <tr>
+                            <th>Catégorie dépense</th>
+                            <th>Date opération</th>
+                            <th>Désignation</th>
+                            <th>Quantité</th>
+                            <th>Prix unitaire</th>
+                            <th>Montant</th>
+                            <th>Provient de</th>
+                            <th>Destiné à</th>
+                            <th>Type opération</th>
+                            <th>Solde progressif</th>
+                            <th>Observation/Mémo</th>
+                            <th>Année scolaire</th>
+                            <th>Pièce jointe</th>
+                            <th>ID</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for d in depense %}
                                 <tr>
                                     <td class="fit">{{d.categ_depense}}</td>
                                     <td class="fit">{{ d.date_operation | date:'j-n-Y' }}</td>
@@ -322,56 +942,222 @@
                                         <a class="btn btn-danger" href="{% url 'supprimedepense' d.id %}" title="Supprimer" target="_self"><i class="fa-solid fa-remove fa-sm"></i></a>
                                     </td>
                                 </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                            {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th>Catégorie dépense</th>
+                            <th>Date opération</th>
+                            <th>Désignation</th>
+                            <th>Quantité</th>
+                            <th>Prix unitaire</th>
+                            <th>Montant</th>
+                            <th>Provient de</th>
+                            <th>Destiné à</th>
+                            <th>Type opération</th>
+                            <th>Solde progressif</th>
+                            <th>Observation/Mémo</th>
+                            <th>Année scolaire</th>
+                            <th>Pièce jointe</th>
+                            <th>ID</th>
+                            <th>Actions</th>
+                        </tr>
+                    </tfoot>
+            </table>
 
-                        <div class="row">
-                            <div class="col-md-8">
-                                <div class="text-center">
-                                    <nav aria-label="">
-                                        <ul class="pagination">
+            <div class="row mt-3 mb-2">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="totalrecu">Total entrée</label>
+                        {% if total_entree %}
+                        <input type="text" id="totalrecu" name="total_recette"
+                            value="{{ total_entree|floatformat:'2g' }}"
+                            class="form-control" readonly
+                            style="color:red; font-weight:bold; font-size:12pt;">
+                        {% else %}
+                        <input type="text" name="total_recette" value="0"
+                            class="form-control" readonly
+                            style="color:red; font-weight:bold; font-size:12pt;">
+                        {% endif %}
+                    </div>
+                </div>
+           
 
-                                            {% if depense.has_previous %}
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="totaldep">Total sortie</label>
+                        {% if total_sortie %}
+                        <input type="text" id="totaldep" name="total_depense"
+                            value="{{ total_sortie|floatformat:'2g' }}"
+                            class="form-control" readonly
+                            style="color:red; font-weight:bold; font-size:12pt;">
+                        {% else %}
+                        <input type="text" name="total_depense" value="0"
+                            class="form-control" readonly
+                            style="color:red; font-weight:bold; font-size:12pt;">
+                        {% endif %}
+                    </div>
+                </div>
 
-                                            <li class="page-item">
-                                                <a class="page-link" href="?page=1">1</a>
-                                            </li>
-                                            <li class="page-item">
-                                                <a class="page-link" href="?page={{ depense.previous_page_number }}"><i class="fa-solid fa-backward fa-sm"></i>&nbsp; Précédent</a>
-                                            </li>
-
-                                            {% endif %}
-
-                                            <li class="page-item active" aria-current="page">
-                                                <a class="page-link" href="#">
-                                                    Page {{ depense.number }} sur {{ depense.paginator.num_pages }}
-                                                </a>
-                                            </li>
-
-                                            {% if depense.has_next %}
-
-                                            <li class="page-item">
-                                                <a class="page-link" href="?page={{ depense.next_page_number }}"><i class="fa-solid fa-forward fa-sm"></i>&nbsp; Suivant</a>
-                                            </li>
-
-                                            <li class="page-item">
-                                                <a class="page-link" href="?page={{ depense.paginator.num_pages }}"><i class="fa-solid fa-step-forward fa-sm"></i>&nbsp; Dernier</a>
-                                            </li>
-
-                                            {% endif %}
-
-                                        </ul>
-                                    </nav>
-                                </div>
-                            </div>
-                        </div>
-
-                {% endif %}
-
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="totalsolde">Solde disponible</label>
+                        {% if solde_dispo %}
+                        <input type="text" id="totalsolde" name="total_solde"
+                            value="{{ solde_dispo|floatformat:'2g' }}"
+                            class="form-control" readonly
+                            style="color:red; font-weight:bold; font-size:12pt;">
+                        {% else %}
+                        <input type="text" name="total_solde" value="0"
+                            class="form-control" readonly
+                            style="color:red; font-weight:bold; font-size:12pt;">
+                        {% endif %}
+                    </div>
+                </div>
             </div>
+
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="text-center">
+                        <nav aria-label="">
+                            <ul class="pagination">
+
+                                {% if depense.has_previous %}
+
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1">1</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ depense.previous_page_number }}"><i class="fa-solid fa-backward fa-sm"></i>&nbsp; Précédent</a>
+                                </li>
+
+                                {% endif %}
+
+                                <li class="page-item active" aria-current="page">
+                                    <a class="page-link" href="#">
+                                        Page {{ depense.number }} sur {{ depense.paginator.num_pages }}
+                                    </a>
+                                </li>
+
+                                {% if depense.has_next %}
+
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ depense.next_page_number }}"><i class="fa-solid fa-forward fa-sm"></i>&nbsp; Suivant</a>
+                                </li>
+
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ depense.paginator.num_pages }}"><i class="fa-solid fa-step-forward fa-sm"></i>&nbsp; Dernier</a>
+                                </li>
+
+                                {% endif %}
+
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            
+
+        {% endif %}
+        
+        </div>
+            <!-- /.card-body -->
+
+        </div>
+            <!-- /.card -->
+        </div>
+          <!--/.col (left) -->
+          <!-- right column -->
+        <div class="col-md-6">
+
           </div>
-     </div>
+          <!--/.col (right) -->
+        </div>
+        <!-- /.row -->
+    </section>
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+  <footer class="main-footer">
+    <div class="float-right d-none d-sm-block">
+      <b>Version</b> 1.0.0.1
+    </div>
+    <strong>Copyright &copy; 2023-2026 <a href="https://www.universtechgroup.com">Univers Tech Group</a>.</strong> Tous droits reservés
+  </footer>
+
+  <!-- Control Sidebar -->
+  <aside class="control-sidebar control-sidebar-dark">
+    <!-- Control sidebar content goes here -->
+  </aside>
+  <!-- /.control-sidebar -->
+</div>
+<!-- ./wrapper -->
+
+<!-- jQuery -->
+<script src="{% static 'assets/plugins/jquery/jquery.min.js' %}"></script>
+<!-- Overlayscrollbars -->
+<script src="{% static 'assets/plugins/overlayScrollbars/js/OverlayScrollbars.min.js' %}"></script>
+<!--Popper -->
+<script src="{% static 'assets/plugins/popper/umd/popper.min.js' %}"></script>
+<!-- Bootstrap 4 -->
+<script src="{% static 'assets/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+
+<!-- AdminLTE App -->
+<script src="{% static 'assets/dist/js/adminlte.min.js' %}"></script>
+<script src="{% static 'fontawesomefree/js/all.min.js' %}"></script>
+
+<!-- DataTables & Plugins -->
+<script src="{% static 'assets/plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+
+
+<script>
+  $(function () {
+    $("#depense_derniere_annee").DataTable({
+      "paging": true,
+      "lengthChange": true,
+      "lengthMenu": [10, 25, 50, 100],
+      "ordering": true,
+      "info": true,
+      "responsive": true,
+      "autoWidth": false,
+      "language": {
+        "paginate": {
+          "previous": "Précédent",
+          "next": "Suivant"
+        },
+        "search": "Rechercher :",
+        "info": "Affichage de  _START_ à _END_ sur _TOTAL_ entrées",
+        "lengthMenu": "Afficher  _MENU_ entrées"
+      }
+    });
+  });
+
+  $(function () {
+    $("#depense_annee_select").DataTable({
+      "paging": true,
+      "lengthChange": true,
+      "lengthMenu": [10, 25, 50, 100],
+      "ordering": true,
+      "info": true,
+      "responsive": true,
+      "autoWidth": false,
+      "language": {
+        "paginate": {
+          "previous": "Précédent",
+          "next": "Suivant"
+        },
+        "search": "Rechercher :",
+        "info": "Affichage de  _START_ à _END_ sur _TOTAL_ entrées",
+        "lengthMenu": "Afficher  _MENU_ entrées"
+      }
+    });
+  });
+</script>   
+
+
 </body>
 </html>
 

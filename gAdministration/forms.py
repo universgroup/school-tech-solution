@@ -87,7 +87,7 @@ class FormEcole(ModelForm):
             'email_ecole': 'Email/Adresse electronique',
             'site_internet': 'Site web',
             'devise_ecole': 'Devise/Slogan',
-            'dg': 'Directeur Général',
+            'dg': 'Directeur(trice) Général(e)',
             'coordo_primaire': 'Coordinateur Primaire',
             'coordo_secondaire': 'Coordinateur Secondaire',
             'comptable': 'Comptable',
@@ -125,16 +125,16 @@ class FormEcole(ModelForm):
                        'title': 'Saisissez un site web correct!'}),
             'devise_ecole': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Devise de l\'école',
                                                    'title': 'Saisissez la devise/slogan de l\'école'}),
-            'dg': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nom et Prénoms du DG',
-                                         'title': 'Saisissez le nom et prénoms du DG'}),
+            'dg': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Prénoms et Nom DG',
+                                         'title': 'Saisissez le prénoms et nom du/de la Directeur(trice) Général(e)'}),
             'coordo_primaire': forms.TextInput(
-                attrs={'class': 'form-control', 'placeholder': 'Nom et Prénoms Coordinateur Primaire',
-                       'title': 'Saisissez le nom et prénoms du coordinateur du primaire'}),
+                attrs={'class': 'form-control', 'placeholder': 'Prénoms et Nom du Coordinateur Primaire',
+                       'title': 'Saisissez le prénoms et nom du coordinateur du primaire'}),
             'coordo_secondaire': forms.TextInput(
-                attrs={'class': 'form-control', 'placeholder': 'Nom et Prénoms Coordinateur Secondaire',
-                       'title': 'Saisissez le nom et prénoms du coordinateur du secondaire'}),
-            'comptable': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nom et Prénoms Comptable',
-                                                'title': 'Saisissez le nom et prénoms du/de la comptable'}),
+                attrs={'class': 'form-control', 'placeholder': 'Prénoms et Nom du Coordinateur Secondaire',
+                       'title': 'Saisissez le prénoms et nom du coordinateur du secondaire'}),
+            'comptable': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Prénoms et Nom Comptable',
+                                                'title': 'Saisissez le prénoms et nom du/de la comptable'}),
             'logo_ecole': forms.FileInput(
                 attrs={'class': 'form-control', 'title': 'Importez le logo de l\'école',
                        'accept': 'image/jpeg, image/png'}),
@@ -156,5 +156,6 @@ class FormEcole(ModelForm):
         self.fields['signa_de'].required = False
         self.fields['email_ecole'].required=False
         self.fields['site_internet'].required=False
+        self.fields['coordo_primaire'].required=False
         
         

@@ -1,16 +1,18 @@
 {% extends "base.html" %}
 {% block titre_page %} MIS A JOUR {% endblock %}
+{% block titre_formulaire %} DETAILS D'UN CYCLE SCOLAIRE {% endblock %}
 {% block titre_cadre %}
 EDITION D'UN CYCLE SCOLAIRE
 {% endblock %}
 
 {% block formulaire %}
 
-            <form class="form-horizontal" action="{% url 'modifiecycle' cycle.id %}" method="POST">
+            <form  action="{% url 'modifiecycle' cycle.id %}" method="POST" class="needs-validation">
 
                             {% csrf_token %}
 
-                            <div class="row">
+                      <div class="card-body">    
+                            <div class="row g-3">
                                 <div class="col-md-12">
                                     <div class="form-group">
                                         <label for="IDCycle">ID Cycle</label>
@@ -18,7 +20,7 @@ EDITION D'UN CYCLE SCOLAIRE
                                     </div>
                                 </div>
                             </div>
-                            <div class="row">
+                            <div class="row g-3">
                                 <div class="col-md-12">
                                     <div class="form-group">
                                         <label for="id_ncycle">Cycle scolaire</label>
@@ -34,15 +36,12 @@ EDITION D'UN CYCLE SCOLAIRE
                                     </div>
                                 </div>
                             </div>
-
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="text-center">
-                                        <button type="submit" class="btn btn-success btn-sm">Modifier &nbsp;<i class="fa fa-edit"></i></button>
-                                        <a href="{% url 'listecycle' %}" target="_self" class="btn btn-primary btn-sm">Retour &nbsp;<i class="fa fa-arrow-circle-left"></i></a>
-                                    </div>
-                                </div>
-                            </div>
+                        </div>
+                        
+                        <div class="card-footer text-center">
+                            <button type="submit" class="btn btn-success btn-sm">Modifier &nbsp;<i class="fa fa-edit"></i></button>
+                            <a href="{% url 'listecycle' %}" target="_self" class="btn btn-primary btn-sm">Retour &nbsp;<i class="fa fa-arrow-circle-left"></i></a>
+                        </div>
             </form>
 
 {% endblock %}

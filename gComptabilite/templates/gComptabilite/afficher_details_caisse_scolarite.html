@@ -1,16 +1,18 @@
 {% extends "base.html" %}
 {% block titre_page %} CONSULTATION {% endblock %}
+{% block titre_formulaire %} DETAILS D'UNE LIGNE DE RECETTE {% endblock %}
 {% block titre_cadre %}
-DETAILS D'UNE LIGNE DE RECETTE
+INFORMATIONS SUR L'OPERATION DE RECETTE
 {% endblock %}
 
 {% block formulaire %}
 
-   <form class="form-horizontal" action="" method="POST">
+   <form class="needs-validation" action="" method="get">
 
                 {% csrf_token %}
 
-                <div class="row">
+            <div class="card-body">
+                <div class="row g-3">
                     <div class="col-md-12">
                         <div class="form-group">
                             <label for="IDcaisse">ID</label>
@@ -18,7 +20,7 @@ DETAILS D'UNE LIGNE DE RECETTE
                         </div>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="id_categ">Catégorie recette</label>
@@ -32,7 +34,7 @@ DETAILS D'UNE LIGNE DE RECETTE
                         </div>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-12">
                         <div class="form-group">
                             <label for="id_libelle">Désignation</label>
@@ -40,7 +42,7 @@ DETAILS D'UNE LIGNE DE RECETTE
                         </div>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="id_type_op">Type opération</label>
@@ -54,7 +56,7 @@ DETAILS D'UNE LIGNE DE RECETTE
                         </div>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-12">
                         <div class="form-group">
                             <label for="id_memo">Observation/Mémo</label>
@@ -62,7 +64,7 @@ DETAILS D'UNE LIGNE DE RECETTE
                         </div>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-12">
                         <div class="form-group">
                             <label for="id_annee">Année Scolaire</label>
@@ -70,13 +72,11 @@ DETAILS D'UNE LIGNE DE RECETTE
                       </div>
                     </div>
                 </div>
-
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="text-center">
-                            <a href="{% url 'listerecette' %}" target="_self" class="btn btn-primary btn-sm">Retour &nbsp;<i class="fa fa-arrow-circle-left"></i></a>
-                        </div>
-                    </div>
+            </div>
+            
+            
+              <div class="card-footer text-center">
+                    <a href="{% url 'listerecette' %}" target="_self" class="btn btn-primary btn-sm">Retour &nbsp;<i class="fa fa-arrow-circle-left"></i></a>
               </div>
 
    </form>

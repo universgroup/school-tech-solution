@@ -41,6 +41,7 @@ def enregistrer_recette(request):
             mont = request.POST['montant_encaisse']
             cai.montant_encaisse = Decimal(mont)
             cai.solde_actuel = Decimal(affichersoldecaisse()) + Decimal(mont)
+            cai.date_operation = request.POST['date_operation']
             cai.save()
             formrecette = FormCaisseScolarite()
             messages.success(request, 'Opération validée avec succès')
@@ -122,6 +123,7 @@ def modifiercaisserecette(request, idcais):
         cais = Caisse.objects.get(id=idcais)
         cais.libelle_operation = request.POST['libelle_operation']
         cais.observ = request.POST['observ']
+        cais.date_operation = request.POST['date_operation']
         cais.save()
         return redirect('../listerecette/')
     else:
@@ -138,6 +140,9 @@ def supprimercaisserecette(request, pk):
 t_entree = {}
 t_sortie = {}
 recette = {}
+solde_dispo = 0
+debut = None
+fin = None
 
 def recherchersituationrecette(request):
     
@@ -148,11 +153,14 @@ def recherchersituationrecette(request):
     global t_entree
     global t_sortie
     global recette
+    global solde_dispo
+    global debut, fin
     
     total_entree = 0
     total_sortie = 0
+    recette = Caisse.objects.none() # Initialisation de base pour eviter le bug lié au keyerror slice(0,0,None) lors du filtre par annee scolaire
     
-        
+           
     if (ans !='' and ans is not None) and (ddebut =='' and ddebut is None) and (dfin =='' and dfin is None):
         
         recette = Caisse.objects.filter(Q(anscolaire__exact=ans),
@@ -180,6 +188,7 @@ def recherchersituationrecette(request):
         # filtre ci-dessus; 'sortie' est un alias de la colonne Sum('montant_encaisse')
         else:
             total_sortie = 0
+        
         
     elif (ans !='' and ans is not None) and (ddebut !='' and ddebut is not None) and (dfin !='' and dfin is not None):
                 
@@ -211,7 +220,7 @@ def recherchersituationrecette(request):
         else:
             total_sortie = 0       
 
-    
+
     paginecais = Paginator(recette, 10)
     numpagecais = request.GET.get('page')
     recette = paginecais.get_page(numpagecais)
@@ -237,6 +246,8 @@ def enregistrerdepense(request):
             cais.destine = request.POST['destine']
             cais.montant_encaisse = Decimal(cais.qte) * Decimal(cais.pua)
             cais.observ = request.POST['observ']
+            cais.date_operation = request.POST['date_operation']
+
             if request.FILES.get('piece_jointe') != '':
                 cais.piece_jointe = request.FILES.get('piece_jointe')
 
@@ -310,6 +321,10 @@ def listedepense(request):
                        solde_dispo=solde_dispo, annee=annee, mois_actuel=mactu))
 
 depense = {}
+debut = None
+fin = None
+solde_dispo = 0
+
 def recherchersituationdepense(request):
     
     ans = request.GET.get('nom_annee')
@@ -319,10 +334,11 @@ def recherchersituationdepense(request):
     global t_entree
     global t_sortie
     global depense
+    global debut, fin
     
     total_entree = 0
     total_sortie = 0
-    
+    depense = Caisse.objects.none()
     
     if (ans !='' and ans is not None) and (ddebut =='' and ddebut is None) and (dfin =='' and dfin is None):
         
@@ -408,7 +424,9 @@ def modifierdepense(request, pk):
         depense.provient = request.POST['provient']
         depense.destine = request.POST['destine']
         depense.observ = request.POST['observ']
-        if request.FILES.get('new_piece') != '':
+        depense.date_operation = request.POST['date_operation']
+
+        if request.FILES.get('new_piece'):
             depense.piece_jointe = request.FILES.get('new_piece')
         depense.save()
         return redirect('../listedepense/')

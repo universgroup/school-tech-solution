@@ -1,54 +1,78 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
-
 {% block titre_page %} GESTION DES INSCRIPTIONS {% endblock %}
-
+{% block titre_formulaire %} GESTION DES INSCRIPTIONS DES ELEVES {% endblock %}
 {% block titre_cadre %}
-INSCRIPTION DES ELEVES
+INSCRIRE UN ELEVE
 {% endblock %}
 
- {% block formulaire %}
+{% block formulaire %}
 
-   <form  action="" method="POST"  enctype="multipart/form-data">
-
+<form action="" method="POST" enctype="multipart/form-data" autocomplete="on" id="finscription" data-classe-url="{% url 'chargerlisteclasse' %}">
+                    
                     {% csrf_token %}
-                    <div class="row">
+
+        <!-- Navigation des onglets -->
+        <div class="card-header p-0 pt-1">
+            <ul class="nav nav-tabs" id="inscriptionTabs" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="tab-perso" data-toggle="tab"
+                    href="#perso" role="tab">
+                        <i class="fas fa-user mr-1"></i> INFORMATIONS PERSONNELLES
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="tab-inscription" data-toggle="tab"
+                    href="#inscription" role="tab">
+                        <i class="fas fa-graduation-cap mr-1"></i> INSCRIPTION
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Contenu des onglets -->
+        <div class="card-body">
+            <div class="tab-content" id="inscriptionTabsContent">
+
+                <!-- Onglet 1 : Infos personnelles -->
+                <div class="tab-pane fade show active" id="perso" role="tabpanel">
+
+                    <div class="row g-3 mt-1">
                         <div class="col-md-6">
                             <div class="form-group">
-                                {{form.nom|as_crispy_field}}
+                                {{ form.nom|as_crispy_field }}
                             </div>
                         </div>
-
                         <div class="col-md-6">
                             <div class="form-group">
-                                {{form.prenom|as_crispy_field}}
+                                {{ form.prenom|as_crispy_field }}
                             </div>
                         </div>
                     </div>
 
-                    <div class="row">
+                    <div class="row g-3">
                         <div class="col-md-12">
                             <div class="form-group">
-                                {{form.sexe_eleve|as_crispy_field}}
+                                {{ form.sexe_eleve|as_crispy_field }}
                             </div>
                         </div>
                     </div>
 
-                    <div class="row">
+                    <div class="row g-3">
                         <div class="col-md-6">
                             <div class="form-group">
                                 {{form.pere|as_crispy_field}}
                             </div>
                         </div>
-
                         <div class="col-md-6">
                             <div class="form-group">
                                 {{form.mere|as_crispy_field}}
                             </div>
                         </div>
+
                     </div>
 
-                    <div class="row">
+                    <div class="row g-3">
                         <div class="col-md-6">
                             <div class="form-group">
                                 {{form.tuteur|as_crispy_field}}
@@ -62,15 +86,15 @@ INSCRIPTION DES ELEVES
                         </div>
                     </div>
 
-                    <div class="row">
+                    <div class="row g-3">
                         <div class="col-md-12">
                             <div class="form-group">
-                                {{form.email_parent|as_crispy_field}}
+                                {{ form.email_parent|as_crispy_field }}
                             </div>
                         </div>
                     </div>
 
-                    <div class="row">
+                    <div class="row g-3">
                         <div class="col-md-6">
                             <div class="form-group">
                                 {{form.adresse|as_crispy_field}}
@@ -84,7 +108,7 @@ INSCRIPTION DES ELEVES
                         </div>
                     </div>
 
-                    <div class="row">
+                    <div class="row g-3">
                         <div class="col-md-12">
                             <div class="form-group">
                                 {{form.photo_eleve|as_crispy_field}}
@@ -92,7 +116,7 @@ INSCRIPTION DES ELEVES
                         </div>
                    </div>
 
-                    <div class="row">
+                    <div class="row g-3">
                         <div class="col-md-6">
                             <div class="form-group">
                                 {{form.datenaissance|as_crispy_field}}
@@ -106,7 +130,7 @@ INSCRIPTION DES ELEVES
                         </div>
                     </div>
 
-                    <div class="row">
+                    <div class="row g-3">
                         <div class="col-md-6">
                             <div class="form-group">
                                 {{form.date_arrivee|as_crispy_field}}
@@ -119,20 +143,107 @@ INSCRIPTION DES ELEVES
                             </div>
                         </div>
                     </div>
+                      
 
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="text-center">
-
-                                <button type="submit" class="btn btn-success btn-sm" title="Aller à la page suivante pour terminer l'inscription">Suivant &nbsp;<i class="fa fa-circle-check"></i></button>
-                                <button type="reset" class="btn btn-warning btn-sm">Annuler &nbsp; <i class="fa fa-refresh"></i></button>
-
-                            </div>
+                    <!-- Bouton Suivant -->
+                    <div class="row mt-3">
+                        <div class="col-md-12 text-right">
+                            <button type="reset" class="btn btn-warning  mr-2">Actualiser &nbsp; <i class="fa fa-refresh"></i></button>
+                            <button type="button" class="btn btn-primary"
+                                    onclick="$('#tab-inscription').tab('show')">
+                                Suivant <i class="fas fa-arrow-right ml-1"></i>
+                            </button>
                         </div>
-
                     </div>
 
-   </form>
+                </div>
+                <!-- Fin onglet 1 -->
+
+                <!-- Onglet 2 : Inscription -->
+                <div class="tab-pane fade" id="inscription" role="tabpanel">
+
+                    <div class="row g-3 mt-1">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                {{ form_inscrit.annee_scolaire|as_crispy_field }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{ form_inscrit.idcycle|as_crispy_field }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{ form_inscrit.idclasse|as_crispy_field }}
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                    <!-- Boutons -->
+                    <div class="row mt-3">
+                        <div class="col-md-12 text-right">
+                            <button type="button" class="btn btn-secondary mr-2"
+                                    onclick="$('#tab-perso').tab('show')">
+                                <i class="fas fa-arrow-left mr-1"></i> Précédent
+                            </button>
+                            <button type="submit" class="btn btn-success mr-2" title="Cliquez ici pour valider l'inscription de l'élève">Terminer &nbsp;<i class="fas fa-check"></i></button>
+                            <button type="reset" class="btn btn-warning  mr-2">Actualiser &nbsp; <i class="fa fa-refresh"></i></button>
+                            <a href="{% url 'chargeranneecourante' %}" target="_self" class="btn btn-primary ">Liste Elèves Inscrits &nbsp;<i class="fa fa-circle-chevron-right"></i></a>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- Fin onglet 2 -->
+
+            </div>
+        </div>
+        <!-- Fin card-body -->
+
+</form>
 
 {% endblock %}
 
+{% block javascript %}
+ 
+ <!-- <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script> Pas necessaire car déjà intégré dans le base.html -->
+ <script>
+    // Cette fonction javascript (JQuery) m'a permis de filtrer les classes selon le cycle choisi
+    $("#id_cycle").change(function(){
+        var url = $("#finscription").attr("data-classe-url");
+        var idcycle = $(this).val();
+
+        $.ajax({
+            url:url,
+            data:{
+                'idcycle':idcycle
+            },
+            success:function(data){
+                $("#id_classe").html(data);
+            }
+
+
+        });
+    });
+
+    // Mettre le nom en majuscule après saisie
+    $("#idnom").on('input', function(){
+        $(this).val($(this).val().toUpperCase());
+    });
+
+    // Mettre la première lettre de chaque mot du prénom en majuscule
+    $("#idprenom").on('input', function(){
+        var val = $(this).val();
+        $(this).val(val.replace(/\b\w/g, function(l){
+            return l.toUpperCase();
+        }));
+    });
+    
+
+ </script>
+
+ {% endblock %}

@@ -1,16 +1,18 @@
 {% extends "base.html" %}
 {% block titre_page %} MIS A JOUR {% endblock %}
+{% block titre_formulaire %} DETAILS DES INFORMATIONS DE L'ECOLE {% endblock %}
 {% block titre_cadre %}
 EDITION DES INFORMATIONS DE L'ECOLE
 {% endblock %}
 
 {% block formulaire %}
 
-  <form class="form-horizontal" action="{% url 'modifieinfosecole' ecole.id %}" method="POST" enctype="multipart/form-data">
+  <form action="{% url 'modifieinfosecole' ecole.id %}" method="POST" enctype="multipart/form-data" class="needs-validation">
 
                 {% csrf_token %}
 
-                <div class="row">
+            <div class="card-body">    
+                <div class="row g-3">
                     <div class="col-md-12">
                         <div class="form-group">
                             <label for="IDecole">ID</label>
@@ -18,7 +20,7 @@ EDITION DES INFORMATIONS DE L'ECOLE
                         </div>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row g-3">
                    <div class="col-md-12">
                         <div class="form-group">
                             <label for="id_nom_ecole">Nom/Raison sociale</label>
@@ -26,7 +28,7 @@ EDITION DES INFORMATIONS DE L'ECOLE
                         </div>
                    </div>
                 </div>
-                <div class="row">
+                <div class="row g-3">
                    <div class="col-md-12">
                        <div class="form-group">
                             <label for="id_ville_ecole">IRE</label>
@@ -34,7 +36,7 @@ EDITION DES INFORMATIONS DE L'ECOLE
                        </div>
                    </div>
                 </div>
-                <div class="row">
+                <div class="row g-3">
                    <div class="col-md-6">
                        <div class="form-group">
                             <label for="id_dce">DCE/DPE</label>
@@ -48,21 +50,21 @@ EDITION DES INFORMATIONS DE L'ECOLE
                        </div>
                    </div>
                 </div>
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="id_tel1">Contact 1</label>
-                            <input type="tel" name="tel1" id="id_tel1" value="{{ecole.telephone1}}" class="form-control" pattern="^6(1|2|3|4|5|6)[0-9]{7}" min="600000000" max="699999999" title="Entrez un numéro de téléphone guinéen">
+                            <input type="tel" name="tel1" id="id_tel1" value="{{ecole.telephone1}}" class="form-control" pattern="(\\+224)?[36][0-9]{8}" title="Entrez un numéro de téléphone guinéen">
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="id_tel2">Contact 2</label>
-                            <input type="tel" name="tel2" id="id_tel2" value="{{ecole.telephone2}}" class="form-control" pattern="^6(1|2|3|4|5|6)[0-9]{7}" min="600000000" max="699999999" title="Entrez un numéro de téléphone guinéen">
+                            <input type="tel" name="tel2" id="id_tel2" value="{{ecole.telephone2}}" class="form-control" pattern="(\\+224)?[36][0-9]{8}" title="Entrez un numéro de téléphone guinéen">
                         </div>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="id_agrement">N°agrement</label>
@@ -76,21 +78,21 @@ EDITION DES INFORMATIONS DE L'ECOLE
                         </div>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-6">
                         <div class="form-group">
                                 <label for="id_mail">Email</label>
-                                <input type="email" name="email_ecole" id="id_mail" value="{{ecole.email_ecole}}" class="form-control" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" title="Entrez un email correct">
+                                <input type="email" name="email_ecole" id="id_mail" value="{{ecole.email_ecole}}" class="form-control" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\'.[a-zA-Z]{2,}" title="Entrez un email correct">
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="id_site_web">Site web</label>
-                            <input type="url" name="site_web" id="id_site_web" value="{{ecole.site_internet}}" class="form-control" pattern="^(http(s)?:\/\/)+[\w\-\._~:\/?#[\]@!\$&'\(\)\*\+,;=.]+$" title="Entrez une URL correcte du site web">
+                            <input type="url" name="site_web" id="id_site_web" value="{{ecole.site_internet}}" class="form-control" pattern="https?://[a-zA-Z0-9.-]+\\'.[a-zA-Z]{2,}.*" title="Entrez une URL correcte du site web">
                         </div>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-12">
                         <div class="form-group">
                             <label for="id_devise">Devise/Slogan</label>
@@ -98,10 +100,10 @@ EDITION DES INFORMATIONS DE L'ECOLE
                         </div>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="id_dg">Directeur général</label>
+                            <label for="id_dg">Directeur(trice) Général(e)</label>
                             <input type="text" name="dg" id="id_dg" value="{{ecole.dg}}" class="form-control" maxlength="35">
                         </div>
                     </div>
@@ -112,7 +114,7 @@ EDITION DES INFORMATIONS DE L'ECOLE
                         </div>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="id_coordo_second">Coordinateur Secondaire</label>
@@ -126,53 +128,50 @@ EDITION DES INFORMATIONS DE L'ECOLE
                         </div>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-12">
                         <div class="form-group">
                             <div class="text-center">
                                 {% if ecole.logo_ecole %}
                                 <img src="{{ecole.logo_ecole.url}}" width="90px" title="Logo ecole" name="logo_old">
                                 {% endif %}
-                                <input type="file" accept="image/jpeg, image/png" name="logo_new">
+                                <input type="file" accept="image/jpeg, image/png" name="logo_new" title="Téléverser ici le nouveau logo de l'école">
                             </div>
                         </div>
                     </div>
                 </div>
                 
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-6">
                         <div class="form-group">
                             <div class="text-left">
                                 {% if ecole.signa_dg %}
                                 <img src="{{ecole.signa_dg.url}}" width="90px" title="Signature du DG" name="signe_dg_old">
                                 {% endif %}
-                                <input type="file" accept="image/jpeg, image/png" name="signe_dg">
+                                <input type="file" accept="image/jpeg, image/png" name="signe_dg" title="Téléverser ici la signature du directeur général">
                             </div>
                         </div>
                     </div>
 
                     <div class="col-md-6">
                         <div class="form-group">
-                           <div class="text-left"> 
+                           <div class="text-right"> 
                                 {% if ecole.signa_de %}
                                 <img src="{{ecole.signa_de.url}}" width="90px" title="Signature du DE" name="signe_de_old">
                                 {% endif %}
-                                <input type="file" accept="image/jpeg, image/png" name="signe_de">
+                                <input type="file" accept="image/jpeg, image/png" name="signe_de" alt="Téléverser ici la signature du directeur des études">
                             </div>
                         </div>
                     </div>
 
                 </div>
-                
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="text-center">
-                            <button type="submit" class="btn btn-success btn-sm">Modifier &nbsp;<i class="fa fa-edit"></i></button>
-                            <a href="{% url 'listeinfos' %}" target="_self" class="btn btn-secondary btn-sm ">&nbsp; Retour <i class="fa fa-arrow-circle-left"></i></a>
-                        </div>
-                    </div>
-                </div>
-
+            </div>
+            
+        
+            <div class="card-footer text-center">
+                <button type="submit" class="btn btn-success btn-sm">Modifier &nbsp;<i class="fa fa-edit"></i></button>
+                <a href="{% url 'listeinfos' %}" target="_self" class="btn btn-primary btn-sm ">&nbsp; Retour <i class="fa fa-arrow-circle-left"></i></a>
+            </div>
   </form>
 
 {% endblock %}
