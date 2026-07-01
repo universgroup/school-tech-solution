@@ -148,7 +148,8 @@ INSCRIRE UN ELEVE
                     <!-- Bouton Suivant -->
                     <div class="row mt-3">
                         <div class="col-md-12 text-right">
-                            <button type="reset" class="btn btn-warning  mr-2">Actualiser &nbsp; <i class="fa fa-refresh"></i></button>
+                            <a href="{% url 'chargeranneecourante' %}" target="_self" class="btn btn-secondary btn-md mr-2">Retour &nbsp;<i class="fas fa-circle-chevron-left"></i></a>
+                            <button type="reset" class="btn btn-warning  mr-2">Actualiser &nbsp; <i class="fas fa-refresh"></i></button>
                             <button type="button" class="btn btn-primary"
                                     onclick="$('#tab-inscription').tab('show')">
                                 Suivant <i class="fas fa-arrow-right ml-1"></i>

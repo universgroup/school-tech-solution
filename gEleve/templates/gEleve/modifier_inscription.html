@@ -1,33 +1,34 @@
 {% extends "base.html" %}
 {% block titre_page %} MIS A JOUR {% endblock %}
+{% block titre_formulaire %} DETAILS DE L'INSCRIPTION D'UN ELEVE {% endblock %}
 {% block titre_cadre %}
 EDITION DES INFORMATIONS D'UNE INSCRIPTION
 {% endblock %}
 
 {% block formulaire %}
 
-   <form class="form-horizontal" action="{% url 'modifieinscription' ins.id ins.mateleve %}" method="POST" id="finscription" data-classe-url="{% url 'chargerlisteclasse' %}">
+   <form class="needs-validation" action="{% url 'modifieinscription' ins.id ins.mateleve.matricule %}" method="POST" id="finscription" data-classe-url="{% url 'chargerlisteclasse' %}" enctype="multipart/form-data">
 
                 {% csrf_token %}
-
-                <div class="row">
-                    <div class="col-md-12">
+        <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
                         <div class="form-group">
                             <label for="IDInscrip">ID Inscription</label>
                             <input type="text" id="IDInscrip" value="{{ins.id}}" class="form-control" readonly>
                         </div>
                     </div>
-                </div>
-
-                <div class="row">
+                 
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="id_dateins">Date inscription</label>
-                            <input type="date" name="date_inscription" id="id_dateins" value="{{ins.date_inscription|date:'j-n-Y'}}" class="form-control">
+                            <input type="text" name="date_inscription" id="id_dateins" value="{{ins.date_inscription|date:'Y-n-j'}}" class="form-control">
                         </div>
                     </div>
+                </div>    
 
-                    <div class="col-md-6">
+                <div class="row g-3">
+                    <div class="col-md-3">
                         <div class="form-group">
                             <label for="id_ansco">Année scolaire</label>
                             <select class="form-control" name="ansco" id="id_ansco">
@@ -38,10 +39,8 @@ EDITION DES INFORMATIONS D'UNE INSCRIPTION
                             </select>
                         </div>
                     </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6">
+         
+                    <div class="col-md-3">
                         <div class="form-group">
                             <label for="cbocycle">Cycle</label>
                             <select class="form-control" name="cycle" id="cbocycle">
@@ -64,16 +63,16 @@ EDITION DES INFORMATIONS D'UNE INSCRIPTION
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-12">
                         <div class="form-group">
                             <label for="id_mat">Matricule</label>
-                            <input type="text" name="matricule" id="id_mat" value="{{ins.mateleve}}" class="form-control" readonly>
+                            <input type="text" name="matricule" id="id_mat" value="{{ins.mateleve.matricule}}" class="form-control" readonly>
                         </div>
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-6">
                         <div class="form-group">
                           <label for="id_nom">Nom Famille</label>
@@ -89,7 +88,7 @@ EDITION DES INFORMATIONS D'UNE INSCRIPTION
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-12">
                         <div class="form-group">
                             <label for="id_sexe">Sexe</label>
@@ -102,7 +101,7 @@ EDITION DES INFORMATIONS D'UNE INSCRIPTION
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="id_pere">Prénom(s) du Père</label>
@@ -112,46 +111,46 @@ EDITION DES INFORMATIONS D'UNE INSCRIPTION
 
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="id_mere">Nom & Prénom(s) mère</label>
+                            <label for="id_mere">Prénom(s) et Nom de la mère</label>
                             <input type="text" name="mere" id="id_mere"  value="{{ins.mateleve.mere}}" class="form-control">
                         </div>
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="id_tuteur">Nom & Prénom(s) tuteur</label>
+                            <label for="id_tuteur">Prénom(s) et Nom du tuteur</label>
                             <input type="text" name="tuteur" id="id_tuteur"  value="{{ins.mateleve.tuteur}}" class="form-control">
                         </div>
                     </div>
 
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="id_contact">Contact tuteur</label>
-                            <input type="tel" pattern="^6(1|3|2|6|5)[0-9]{7}" min="600000000" max="699999999" title="Saisissez un numéro de téléphone guinéen" name="contact" id="id_contact"  value="{{ins.mateleve.contact_parent}}" class="form-control">
+                            <label for="id_contact">Contact du tuteur</label>
+                            <input type="tel" pattern="(\\+224)?[36][0-9]{8}" title="Saisissez un numéro de téléphone guinéen" name="contact" id="id_contact"  value="{{ins.mateleve.contact_parent}}" class="form-control">
                         </div>
                     </div>
                 </div>
 
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <label for="id_mail_parent">Email tuteur/parent</label>
-                            <input type="email" name="email_tuteur" id="id_mail_parent" value="{{ins.mateleve.email_parent}}" class="form-control" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" title="Entrez un email correct">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="id_adresse">Adresse</label>
+                            <label for="id_mail_parent">Email du tuteur/parent</label>
+                            <input type="email" name="email_tuteur" id="id_mail_parent" value="{{ins.mateleve.email_parent}}" class="form-control" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\'.[a-zA-Z]{2,}" title="Entrez un email correct">
+                        </div>
+                    </div>
+               
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_adresse">Adresse du tuteur</label>
                             <input type="text" name="adresse" id="id_adresse"  value="{{ins.mateleve.adresse}}" class="form-control">
                         </div>
                     </div>
-
-                    <div class="col-md-6">
+                </div>
+                
+                <div class="row g-3">
+                    <div class="col-md-12">
                         <div class="form-group">
                             <label for="id_ecole">Ecole origine</label>
                             <input type="text" name="ecole_origine" id="id_ecole"  value="{{ins.mateleve.ecole_origine}}" class="form-control">
@@ -159,11 +158,11 @@ EDITION DES INFORMATIONS D'UNE INSCRIPTION
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="id_datenais">Date naissance</label>
-                            <input type="date" name="datenaiss" id="id_datenais" value="{{ins.mateleve.datenaissance|date:'j-n-Y'}}" class="form-control">
+                            <input type="text" name="datenaiss" id="id_datenais" value="{{ins.mateleve.datenaissance|date:'Y-n-j'}}" class="form-control">
                         </div>
                     </div>
 
@@ -175,11 +174,11 @@ EDITION DES INFORMATIONS D'UNE INSCRIPTION
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="id_date_entree">Date entrée</label>
-                            <input type="date" name="date_entree" id="id_date_entree" value="{{ins.mateleve.date_arrivee|date:'j-n-Y'}}" class="form-control">
+                            <input type="text" name="date_entree" id="id_date_entree" value="{{ins.mateleve.date_arrivee|date:'Y-n-j'}}" class="form-control">
                         </div>
                     </div>
 
@@ -191,7 +190,7 @@ EDITION DES INFORMATIONS D'UNE INSCRIPTION
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-12">
                         <div class="text-center">
 
@@ -201,24 +200,15 @@ EDITION DES INFORMATIONS D'UNE INSCRIPTION
                                 </a>
                             {% else %}
                                 <label>Photo indisponible</label>
-                                <input type="file" name="photoel" class="form-control" title="Modifier la photo de l'élève ici">
                             {% endif %}
+                            <input type="file" name="photoel" class="form-control" title="Charger la nouvelle photo de l'élève ici">
                         </div>
                     </div>
                 </div>
-                <br><br>
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="text-center">
-                        <button type="submit" class="btn btn-success btn-sm">Modifier &nbsp;<i class="fa fa-edit"></i></button>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <div class="text-center">
-                            <a href="{% url 'chargeranneecourante' %}" target="_self" class="btn btn-sm btn-secondary">Retour &nbsp;<i class="fa fa-arrow-circle-left"></i></a>
-                        </div>
-                    </div>
+               
+                <div class="card-footer text-center">
+                    <button type="submit" class="btn btn-success btn-md">Modifier &nbsp;<i class="fas fa-edit"></i></button>
+                    <a href="{% url 'chargeranneecourante' %}" target="_self" class="btn btn-secondary btn-md">Retour &nbsp;<i class="fas fa-arrow-circle-left"></i></a>
                 </div>
 
    </form>
@@ -227,9 +217,9 @@ EDITION DES INFORMATIONS D'UNE INSCRIPTION
 
 {% block javascript %}
 
- <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
- <script>
-    // Cette fonction javascript (JQuery) m'a permis de filtrer les classes selon le cycle choisi
+<script>
+
+// Cette fonction javascript (JQuery) m'a permis de filtrer les classes selon le cycle choisi
     $("#cbocycle").change(function(){
         var url = $("#finscription").attr("data-classe-url");
         var idcycle = $(this).val();
@@ -246,6 +236,59 @@ EDITION DES INFORMATIONS D'UNE INSCRIPTION
         });
     });
 
+    $(document).ready(function () {
+            // Au clic sur le champ date, changer le type en "date" pour permettre la modification
+            $('#id_dateins').on('click', function () {
+                $(this).attr('type', 'date');
+                $(this).focus();
+            });
+
+            // Quand on quitte le champ, reformater en texte lisible
+            $('#id_dateins').on('blur', function () {
+                if ($(this).val() !== '') {
+                    //let date = new Date($(this).val());
+                    //let formatted = date.toLocaleDateString('fr-FR');
+                    $(this).attr('type', 'text');
+                    $(this).val(formatted);
+                }
+            });
+        });
+
+    $(document).ready(function () {
+            // Au clic sur le champ date, changer le type en "date" pour permettre la modification
+            $('#id_datenais').on('click', function () {
+                $(this).attr('type', 'date');
+                $(this).focus();
+            });
+
+            // Quand on quitte le champ, reformater en texte lisible
+            $('#id_datenais').on('blur', function () {
+                if ($(this).val() !== '') {
+                    //let date = new Date($(this).val());
+                    //let formatted = date.toLocaleDateString('fr-FR');
+                    $(this).attr('type', 'text');
+                    $(this).val(formatted);
+                }
+            });
+        });    
+    
+    $(document).ready(function () {
+            // Au clic sur le champ date, changer le type en "date" pour permettre la modification
+            $('#id_date_entree').on('click', function () {
+                $(this).attr('type', 'date');
+                $(this).focus();
+            });
+
+            // Quand on quitte le champ, reformater en texte lisible
+            $('#id_date_entree').on('blur', function () {
+                if ($(this).val() !== '') {
+                    //let date = new Date($(this).val());
+                    //let formatted = date.toLocaleDateString('fr-FR');
+                    $(this).attr('type', 'text');
+                    $(this).val(formatted);
+                }
+            });
+        });
 
  </script>
 

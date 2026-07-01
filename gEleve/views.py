@@ -240,7 +240,26 @@ def modifierinscription(request, idins, mat):
     if request.method == 'POST':
         inscri = Inscription.objects.get(id=idins)
         inscri.date_inscription = request.POST.get('date_inscription')
+
+        
+        ansco = request.POST.get('ansco')  # Je recupère ici l'ID de l'année scolaire selectionnée
+        idclas = request.POST.get('classe')  # Ici l'ID de la Classe selectionnée
+        idcy = request.POST.get('cycle')  # Ici l'ID du cycle selectionné
+                
+        # Je fais ensuite des requêtes sur les quatre tables en vue de recuperer les identifiants à inserer dans
+        # la table inscription
+        an = AnneeScolaire.objects.get(id=ansco)
+        cl = Classe.objects.get(id=idclas)
+        cy = CycleScolaire.objects.get(id=idcy)
+
+        # J'enregistre maintenant ces ID dans la table Inscription
+        inscri.annee_scolaire = an
+        inscri.idclasse = cl
+        inscri.idcycle = cy
         inscri.save()
+
+        dnais = request.POST.get('datenaiss')
+        dentree = request.POST.get('date_entree')
 
         el = Eleve.objects.get(matricule=mat)
         el.nom = request.POST.get('nom')
@@ -253,25 +272,25 @@ def modifierinscription(request, idins, mat):
         el.email_parent = request.POST.get('email_tuteur')
         el.adresse = request.POST.get('adresse')
         el.ecole_origine = request.POST.get('ecole_origine')
-        el.datenaissance = request.POST.get('datenaiss')
+        el.datenaissance = datetime.strptime(dnais,'%Y-%m-%d')
         el.lieu_naissance = request.POST.get('lieunais')
-        el.date_arrivee = request.POST.get('date_entree')
+        el.date_arrivee = datetime.strptime(dentree,'%Y-%m-%d')
         el.pays_naissance = request.POST.get('pays_naiss')
-        if request.FILES.get('photoel') != '':
+
+        if request.FILES.get('photoel'):
             el.photo_eleve = request.FILES.get('photoel')
-        else:
-            el.photo_eleve = request.FILES.get('photo_eleve')
+ 
         el.save()
-        return redirect('../registrematricule/')
+        return redirect('chargeranneecourante')
     else:
-        return redirect('../registrematricule/')
+        return redirect('chargeranneecourante')
 
 
 def supprimerinscription(request, pkins):
     insc = Inscription.objects.get(id=pkins)
     insc.delete()
     messages.success(request, 'Inscription supprimée avec succès')
-    return redirect('../registrematricule/')
+    return redirect('../chargeranneecourante/')
 
 
 # Fonctions me permettant de filtrer la liste des inscrits par matricule, par classe, par nom de famille
@@ -995,34 +1014,62 @@ def imprimerecureinscription(request, idins):
                                         args=(
                                             idins,)))
 
+effectif_total = 0
+effectif_total_garcons = 0
+effectif_total_filles = 0
 
 def chargeranneescolairecourante(request):
+
     ans = Inscription.objects.all().distinct('annee_scolaire')
     cy = CycleScolaire.objects.all()
-    return render(request, 'gEleve/liste_eleves_inscrits.html', dict(ans=ans, cycles=cy))
+
+    listeeleves = {}
+    listeeleves = Inscription.objects.none()
+
+    global effectif_total
+    global effectif_total_garcons
+    global effectif_total_filles
+
+    mois = date.today()
+    mois_actuel = mois.strftime('%m')
+
+    listeeleves = Inscription.objects.select_related('annee_scolaire', 'mateleve', 'idcycle', 'idclasse').filter(
+            (Q(etat_inscription__exact=ETAT_INSCRIPTION[0][1]) | Q(etat_inscription__exact=ETAT_INSCRIPTION[1][1])),Q(date_inscription__month=mois_actuel)).order_by('-date_inscription')
+    
+    effectif_total = listeeleves.count()
+    effectif_total_garcons = listeeleves.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[1][1]).count() # SEXE_ELEVE_CHOICES[1][1] correspond à Masculin
+    effectif_total_filles = listeeleves.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[2][1]).count() # SEXE_ELEVE_CHOICES[2][1] correspond à Feminin
+    
+    pagineins = Paginator(listeeleves, 10)
+    numpageins = request.GET.get('page')
+    listeeleves = pagineins.get_page(numpageins)
+    
+    return render(request, 'gEleve/liste_eleves_inscrits.html', dict(ans=ans, cycles=cy, listeeleves=listeeleves, effectif_total=effectif_total, effectif_total_garcons=effectif_total_garcons, effectif_total_filles=effectif_total_filles))
 
 
 def filtrelisteinscrits(request):
-    listeinsclasse = {}
-    effectif_total = 0
-    effectif_total_garcons = 0
-    effectif_total_filles = 0
-
+    
     idclass = request.GET.get('id_classe')
     idcy = request.GET.get('cycle')
     idansc = request.GET.get('annee_scolaire')
+
+    listeinsclasse = {}
     listeinsclasse = Inscription.objects.none()
 
+    global effectif_total
+    global effectif_total_garcons
+    global effectif_total_filles
 
     if (idclass != '' and idclass is not None) and (idcy != '' and idcy is not None) and (
             idansc != '' and idansc is not None):
         listeinsclasse = Inscription.objects.select_related('annee_scolaire', 'mateleve', 'idcycle', 'idclasse').filter(
-            Q(idclasse__exact=idclass), Q(idcycle__exact=idcy), Q(annee_scolaire__exact=idansc))
+            Q(idclasse__exact=idclass), Q(idcycle__exact=idcy), Q(annee_scolaire__exact=idansc)).order_by('-date_inscription')
+
 
         # Ici je calcule les effectifs totaux des eleves inscrits
         effectif_total = listeinsclasse.count()
-        effectif_total_garcons = listeinsclasse.filter(mateleve__sexe_eleve='Masculin').count()
-        effectif_total_filles = listeinsclasse.filter(mateleve__sexe_eleve='Feminin').count()
+        effectif_total_garcons = listeinsclasse.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[1][1]).count() # SEXE_ELEVE_CHOICES[1][1] correspond à Masculin
+        effectif_total_filles = listeinsclasse.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[2][1]).count() # SEXE_ELEVE_CHOICES[2][1] correspond à Feminin
 
         pagineinscrit = Paginator(listeinsclasse, 10)
         numpageinscrit = request.GET.get('page')

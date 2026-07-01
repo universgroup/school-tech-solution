@@ -7,6 +7,10 @@ SEXE_ELEVE_CHOICES = (
     ('Masculin', 'Masculin'),  # 1
     ('Feminin', 'Feminin')  # 2
 )
+ETAT_INSCRIPTION = (
+    ('Inscrit','Inscrit'), # 0
+    ('Reinscrit','Reinscrit') # 1
+)
 
 
 # Create your models here.
@@ -64,7 +68,7 @@ class Discipline(models.Model):
 class Inscription(models.Model):
     date_inscription = models.DateField(auto_now=True)
     annee_scolaire = models.ForeignKey(AnneeScolaire, on_delete=models.CASCADE)
-    etat_inscription = models.CharField(max_length=10, default='Inscrit')
+    etat_inscription = models.CharField(max_length=10, default='Inscrit', choices=ETAT_INSCRIPTION)
     mateleve = models.ForeignKey(Eleve, on_delete=models.CASCADE)
     idcycle = models.ForeignKey(CycleScolaire, on_delete=models.CASCADE, null=True)
     idclasse = models.ForeignKey(Classe, on_delete=models.CASCADE)
