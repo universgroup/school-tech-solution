@@ -49,7 +49,7 @@
       <li class="nav-item dropdown">
             <a id="dropdownSubMenu1" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle">Administration</a>
             <ul aria-labelledby="dropdownSubMenu1" class="dropdown-menu border-0 shadow">
-              <li><a href="#" class="dropdown-item">Paramètres de l'école </a></li>
+              <li><a href="{% url 'listeinfos' %}" class="dropdown-item">Paramètres de l'école </a></li>
               <li><a href="#" class="dropdown-item">Certificat de scolarité</a></li>
               <li><a href="#" class="dropdown-item">Contrat de travail</a></li>
 
@@ -59,8 +59,8 @@
               <li class="dropdown-submenu dropdown-hover">
                 <a id="dropdownSubMenu2" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-item dropdown-toggle">Gestion des cours</a>
                 <ul aria-labelledby="dropdownSubMenu2" class="dropdown-menu border-0 shadow">
-                  <li><a tabindex="-1" href="#" class="dropdown-item">Ajouter une année scolaire</a></li>
-                  <li><a href="#" class="dropdown-item">Ajouter une classe</a></li>
+                  <li><a tabindex="-1" href="{% url 'listeanneescolaire' %}" class="dropdown-item">Ajouter une année scolaire</a></li>
+                  <li><a href="{% url 'listeclasse' %}" class="dropdown-item">Ajouter une classe</a></li>
                   <li><a href="#" class="dropdown-item">Ajouter une matière</a></li>
                 </ul>
               </li>
@@ -71,7 +71,7 @@
       <li class="nav-item dropdown">
             <a id="dropdownSubMenu3" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle">Elèves</a>
             <ul aria-labelledby="dropdownSubMenu3" class="dropdown-menu border-0 shadow">
-              <li><a href="#" class="dropdown-item">Inscription</a></li>
+              <li><a href="{% url 'chargeranneecourante' %}" class="dropdown-item">Inscription</a></li>
               <li><a href="#" class="dropdown-item">Reinscription</a></li>
               <li><a href="#" class="dropdown-item">Etat des paiements</a></li>
               <li><a href="#" class="dropdown-item">Etat des inscriptions/reinscriptions</a></li>
@@ -84,10 +84,10 @@
             <a id="dropdownSubMenu4" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle">Comptabilité</a>
             <ul aria-labelledby="dropdownSubMenu4" class="dropdown-menu border-0 shadow">
               <li><a href="#" class="dropdown-item">Paiement de la scolarité</a></li>
-              <li><a href="#" class="dropdown-item">Situation de la scolarité</a></li>
+              <li><a href="{% url 'listerecette' %}" class="dropdown-item">Situation de la scolarité</a></li>
               <li><a href="#" class="dropdown-item">Situation de la cantine scolaire</a></li>
               <li><a href="#" class="dropdown-item">Situation des activités extra scolaires</a></li>
-              <li><a href="#" class="dropdown-item">Situation des dépenses</a></li>
+              <li><a href="{% url 'listedepense' %}" class="dropdown-item">Situation des dépenses</a></li>
               
               <li class="dropdown-divider"></li>
               
@@ -269,7 +269,7 @@
   <!-- Main Sidebar Container -->
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
-    <a href="../../index3.html" class="brand-link">
+    <a href="#" class="brand-link">
       <img src="{% static 'assets/dist/img/LogoEC.png' %}"
            alt="Logo Ecole les Champions"
            class="brand-image img-circle elevation-3"
@@ -307,7 +307,7 @@
 
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="#" class="nav-link" title="Permet de saisir les renseignements de l'école">
+                <a href="{% url 'listeinfos' %}" class="nav-link" title="Permet de saisir les renseignements de l'école">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Paramères de l'école &nbsp;</p>
                   <i class=" fas fa-gears"></i>
@@ -328,14 +328,14 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="#" class="nav-link" title="Permet d'ajouter de nouvelles années scolaires">
+                <a href="{% url 'listeanneescolaire' %}" class="nav-link" title="Permet d'ajouter de nouvelles années scolaires">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Créer une année scolaire &nbsp;</p>
                   <i class="fas fa-calendar-plus"></i>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="#" class="nav-link" title="Permet d'ajouter de nouvelles classes dans le système">
+                <a href="{% url 'listeclasse' %}" class="nav-link" title="Permet d'ajouter de nouvelles classes dans le système">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Créer une classe &nbsp;</p>
                   <i class="fas fa-school"></i>
@@ -369,7 +369,7 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="#" class="nav-link" title="Permet d'effectuer les inscriptions des nouvels élèves">
+                <a href="{% url 'chargeranneecourante' %}" class="nav-link" title="Permet d'effectuer les inscriptions des nouvels élèves">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Inscription &nbsp;</p>
                   <i class="fas fa-info"></i>
@@ -431,7 +431,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="#" class="nav-link" title="Permet de gérer la situation des recettes générées par le paiement des frais à la scolarité">
+                <a href="{% url 'listerecette' %}" class="nav-link" title="Permet de gérer la situation des recettes générées par le paiement des frais à la scolarité">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Recettes scolarité &nbsp;</p>
                   <i class="fa-brands fa-cc-mastercard"></i>
@@ -452,7 +452,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="#" class="nav-link" title="Permet de gérer la situation des dépenses quotidiennes">
+                <a href="{% url 'listedepense' %}" class="nav-link" title="Permet de gérer la situation des dépenses quotidiennes">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Gestion dépenses &nbsp;</p>
                   <i class="fas fa-credit-card"></i>
