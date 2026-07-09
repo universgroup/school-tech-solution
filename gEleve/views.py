@@ -8,7 +8,7 @@ from datetime import datetime, date  # Utilisé pour recuperer l'année courante
 from django.db.models import Q, Max, \
     Sum  # Permet de faire des requêtes avec les opérateurs And (,) et les opérateurs OR (|)
 import io  # Librairie contenant les methodes utilisant les péripheriques d'entrées/sorties
-from django.http import FileResponse, HttpResponseRedirect
+from django.http import FileResponse, HttpResponseRedirect, JsonResponse
 
 from reportlab.pdfgen import canvas
 from reportlab.platypus.tables import Table, TableStyle  # Permet de generer des tableaux (matrices) de données
@@ -205,20 +205,21 @@ def chargerlisteclasse(request):
 
 # Permet d'afficher la liste générale des élèves (registre de matriculation)
 def registrematricule(request):
+    
     liste = Inscription.objects.select_related('annee_scolaire', 'mateleve', 'idcycle', 'idclasse').all().order_by(
         'idcycle')
     ansc = AnneeScolaire.objects.all().order_by('descript_annee')
     cycles = CycleScolaire.objects.all().order_by('id')
     # Ici je calcule les effectifs totaux des eleves inscrits
     effectif_total = liste.count()
-    effectif_total_garcons = liste.filter(mateleve__sexe_eleve='Masculin').count()
-    effectif_total_filles = liste.filter(mateleve__sexe_eleve='Feminin').count()
+    effectif_total_garcons = liste.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[1][1]).count()
+    effectif_total_filles = liste.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[2][1]).count()
 
     pagineinscrit = Paginator(liste, 10)
     numpageinscrit = request.GET.get('page')
     liste = pagineinscrit.get_page(numpageinscrit)
     return render(request, 'gEleve/liste_generale_eleves.html',
-                  dict(listeinscrits=liste, ansc=ansc, cycles=cycles, effectif_total=effectif_total,
+                  dict(listegenerale=liste, ansc=ansc, cycles=cycles, effectif_total=effectif_total,
                        effectif_total_garcons=effectif_total_garcons, effectif_total_filles=effectif_total_filles))
 
 
@@ -295,9 +296,9 @@ def supprimerinscription(request, pkins):
 
 # Fonctions me permettant de filtrer la liste des inscrits par matricule, par classe, par nom de famille
 def filtrelistegenerale(request):
-    listeins = []
-    listeinsclasse = []
-    listeinsnp = []
+    listeins = {}
+    listeinsclasse = {}
+    listeinsnp = {}
     effectif_total = 0
     effectif_total_garcons = 0
     effectif_total_filles = 0
@@ -307,6 +308,10 @@ def filtrelistegenerale(request):
     idcy = request.GET.get('cycle')
     idansc = request.GET.get('annee_scolaire')
     np = request.GET.get('nomeleve')
+
+    listeins = Inscription.objects.none()
+    listeinsclasse = Inscription.objects.none()
+    listeinsnp = Inscription.objects.none()
 
     if mat != '' and mat is not None:
 
@@ -656,7 +661,7 @@ def imprimerecuinscription(request, idins):
 
 # Gestion des reinscription des élèves
 def chargeranneecycle(request):
-    ans = Inscription.objects.all().distinct()
+    ans = Inscription.objects.all().distinct('annee_scolaire')
     cy = CycleScolaire.objects.all()
     an = AnneeScolaire.objects.all()
     clas = Classe.objects.all()
@@ -666,14 +671,31 @@ def chargeranneecycle(request):
 # Cette fonction me permet de charger la liste des élèves inscrits dans une classe donnée aucours d'une année
 # scolaire donnée
 def chargerlisteeleveclasse(request):
-    ane = request.GET.get('anneesco')
-    clas = request.GET.get('id_classe')
+    ane = request.GET.get('anneesco') # anneesco est la valeur renvoyée depuis la fonction JQuery dans le template reinscription_eleve.html
+    clas = request.GET.get('id_classe') # id_classe est recupérée depuis la fonction JQuery
     el = Inscription.objects.select_related('annee_scolaire', 'mateleve', 'idcycle', 'idclasse').filter(
         Q(annee_scolaire=ane), Q(idclasse=clas))
     return render(request, 'gEleve/charger_liste_eleve_classe_cycle.html', dict(eleve=el))
 
 
+# Cette fonction me permet de charger les infos de l'élève sélectionné lors de la reinscription à savoir le prénom, le nom et la photo
+def chargerinfoeleveclasse(request):
+    matricule = request.GET.get('matricule')
+    try:
+        el = Eleve.objects.get(matricule=matricule)
+        data = {
+            'nom': el.nom,
+            'prenom': el.prenom,
+            'photo': str(el.photo_eleve) if el.photo_eleve else '',
+        }
+    except Eleve.DoesNotExist:
+        data = {'nom': '', 'prenom': '', 'photo': ''}
+    
+    return JsonResponse(data)
+
+
 def validerreinscription(request):
+
     if request.method == 'POST':
         cy = request.POST['cycle']
         ans = request.POST['annee_scolaire_new']
@@ -685,7 +707,7 @@ def validerreinscription(request):
         idcy = CycleScolaire.objects.get(id=cy)
         el = Eleve.objects.get(matricule=mat)
 
-        insc = Inscription(annee_scolaire=an, mateleve=el, idcycle=idcy, idclasse=cl, etat_inscription='Reinscrit')
+        insc = Inscription(annee_scolaire=an, mateleve=el, idcycle=idcy, idclasse=cl, etat_inscription=ETAT_INSCRIPTION[1][1])
         insc.save()
 
         frais = Decimal(cl.frais_reinscription)
@@ -702,7 +724,7 @@ def validerreinscription(request):
         soldecaisse = affichersoldecaisse()
         cais = Caisse()
         cais.type_operation = TYPE_OPERATION_CAISSE_CHOICES[1][1]
-        cais.libelle_operation = 'Paiement des frais reinscription de l\'élève:  {},  {} , {} '.format(
+        cais.libelle_operation = 'Paiement des frais de reinscription de l\'élève:  {},  {} , {} '.format(
             el.matricule, el.nom, el.prenom)
         cais.montant_encaisse = Decimal(frais)
         cais.anscolaire = an
@@ -728,7 +750,7 @@ def validerreinscription(request):
                                             args=(
                                                 lastid,)))  # Je redirige l'utilisateur vers l'impression du recu d'inscription (PDF)
     else:
-        return redirect('../reinscriptioneleve/')
+        return redirect('../listereinscritsanneecourante/')
 
 
 def recureinscription(request, idinsc):
@@ -751,7 +773,7 @@ def recureinscription(request, idinsc):
         ins = Inscription.objects.select_related('annee_scolaire', 'mateleve', 'idcycle', 'idclasse').get(id=idinsc)
         data = [ins.id, ins.annee_scolaire.descript_annee, ins.mateleve.matricule, ins.idclasse, ins.mateleve.nom,
                 ins.mateleve.prenom,
-                ins.mateleve.tuteur, ins.mateleve.contact_parent,ins.mateleve.email_parent, ins.date_inscription, ins.idclasse.frais_inscription
+                ins.mateleve.tuteur, ins.mateleve.contact_parent,ins.mateleve.email_parent, ins.date_inscription, ins.idclasse.frais_reinscription
                 ]
 
         ch = str(data[1])  # Je recupère le nom de l'année scolaire i.e 2023-2024 par exemple
@@ -790,17 +812,22 @@ def recureinscription(request, idinsc):
         # Affichage du logo de l'ecole
         try:
             logo = Image.open(data_ecole[5]) # Ici je tente d'ouvrir l'image stockee dans la BD en utilisant son path (voir dans la liste data_ecole[])
-            logo.thumbnail((60,60)) # Redimensionne l'image en format miniature avec comme taille (width=100,height=100), permet de gerer les ratios de l'image
-            if logo.mode in ('RGBA','P'): # Permet de verifier le type de couleur utilise dans l'image (RGBA == Red Green Blue + Alpha (transparent) pour PNG)
-                logo = logo.convert('RGB') # Transforme la couleur en format RGB standard
-            
+
+            # Redimensionner avec haute qualité au lieu de thumbnail
+            logo = logo.resize((90, 60), Image.LANCZOS)  # LANCZOS = meilleur algorithme de rééchantillonnage
+
+            if logo.mode in ('RGBA', 'P'):
+                logo = logo.convert('RGB') # PNG supporte la transparence
+            elif logo.mode != 'RGB':
+                logo = logo.convert('RGB')
+
             # Je cree ici un buffer (fichier temporaire) pour stocker l'image recuperee
             logo_buffer = io.BytesIO()
-            logo.save(logo_buffer,format='JPEG') # Sauvegarde l'image au format JPEG
+            logo.save(logo_buffer, format='PNG', quality=95)  # qualité 95 au lieu de la valeur par défaut, PNG = sans perte
             logo_buffer.seek(0)
-            
+
             # Ici je dessine l'image stockee dans le fichier temporaire a l'interieur du PDF
-            p.drawImage(ImageReader(logo_buffer), 245, 770, 60, 60)
+            p.drawImage(ImageReader(logo_buffer), 245, 770, 90, 60)
             
         except FileNotFoundError:
             p.drawString(data_ecole[5],245, 770)
@@ -878,11 +905,11 @@ def recureinscription(request, idinsc):
         p.setFont('Helvetica-Bold',11)
         p.drawString(120, 590, 'Date reinscription : ')
         p.setFont('Helvetica',11)
-        p.drawString(216, 590, str(data[9]))
+        p.drawString(225, 590, str(data[9]))
         p.setFont('Helvetica-Bold',11)
         p.drawString(120, 570, 'Frais reinscription : ')
         p.setFont('Helvetica',11)
-        p.drawString(216, 570, str(data[10]))
+        p.drawString(225, 570, str(data[10]))
         p.setFont('Helvetica-Bold',11)
         p.drawString(120, 550, 'Classe : ')
         p.setFont('Helvetica',11)
@@ -941,11 +968,11 @@ def recureinscription(request, idinsc):
         p.setFont('Helvetica-Bold',11)
         p.drawString(120, 240, 'Date reinscription : ')
         p.setFont('Helvetica',11)
-        p.drawString(216, 240, str(data[9]))
+        p.drawString(225, 240, str(data[9]))
         p.setFont('Helvetica-Bold',11)
         p.drawString(120, 220, 'Frais reinscription : ')
         p.setFont('Helvetica',11)
-        p.drawString(216, 220, str(data[10]))
+        p.drawString(225, 220, str(data[10]))
         p.setFont('Helvetica-Bold',11)
         p.drawString(120, 200, 'Classe : ')
         p.setFont('Helvetica',11)
@@ -1018,7 +1045,7 @@ effectif_total = 0
 effectif_total_garcons = 0
 effectif_total_filles = 0
 
-def chargeranneescolairecourante(request):
+def listeinscritsanneescolairecourante(request):
 
     ans = Inscription.objects.all().distinct('annee_scolaire')
     cy = CycleScolaire.objects.all()
@@ -1034,7 +1061,7 @@ def chargeranneescolairecourante(request):
     mois_actuel = mois.strftime('%m')
 
     listeeleves = Inscription.objects.select_related('annee_scolaire', 'mateleve', 'idcycle', 'idclasse').filter(
-            (Q(etat_inscription__exact=ETAT_INSCRIPTION[0][1]) | Q(etat_inscription__exact=ETAT_INSCRIPTION[1][1])),Q(date_inscription__month=mois_actuel)).order_by('-date_inscription')
+            Q(etat_inscription__exact=ETAT_INSCRIPTION[0][1]),Q(date_inscription__month=mois_actuel)).order_by('-date_inscription')
     
     effectif_total = listeeleves.count()
     effectif_total_garcons = listeeleves.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[1][1]).count() # SEXE_ELEVE_CHOICES[1][1] correspond à Masculin
@@ -1045,6 +1072,35 @@ def chargeranneescolairecourante(request):
     listeeleves = pagineins.get_page(numpageins)
     
     return render(request, 'gEleve/liste_eleves_inscrits.html', dict(ans=ans, cycles=cy, listeeleves=listeeleves, effectif_total=effectif_total, effectif_total_garcons=effectif_total_garcons, effectif_total_filles=effectif_total_filles))
+
+
+def listereinscritsanneescolairecourante(request):
+
+    ans = Inscription.objects.all().distinct('annee_scolaire')
+    cy = CycleScolaire.objects.all()
+
+    listeeleves = {}
+    listeeleves = Inscription.objects.none()
+
+    global effectif_total
+    global effectif_total_garcons
+    global effectif_total_filles
+
+    mois = date.today()
+    mois_actuel = mois.strftime('%m')
+
+    listeeleves = Inscription.objects.select_related('annee_scolaire', 'mateleve', 'idcycle', 'idclasse').filter(
+            Q(etat_inscription__exact=ETAT_INSCRIPTION[1][1]),Q(date_inscription__month=mois_actuel)).order_by('-date_inscription')
+    
+    effectif_total = listeeleves.count()
+    effectif_total_garcons = listeeleves.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[1][1]).count() # SEXE_ELEVE_CHOICES[1][1] correspond à Masculin
+    effectif_total_filles = listeeleves.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[2][1]).count() # SEXE_ELEVE_CHOICES[2][1] correspond à Feminin
+    
+    pagineins = Paginator(listeeleves, 10)
+    numpageins = request.GET.get('page')
+    listeeleves = pagineins.get_page(numpageins)
+    
+    return render(request, 'gEleve/liste_eleves_reinscrits.html', dict(ans=ans, cycles=cy, listeeleves=listeeleves, effectif_total=effectif_total, effectif_total_garcons=effectif_total_garcons, effectif_total_filles=effectif_total_filles))
 
 
 def filtrelisteinscrits(request):
@@ -1063,7 +1119,7 @@ def filtrelisteinscrits(request):
     if (idclass != '' and idclass is not None) and (idcy != '' and idcy is not None) and (
             idansc != '' and idansc is not None):
         listeinsclasse = Inscription.objects.select_related('annee_scolaire', 'mateleve', 'idcycle', 'idclasse').filter(
-            Q(idclasse__exact=idclass), Q(idcycle__exact=idcy), Q(annee_scolaire__exact=idansc)).order_by('-date_inscription')
+            Q(idclasse__exact=idclass), Q(idcycle__exact=idcy), Q(annee_scolaire__exact=idansc), Q(etat_inscription__exact=ETAT_INSCRIPTION[0][1])).order_by('-date_inscription')
 
 
         # Ici je calcule les effectifs totaux des eleves inscrits
@@ -1077,4 +1133,37 @@ def filtrelisteinscrits(request):
         
     return render(request, 'gEleve/liste_eleves_inscrits.html',
                   dict(listeinscrits=listeinsclasse, effectif_total=effectif_total,
+                       effectif_total_garcons=effectif_total_garcons, effectif_total_filles=effectif_total_filles))
+
+
+def filtrelistereinscrits(request):
+    
+    idclass = request.GET.get('id_classe')
+    idcy = request.GET.get('cycle')
+    idansc = request.GET.get('annee_scolaire')
+
+    listeinsclasse = {}
+    listeinsclasse = Inscription.objects.none()
+
+    global effectif_total
+    global effectif_total_garcons
+    global effectif_total_filles
+
+    if (idclass != '' and idclass is not None) and (idcy != '' and idcy is not None) and (
+            idansc != '' and idansc is not None):
+        listeinsclasse = Inscription.objects.select_related('annee_scolaire', 'mateleve', 'idcycle', 'idclasse').filter(
+            Q(idclasse__exact=idclass), Q(idcycle__exact=idcy), Q(annee_scolaire__exact=idansc), Q(etat_inscription__exact=ETAT_INSCRIPTION[1][1])).order_by('-date_inscription')
+
+
+        # Ici je calcule les effectifs totaux des eleves inscrits
+        effectif_total = listeinsclasse.count()
+        effectif_total_garcons = listeinsclasse.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[1][1]).count() # SEXE_ELEVE_CHOICES[1][1] correspond à Masculin
+        effectif_total_filles = listeinsclasse.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[2][1]).count() # SEXE_ELEVE_CHOICES[2][1] correspond à Feminin
+
+        pagineinscrit = Paginator(listeinsclasse, 10)
+        numpageinscrit = request.GET.get('page')
+        listeinsclasse = pagineinscrit.get_page(numpageinscrit)
+        
+    return render(request, 'gEleve/liste_eleves_reinscrits.html',
+                  dict(listereinscrits=listeinsclasse, effectif_total=effectif_total,
                        effectif_total_garcons=effectif_total_garcons, effectif_total_filles=effectif_total_filles))

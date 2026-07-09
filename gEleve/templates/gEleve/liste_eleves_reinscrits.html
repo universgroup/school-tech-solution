@@ -1,42 +1,39 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    
-  {% load static %}
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>LISTE DES CYCLES</title>
-  <!-- Tell the browser to be responsive to screen width -->
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+     {% load static %}
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>LISTE GENERALE DES REINSCRITS PAR CLASSE</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="{% static 'assets/plugins/fontawesome-free/css/all.min.css' %}">
-  <!-- Ionicons -->
-  <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
-  <!-- Theme style -->
-  <link rel="stylesheet" href="{% static 'assets/dist/css/adminlte.min.css' %}">
-  <!-- Google Font: Source Sans Pro -->
-  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="{% static 'assets/plugins/fontawesome-free/css/all.min.css' %}">
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="{% static 'assets/dist/css/adminlte.min.css' %}">
+    <!-- Google Font: Source Sans Pro -->
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
 
-  <!--begin::Third Party Plugin(OverlayScrollbars)-->
-  <link rel="stylesheet" href="{% static 'assets/plugins/overlayScrollbars/css/OverlayScrollbars.min.css' %}"/>
-  <link href="{% static 'fontawesomefree/css/all.min.css' %}" rel="stylesheet" type="text/css">
+    <!--begin::Third Party Plugin(OverlayScrollbars)-->
+    <link rel="stylesheet" href="{% static 'assets/plugins/overlayScrollbars/css/OverlayScrollbars.min.css' %}"/>
+    <link href="{% static 'fontawesomefree/css/all.min.css' %}" rel="stylesheet" type="text/css">
 
-  <!-- DataTables -->
-  <link rel="stylesheet" href="{% static 'assets/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
-  <link rel="stylesheet" href="{% static 'assets/plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
-  <link rel="stylesheet" href="{% static 'assets/plugins/datatables-buttons/css/buttons.bootstrap4.min.css' %}">
+    <!-- DataTables -->
+    <link rel="stylesheet" href="{% static 'assets/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/plugins/datatables-buttons/css/buttons.bootstrap4.min.css' %}">
 
-  <!--begin::Third Party Plugin(Bootstrap Icons)-->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"/>
-
-
+    <!--begin::Third Party Plugin(Bootstrap Icons)-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"/>
 </head>
 <body class="hold-transition sidebar-mini">
-
-<div class="wrapper">
+    
+ <div class="wrapper">
   <!-- Navbar -->
-  <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+   <nav class="main-header navbar navbar-expand navbar-white navbar-light">
     <!-- Left navbar links -->
     <ul class="navbar-nav">
       <li class="nav-item">
@@ -274,7 +271,7 @@
            alt="Logo Ecole les Champions"
            class="brand-image img-circle elevation-3"
            style="opacity: .8">
-      <span class="brand-text font-weight-light">Ecole les Champions</span>
+      <span class="brand-text font-weight-light">EC les Champions</span>
     </a>
 
     <!-- Sidebar -->
@@ -642,12 +639,12 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1>LISTE DES CYCLES DISPONIBLES</h1>
+            <h1>SITUATION DES ELEVES REINSCRITS PAR CLASSE</h1>
           </div>
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="#">Accueil</a></li>
-              <li class="breadcrumb-item active">Liste des cycles</li>
+              <li class="breadcrumb-item active">Situation des reinscrits</li>
             </ol>
           </div>
         </div>
@@ -663,88 +660,421 @@
             <!-- jquery validation -->
             <div class="card card-primary">
               <div class="card-header">
-                <h2 class="card-title">Liste des cycles scolaires</h2>
-                <div class="text-right">
-                        <a href="{% url 'ajoutcycle' %}" class="btn btn-success btn-md" target="_self" title="Cliquez ici pour ajouter un nouveau cycle">Nouveau cycle &nbsp;<i class="fa fa-solid fa-plus-circle"></i></a>
+                <div class="d-flex justify-content-between align-items-center">
+                    
+                        <h2 class="card-title mb-0">Filtrez la liste des élèves reinscrits à la scolarité</h2>
+                            
+                        <div class="d-flex align-items-center">
+
+                            <form class="form-inline ml-3" action="{% url 'filtrerlistereinscrits' %}" method="GET" id="flistereinscrits" data-classe-url="{% url 'chargerlisteclasse' %}">
+
+                                <div class="d-flex align-items-center">
+                                    
+                                    <label for="idannee" class="mr-2 mb-0">Année scolaire</label>
+                                    <select class="form-control form-control-sm mr-3" name="annee_scolaire" id="idannee" title="Sélectionnez une année scolaire pour afficher la liste des élèves reinscrits">
+                                        <option value="" selected>Sélectionnez</option>
+                                        {% for an in ans %}
+                                        <option value="{{an.annee_scolaire.id}}">{{an.annee_scolaire.descript_annee}}</option>
+                                        {% endfor %}
+                                    </select>
+
+                                    <label for="cbocycle" class="mr-2 mb-0">Cycle</label>
+                                    <select class="form-control form-control-sm mr-3" name="cycle" id="cbocycle">
+                                          <option value="" selected>Selectionnez</option>
+                                          {% for cl in cycles %}
+                                            <option value="{{cl.id}}">{{cl.cycle}}</option>
+                                          {% endfor %}
+                                    </select>
+
+                                    <label for="cboclasse" class="mr-2 mb-0">Classe</label>
+                                    <select class="form-control form-control-sm mr-3" name="id_classe" id="cboclasse">
+                                      <option value="" selected>Selectionnez</option>
+                                    </select>
+
+                                    <button type="submit" id="btn_rechercher" class="btn btn-secondary btn-sm mr-2" title="Filtrez la liste des élèves reinscrits par année scolaire et cycle">Rechercher &nbsp;<i class="fas fa-search"></i></button>
+                                    <a href="{% url 'listereinscritsanneecourante' %}" target="_self" class="btn btn-warning btn-sm mr-3" title="Actualisez la liste des élèves reinscrits">Actualiser &nbsp;<i class="fas fa-refresh"></i></a>
+                                    <a href="{% url 'registrematricule' %}" class="btn btn-info btn-sm mr-2" target="_self" title="Affichez le Registre de matricule"><i class="fas fa-list-ol mr-1"></i> Registre matricule</a>
+                                    
+                                </div>
+
+                            </form>
+                        </div>
+
+                            <div class="text-right">
+                                <a href="{% url 'reinscriptioneleve' %}" class="btn btn-success btn-sm" target="_self" title="Cliquez ici pour effectuer la reinscription d'un élève">Nouvelle reinscription &nbsp;<i class="fas fa-graduation-cap"></i></a>
+                            </div>
+            
                 </div>
-              </div>
+                
+            </div>
               <!-- /.card-header -->
 
-            <div class="card-body">
-              <table id="idlistecycle" class="table table-bordered table-striped">
-                <thead class="table-success">
+        <div class="card-body">
+
+        {% if listereinscrits %}
+             <table id="listereinscritsannee" class="table table-bordered table-striped">
+                    <thead class="table-success">
                 
-                    <tr>
-                        <th>Cycle scolaire</th>
-                        <th>ID</th>
-                        <th>Actions</th>
-                    </tr>
+                        <tr>
+                                <th>Statut</th>
+                                <th>Matricule</th>
+                                <th>Nom Famille</th>
+                                <th>Prénom(s)</th>
+                                <th>Sexe</th>
+                                <th>Prénom(s) Père</th>
+                                <th>Prénom(s) & Nom Mère</th>
+                                <th>Prénom(s) & Nom Tuteur</th>
+                                <th>Contact tuteur</th>
+                                <th>Adresse</th>
+                                <th>Ecole d'origine</th>
+                                <th>Photo ID</th>
+                                <th>Date naissance</th>
+                                <th>Lieu naissance</th>
+                                <th>Date entrée</th>
+                                <th>Pays naissance</th>
+                                <th>Classe</th>
+                                <th>Cycle</th>
+                                <th>Année scolaire</th>
+                                <th>Date inscription</th>
+                                <th>ID Inscription</th>
+                                <th>Actions</th>
+                        </tr>
 
-                </thead>
-                <tbody>
+                    </thead>
+                    <tbody>
                     
-                    {% for c in cycles %}
-                    <tr>
-                        <td class="fit">{{c.cycle}}</td>
-                        <td class="fit">{{c.id}}</td>
-                        <td class="fit">
-                            <a class="btn btn-primary" href="{% url 'afficherdetailscycle' c.id %}" title="Voir/Afficher" target="_self"><i class="fa-solid fa-eye fa-sm"></i></a>
-                            <a class="btn btn-info" href="{% url 'editioncycle' c.id %}" title="Modifier/Editer" target="_self"><i class="fa-solid fa-edit fa-sm"></i></a>
-                            <a class="btn btn-danger" href="{% url 'suppcycle' c.id %}" title="Supprimer"><i class="fa-solid fa-remove fa-sm"></i></a>
-                        </td>
-                    </tr>
-                    {% endfor %}
+                        {% for le in listereinscrits %}
+                                          <tr>
+                                              <td class="fit">{{le.etat_inscription}}</td>
+                                              <td class="fit">{{le.mateleve.matricule}}</td>
+                                              <td class="fit">{{le.mateleve.nom}}</td>
+                                              <td class="fit">{{le.mateleve.prenom}}</td>
+                                              <td class="fit">{{le.mateleve.sexe_eleve}}</td>
+                                              <td class="fit">{{le.mateleve.pere}}</td>
+                                              <td class="fit">{{le.mateleve.mere}}</td>
+                                              <td class="fit">{{le.mateleve.tuteur}}</td>
+                                              <td class="fit">{{le.mateleve.contact_parent}}</td>
+                                              <td class="fit">{{le.mateleve.adresse}}</td>
+                                              <td class="fit">{{le.mateleve.ecole_origine}}</td>
 
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <th>Cycle scolaire</th>
-                        <th>ID</th>
-                        <th>Actions</th>
-                    </tr>
-                </tfoot>
+                                              {% if le.mateleve.photo_eleve %}
+                                              <td class="fit">
+                                                    <a href="{{ le.mateleve.photo_eleve.url }}" target="_blank" title="Agrandir la photo de l'élève">
+                                                        <img src="{{le.mateleve.photo_eleve.url}}" width="40px">
+                                                    </a>
+                                              </td>
+                                              {% else %}
+                                              <td>Photo indisponible</td>
+                                              {% endif %}
+
+                                              <td class="fit">{{le.mateleve.datenaissance|date:'j-n-Y'}}</td>
+                                              <td class="fit">{{le.mateleve.lieu_naissance}}</td>
+                                              <td class="fit">{{le.mateleve.date_arrivee|date:'j-n-Y'}}</td>
+                                              <td class="fit">{{le.mateleve.pays_naissance}}</td>
+                                              <td class="fit">{{le.idclasse}}</td>
+                                              <td class="fit">{{le.idcycle}}</td>
+                                              <td class="fit">{{le.annee_scolaire}}</td>
+                                              <td class="fit">{{le.date_inscription|date:'j-n-Y'}}</td>
+                                              <td class="fit">{{le.id}}</td>
+                                              <td class="fit">
+                                                  <a class="btn btn-primary" href="{% url 'afficherdetailsinscription' le.id %}" title="Voir/Afficher"><i class="fa fa-eye fa-sm"></i></a>
+                                                  <a class="btn btn-info" href="{% url 'editioninscription' le.id %}" title="Modifier/Editer"><i class="fa fa-edit fa-sm"></i></a>
+                                                  <a class="btn btn-danger" href=" {% url 'suppinscription' le.id %}" title="Supprimer"><i class="fa fa-remove fa-sm"></i></a>
+                                                  <a class="btn btn-secondary" target="_blank" href="{% url 'imprimerecureinscription' le.id %}" title="Imprimer le recu de reinscription"><i class="fas fa-print fa-sm"></i></a>
+                                              </td>
+
+                                          </tr>
+
+                                      {% endfor %}
+
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th>Statut</th>
+                            <th>Matricule</th>
+                            <th>Nom Famille</th>
+                            <th>Prénom(s)</th>
+                            <th>Sexe</th>
+                            <th>Prénom(s) Père</th>
+                            <th>Prénom(s) & Nom Mère</th>
+                            <th>Prénom(s) & Nom Tuteur</th>
+                            <th>Contact tuteur</th>
+                            <th>Adresse</th>
+                            <th>Ecole d'origine</th>
+                            <th>Photo ID</th>
+                            <th>Date naissance</th>
+                            <th>Lieu naissance</th>
+                            <th>Date entrée</th>
+                            <th>Pays naissance</th>
+                            <th>Classe</th>
+                            <th>Cycle</th>
+                            <th>Année scolaire</th>
+                            <th>Date inscription</th>
+                            <th>ID Inscription</th>
+                            <th>Actions</th>
+                        </tr>
+                   </tfoot>
             </table>
 
-              <div class="row">
-                    <div class="col-md-8">
-                            <nav aria-label="">
-                                <ul class="pagination">
-
-                                    {% if cycles.has_previous %}
-
-                                    <li class="page-item">
-                                        <a class="page-link" href="?page=1">1</a>
-                                    </li>
-                                    <li class="page-item">
-                                        <a class="page-link" href="?page={{ cycles.previous_page_number }}"><i class="fa-solid fa-backward fa-sm"></i>&nbsp; Précédent</a>
-                                    </li>
-
-                                    {% endif %}
-
-                                    <li class="page-item active" aria-current="page">
-                                        <a class="page-link" href="#">
-                                            Page {{ cycles.number }} sur {{ cycles.paginator.num_pages }}
-                                        </a>
-                                    </li>
-
-                                    {% if cycles.has_next %}
-
-                                    <li class="page-item">
-                                        <a class="page-link" href="?page={{ cycles.next_page_number }}"><i class="fa-solid fa-forward fa-sm"></i>&nbsp; Suivant</a>
-                                    </li>
-
-                                    <li class="page-item">
-                                        <a class="page-link" href="?page={{ cycles.paginator.num_pages }}"><i class="fa-solid fa-step-forward fa-sm"></i>&nbsp; Dernier</a>
-                                    </li>
-
-                                    {% endif %}
-
-                                </ul>
-                            </nav>
+            <div class="row mt-3 mb-2">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="effgarcons">Effectif total garçons</label>
+                        {% if effectif_total_garcons %}
+                        <input type="text" id="effgarcons" name="effectif_total_garcons" value="{{ effectif_total_garcons }}" maxlength="25" class="form-control" readonly style="color:red">
+                        {% else %}
+                        <input type="text" name="effectif_total_garcons" value="0" maxlength="25" class="form-control" readonly style="color:red">
+                        {% endif %}
                     </div>
-                </div>  
+                </div>
+           
 
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="eff_filles">Effectif total filles</label>
+                        {% if effectif_total_filles %}
+                        <input type="text" id="eff_filles" name="effectif_total_filles" value="{{ effectif_total_filles }}" maxlength="25" class="form-control" readonly style="color:red">
+                        {% else %}
+                        <input type="text" name="effectif_total_filles" value="0" maxlength="25" class="form-control" readonly style="color:red">
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="efftotal">Effectif total</label>
+                        {% if effectif_total %}
+                        <input type="text" id="efftotal" name="effectif_total" value="{{ effectif_total }}" maxlength="25" class="form-control" readonly style="color:red;">
+                        {% else %}
+                        <input type="text" name="effectif_total" value="0" maxlength="25" class="form-control" readonly style="color:red;">
+                        {% endif %}
+                    </div>
+                </div>
             </div>
+
+            <div class="row">
+              <div class="col-md-8">
+                      <nav aria-label="">
+                          <ul class="pagination">
+
+                              {% if listereinscrits.has_previous %}
+
+                              <li class="page-item">
+                                  <a class="page-link" href="?page=1">1</a>
+                              </li>
+                              <li class="page-item">
+                                  <a class="page-link" href="?page={{ listereinscrits.previous_page_number }}"><i class="fa-solid fa-backward fa-sm"></i>&nbsp; Précédent</a>
+                              </li>
+
+                              {% endif %}
+
+                              <li class="page-item active" aria-current="page">
+                                  <a class="page-link" href="#">
+                                      Page {{ listereinscrits.number }} sur {{ listereinscrits.paginator.num_pages }}
+                                  </a>
+                              </li>
+
+                              {% if listereinscrits.has_next %}
+
+                              <li class="page-item">
+                                  <a class="page-link" href="?page={{ listereinscrits.next_page_number }}"><i class="fa-solid fa-forward fa-sm"></i>&nbsp; Suivant</a>
+                              </li>
+
+                              <li class="page-item">
+                                  <a class="page-link" href="?page={{ listereinscrits.paginator.num_pages }}"><i class="fa-solid fa-step-forward fa-sm"></i>&nbsp; Dernier</a>
+                              </li>
+
+                              {% endif %}
+
+                          </ul>
+                      </nav>
+              </div>
+          </div>
+
+        {% elif listeeleves %}
+
+          <table id="listereinscritmensuel" class="table table-bordered table-striped">
+                    <thead class="table-success">
+                
+                        <tr>
+                                <th>Statut</th>
+                                <th>Matricule</th>
+                                <th>Nom Famille</th>
+                                <th>Prénom(s)</th>
+                                <th>Sexe</th>
+                                <th>Prénom(s) Père</th>
+                                <th>Prénom(s) & Nom Mère</th>
+                                <th>Prénom(s) & Nom Tuteur</th>
+                                <th>Contact tuteur</th>
+                                <th>Adresse</th>
+                                <th>Ecole d'origine</th>
+                                <th>Photo ID</th>
+                                <th>Date naissance</th>
+                                <th>Lieu naissance</th>
+                                <th>Date entrée</th>
+                                <th>Pays naissance</th>
+                                <th>Classe</th>
+                                <th>Cycle</th>
+                                <th>Année scolaire</th>
+                                <th>Date inscription</th>
+                                <th>ID Inscription</th>
+                                <th>Actions</th>
+                        </tr>
+
+                    </thead>
+                    <tbody>
+                    
+                        {% for le in listeeleves %}
+                                          <tr>
+                                              <td class="fit">{{le.etat_inscription}}</td>
+                                              <td class="fit">{{le.mateleve.matricule}}</td>
+                                              <td class="fit">{{le.mateleve.nom}}</td>
+                                              <td class="fit">{{le.mateleve.prenom}}</td>
+                                              <td class="fit">{{le.mateleve.sexe_eleve}}</td>
+                                              <td class="fit">{{le.mateleve.pere}}</td>
+                                              <td class="fit">{{le.mateleve.mere}}</td>
+                                              <td class="fit">{{le.mateleve.tuteur}}</td>
+                                              <td class="fit">{{le.mateleve.contact_parent}}</td>
+                                              <td class="fit">{{le.mateleve.adresse}}</td>
+                                              <td class="fit">{{le.mateleve.ecole_origine}}</td>
+
+                                              {% if le.mateleve.photo_eleve %}
+                                              <td class="fit">
+                                                    <a href="{{ le.mateleve.photo_eleve.url }}" target="_blank" title="Agrandir la photo de l'élève">
+                                                        <img src="{{le.mateleve.photo_eleve.url}}" width="40px">
+                                                    </a>
+                                              </td>
+                                              {% else %}
+                                              <td>Photo indisponible</td>
+                                              {% endif %}
+
+                                              <td class="fit">{{le.mateleve.datenaissance|date:'j-n-Y'}}</td>
+                                              <td class="fit">{{le.mateleve.lieu_naissance}}</td>
+                                              <td class="fit">{{le.mateleve.date_arrivee|date:'j-n-Y'}}</td>
+                                              <td class="fit">{{le.mateleve.pays_naissance}}</td>
+                                              <td class="fit">{{le.idclasse}}</td>
+                                              <td class="fit">{{le.idcycle}}</td>
+                                              <td class="fit">{{le.annee_scolaire}}</td>
+                                              <td class="fit">{{le.date_inscription|date:'j-n-Y'}}</td>
+                                              <td class="fit">{{le.id}}</td>
+                                              <td class="fit">
+                                                  <a class="btn btn-primary" href="{% url 'afficherdetailsinscription' le.id %}" title="Voir/Afficher"><i class="fa fa-eye fa-sm"></i></a>
+                                                  <a class="btn btn-info" href="{% url 'editioninscription' le.id %}" title="Modifier/Editer"><i class="fa fa-edit fa-sm"></i></a>
+                                                  <a class="btn btn-danger" href=" {% url 'suppinscription' le.id %}" title="Supprimer"><i class="fa fa-remove fa-sm"></i></a>
+                                                  <a class="btn btn-secondary" target="_blank" href="{% url 'imprimerecureinscription' le.id %}" title="Imprimer le recu de reinscription"><i class="fas fa-print fa-sm"></i></a>
+                                              </td>
+
+                                          </tr>
+
+                                      {% endfor %}
+
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th>Statut</th>
+                            <th>Matricule</th>
+                            <th>Nom Famille</th>
+                            <th>Prénom(s)</th>
+                            <th>Sexe</th>
+                            <th>Prénom(s) Père</th>
+                            <th>Prénom(s) & Nom Mère</th>
+                            <th>Prénom(s) & Nom Tuteur</th>
+                            <th>Contact tuteur</th>
+                            <th>Adresse</th>
+                            <th>Ecole d'origine</th>
+                            <th>Photo ID</th>
+                            <th>Date naissance</th>
+                            <th>Lieu naissance</th>
+                            <th>Date entrée</th>
+                            <th>Pays naissance</th>
+                            <th>Classe</th>
+                            <th>Cycle</th>
+                            <th>Année scolaire</th>
+                            <th>Date inscription</th>
+                            <th>ID Inscription</th>
+                            <th>Actions</th>
+                        </tr>
+                   </tfoot>
+            </table>
+
+            <div class="row mt-3 mb-2">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="effgarcons">Effectif total garçons</label>
+                        {% if effectif_total_garcons %}
+                        <input type="text" id="effgarcons" name="effectif_total_garcons" value="{{ effectif_total_garcons }}" maxlength="25" class="form-control" readonly style="color:red">
+                        {% else %}
+                        <input type="text" name="effectif_total_garcons" value="0" maxlength="25" class="form-control" readonly style="color:red">
+                        {% endif %}
+                    </div>
+                </div>
+           
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="eff_filles">Effectif total filles</label>
+                        {% if effectif_total_filles %}
+                        <input type="text" id="eff_filles" name="effectif_total_filles" value="{{ effectif_total_filles }}" maxlength="25" class="form-control" readonly style="color:red">
+                        {% else %}
+                        <input type="text" name="effectif_total_filles" value="0" maxlength="25" class="form-control" readonly style="color:red">
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="efftotal">Effectif total</label>
+                        {% if effectif_total %}
+                        <input type="text" id="efftotal" name="effectif_total" value="{{ effectif_total }}" maxlength="25" class="form-control" readonly style="color:red;">
+                        {% else %}
+                        <input type="text" name="effectif_total" value="0" maxlength="25" class="form-control" readonly style="color:red;">
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-8">
+                      <nav aria-label="">
+                          <ul class="pagination">
+
+                              {% if listeeleves.has_previous %}
+
+                              <li class="page-item">
+                                  <a class="page-link" href="?page=1">1</a>
+                              </li>
+                              <li class="page-item">
+                                  <a class="page-link" href="?page={{ listeeleves.previous_page_number }}"><i class="fa-solid fa-backward fa-sm"></i>&nbsp; Précédent</a>
+                              </li>
+
+                              {% endif %}
+
+                              <li class="page-item active" aria-current="page">
+                                  <a class="page-link" href="#">
+                                      Page {{ listeeleves.number }} sur {{ listeeleves.paginator.num_pages }}
+                                  </a>
+                              </li>
+
+                              {% if listeeleves.has_next %}
+
+                              <li class="page-item">
+                                  <a class="page-link" href="?page={{ listeeleves.next_page_number }}"><i class="fa-solid fa-forward fa-sm"></i>&nbsp; Suivant</a>
+                              </li>
+
+                              <li class="page-item">
+                                  <a class="page-link" href="?page={{ listeeleves.paginator.num_pages }}"><i class="fa-solid fa-step-forward fa-sm"></i>&nbsp; Dernier</a>
+                              </li>
+
+                              {% endif %}
+
+                          </ul>
+                      </nav>
+              </div>
+          </div>
+
+       {% endif %}
+        
+        </div>
             <!-- /.card-body -->
 
         </div>
@@ -799,7 +1129,7 @@
 
 <script>
   $(function () {
-    $("#idlistecycle").DataTable({
+    $("#listereinscritsannee").DataTable({
       "paging": true,
       "lengthChange": true,
       "lengthMenu": [10, 25, 50, 100],
@@ -818,8 +1148,61 @@
       }
     });
   });
-</script>
- 
+
+  $(function () {
+    $("#listereinscritmensuel").DataTable({
+      "paging": true,
+      "lengthChange": true,
+      "lengthMenu": [10, 25, 50, 100],
+      "ordering": true,
+      "info": true,
+      "responsive": true,
+      "autoWidth": false,
+      "language": {
+        "paginate": {
+          "previous": "Précédent",
+          "next": "Suivant"
+        },
+        "search": "Rechercher :",
+        "info": "Affichage de  _START_ à _END_ sur _TOTAL_ entrées",
+        "lengthMenu": "Afficher  _MENU_ entrées"
+      }
+    });
+  });
+
+  // Cette fonction javascript (JQuery) m'a permis de filtrer les classes selon le cycle choisi
+    $("#cbocycle").change(function(){
+        var url = $("#flistereinscrits").attr("data-classe-url");
+        var idcycle = $(this).val();
+
+        $.ajax({
+            url:url,
+            data:{
+                'idcycle':idcycle
+            },
+            success:function(data){
+                $("#cboclasse").html(data);
+            }
+
+
+        });
+    });
+
+    // Cette fonction javascript (JQuery) m'a permis de masquer le tableau d'affichage au chargement de la page
+    $("window").on("load",function(){
+        $('#listereinscritsannee').hide();
+    });
+
+    // Cette fonction me permet d'afficher le tableau d'affichage auparavant masqué lors du chargement
+  $("#btn_rechercher").click(function(){
+    $('#listereinscritsannee').show();
+  });
+
+</script> 
+
+
 </body>
 </html>
+
+
 

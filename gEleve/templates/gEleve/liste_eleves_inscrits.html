@@ -69,11 +69,11 @@
             <a id="dropdownSubMenu3" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle">Elèves</a>
             <ul aria-labelledby="dropdownSubMenu3" class="dropdown-menu border-0 shadow">
               <li><a href="{% url 'chargeranneecourante' %}" class="dropdown-item">Inscription</a></li>
-              <li><a href="#" class="dropdown-item">Reinscription</a></li>
+              <li><a href="{% url 'listereinscritsanneecourante' %}" class="dropdown-item">Reinscription</a></li>
               <li><a href="#" class="dropdown-item">Etat des paiements</a></li>
               <li><a href="#" class="dropdown-item">Etat des inscriptions/reinscriptions</a></li>
               <li><a href="#" class="dropdown-item">Liste des élèves par classe</a></li>
-              <li><a href="#" class="dropdown-item">Registre de matriculation</a></li>
+              <li><a href="{% url 'registrematricule' %}" class="dropdown-item">Registre de matriculation</a></li>
             </ul>
       </li>
 
@@ -373,7 +373,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="#" class="nav-link" title="Permet d'effectuer la reinscription des anciens élèves">
+                <a href="{% url 'listereinscritsanneecourante' %}" class="nav-link" title="Permet d'effectuer la reinscription des anciens élèves">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Reinscription &nbsp;</p>
                   <i class="fas fa-registered"></i>
@@ -401,7 +401,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="#" class="nav-link" title="Permet de consulter le registre de matriculation de l'école">
+                <a href="{% url 'registrematricule' %}" class="nav-link" title="Permet de consulter le registre de matriculation de l'école">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Registre de matricule &nbsp;</p>
                   <i class="fas fa-list-ol"></i>
@@ -691,8 +691,9 @@
                                       <option value="" selected>Selectionnez</option>
                                     </select>
 
-                                    <button type="submit" id="btn_rechercher" class="btn btn-secondary btn-md mr-2" title="Filtrer la liste des élèves par année scolaire et cycle">Rechercher &nbsp;<i class="fas fa-search"></i></button>
-                                    <a href="{% url  'chargeranneecourante' %}" target="_self" class="btn btn-warning btn-md mr-3" title="Actualiser la liste des inscrits">Actualiser &nbsp;<i class="fas fa-refresh"></i></a>
+                                    <button type="submit" id="btn_rechercher" class="btn btn-secondary btn-sm mr-2" title="Filtrer la liste des élèves par année scolaire et cycle">Rechercher &nbsp;<i class="fas fa-search"></i></button>
+                                    <a href="{% url  'chargeranneecourante' %}" target="_self" class="btn btn-warning btn-sm mr-3" title="Actualiser la liste des inscrits">Actualiser &nbsp;<i class="fas fa-refresh"></i></a>
+                                    <a href="{% url 'registrematricule' %}" class="btn btn-info btn-sm mr-2" target="_self" title="Afficher le Registre de matricule"><i class="fas fa-list-ol mr-1"></i> Registre matricule</a>
                                     
                                 </div>
 
@@ -700,7 +701,7 @@
                         </div>
 
                             <div class="text-right">
-                                <a href="{% url 'enregistrereleve' %}" class="btn btn-success btn-md" target="_self" title="Cliquez ici pour inscrire un élève">Nouvelle inscription &nbsp;<i class="fas fa-graduation-cap"></i></a>
+                                <a href="{% url 'enregistrereleve' %}" class="btn btn-success btn-sm" target="_self" title="Cliquez ici pour inscrire un élève">Nouvelle inscription &nbsp;<i class="fas fa-graduation-cap"></i></a>
                             </div>
             
                 </div>

@@ -3,12 +3,12 @@
 {% block titre_page %} GESTION DES INSCRIPTIONS {% endblock %}
 {% block titre_formulaire %} GESTION DES INSCRIPTIONS DES ELEVES {% endblock %}
 {% block titre_cadre %}
-INSCRIRE UN ELEVE
+INSCRIPTION DES ELEVES
 {% endblock %}
 
 {% block formulaire %}
 
-<form action="" method="POST" enctype="multipart/form-data" autocomplete="on" id="finscription" data-classe-url="{% url 'chargerlisteclasse' %}">
+<form class="needs-validation" action="" method="POST" enctype="multipart/form-data" autocomplete="on" id="finscription" data-classe-url="{% url 'chargerlisteclasse' %}">
                     
                     {% csrf_token %}
 

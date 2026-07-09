@@ -36,7 +36,7 @@ class Eleve(models.Model):
     pays_naissance = models.CharField(max_length=70)
 
     def __str__(self):
-        return f'{self.matricule}-{self.nom}-{self.prenom}-{self.contact_parent}'
+        return f'{self.matricule}|{self.prenom}|{self.nom}|{self.contact_parent}'
 
 
 class Discipline(models.Model):
@@ -50,7 +50,7 @@ class Discipline(models.Model):
     idclasse = models.ForeignKey(Classe, on_delete=models.CASCADE)
 
     def __str__(self):
-        return '{} {} {} {}'.format(self.mateleve, self.motif_sanction, self.sanction, self.delit)
+        return '{} | {} | {} | {}'.format(self.mateleve, self.motif_sanction, self.sanction, self.delit)
 
     @property
     def eleve(self):
@@ -68,13 +68,13 @@ class Discipline(models.Model):
 class Inscription(models.Model):
     date_inscription = models.DateField(auto_now=True)
     annee_scolaire = models.ForeignKey(AnneeScolaire, on_delete=models.CASCADE)
-    etat_inscription = models.CharField(max_length=10, default='Inscrit', choices=ETAT_INSCRIPTION)
+    etat_inscription = models.CharField(max_length=10, default=ETAT_INSCRIPTION[0][1], choices=ETAT_INSCRIPTION)
     mateleve = models.ForeignKey(Eleve, on_delete=models.CASCADE)
     idcycle = models.ForeignKey(CycleScolaire, on_delete=models.CASCADE, null=True)
     idclasse = models.ForeignKey(Classe, on_delete=models.CASCADE)
 
     def __str__(self):
-        return '{} {} {} '.format(self.mateleve, self.idclasse, self.etat_inscription)
+        return '{} | {} | {} '.format(self.mateleve, self.idclasse, self.etat_inscription)
 
     @property
     def eleve(self):

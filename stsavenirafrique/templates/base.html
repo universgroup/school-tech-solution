@@ -65,11 +65,11 @@
             <a id="dropdownSubMenu3" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle">Elèves</a>
             <ul aria-labelledby="dropdownSubMenu3" class="dropdown-menu border-0 shadow">
               <li><a href="{% url 'chargeranneecourante' %}" class="dropdown-item">Inscription</a></li>
-              <li><a href="#" class="dropdown-item">Reinscription</a></li>
+              <li><a href="{% url 'listereinscritsanneecourante' %}" class="dropdown-item">Reinscription</a></li>
               <li><a href="#" class="dropdown-item">Etat des paiements</a></li>
               <li><a href="#" class="dropdown-item">Etat des inscriptions/reinscriptions</a></li>
               <li><a href="#" class="dropdown-item">Liste des élèves par classe</a></li>
-              <li><a href="#" class="dropdown-item">Registre de matriculation</a></li>
+              <li><a href="{% url 'registrematricule' %}" class="dropdown-item">Registre de matriculation</a></li>
             </ul>
       </li>
 
@@ -369,7 +369,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="#" class="nav-link" title="Permet d'effectuer la reinscription des anciens élèves">
+                <a href="{% url 'listereinscritsanneecourante' %}" class="nav-link" title="Permet d'effectuer la reinscription des anciens élèves">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Reinscription &nbsp;</p>
                   <i class="fas fa-registered"></i>
@@ -397,7 +397,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="#" class="nav-link" title="Permet de consulter le registre de matriculation de l'école">
+                <a href="{% url 'registrematricule' %}" class="nav-link" title="Permet de consulter le registre de matriculation de l'école">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Registre de matricule &nbsp;</p>
                   <i class="fas fa-list-ol"></i>

@@ -11,7 +11,7 @@ urlpatterns = [
     path('suppinscription/<int:pkins>', supprimerinscription, name='suppinscription'),
     path('filtrerlistegenerale/', filtrelistegenerale,
          name='filtrerlistegenerale'),
-    path('chargeranneecourante/', chargeranneescolairecourante, name='chargeranneecourante'),
+    path('chargeranneecourante/', listeinscritsanneescolairecourante, name='chargeranneecourante'),
     path('filtrerlisteinscrits/', filtrelisteinscrits, name='filtrerlisteinscrits'),
     path('recuinscription/<int:idinsc>', recuinscription, name='recuinscription'),
     path('imprimerecuinscription/<int:idins>', imprimerecuinscription, name='imprimerecuinscription'),
@@ -21,4 +21,7 @@ urlpatterns = [
     path('recureinscription/<int:idinsc>', recureinscription, name='recureinscription'),
     path('imprimerecureinscription/<int:idins>', imprimerecureinscription,
          name='imprimerecureinscription'),
+    path('chargerinfoeleveclasse/', chargerinfoeleveclasse, name='chargerinfoeleveclasse'), # url permettant de charger les prénoms, nom et photo de l'élève lors de la reinscription
+    path('listereinscritsanneecourante/',listereinscritsanneescolairecourante,name='listereinscritsanneecourante'),
+    path('filtrerlistereinscrits/',filtrelistereinscrits,name='filtrerlistereinscrits'),
 ]
