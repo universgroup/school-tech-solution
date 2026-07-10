@@ -1,6 +1,6 @@
 from django.db import models
 from gComptabilite.models import *
-from gPersonnel.models import Personnel
+from gPersonnel.models import Personnel, MOIS_CHOICES
 
 # Create your models here.
 class Matiere(models.Model):

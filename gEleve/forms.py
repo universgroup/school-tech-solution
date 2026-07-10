@@ -6,7 +6,7 @@ from .models import *
 class FormEleve(ModelForm):
     class Meta:
         model = Eleve
-        fields = ('nom', 'prenom', 'sexe_eleve', 'pere', 'mere', 'tuteur', 'contact_parent','email_parent', 'adresse',
+        fields = ('nom', 'prenom', 'sexe_eleve', 'pere', 'mere', 'tuteur', 'contact_pere','contact_mere','email_pere','email_mere','profes_pere','profes_mere','personne_contact', 'adresse',
                   'ecole_origine', 'photo_eleve', 'datenaissance', 'lieu_naissance', 'date_arrivee', 'pays_naissance')
         labels = {
             'nom': 'Nom Famille',
@@ -15,8 +15,13 @@ class FormEleve(ModelForm):
             'pere': 'Prénoms du père',
             'mere': 'Prénoms & Nom de la mère',
             'tuteur': 'Prénoms & Nom du tuteur',
-            'contact_parent': 'Contact du tuteur',
-            'email_parent':'Email du tuteur/parent',
+            'contact_pere': 'Contact du père',
+            'contact_mere': 'Contact de la mère',
+            'email_pere':'Email du père',
+            'email_mere':'Email de la mère',
+            'profes_pere':'Profession du père',
+            'profes_mere': 'Profession de la mère',
+            'personne_contact': 'Personne contact',
             'adresse': 'Adresse du tuteur',
             'ecole_origine': 'Ecole d\'origine',
             'photo_eleve': 'Photo identité',
@@ -37,16 +42,29 @@ class FormEleve(ModelForm):
                                        choices=SEXE_ELEVE_CHOICES),
             'pere': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Prénoms du père',
                                            'title': 'Saisissez le prénom du père'}),
-            'mere': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nom & Prénoms mère',
-                                           'title': 'Saisissez le prénoms et nom de la mère'}),
-            'tuteur': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nom & Prénoms tuteur',
+            'mere': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Prénoms et nom de la mère',
+                                           'title': 'Saisissez les prénoms et nom de la mère'}),
+            'tuteur': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Prénoms et nom du tuteur',
                                              'title': 'Saisissez le prénoms et nom du tuteur'}),
-            'contact_parent': forms.TextInput(
-                attrs={'class': 'form-control', 'placeholder': 'Contact du tuteur', 'type': 'tel',
-                       'pattern': '(\\+224)?[36][0-9]{8}','title': 'Saisissez un numéro de téléphone guinéen'}),
-            'email_parent': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Ex: contact@universtechgroup.com',
+            'contact_pere': forms.TextInput(
+                attrs={'class': 'form-control', 'placeholder': 'Contact du père', 'type': 'tel',
+                       'pattern': '^(\\+?[0-9]{1,3}[\\s\\-]?)?[0-9\\s\\-\\(\\)]{7,15}$','title': 'Saisissez un numéro de téléphone valide avec ou sans code du pays'}),
+
+            'contact_mere': forms.TextInput(attrs={'class': 'form-control', 'placeholder' : 'Contact de la mère', 'type': 'tel', 'pattern': '^(\\+?[0-9]{1,3}[\\s\\-]?)?[0-9\\s\\-\\(\\)]{7,15}$', 'title': 'Saisissez un numéro de téléphone valide avec ou sans code du pays'}),
+
+            'email_pere': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Ex: contact@universtechgroup.com',
                        'pattern': "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\'.[a-zA-Z]{2,}", 'title': 'Saisissez un email correct!'}),
-            'adresse': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Adresse tuteur',
+
+            'email_mere': forms.EmailInput(attrs={'class': 'form-control','placeholder': 'Ex: contact@universtechgroup.com',
+                       'pattern': "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\'.[a-zA-Z]{2,}", 'title': 'Saisissez un email correct!'}),
+
+            'profes_pere': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Profession du père', 'title': 'Saisissez la profession du père'}),
+
+            'profes_mere': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Profession de la mère', 'title': 'Saisissez la profession de la mère'}),
+
+            'personne_contact': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Prénoms et nom personne contact', 'title': 'Saisissez les prénoms et nom de la personne contact'}),
+
+            'adresse': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Adresse du tuteur',
                                               'title': 'Saisissez l\'adresse du tuteur'}),
             'ecole_origine': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ecole d\'origine',
                                                     'title': 'Saisissez le nom de l\'école d\'origine'}),
@@ -66,7 +84,8 @@ class FormEleve(ModelForm):
         super(FormEleve, self).__init__(*args, **kwargs)
         self.fields[
             'photo_eleve'].required = False  # Permet de rendre non obligatoire la selection de la photo d'un élève
-        self.fields['email_parent'].required = True
+        self.fields['email_pere'].required = True
+        self.fields['email_mere'].required = True
 
 
 class FormInscription(ModelForm):

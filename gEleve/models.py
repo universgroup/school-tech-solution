@@ -18,13 +18,18 @@ class Eleve(models.Model):
     ideleve = models.IntegerField(null=True)
     matricule = models.CharField(max_length=50, primary_key=True, unique=True, default=uuid.uuid4)
     nom = models.CharField(max_length=50)
-    prenom = models.CharField(max_length=50)
+    prenom = models.CharField(max_length=100)
     sexe_eleve = models.CharField(max_length=15, default=SEXE_ELEVE_CHOICES[1][1], choices=SEXE_ELEVE_CHOICES)
-    pere = models.CharField(max_length=50)
-    mere = models.CharField(max_length=50, default='')
-    tuteur = models.CharField(max_length=50)
-    contact_parent = models.CharField(max_length=25)
-    email_parent = models.EmailField(blank=True, null=False)
+    pere = models.CharField(max_length=100)
+    mere = models.CharField(max_length=100, default='')
+    tuteur = models.CharField(max_length=100)
+    contact_pere = models.CharField(max_length=25)
+    contact_mere = models.CharField(max_length=25, null=True)
+    email_pere = models.EmailField(blank=True, null=False)
+    email_mere = models.EmailField(blank=True, null=True)
+    profes_pere = models.CharField(max_length=50, null=True) # C'est la profession du père de l'enfant
+    profes_mere = models.CharField(max_length=50, null=True) # C'est la profession de la mère de l'enfant
+    personne_contact = models.CharField(max_length=70, null=True)
     adresse = models.CharField(max_length=50)
     ecole_origine = models.CharField(max_length=50)
     photo_eleve = models.FileField(upload_to='media/photoeleve/', null=True)
@@ -36,7 +41,7 @@ class Eleve(models.Model):
     pays_naissance = models.CharField(max_length=70)
 
     def __str__(self):
-        return f'{self.matricule}|{self.prenom}|{self.nom}|{self.contact_parent}'
+        return f'{self.matricule}|{self.prenom}|{self.nom}|{self.contact_pere}'
 
 
 class Discipline(models.Model):

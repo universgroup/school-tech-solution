@@ -79,23 +79,57 @@ INSCRIPTION DES ELEVES
                             </div>
                         </div>
 
-                        <div class="col-md-6">
+                        <div class="col-md-3">
                             <div class="form-group">
-                                {{form.contact_parent|as_crispy_field}}
+                                {{form.contact_pere|as_crispy_field}}
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                {{form.contact_mere|as_crispy_field}}
                             </div>
                         </div>
                     </div>
 
                     <div class="row g-3">
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <div class="form-group">
-                                {{ form.email_parent|as_crispy_field }}
+                                {{form.email_pere|as_crispy_field}}
                             </div>
                         </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{form.email_mere|as_crispy_field}}
+                            </div>
+                        </div>
+
                     </div>
 
                     <div class="row g-3">
                         <div class="col-md-6">
+                            <div class="form-group">
+                                {{form.profes_pere|as_crispy_field}}
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{form.profes_mere|as_crispy_field}}
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                {{form.personne_contact|as_crispy_field}}
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
                             <div class="form-group">
                                 {{form.adresse|as_crispy_field}}
                             </div>
@@ -108,6 +142,7 @@ INSCRIPTION DES ELEVES
                         </div>
                     </div>
 
+                    
                     <div class="row g-3">
                         <div class="col-md-12">
                             <div class="form-group">

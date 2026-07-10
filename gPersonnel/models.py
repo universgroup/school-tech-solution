@@ -1,6 +1,5 @@
 from django.db import models
 from gAdministration.models import AnneeScolaire
-from gComptabilite.models import MOIS_CHOICES
 
 CIVILITE_CHOICES = [
     ('Selectionnez', 'Sélectionnez'),  # 0
@@ -25,6 +24,22 @@ CONTRAT_CHOICES = (
     ('Selectionnez', 'Sélectionnez'),  # 0
     ('CDD', 'CDD'),  # 1
     ('CDI', 'CDI')  # 2
+)
+
+MOIS_CHOICES = (
+    ('Selectionnez','Sélectionnez'), # 0
+    ('janvier','janvier'), # 1
+    ('fevrier','fevrier'), # 2
+    ('mars','mars'), # 3
+    ('avril','avril'), # 4
+    ('mai','mai'), # 5
+    ('juin','juin'), # 6
+    ('juillet','juillet'), # 7
+    ('aout','août'), # 8
+    ('septembre','septembre'), # 9
+    ('octobre','octobre'), # 10
+    ('novembre','novembre'), # 11
+    ('decembre','décembre') # 12
 )
 
 # Create your models here.

@@ -156,7 +156,7 @@ def enregistrereleve(request):
                 cais.date_operation = date.today() # Recupère la date du système en YYYY-MM-dd
                 cais.save()
                 # Ici je vais enregistrer les frais d'inscription de l'élève dans son etat de paiement de la scolarité
-                etatscol = EtatPaiementScolarite()
+                etatscol = EtatPaiementTranche()
                 etatscol.anneescolaire = an
                 etatscol.idclasse = cl
                 etatscol.mateleve = el
@@ -713,7 +713,7 @@ def validerreinscription(request):
         frais = Decimal(cl.frais_reinscription)
 
         # Ici je vais ensuite enregistrer l'état de paiement de la scolarité de l'élève
-        eps = EtatPaiementScolarite()
+        eps = EtatPaiementTranche()
         eps.anneescolaire = an
         eps.mateleve = el
         eps.inscription = frais

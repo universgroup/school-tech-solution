@@ -10,12 +10,6 @@ CYCLE_CHOICES = [
     ('Lycée SE', 'Lycée SE')
 ]
 
-REGIME_CORANIQUE_CHOICES = (
-    ('Selectionnez', 'Sélectionnez'),  # 0
-    ('Internat', 'Internat'),  # 1
-    ('Externat', 'Externat')  # 2
-)
-
 
 # Create your models here.
 class AnneeScolaire(models.Model):
@@ -64,14 +58,16 @@ class Ecole(models.Model):
     logo_ecole = models.FileField(upload_to='media/', null=True, blank=True)
     dsee = models.CharField(max_length=30)
     dg = models.CharField(max_length=50)
+    dga = models.CharField(max_length=50, null=True, blank=True)
     coordo_primaire = models.CharField(max_length=50, null=True)
     coordo_secondaire = models.CharField(max_length=50, null=True, blank=True)
+    coordo_maternelle = models.CharField(max_length=50, null=True, blank=True)
     comptable = models.CharField(max_length=50, null=True)
     signa_dg = models.FileField(upload_to='media/', null=True, blank=True)
     signa_de = models.FileField(upload_to='media/', null=True, blank=True)
 
     def __str__(self):
-        return '{} {} {} '.format(self.nom_ecole, self.ville_ecole, self.telephone1)
+        return '{} | {} | {} '.format(self.nom_ecole, self.ville_ecole, self.telephone1)
 
 
 class Historique(models.Model):
@@ -80,6 +76,8 @@ class Historique(models.Model):
     detail_operation = models.TextField()
     date_operation = models.DateField(auto_now=True)
     heure_op = models.TimeField(auto_now=True)
+    email_user = models.EmailField(null=True)
+    poste_travail = models.CharField(max_length=50, null=True) # C'est le nom du poste à partir duquel il s'est connecté
 
     def __str__(self):
-        return '{} {} {} '.format(self.user_login, self.detail_operation, self.date_operation)
+        return '{} | {} | {} | {} | {} '.format(self.user_login, self.detail_operation, self.date_operation, self.email_user, self.poste_travail)
