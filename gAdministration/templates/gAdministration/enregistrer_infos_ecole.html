@@ -95,9 +95,14 @@
                     </div>
 
                     <div class="row g-3">
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <div class="form-group">
                                 {{form.dg|as_crispy_field}}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{form.dga|as_crispy_field}}
                             </div>
                         </div>
                     </div>
@@ -105,11 +110,15 @@
                     <div class="row g-3">
                         <div class="col-md-6">
                             <div class="form-group">
+                                {{form.coordo_maternelle|as_crispy_field}}
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
                                 {{form.coordo_primaire|as_crispy_field}}
                             </div>
                         </div>
-
-                        <div class="col-md-6">
+                        <div class="col-md-3">
                             <div class="form-group">
                                 {{form.coordo_secondaire|as_crispy_field}}
                             </div>

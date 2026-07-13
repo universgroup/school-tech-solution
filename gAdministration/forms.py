@@ -73,7 +73,7 @@ class FormEcole(ModelForm):
         fields = (
             'nom_ecole', 'ville_ecole', 'prefect_commune', 'dsee', 'telephone1', 'telephone2', 'agrement_ecole',
             'bp_ecole',
-            'email_ecole', 'site_internet', 'devise_ecole', 'dg', 'coordo_primaire', 'coordo_secondaire', 'comptable',
+            'email_ecole', 'site_internet', 'devise_ecole', 'dg', 'dga', 'coordo_maternelle', 'coordo_primaire', 'coordo_secondaire', 'comptable',
             'logo_ecole', 'signa_dg', 'signa_de')  # '__all__'
         labels = {
             'nom_ecole': 'Nom école/Raison sociale',
@@ -88,6 +88,8 @@ class FormEcole(ModelForm):
             'site_internet': 'Site web',
             'devise_ecole': 'Devise/Slogan',
             'dg': 'Directeur(trice) Général(e)',
+            'dga': 'Directeur(trice) Général(e) Adjoint(e)',
+            'coordo_maternelle': 'Coordinateur Maternelle',
             'coordo_primaire': 'Coordinateur Primaire',
             'coordo_secondaire': 'Coordinateur Secondaire',
             'comptable': 'Comptable',
@@ -107,11 +109,11 @@ class FormEcole(ModelForm):
             'dsee': forms.TextInput(
                 attrs={'class': 'form-control', 'placeholder': 'DSEE', 'title': 'Saisissez le nom de la DSEE'}),
             'telephone1': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Contact 1', 'type': 'tel',
-                                                 'pattern': "(\\+224)?[36][0-9]{8}",
-                                                 'title': 'Saisissez un numéro de téléphone guinéen'}),
+                                                 'pattern': "^(\\+?[0-9]{1,3}[\\s\\-]?)?[0-9\\s\\-\\(\\)]{7,15}$",
+                                                 'title': 'Saisissez un numéro de téléphone valide'}),
             'telephone2': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Contact 2', 'type': 'tel',
-                                                 'pattern': "(\\+224)?[36][0-9]{8}",
-                                                 'title': 'Saisissez un numéro de téléphone guinéen'}),
+                                                 'pattern': "^(\\+?[0-9]{1,3}[\\s\\-]?)?[0-9\\s\\-\\(\\)]{7,15}$",
+                                                 'title': 'Saisissez un numéro de téléphone valide'}),
             'agrement_ecole': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'N°agrement',
                                                      'title': 'Saisissez le numéro de l\'agrement de votre école'}),
             'bp_ecole': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Boîte Postale (BP)',
@@ -127,12 +129,20 @@ class FormEcole(ModelForm):
                                                    'title': 'Saisissez la devise/slogan de l\'école'}),
             'dg': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Prénoms et Nom DG',
                                          'title': 'Saisissez le prénoms et nom du/de la Directeur(trice) Général(e)'}),
+            'dga': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Prénoms et Nom DGA',
+                                         'title': 'Saisissez le prénoms et nom du/de la Directeur(trice) Général(e) Adjoint(e)'}),
+            'coordo_maternelle': forms.TextInput(
+                attrs={'class': 'form-control', 'placeholder': 'Prénoms et Nom du Coordinateur Maternelle',
+                       'title': 'Saisissez le prénoms et nom du coordinateur de la maternelle'}),  
+
             'coordo_primaire': forms.TextInput(
                 attrs={'class': 'form-control', 'placeholder': 'Prénoms et Nom du Coordinateur Primaire',
                        'title': 'Saisissez le prénoms et nom du coordinateur du primaire'}),
+
             'coordo_secondaire': forms.TextInput(
                 attrs={'class': 'form-control', 'placeholder': 'Prénoms et Nom du Coordinateur Secondaire',
                        'title': 'Saisissez le prénoms et nom du coordinateur du secondaire'}),
+                       
             'comptable': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Prénoms et Nom Comptable',
                                                 'title': 'Saisissez le prénoms et nom du/de la comptable'}),
             'logo_ecole': forms.FileInput(

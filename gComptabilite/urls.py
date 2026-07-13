@@ -18,5 +18,9 @@ urlpatterns = [
     path('modifiedepense/<int:pk>', modifierdepense, name='modifiedepense'),
     path('supprimedepense/<int:pk>', supprimerdepense, name='supprimedepense'),
     path('rechercherdepense/', recherchersituationdepense, name='rechercherdepense'),
+    path('chargerlisteclassepaie/', chargerlisteclassepaiement, name='chargerlisteclassepaie'),
+    path('chargerlisteelevepaie/', chargerlisteelevepaiement, name='chargerlisteelevepaie'),
+    path('chargerinfoelevepaie/', chargerinfoeleveclasse, name='chargerinfoelevepaie'), # url permettant de charger les prénoms, nom et photo, etc. de l'élève lors du paiement de la scolarité
+    path('paiementscolarite/',validerpaiementscolarite,name='paiementscolarite'),
 
 ]

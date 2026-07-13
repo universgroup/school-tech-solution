@@ -57,7 +57,8 @@
               <li class="dropdown-submenu dropdown-hover">
                 <a id="dropdownSubMenu2" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-item dropdown-toggle">Gestion des cours</a>
                 <ul aria-labelledby="dropdownSubMenu2" class="dropdown-menu border-0 shadow">
-                  <li><a tabindex="-1" href="{% url 'listeanneescolaire' %}" class="dropdown-item">Ajouter une année scolaire</a></li>
+                  <li><a href="{% url 'listecycle' %}" class="dropdown-item">Ajouter un cycle scolaire</a></li>
+                  <li><a href="{% url 'listeanneescolaire' %}" class="dropdown-item">Ajouter une année scolaire</a></li>
                   <li><a href="{% url 'listeclasse' %}" class="dropdown-item">Ajouter une classe</a></li>
                   <li><a href="#" class="dropdown-item">Ajouter une matière</a></li>
                 </ul>
@@ -81,7 +82,7 @@
       <li class="nav-item dropdown">
             <a id="dropdownSubMenu4" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle">Comptabilité</a>
             <ul aria-labelledby="dropdownSubMenu4" class="dropdown-menu border-0 shadow">
-              <li><a href="#" class="dropdown-item">Paiement de la scolarité</a></li>
+              <li><a href="{% url 'paiementscolarite' %}" class="dropdown-item">Paiement de la scolarité</a></li>
               <li><a href="{% url 'listerecette' %}" class="dropdown-item">Situation de la scolarité</a></li>
               <li><a href="#" class="dropdown-item">Situation de la cantine scolaire</a></li>
               <li><a href="#" class="dropdown-item">Situation des activités extra scolaires</a></li>
@@ -326,6 +327,13 @@
                 </a>
               </li>
               <li class="nav-item">
+                <a href="{% url 'listecycle' %}" class="nav-link" title="Permet d'ajouter de nouveaux cycles scolaires">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Créer un cycle scolaire &nbsp;</p>
+                  <i class="fas fa-calendar-plus"></i>
+                </a>
+              </li>
+              <li class="nav-item">
                 <a href="{% url 'listeanneescolaire' %}" class="nav-link" title="Permet d'ajouter de nouvelles années scolaires">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Créer une année scolaire &nbsp;</p>
@@ -422,7 +430,7 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="#" class="nav-link" title="Permet de procéder au paiement des frais de scolarité">
+                <a href="{% url 'paiementscolarite' %}" class="nav-link" title="Permet de procéder au paiement des frais de scolarité">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Paiement scolarité &nbsp;</p>
                   <i class="fa-brands fa-cc-visa"></i>
@@ -744,29 +752,29 @@
                     
                         {% for c in cais %}
                                 <tr>
-                                    <td class="fit">{{c.categ_depense}}</td>
-                                    <td class="fit">{{ c.date_operation | date:'j-n-Y' }}</td>
-                                    <td class="fit">{{ c.libelle_operation }}</td>
-                                    <td class="fit">{{ c.qte }}</td>
-                                    <td class="fit">{{ c.pua | floatformat:'2g' }}</td>
-                                    <td class="fit">{{ c.montant_encaisse | floatformat:'2g' }}</td>
-                                    <td class="fit">{{ c.provient }}</td>
-                                    <td class="fit">{{ c.destine }}</td>
-                                    <td class="fit">{{ c.type_operation }}</td>
-                                    <td class="fit">{{ c.solde_actuel|floatformat:'2g' }}</td>
-                                    <td class="fit">{{ c.observ }}</td>
-                                    <td class="fit">{{ c.anscolaire }}</td>
+                                    <td>{{c.categ_depense}}</td>
+                                    <td>{{ c.date_operation | date:'j-n-Y' }}</td>
+                                    <td>{{ c.libelle_operation }}</td>
+                                    <td>{{ c.qte }}</td>
+                                    <td>{{ c.pua | floatformat:'2g' }}</td>
+                                    <td>{{ c.montant_encaisse | floatformat:'2g' }}</td>
+                                    <td>{{ c.provient }}</td>
+                                    <td>{{ c.destine }}</td>
+                                    <td>{{ c.type_operation }}</td>
+                                    <td>{{ c.solde_actuel|floatformat:'2g' }}</td>
+                                    <td>{{ c.observ }}</td>
+                                    <td>{{ c.anscolaire }}</td>
                                     {% if c.piece_jointe %}
-                                    <td class="fit zoom">
+                                    <td>
                                       <a href="{{ c.piece_jointe.url }}" target="_blank" title="Afficher la pièce justificative">
                                         <img src="{{ c.piece_jointe.url }}" width="40px" id="photo_piece">
                                       </a>
                                     </td>
                                     {% else %}
-                                    <td class="fit">Pièce indisponible</td>
+                                    <td>Pièce indisponible</td>
                                     {% endif %}
-                                    <td class="fit">{{c.id}}</td>
-                                    <td class="fit">
+                                    <td>{{c.id}}</td>
+                                    <td>
                                         <a class="btn btn-primary" href="{% url 'detailsdepense' c.id %}" title="Voir/Afficher" target="_self"><i class="fa-solid fa-eye fa-sm"></i></a>
                                         <a class="btn btn-info" href="{% url 'editiondepense' c.id %}" title="Modifier/Editer" target="_self"><i class="fa-solid fa-edit fa-sm"></i></a>
                                         <a class="btn btn-danger" href="{% url 'supprimedepense' c.id %}" title="Supprimer" target="_self"><i class="fa-solid fa-remove fa-sm"></i></a>
@@ -914,29 +922,29 @@
                     <tbody>
                         {% for d in depense %}
                                 <tr>
-                                    <td class="fit">{{d.categ_depense}}</td>
-                                    <td class="fit">{{ d.date_operation | date:'j-n-Y' }}</td>
-                                    <td class="fit">{{ d.libelle_operation }}</td>
-                                    <td class="fit">{{ d.qte }}</td>
-                                    <td class="fit">{{ d.pua | floatformat:'2g' }}</td>
-                                    <td class="fit">{{ d.montant_encaisse | floatformat:'2g' }}</td>
-                                    <td class="fit">{{ d.provient }}</td>
-                                    <td class="fit">{{ d.destine }}</td>
-                                    <td class="fit">{{ d.type_operation }}</td>
-                                    <td class="fit">{{ d.solde_actuel|floatformat:'2g' }}</td>
-                                    <td class="fit">{{ d.observ }}</td>
-                                    <td class="fit">{{ d.anscolaire }}</td>
+                                    <td>{{d.categ_depense}}</td>
+                                    <td>{{ d.date_operation | date:'j-n-Y' }}</td>
+                                    <td>{{ d.libelle_operation }}</td>
+                                    <td>{{ d.qte }}</td>
+                                    <td>{{ d.pua | floatformat:'2g' }}</td>
+                                    <td>{{ d.montant_encaisse | floatformat:'2g' }}</td>
+                                    <td>{{ d.provient }}</td>
+                                    <td>{{ d.destine }}</td>
+                                    <td>{{ d.type_operation }}</td>
+                                    <td>{{ d.solde_actuel|floatformat:'2g' }}</td>
+                                    <td>{{ d.observ }}</td>
+                                    <td>{{ d.anscolaire }}</td>
                                     {% if d.piece_jointe %}
-                                    <td class="fit">
+                                    <td>
                                       <a href="{{ d.piece_jointe.url }}" target="_blank" title="Afficher la pièce justificative">
                                          <img src="{{ d.piece_jointe.url }}" width="40px" id="photo_piece_2">
                                       </a>
                                     </td>
                                     {% else %}
-                                    <td class="fit">Pièce indisponible</td>
+                                    <td>Pièce indisponible</td>
                                     {% endif %}
-                                    <td class="fit">{{d.id}}</td>
-                                    <td class="fit">
+                                    <td>{{d.id}}</td>
+                                    <td>
                                         <a class="btn btn-primary" href="{% url 'detailsdepense' d.id %}" title="Voir/Afficher" target="_self"><i class="fa-solid fa-eye fa-sm"></i></a>
                                         <a class="btn btn-info" href="{% url 'editiondepense' d.id %}" title="Modifier/Editer" target="_self"><i class="fa-solid fa-edit fa-sm"></i></a>
                                         <a class="btn btn-danger" href="{% url 'supprimedepense' d.id %}" title="Supprimer" target="_self"><i class="fa-solid fa-remove fa-sm"></i></a>
@@ -1122,7 +1130,7 @@
       "ordering": true,
       "info": true,
       "responsive": true,
-      "autoWidth": false,
+      "autoWidth": true,
       "language": {
         "paginate": {
           "previous": "Précédent",
@@ -1143,7 +1151,7 @@
       "ordering": true,
       "info": true,
       "responsive": true,
-      "autoWidth": false,
+      "autoWidth": true,
       "language": {
         "paginate": {
           "previous": "Précédent",

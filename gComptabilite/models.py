@@ -41,11 +41,15 @@ TYPE_PAIEMENT_MENSUALITE_CHOICES = (
     ('Arriere Scolaire', 'Arriere scolaire') # 4
 )
 
-TRANCHES_CHOICES = (
-    ('Selectionnez', 'Sélectionnez'), # 0
-    ('Premiere tranche', 'Première tranche'), # 1
-    ('Deuxieme tranche', 'Deuxième tranche'), # 2
-    ('Troisieme tranche','Troisième tranche') # 3
+DEUX_TRANCHES_CHOICES = (
+    ('Premiere tranche', 'Première tranche'), # 0
+    ('Deuxieme tranche', 'Deuxième tranche') # 1
+)
+
+TROIS_TRANCHES_CHOICES = (
+    ('Premiere tranche', 'Première tranche'), # 0
+    ('Deuxieme tranche', 'Deuxième tranche'), # 1
+    ('Troisieme tranche','Troisième tranche') # 2
 )
 
 
@@ -88,7 +92,7 @@ class EtatPaiementTranche(models.Model):
     idclasse = models.ForeignKey(Classe, on_delete=models.CASCADE)
 
     def __str__(self):
-        return '{} | {}'.format(self.mateleve, self.inscription)
+        return '{} | {} | {} | {}'.format(self.mateleve, self.inscription, self.premiere_tranche, self.deuxieme_tranche)
 
     @property
     def eleve(self):

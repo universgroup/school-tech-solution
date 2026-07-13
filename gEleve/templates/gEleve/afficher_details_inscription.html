@@ -111,16 +111,65 @@ INFORMATIONS SUR L'INSCRIPTION
                         </div>
                     </div>
 
-                    <div class="col-md-6">
+                    <div class="col-md-3">
                         <div class="form-group">
-                            <label for="id_contact">Contact du tuteur</label>
-                            <input type="text" name="contact" id="id_contact" value="{{ins.mateleve.contact_parent}}" class="form-control" readonly>
+                            <label for="id_contact_pere">Contact du père</label>
+                            <input type="text" name="contact_pere" id="id_contact_pere" value="{{ins.mateleve.contact_pere}}" class="form-control" readonly>
                         </div>
                     </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="id_contact_mere">Contact de la mère</label>
+                            <input type="text" name="contact_mere" id="id_contact_mere" value="{{ins.mateleve.contact_mere}}" class="form-control" readonly>
+                        </div>
+                    </div>
+
                 </div>
 
                 <div class="row g-3">
                     <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_email_pere">Email du père</label>
+                            <input type="text" name="email_pere" id="id_email_pere" value="{{ins.mateleve.email_pere}}" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_email_mere">Email de la mère</label>
+                            <input type="text" name="email_mere" id="id_email_mere" value="{{ins.mateleve.email_mere}}" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_profes_pere">Profession du père</label>
+                            <input type="text" name="profes_pere" id="id_profes_pere" value="{{ins.mateleve.profes_pere}}" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_profes_mere">Profession de la mère</label>
+                            <input type="text" name="profes_mere" id="id_profes_mere" value="{{ins.mateleve.profes_mere}}" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="id_personne_contact">Personne contact</label>
+                            <input type="text" name="personne_contact" id="id_personne_contact" value="{{ins.mateleve.personne_contact}}" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
                         <div class="form-group">
                             <label for="id_adresse">Adresse/Résidence</label>
                             <input type="text" name="adresse" id="id_adresse" value="{{ins.mateleve.adresse}}" class="form-control" readonly>

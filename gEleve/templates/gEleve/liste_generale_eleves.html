@@ -725,7 +725,13 @@
                                 <th>Prénom(s) Père</th>
                                 <th>Prénom(s) & Nom Mère</th>
                                 <th>Prénom(s) & Nom Tuteur</th>
-                                <th>Contact tuteur</th>
+                                <th>Contact père</th>
+                                <th>Contact mère</th>
+                                <th>Email père</th>
+                                <th>Email mère</th>
+                                <th>Profession père</th>
+                                <th>Profession mère</th>
+                                <th>Personne contact</th>
                                 <th>Adresse</th>
                                 <th>Ecole d'origine</th>
                                 <th>Photo ID</th>
@@ -746,20 +752,26 @@
                     
                         {% for le in listegenerale %}
                                           <tr>
-                                              <td class="fit">{{le.etat_inscription}}</td>
-                                              <td class="fit">{{le.mateleve.matricule}}</td>
-                                              <td class="fit">{{le.mateleve.nom}}</td>
-                                              <td class="fit">{{le.mateleve.prenom}}</td>
-                                              <td class="fit">{{le.mateleve.sexe_eleve}}</td>
-                                              <td class="fit">{{le.mateleve.pere}}</td>
-                                              <td class="fit">{{le.mateleve.mere}}</td>
-                                              <td class="fit">{{le.mateleve.tuteur}}</td>
-                                              <td class="fit">{{le.mateleve.contact_parent}}</td>
-                                              <td class="fit">{{le.mateleve.adresse}}</td>
-                                              <td class="fit">{{le.mateleve.ecole_origine}}</td>
+                                              <td>{{le.etat_inscription}}</td>
+                                              <td>{{le.mateleve.matricule}}</td>
+                                              <td>{{le.mateleve.nom}}</td>
+                                              <td>{{le.mateleve.prenom}}</td>
+                                              <td>{{le.mateleve.sexe_eleve}}</td>
+                                              <td>{{le.mateleve.pere}}</td>
+                                              <td>{{le.mateleve.mere}}</td>
+                                              <td>{{le.mateleve.tuteur}}</td>
+                                              <td>{{le.mateleve.contact_pere}}</td>
+                                              <td>{{le.mateleve.contact_mere}}</td>
+                                              <td>{{le.mateleve.email_pere}}</td>
+                                              <td>{{le.mateleve.email_mere}}</td>
+                                              <td>{{le.mateleve.profes_pere}}</td>
+                                              <td>{{le.mateleve.profes_mere}}</td>
+                                              <td>{{le.mateleve.personne_contact}}</td>
+                                              <td>{{le.mateleve.adresse}}</td>
+                                              <td>{{le.mateleve.ecole_origine}}</td>
 
                                               {% if le.mateleve.photo_eleve %}
-                                              <td class="fit">
+                                              <td>
                                                     <a href="{{ le.mateleve.photo_eleve.url }}" target="_blank" title="Agrandir la photo de l'élève">
                                                         <img src="{{le.mateleve.photo_eleve.url}}" width="40px">
                                                     </a>
@@ -768,16 +780,16 @@
                                               <td>Photo indisponible</td>
                                               {% endif %}
 
-                                              <td class="fit">{{le.mateleve.datenaissance|date:'j-n-Y'}}</td>
-                                              <td class="fit">{{le.mateleve.lieu_naissance}}</td>
-                                              <td class="fit">{{le.mateleve.date_arrivee|date:'j-n-Y'}}</td>
-                                              <td class="fit">{{le.mateleve.pays_naissance}}</td>
-                                              <td class="fit">{{le.idclasse}}</td>
-                                              <td class="fit">{{le.idcycle}}</td>
-                                              <td class="fit">{{le.annee_scolaire}}</td>
-                                              <td class="fit">{{le.date_inscription|date:'j-n-Y'}}</td>
-                                              <td class="fit">{{le.id}}</td>
-                                              <td class="fit">
+                                              <td>{{le.mateleve.datenaissance|date:'j-n-Y'}}</td>
+                                              <td>{{le.mateleve.lieu_naissance}}</td>
+                                              <td>{{le.mateleve.date_arrivee|date:'j-n-Y'}}</td>
+                                              <td>{{le.mateleve.pays_naissance}}</td>
+                                              <td>{{le.idclasse}}</td>
+                                              <td>{{le.idcycle}}</td>
+                                              <td>{{le.annee_scolaire}}</td>
+                                              <td>{{le.date_inscription|date:'j-n-Y'}}</td>
+                                              <td>{{le.id}}</td>
+                                              <td>
                                                   <a class="btn btn-primary" href="{% url 'afficherdetailsinscription' le.id %}" title="Voir/Afficher"><i class="fa fa-eye fa-sm"></i></a>
                                                   <a class="btn btn-info" href="{% url 'editioninscription' le.id %}" title="Modifier/Editer"><i class="fa fa-edit fa-sm"></i></a>
                                                   <a class="btn btn-danger" href=" {% url 'suppinscription' le.id %}" title="Supprimer"><i class="fa fa-remove fa-sm"></i></a>
@@ -799,7 +811,13 @@
                             <th>Prénom(s) Père</th>
                             <th>Prénom(s) & Nom Mère</th>
                             <th>Prénom(s) & Nom Tuteur</th>
-                            <th>Contact tuteur</th>
+                            <th>Contact père</th>
+                            <th>Contact mère</th>
+                            <th>Email père</th>
+                            <th>Email mère</th>
+                            <th>Profession père</th>
+                            <th>Profession mère</th>
+                            <th>Personne contact</th>
                             <th>Adresse</th>
                             <th>Ecole d'origine</th>
                             <th>Photo ID</th>
@@ -906,7 +924,13 @@
                                 <th>Prénom(s) Père</th>
                                 <th>Prénom(s) & Nom Mère</th>
                                 <th>Prénom(s) & Nom Tuteur</th>
-                                <th>Contact tuteur</th>
+                                <th>Contact père</th>
+                                <th>Contact mère</th>
+                                <th>Email père</th>
+                                <th>Email mère</th>
+                                <th>Profession père</th>
+                                <th>Profession mère</th>
+                                <th>Personne contact</th>
                                 <th>Adresse</th>
                                 <th>Ecole d'origine</th>
                                 <th>Photo ID</th>
@@ -927,20 +951,26 @@
                     
                         {% for le in listeinsclasse %}
                                           <tr>
-                                              <td class="fit">{{le.etat_inscription}}</td>
-                                              <td class="fit">{{le.mateleve.matricule}}</td>
-                                              <td class="fit">{{le.mateleve.nom}}</td>
-                                              <td class="fit">{{le.mateleve.prenom}}</td>
-                                              <td class="fit">{{le.mateleve.sexe_eleve}}</td>
-                                              <td class="fit">{{le.mateleve.pere}}</td>
-                                              <td class="fit">{{le.mateleve.mere}}</td>
-                                              <td class="fit">{{le.mateleve.tuteur}}</td>
-                                              <td class="fit">{{le.mateleve.contact_parent}}</td>
-                                              <td class="fit">{{le.mateleve.adresse}}</td>
-                                              <td class="fit">{{le.mateleve.ecole_origine}}</td>
+                                              <td>{{le.etat_inscription}}</td>
+                                              <td>{{le.mateleve.matricule}}</td>
+                                              <td>{{le.mateleve.nom}}</td>
+                                              <td>{{le.mateleve.prenom}}</td>
+                                              <td>{{le.mateleve.sexe_eleve}}</td>
+                                              <td>{{le.mateleve.pere}}</td>
+                                              <td>{{le.mateleve.mere}}</td>
+                                              <td>{{le.mateleve.tuteur}}</td>
+                                              <td>{{le.mateleve.contact_pere}}</td>
+                                              <td>{{le.mateleve.contact_mere}}</td>
+                                              <td>{{le.mateleve.email_pere}}</td>
+                                              <td>{{le.mateleve.email_mere}}</td>
+                                              <td>{{le.mateleve.profes_pere}}</td>
+                                              <td>{{le.mateleve.profes_mere}}</td>
+                                              <td>{{le.mateleve.personne_contact}}</td>
+                                              <td>{{le.mateleve.adresse}}</td>
+                                              <td>{{le.mateleve.ecole_origine}}</td>
 
                                               {% if le.mateleve.photo_eleve %}
-                                              <td class="fit">
+                                              <td>
                                                     <a href="{{ le.mateleve.photo_eleve.url }}" target="_blank" title="Agrandir la photo de l'élève">
                                                         <img src="{{le.mateleve.photo_eleve.url}}" width="40px">
                                                     </a>
@@ -949,16 +979,16 @@
                                               <td>Photo indisponible</td>
                                               {% endif %}
 
-                                              <td class="fit">{{le.mateleve.datenaissance|date:'j-n-Y'}}</td>
-                                              <td class="fit">{{le.mateleve.lieu_naissance}}</td>
-                                              <td class="fit">{{le.mateleve.date_arrivee|date:'j-n-Y'}}</td>
-                                              <td class="fit">{{le.mateleve.pays_naissance}}</td>
-                                              <td class="fit">{{le.idclasse}}</td>
-                                              <td class="fit">{{le.idcycle}}</td>
-                                              <td class="fit">{{le.annee_scolaire}}</td>
-                                              <td class="fit">{{le.date_inscription|date:'j-n-Y'}}</td>
-                                              <td class="fit">{{le.id}}</td>
-                                              <td class="fit">
+                                              <td>{{le.mateleve.datenaissance|date:'j-n-Y'}}</td>
+                                              <td>{{le.mateleve.lieu_naissance}}</td>
+                                              <td>{{le.mateleve.date_arrivee|date:'j-n-Y'}}</td>
+                                              <td>{{le.mateleve.pays_naissance}}</td>
+                                              <td>{{le.idclasse}}</td>
+                                              <td>{{le.idcycle}}</td>
+                                              <td>{{le.annee_scolaire}}</td>
+                                              <td>{{le.date_inscription|date:'j-n-Y'}}</td>
+                                              <td>{{le.id}}</td>
+                                              <td>
                                                   <a class="btn btn-primary" href="{% url 'afficherdetailsinscription' le.id %}" title="Voir/Afficher"><i class="fa fa-eye fa-sm"></i></a>
                                                   <a class="btn btn-info" href="{% url 'editioninscription' le.id %}" title="Modifier/Editer"><i class="fa fa-edit fa-sm"></i></a>
                                                   <a class="btn btn-danger" href=" {% url 'suppinscription' le.id %}" title="Supprimer"><i class="fa fa-remove fa-sm"></i></a>
@@ -980,7 +1010,13 @@
                             <th>Prénom(s) Père</th>
                             <th>Prénom(s) & Nom Mère</th>
                             <th>Prénom(s) & Nom Tuteur</th>
-                            <th>Contact tuteur</th>
+                            <th>Contact père</th>
+                            <th>Contact mère</th>
+                            <th>Email père</th>
+                            <th>Email mère</th>
+                            <th>Profession père</th>
+                            <th>Profession mère</th>
+                            <th>Personne contact</th>
                             <th>Adresse</th>
                             <th>Ecole d'origine</th>
                             <th>Photo ID</th>
@@ -1141,7 +1177,7 @@
         "ordering": true,
         "info": true,
         "responsive": true,
-        "autoWidth": false,
+        "autoWidth": true,
         "language": {
           "paginate": {
             "previous": "Précédent",
@@ -1162,7 +1198,7 @@
         "ordering": true,
         "info": true,
         "responsive": true,
-        "autoWidth": false,
+        "autoWidth": true,
         "language": {
           "paginate": {
             "previous": "Précédent",

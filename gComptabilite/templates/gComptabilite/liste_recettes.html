@@ -56,6 +56,7 @@
               <li class="dropdown-submenu dropdown-hover">
                 <a id="dropdownSubMenu2" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-item dropdown-toggle">Gestion des cours</a>
                 <ul aria-labelledby="dropdownSubMenu2" class="dropdown-menu border-0 shadow">
+                  <li><a href="{% url 'listecycle' %}" class="dropdown-item">Ajouter un cycle scolaire</a></li>
                   <li><a tabindex="-1" href="{% url 'listeanneescolaire' %}" class="dropdown-item">Ajouter une année scolaire</a></li>
                   <li><a href="{% url 'listeclasse' %}" class="dropdown-item">Ajouter une classe</a></li>
                   <li><a href="#" class="dropdown-item">Ajouter une matière</a></li>
@@ -80,7 +81,7 @@
       <li class="nav-item dropdown">
             <a id="dropdownSubMenu4" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle">Comptabilité</a>
             <ul aria-labelledby="dropdownSubMenu4" class="dropdown-menu border-0 shadow">
-              <li><a href="#" class="dropdown-item">Paiement de la scolarité</a></li>
+              <li><a href="{% url 'paiementscolarite' %}" class="dropdown-item">Paiement de la scolarité</a></li>
               <li><a href="{% url 'listerecette' %}" class="dropdown-item">Situation de la scolarité</a></li>
               <li><a href="#" class="dropdown-item">Situation de la cantine scolaire</a></li>
               <li><a href="#" class="dropdown-item">Situation des activités extra scolaires</a></li>
@@ -325,6 +326,13 @@
                 </a>
               </li>
               <li class="nav-item">
+                <a href="{% url 'listecycle' %}" class="nav-link" title="Permet d'ajouter de nouveaux cycles scolaires">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Créer un cycle scolaire &nbsp;</p>
+                  <i class="fas fa-calendar-plus"></i>
+                </a>
+              </li>
+              <li class="nav-item">
                 <a href="{% url 'listeanneescolaire' %}" class="nav-link" title="Permet d'ajouter de nouvelles années scolaires">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Créer une année scolaire &nbsp;</p>
@@ -421,7 +429,7 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="#" class="nav-link" title="Permet de procéder au paiement des frais de scolarité">
+                <a href="{% url 'paiementscolarite' %}" class="nav-link" title="Permet de procéder au paiement des frais de scolarité">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Paiement scolarité &nbsp;</p>
                   <i class="fa-brands fa-cc-visa"></i>
@@ -738,16 +746,16 @@
                     
                         {% for c in cais %}
                             <tr>
-                                <td class="fit">{{c.categ_depense}}</td>
-                                <td class="fit">{{c.date_operation | date:'j-n-Y' }}</td>
-                                <td class="fit">{{c.libelle_operation }}</td>
-                                <td class="fit">{{c.montant_encaisse | floatformat:'2g' }}</td>
-                                <td class="fit">{{c.type_operation }}</td>
-                                <td class="fit">{{c.solde_actuel|floatformat:'2g' }}</td>
-                                <td class="fit">{{c.observ }}</td>
-                                <td class="fit">{{c.anscolaire }}</td>
-                                <td class="fit">{{c.id}}</td>
-                                <td class="fit">
+                                <td>{{c.categ_depense}}</td>
+                                <td>{{c.date_operation | date:'j-n-Y' }}</td>
+                                <td>{{c.libelle_operation }}</td>
+                                <td>{{c.montant_encaisse | floatformat:'2g' }}</td>
+                                <td>{{c.type_operation }}</td>
+                                <td>{{c.solde_actuel|floatformat:'2g' }}</td>
+                                <td>{{c.observ }}</td>
+                                <td>{{c.anscolaire }}</td>
+                                <td>{{c.id}}</td>
+                                <td>
                                     <a class="btn btn-primary" href="{% url 'afficherdetailscaisserecette' c.id %}" title="Voir/Afficher" target="_self"><i class="fa-solid fa-eye fa-sm"></i></a>
                                     <a class="btn btn-info" href="{% url 'editioncaisserecette' c.id %}" title="Modifier/Editer" target="_self"><i class="fa-solid fa-edit fa-sm"></i></a>
                                     <a class="btn btn-danger" href="{% url 'supprimecaisserecette' c.id %}" title="Supprimer" target="_self"><i class="fa-solid fa-remove fa-sm"></i></a>
@@ -885,16 +893,16 @@
                     <tbody>
                         {% for r in recette %}
                             <tr>
-                                <td class="fit">{{r.categ_depense}}</td>
-                                <td class="fit">{{r.date_operation | date:'j-n-Y' }}</td>
-                                <td class="fit">{{r.libelle_operation }}</td>
-                                <td class="fit">{{r.montant_encaisse | floatformat:'2g' }}</td>
-                                <td class="fit">{{r.type_operation }}</td>
-                                <td class="fit">{{r.solde_actuel|floatformat:'2g' }}</td>
-                                <td class="fit">{{r.observ }}</td>
-                                <td class="fit">{{r.anscolaire }}</td>
-                                <td class="fit">{{r.id}}</td>
-                                <td class="fit">
+                                <td>{{r.categ_depense}}</td>
+                                <td>{{r.date_operation | date:'j-n-Y' }}</td>
+                                <td>{{r.libelle_operation }}</td>
+                                <td>{{r.montant_encaisse | floatformat:'2g' }}</td>
+                                <td>{{r.type_operation }}</td>
+                                <td>{{r.solde_actuel|floatformat:'2g' }}</td>
+                                <td>{{r.observ }}</td>
+                                <td>{{r.anscolaire }}</td>
+                                <td>{{r.id}}</td>
+                                <td>
                                     <a class="btn btn-primary" href="{% url 'afficherdetailscaisserecette' r.id %}" title="Voir/Afficher" target="_self"><i class="fa-solid fa-eye fa-sm"></i></a>
                                     <a class="btn btn-info" href="{% url 'editioncaisserecette' r.id %}" title="Modifier/Editer" target="_self"><i class="fa-solid fa-edit fa-sm"></i></a>
                                     <a class="btn btn-danger" href="{% url 'supprimecaisserecette' r.id %}" title="Supprimer" target="_self"><i class="fa-solid fa-remove fa-sm"></i></a>
@@ -1075,7 +1083,7 @@
       "ordering": true,
       "info": true,
       "responsive": true,
-      "autoWidth": false,
+      "autoWidth": true,
       "language": {
         "paginate": {
           "previous": "Précédent",
@@ -1096,7 +1104,7 @@
       "ordering": true,
       "info": true,
       "responsive": true,
-      "autoWidth": false,
+      "autoWidth": true,
       "language": {
         "paginate": {
           "previous": "Précédent",

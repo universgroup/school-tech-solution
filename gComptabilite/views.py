@@ -1,13 +1,16 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.core.paginator import Paginator
+from django.http import JsonResponse
 
 from .models import *
 from .forms import *
 from decimal import Decimal
 from django.db.models import Sum, Q
-from gAdministration.models import AnneeScolaire, Historique
-from django.utils.datastructures import MultiValueDictKeyError
+from gAdministration.models import AnneeScolaire, Historique, CycleScolaire
+from gEleve.models import Inscription
+
+#from django.utils.datastructures import MultiValueDictKeyError
 from datetime import datetime
 
 # Create your views here.
@@ -248,7 +251,7 @@ def enregistrerdepense(request):
             cais.observ = request.POST['observ']
             cais.date_operation = request.POST['date_operation']
 
-            if request.FILES.get('piece_jointe') != '':
+            if request.FILES.get('piece_jointe'):
                 cais.piece_jointe = request.FILES.get('piece_jointe')
 
             if soldec > cais.montant_encaisse:
@@ -438,3 +441,92 @@ def supprimerdepense(request, pk):
     depense = Caisse.objects.get(id=pk)
     depense.delete()
     return redirect('../listedepense/')
+
+# Début de la Gestion des paiements de la scolarité
+
+# Cette fonction me permet de charger la liste des élèves inscrits dans une classe donnée aucours d'une année
+# scolaire donnée
+def chargerlisteelevepaiement(request):
+    ane = request.GET.get('anneesco') # anneesco est la valeur renvoyée depuis la fonction JQuery dans le template paiement_scolarite.html
+    clas = request.GET.get('id_classe') # id_classe est recupérée depuis la fonction JQuery
+    el = Inscription.objects.select_related('annee_scolaire', 'mateleve', 'idcycle', 'idclasse').filter(
+        Q(annee_scolaire=ane), Q(idclasse=clas))
+    return render(request, 'gComptabilite/liste_eleve_classe_cycle_paiement.html', dict(eleve=el))
+
+
+# La fonction chargerlisteclasse m'a permis de gerer l'affichage des classes selon le cycle selectionné lors de
+# l'inscription associé au JQuery en Front-end
+def chargerlisteclassepaiement(request):
+    cy = request.GET.get('idcycle')
+    clas = Classe.objects.filter(idcycle=cy).all()
+    context = {'clas': clas}
+    return render(request, 'gComptabilite/liste_classe_cycle_paiement.html', context)
+
+# Cette fonction me permet de charger les infos de l'élève sélectionné lors de la reinscription à savoir le prénom, le nom et la photo
+def chargerinfoeleveclasse(request):
+
+    matricule = request.GET.get('matricule')
+    
+    data = {}
+
+    try:
+        el = Eleve.objects.get(matricule=matricule)
+        data.update({
+            'nom': el.nom,
+            'prenom': el.prenom,
+            'photo': str(el.photo_eleve) if el.photo_eleve else '',
+            'datenaiss': el.datenaissance,
+            'lieunais': el.lieu_naissance,
+            'pays': el.pays_naissance,
+            'pere': el.pere,
+            'mere': el.mere,
+            'contact_pere': el.contact_pere,
+        })
+    except Eleve.DoesNotExist:
+        data.update({
+            'nom': '', 'prenom': '', 'photo': '', 'datenaiss': '',
+            'lieunais': '', 'pays': '', 'pere': '', 'mere': '', 'contact_pere': '',
+        })
+
+    try:
+        etatpaie = EtatPaiementTranche.objects.get(mateleve=matricule)
+        data['tranche1'] = etatpaie.premiere_tranche
+        data['tranche2'] = etatpaie.deuxieme_tranche
+    except EtatPaiementTranche.DoesNotExist:
+        data['tranche1'] = 0
+        data['tranche2'] = 0
+
+    return JsonResponse(data)
+
+# Fonction permettant de valider le paiement de la scolarite
+def validerpaiementscolarite(request):
+
+    ane = request.POST.get('annee_scolaire')
+    clas = request.POST.get('classe')
+    mat = request.POST.get('matricule')
+
+    print(f'Année scolaire recupere {ane}, Classe recupérée {clas}, Matricule {mat}')
+
+    anes = AnneeScolaire.objects.get(id=ane)
+    cls = Classe.objects.get(id=clas)
+    matel = Eleve.objects.get(matricule=mat)
+
+    # Je vais recuperer les frais de scolarité, première tranche et deuxième tranche dans la table Classe
+    fscol = cls.frais_scolarite
+    t1 = cls.tranche1
+    t2 = cls.tranche2
+
+    if request.method == 'POST':
+        etatpaie = EtatPaiementTranche.objects.get(mateleve=matel)
+        etatpaie.anneescolaire = anes
+        etatpaie.idclasse = cls
+        etatpaie.mateleve = matel
+        etatpaie.date_paie = request.POST['date_paiement']
+
+    else:
+        annee = AnneeScolaire.objects.all().order_by('id')
+        cycle = CycleScolaire.objects.all().order_by('id')    
+    
+
+
+    return render(request,'gComptabilite/paiement_scolarite.html',dict(ans=annee,cycles=cycle, tranche_paye=DEUX_TRANCHES_CHOICES, fscol=fscol))

@@ -19,7 +19,7 @@
                         <div class="col-md-3">
                             <div class="form-group">
                               <label for="cboanneold">Année scolaire antérieure<strong style="color:red">*</strong></label>
-                              <select class="form-control" name="annee_scolaire_old" id="cboanneold">
+                              <select class="form-control" name="annee_scolaire_old" id="cboanneold" required>
                                   <option value="" selected>Selectionnez</option>
                                   {% for an in ans %}
                                     <option value="{{an.annee_scolaire.id}}">{{an.annee_scolaire.descript_annee}}</option>
@@ -31,7 +31,7 @@
                         <div class="col-md-3">
                           <div class="form-group">
                               <label for="cbocycle">Cycle<strong style="color:red">*</strong></label>
-                              <select class="form-control" name="cycle" id="cbocycle">
+                              <select class="form-control" name="cycle" id="cbocycle" required>
                                   <option value="" selected>Selectionnez</option>
                                   {% for cl in cycles %}
                                     <option value="{{cl.id}}">{{cl.cycle}}</option>
@@ -43,7 +43,7 @@
                         <div class="col-md-6">
                           <div class="form-group">
                               <label for="cboclassepasse">Classe antérieure<strong style="color:red">*</strong></label>
-                              <select class="form-control" name="id_classe_old" id="cboclassepasse">
+                              <select class="form-control" name="id_classe_old" id="cboclassepasse" required>
                                 <option value="" selected>Selectionnez</option>
                               </select>
                           </div>
@@ -55,7 +55,7 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                   <label for="cbomateleve">Elève<strong style="color:red">*</strong></label>
-                                  <select class="form-control" name="matricule" id="cbomateleve">
+                                  <select class="form-control" name="matricule" id="cbomateleve" required>
                                     <option value="" selected>Selectionnez</option>
                                   </select>
                             </div>
@@ -89,7 +89,7 @@
                         <div class="col-md-6">
                            <div class="form-group">
                                   <label for="cboannenew">Année scolaire courante<strong style="color:red">*</strong></label>
-                                  <select class="form-control" name="annee_scolaire_new" id="cboannenew">
+                                  <select class="form-control" name="annee_scolaire_new" id="cboannenew" required>
                                       <option value="" selected>Selectionnez</option>
                                       {% for an in ane %}
                                         <option value="{{an.id}}">{{an.descript_annee}}</option>
@@ -101,7 +101,7 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="cboclassenew">Classe supérieure<strong style="color:red">*</strong></label>
-                                <select class="form-control" name="id_classe_new" id="cboclassenew">
+                                <select class="form-control" name="id_classe_new" id="cboclassenew" required>
                                     <option value="" selected>Selectionnez</option>
                                       {% for cla in clas %}
                                         <option value="{{cla.id}}">{{cla.nom_classe}}</option>

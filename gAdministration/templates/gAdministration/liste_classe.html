@@ -688,15 +688,15 @@
                     
                     {% for cl in clas %}
                         <tr>
-                            <td class="fit">{{cl.idcycle}}</td>
-                            <td class="fit">{{cl.nom_classe}}</td>
-                            <td class="fit">{{cl.frais_inscription|floatformat:'2g'}}</td>
-                            <td class="fit">{{cl.frais_reinscription|floatformat:'2g'}}</td>
-                            <td class="fit">{{cl.tranche1|floatformat:'2g'}}</td>
-                            <td class="fit">{{cl.tranche2|floatformat:'2g'}}</td>
-                            <td class="fit">{{cl.frais_scolarite|floatformat:'2g'}}</td>
-                            <td class="fit">{{cl.id}}</td>
-                            <td class="fit">
+                            <td>{{cl.idcycle}}</td>
+                            <td>{{cl.nom_classe}}</td>
+                            <td>{{cl.frais_inscription|floatformat:'2g'}}</td>
+                            <td>{{cl.frais_reinscription|floatformat:'2g'}}</td>
+                            <td>{{cl.tranche1|floatformat:'2g'}}</td>
+                            <td>{{cl.tranche2|floatformat:'2g'}}</td>
+                            <td>{{cl.frais_scolarite|floatformat:'2g'}}</td>
+                            <td>{{cl.id}}</td>
+                            <td>
                                 <a class="btn btn-primary" href="{% url 'afficherdetailsclasse' cl.id %}" title="Voir/Afficher" target="_self"><i class="fa-solid fa-eye fa-sm"></i></a>
                                 <a class="btn btn-info" href="{% url 'editionclasse' cl.id %}" title="Editer/Modifier" target="_self"><i class="fa-solid fa-edit fa-sm"></i></a>
                                 <a class="btn btn-danger" href="{% url 'suppclasse' cl.id %}" title="Supprimer" target="_self"><i class="fa-solid fa-remove fa-sm"></i></a>
@@ -824,7 +824,7 @@
       "ordering": true,
       "info": true,
       "responsive": true,
-      "autoWidth": false,
+      "autoWidth": true,
       "language": {
         "paginate": {
           "previous": "Précédent",

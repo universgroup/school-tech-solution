@@ -26,12 +26,9 @@ EDITION D'UN CYCLE SCOLAIRE
                                         <label for="id_ncycle">Cycle scolaire</label>
                                         <select name="nom_cycle" class="form-control" id="id_ncycle">
                                             <option value="{{cycle.cycle}}" selected>{{ cycle.cycle }}</option>
-                                            <option value="Maternelle">Maternelle</option>
-                                            <option value="Primaire">Primaire</option>
-                                            <option value="Collège">Collège</option>
-                                            <option value="Lycée SM">Lycée SM</option>
-                                            <option value="Lycée SS">Lycée SS</option>
-                                            <option value="Lycée SE">Lycée SE</option>
+                                            {% for cy in cycles %}
+                                            <option value="{{cy.cycle}}">{{cy.cycle}}</option>
+                                            {% endfor %}                                            
                                         </select>
                                     </div>
                                 </div>

@@ -684,9 +684,9 @@
                     
                   {% for an in ansc %}
                     <tr>
-                        <td class="fit">{{an.descript_annee}}</td>
-                        <td class="fit">{{an.id}}</td>
-                        <td class="fit">
+                        <td>{{an.descript_annee}}</td>
+                        <td>{{an.id}}</td>
+                        <td>
                             <a class="btn btn-primary" href="{% url 'afficherdetailsansc' an.id %}" title="Voir/Afficher" target="_self"><i class="fa-solid fa-eye fa-sm"></i></a>
                             <a class="btn btn-info" href="{% url 'editionanneesc' an.id %}" title="Modifier/Editer" target="_self"><i class="fa-solid fa-edit fa-sm"></i></a>
                             <a class="btn btn-danger" href="{% url 'suppanneescolaire' an.id %}" title="Supprimer" target="_self"><i class="fa-solid fa-remove fa-sm"></i></a>

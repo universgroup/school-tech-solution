@@ -685,9 +685,9 @@
                     
                     {% for c in cycles %}
                     <tr>
-                        <td class="fit">{{c.cycle}}</td>
-                        <td class="fit">{{c.id}}</td>
-                        <td class="fit">
+                        <td>{{c.cycle}}</td>
+                        <td>{{c.id}}</td>
+                        <td>
                             <a class="btn btn-primary" href="{% url 'afficherdetailscycle' c.id %}" title="Voir/Afficher" target="_self"><i class="fa-solid fa-eye fa-sm"></i></a>
                             <a class="btn btn-info" href="{% url 'editioncycle' c.id %}" title="Modifier/Editer" target="_self"><i class="fa-solid fa-edit fa-sm"></i></a>
                             <a class="btn btn-danger" href="{% url 'suppcycle' c.id %}" title="Supprimer"><i class="fa-solid fa-remove fa-sm"></i></a>
@@ -806,7 +806,7 @@
       "ordering": true,
       "info": true,
       "responsive": true,
-      "autoWidth": false,
+      "autoWidth": true,
       "language": {
         "paginate": {
           "previous": "Précédent",

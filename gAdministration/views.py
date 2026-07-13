@@ -50,7 +50,7 @@ def detailscyclescolaire(request, pk_cycle):
 
 def editercyclescolaire(request, pk):
     cy = CycleScolaire.objects.get(id=pk)
-    return render(request, 'gAdministration/modifier_cyclescolaire.html', dict(cycle=cy))
+    return render(request, 'gAdministration/modifier_cyclescolaire.html', dict(cycle=cy,cycles=CYCLE_CHOICES))
 
 
 def modifiercyclescolaire(request, idcycle):
@@ -237,6 +237,8 @@ def enregistrerinfosecole(request):
                     pass
                 ecole.dsee = request.POST['dsee']
                 ecole.dg = request.POST['dg']
+                ecole.dga = request.POST['dga']
+                ecole.coordo_maternelle = request.POST['coordo_maternelle']
                 ecole.coordo_primaire = request.POST['coordo_primaire']
                 ecole.coordo_secondaire = request.POST['coordo_secondaire']
                 ecole.comptable = request.POST['comptable']
@@ -288,6 +290,8 @@ def modifierinfosecole(request, idec):
         infos.site_internet = request.POST['site_web']
         infos.devise_ecole = request.POST['devise']
         infos.dg = request.POST['dg']
+        infos.dga = request.POST['dga']
+        infos.coordo_maternelle = request.POST['coordomat']
         infos.coordo_primaire = request.POST['coordop']
         infos.coordo_secondaire = request.POST['coordos']
         infos.comptable = request.POST['comptable']

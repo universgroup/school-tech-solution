@@ -684,6 +684,8 @@
                             <th>Site web</th>
                             <th>Devise/Slogan</th>
                             <th>DG</th>
+                            <th>DGA</th>
+                            <th>Coordinateur Maternelle</th>
                             <th>Coordinateur Primaire</th>
                             <th>Coordinateur Secondaire</th>
                             <th>Comptable</th>
@@ -699,42 +701,44 @@
                     
                     {% for ec in ecole %}
                             <tr>
-                                <td class="fit">{{ec.nom_ecole|upper}}</td>
-                                <td class="fit">{{ec.ville_ecole}}</td>
-                                <td class="fit">{{ec.prefect_commune}}</td>
-                                <td class="fit">{{ec.dsee}}</td>
-                                <td class="fit">{{ec.telephone1}}</td>
-                                <td class="fit">{{ec.telephone2}}</td>
-                                <td class="fit">{{ec.agrement_ecole}}</td>
-                                <td class="fit">{{ec.bp_ecole}}</td>
-                                <td class="fit">{{ec.email_ecole}}</td>
-                                <td class="fit">{{ec.site_internet}}</td>
-                                <td class="fit">{{ec.devise_ecole}}</td>
-                                <td class="fit">{{ec.dg}}</td>
-                                <td class="fit">{{ec.coordo_primaire}}</td>
-                                <td class="fit">{{ec.coordo_secondaire}}</td>
-                                <td class="fit">{{ec.comptable}}</td>
+                                <td>{{ec.nom_ecole|upper}}</td>
+                                <td>{{ec.ville_ecole}}</td>
+                                <td>{{ec.prefect_commune}}</td>
+                                <td>{{ec.dsee}}</td>
+                                <td>{{ec.telephone1}}</td>
+                                <td>{{ec.telephone2}}</td>
+                                <td>{{ec.agrement_ecole}}</td>
+                                <td>{{ec.bp_ecole}}</td>
+                                <td>{{ec.email_ecole}}</td>
+                                <td>{{ec.site_internet}}</td>
+                                <td>{{ec.devise_ecole}}</td>
+                                <td>{{ec.dg}}</td>
+                                <td>{{ec.dga}}</td>
+                                <td>{{ec.coordo_maternelle}}</td>
+                                <td>{{ec.coordo_primaire}}</td>
+                                <td>{{ec.coordo_secondaire}}</td>
+                                <td>{{ec.comptable}}</td>
 
                                 {% if ec.logo_ecole %}
-                                <td class="fit"><img src="{{ec.logo_ecole.url}}" width="60px"></td>
+                                <td><img src="{{ec.logo_ecole.url}}" width="60px"></td>
                                 {% else %}
-                                <td class="fit">Logo non disponible</td>
+                                <td>Logo non disponible</td>
                                 {% endif %}
 
                                 {% if ec.signa_dg %}
-                                <td class="fit"><img src="{{ec.signa_dg.url}}" width="60px"></td>
+                                <td><img src="{{ec.signa_dg.url}}" width="60px"></td>
                                 {% else %}
-                                <td class="fit">Signature non disponible</td>
+                                <td>Signature non disponible</td>
                                 {% endif %}
 
                                 {% if ec.signa_de %}
-                                <td class="fit"><img src="{{ec.signa_de.url}}" width="60px"></td>
+                                <td><img src="{{ec.signa_de.url}}" width="60px"></td>
                                 {% else %}
-                                <td class="fit">Signature non disponible</td>
+                                <td>Signature non disponible</td>
                                 {% endif %}
 
                                 <td>{{ec.id}}</td>
-                                <td class="fit">
+                                <td>
                                     <a class="btn btn-primary" href=" {% url 'afficherdetailsecole' ec.id %}" title="Voir/Afficher" target="_self"><i class="fa-solid fa-eye fa-sm"></i></a>
                                     <a class="btn btn-info" href="{% url 'editioninfosecole' ec.id %}" title="Modifier/Editer" target="_self"><i class="fa-solid fa-edit fa-sm"></i></a>
                                 </td>
@@ -757,7 +761,8 @@
                         <th>Email</th>
                         <th>Site web</th>
                         <th>Devise/Slogan</th>
-                        <th>DG</th>
+                        <th>DGA</th>
+                        <th>Coordinateur Maternelle</th>
                         <th>Coordinateur Primaire</th>
                         <th>Coordinateur Secondaire</th>
                         <th>Comptable</th>
@@ -873,7 +878,7 @@
       "ordering": true,
       "info": true,
       "responsive": true,
-      "autoWidth": false,
+      "autoWidth": true,
       "language": {
         "paginate": {
           "previous": "Précédent",

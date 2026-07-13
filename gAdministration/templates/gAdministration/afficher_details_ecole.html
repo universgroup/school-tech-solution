@@ -108,14 +108,22 @@ DONNEES DE L'ECOLE
                 <div class="row g-3">
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="id_dg">Directeur général</label>
+                            <label for="id_dg">Directeur(trice) Général(e)</label>
                             <input type="text" name="dg" id="id_dg" value="{{ecole.dg}}" class="form-control" readonly>
                         </div>
                     </div>
-                    <div class="col-md-6">
+
+                    <div class="col-md-3">
                         <div class="form-group">
-                            <label for="id_coordo_primaire">Coordinateur Primaire</label>
-                            <input type="text" name="coordop" id="id_coordo_primaire" value="{{ecole.coordo_primaire}}" class="form-control" readonly>
+                            <label for="id_dga">Directeur(trice) Général(e) Adjoint(e)</label>
+                            <input type="text" name="dga" id="id_dga" value="{{ecole.dga}}" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="id_coordo_maternelle">Coordinateur Maternelle</label>
+                            <input type="text" name="coordomat" id="id_coordo_maternelle" value="{{ecole.coordo_maternelle}}" class="form-control" readonly>
                         </div>
                     </div>
                 </div>
@@ -123,11 +131,18 @@ DONNEES DE L'ECOLE
                 <div class="row g-3">
                     <div class="col-md-6">
                         <div class="form-group">
+                            <label for="id_coordo_primaire">Coordinateur Primaire</label>
+                            <input type="text" name="coordop" id="id_coordo_primaire" value="{{ecole.coordo_primaire}}" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
                             <label for="id_coordo_second">Coordinateur Secondaire</label>
                             <input type="text" name="coordos" id="id_coordo_second" value="{{ecole.coordo_secondaire}}" class="form-control" readonly>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-3">
                         <div class="form-group">
                             <label for="id_comptable">Comptable</label>
                             <input type="text" name="comptable" id="id_comptable" value="{{ecole.comptable}}" class="form-control" readonly>
