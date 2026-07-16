@@ -71,7 +71,7 @@ class Ecole(models.Model):
 
 
 class Historique(models.Model):
-    user_login = models.CharField(max_length=20)
+    user_login = models.CharField(max_length=50)
     nature_operation = models.CharField(max_length=30)
     detail_operation = models.TextField()
     date_operation = models.DateField(auto_now=True)

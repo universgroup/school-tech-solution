@@ -1,17 +1,29 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.core.paginator import Paginator
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseRedirect, FileResponse
 
 from .models import *
 from .forms import *
 from decimal import Decimal
 from django.db.models import Sum, Q
-from gAdministration.models import AnneeScolaire, Historique, CycleScolaire
+from gAdministration.models import AnneeScolaire, Historique, CycleScolaire, Ecole
 from gEleve.models import Inscription
 
 #from django.utils.datastructures import MultiValueDictKeyError
 from datetime import datetime
+import re # Librairie contenant les fonctions de gestion des regex
+import socket
+from smtplib import SMTPException
+from reportlab.pdfgen import canvas
+from reportlab.lib import colors  # Contient les méthodes/fonctions de gestion des couleurs
+from reportlab.lib.utils import ImageReader
+from PIL import Image
+
+from django.urls import reverse
+from django.core.mail import EmailMessage
+from django.conf import settings
+import io  # Librairie contenant les methodes utilisant les péripheriques d'entrées/sorties
 
 # Create your views here.
 
@@ -492,41 +504,416 @@ def chargerinfoeleveclasse(request):
         etatpaie = EtatPaiementTranche.objects.get(mateleve=matricule)
         data['tranche1'] = etatpaie.premiere_tranche
         data['tranche2'] = etatpaie.deuxieme_tranche
+        data['fscolarite'] = etatpaie.fscolarite
+        data['reliquat'] = etatpaie.reste_a_payer
+
     except EtatPaiementTranche.DoesNotExist:
         data['tranche1'] = 0
         data['tranche2'] = 0
+        data['fscolarite'] = 0
+        data['reliquat'] = 0
+    
+
 
     return JsonResponse(data)
+
+# Fonction me permettant de convertir le montant recupéré depuis le template Paiement_scolarite
+def reformater_montant(valeur):
+    montant_a_reformater = re.sub(r'[\s\u00a0\u202f]','',valeur) # Supprime tous types d'espace dans le montant
+    montant_a_reformater = montant_a_reformater.replace(',','.') # remplace la virgule par les points.
+    return Decimal(montant_a_reformater)
+
 
 # Fonction permettant de valider le paiement de la scolarite
 def validerpaiementscolarite(request):
 
-    ane = request.POST.get('annee_scolaire')
-    clas = request.POST.get('classe')
-    mat = request.POST.get('matricule')
+    t1 = 0
+    t2 = 0
+    fannuel = 0
+    mont_paye = 0
+    p_tranche = 0
+    d_tranche = 0
+    mremise = 0
+    fscol = 0
+    annee = {}
+    cycle = {}
 
-    print(f'Année scolaire recupere {ane}, Classe recupérée {clas}, Matricule {mat}')
-
-    anes = AnneeScolaire.objects.get(id=ane)
-    cls = Classe.objects.get(id=clas)
-    matel = Eleve.objects.get(matricule=mat)
-
-    # Je vais recuperer les frais de scolarité, première tranche et deuxième tranche dans la table Classe
-    fscol = cls.frais_scolarite
-    t1 = cls.tranche1
-    t2 = cls.tranche2
+    annee = AnneeScolaire.objects.none()
+    cycle = CycleScolaire.objects.none()
 
     if request.method == 'POST':
-        etatpaie = EtatPaiementTranche.objects.get(mateleve=matel)
-        etatpaie.anneescolaire = anes
-        etatpaie.idclasse = cls
-        etatpaie.mateleve = matel
-        etatpaie.date_paie = request.POST['date_paiement']
+        
+        ane = request.POST.get('annee_scolaire')
+        clas = request.POST.get('classe')
+        mat = request.POST.get('matricule')
+        nom_tranche = request.POST.get('cbo_tranche_paye')
+        mont_paye = reformater_montant(request.POST.get('montant_paye')) 
+        p_tranche = reformater_montant(request.POST.get('montant_premiere_tranche')) # Je recupère le montant de la première tranche affiché dans le template
+        d_tranche = reformater_montant(request.POST.get('montant_deuxieme_tranche')) # Je recupère le montant de la deuxième tranche affiché dans le template
+        mremise = reformater_montant(request.POST.get('montant_remise')) # Je recupère le montant de la remise saisi
 
+
+        anes = AnneeScolaire.objects.get(id=ane)
+        cls = Classe.objects.get(id=clas)
+        matel = Eleve.objects.get(matricule=mat)
+
+        # Je vais recuperer les frais de la première tranche et deuxième tranche ainsi que le frais de la scolarité dans la table Classe
+        t1 = cls.tranche1
+        t2 = cls.tranche2
+        fannuel = cls.frais_scolarite
+
+        etatpaie = EtatPaiementTranche.objects.get(mateleve=matel.matricule) # matel.matricule car matel renvoi les données du str de la classe Eleve au lieu de matricule seulement
+               
+        if nom_tranche == DEUX_TRANCHES_CHOICES[0][0]: # Permet de verifier la première tranche
+            
+            if p_tranche < t1: # Je verifie que le montant de la première tranche payée est inférieur au montant de la tranche 1 défini dans la table classe
+                
+                etatpaie.anneescolaire = anes
+                etatpaie.idclasse = cls
+                etatpaie.mateleve = matel
+                etatpaie.date_paie = request.POST['date_paiement']                
+                etatpaie.premiere_tranche = p_tranche + mont_paye # Le montant de la première tranche sera égal au montant initial payé + le nouveau montant payé pour cette tranche 
+
+                fscol = (etatpaie.premiere_tranche + etatpaie.deuxieme_tranche)- mremise # Permet de calculer le paiement total effectué par l'élève
+                etatpaie.fscolarite = fscol
+                etatpaie.reste_a_payer = fannuel - fscol # Le reste à payer annuel est le montant annuel dû moins le total de ses paiements
+                etatpaie.m_rabais = mremise
+                etatpaie.save()
+
+                solde_dispo= Decimal(affichersoldecaisse())
+                # Je vais enregistrer ensuite l'opération dans la table caisse
+                cais = Caisse()
+                cais.type_operation = TYPE_OPERATION_CAISSE_CHOICES[1][1]
+                cais.libelle_operation = 'Paiement des frais de scolarité de l\'élève:  {},  {} , {} '.format(
+                    matel.matricule, matel.nom, matel.prenom)
+                cais.montant_encaisse = Decimal(mont_paye)
+                cais.anscolaire = anes
+                cais.categ_depense = CATEGORIE_RECETTE_CHOICES[1][1]
+                cais.solde_actuel = Decimal(solde_dispo) + Decimal(mont_paye)
+                cais.date_operation = request.POST['date_paiement']
+                cais.save()
+
+                messages.success(request,'Paiement validé avec succès !!!')
+
+                # Ici je vais enregistrer l'evenement dans la table Historique
+                his = Historique()
+                his.nature_operation = CATEGORIE_RECETTE_CHOICES[1][1]
+                his.detail_operation = 'Paiement des frais de scolarité de l\'élève:  {},  {} , {} '.format(
+                    matel.matricule, matel.nom, matel.prenom)
+                his.user_login = 'contact@universtechgroup.com'
+                his.save()
+
+            else:
+                messages.error(request,'La première tranche est déjà complète. Veuillez passer à la seconde tranche !!!')
+        
+        elif nom_tranche == DEUX_TRANCHES_CHOICES[1][0]: # Permet de vérifier la deuxième tranche
+            if p_tranche < t1: # Je verifie ici si la première tranche n'est pas bouclée alors je renvoie une alerte pour completer celle-ci
+                messages.error(request,'Vous devez finaliser le paiement de la première tranche avant de passer à la suivante')
+            else:
+                if d_tranche < t2:
+
+                    etatpaie.anneescolaire = anes
+                    etatpaie.idclasse = cls
+                    etatpaie.mateleve = matel
+                    etatpaie.date_paie = request.POST['date_paiement'] 
+                    etatpaie.deuxieme_tranche = d_tranche + mont_paye # Le montant de la deuxième tranche sera égal au montant initial payé + le nouveau montant payé pour cette tranche
+
+                    fscol = (etatpaie.premiere_tranche + etatpaie.deuxieme_tranche)- mremise # Permet de calculer le paiement total effectué par l'élève
+                    etatpaie.fscolarite = fscol
+                    etatpaie.reste_a_payer = fannuel - fscol # Le reste à payer annuel est le montant annuel dû moins le total de ses paiements
+                    etatpaie.m_rabais = mremise
+                    etatpaie.save()
+
+                    solde_dispo= Decimal(affichersoldecaisse())
+                    # Je vais enregistrer ensuite l'opération dans la table caisse
+                    cais = Caisse()
+                    cais.type_operation = TYPE_OPERATION_CAISSE_CHOICES[1][1]
+                    cais.libelle_operation = 'Paiement des frais de scolarité de l\'élève:  {},  {} , {} '.format(
+                        matel.matricule, matel.nom, matel.prenom)
+                    cais.montant_encaisse = Decimal(mont_paye)
+                    cais.anscolaire = anes
+                    cais.categ_depense = CATEGORIE_RECETTE_CHOICES[1][1]
+                    cais.solde_actuel = Decimal(solde_dispo) + Decimal(mont_paye)
+                    cais.date_operation = request.POST['date_paiement']
+                    cais.save()
+
+                    messages.success(request,'Paiement validé avec succès !!!')
+
+                    # Ici je vais enregistrer l'evenement dans la table Historique
+                    his = Historique()
+                    his.nature_operation = CATEGORIE_RECETTE_CHOICES[1][1]
+                    his.detail_operation = 'Paiement des frais de scolarité de l\'élève:  {},  {} , {} '.format(
+                        matel.matricule, matel.nom, matel.prenom)
+                    his.user_login = 'contact@universtechgroup.com'
+                    his.save()
+
+                else:
+                    messages.error(request,'La scolarité est déjà complète!! cet élève ne doit plus rien pour cette année scolaire')
+        
+        
+
+        annee = AnneeScolaire.objects.all().order_by('id')
+        cycle = CycleScolaire.objects.all().order_by('id')
+
+        # Génération du reçu de paiement de la scolarité après
+        idetat = etatpaie.id
+        return HttpResponseRedirect(reverse('recupaiementscolarite',args=(idetat,nom_tranche,str(mont_paye),)))
+
+
+    
     else:
         annee = AnneeScolaire.objects.all().order_by('id')
         cycle = CycleScolaire.objects.all().order_by('id')    
     
 
 
-    return render(request,'gComptabilite/paiement_scolarite.html',dict(ans=annee,cycles=cycle, tranche_paye=DEUX_TRANCHES_CHOICES, fscol=fscol))
+    return render(request,'gComptabilite/paiement_scolarite.html',dict(ans=annee,cycles=cycle, tranche_paye=DEUX_TRANCHES_CHOICES))
+
+
+def recupaiementscolarite(request, idetat, nom_tranche, mont_paye):
+    # Et là je tente de recuperer les données d'identification de l'école
+    ec = Ecole.objects.count()
+    if ec==0:
+        messages.error(request,'Veuillez saisir les informations de l\'école')
+    else:
+        ecole = Ecole.objects.get(id=1)
+        if ecole.logo_ecole:
+            data_ecole = [ecole.nom_ecole, ecole.ville_ecole, ecole.prefect_commune, ecole.telephone1, ecole.telephone2,
+                          ecole.logo_ecole.path, ecole.devise_ecole, ecole.dsee, ecole.comptable]
+        else:
+            data_ecole = [ecole.nom_ecole, ecole.ville_ecole, ecole.prefect_commune, ecole.telephone1, ecole.telephone2,
+                          'Logo', ecole.devise_ecole, ecole.dsee, ecole.comptable]
+
+        # Ici je tente de recuperer les données sur l'état de paiement de l'élève depuis la BD
+
+        etatpaie = EtatPaiementTranche.objects.select_related('anneescolaire', 'mateleve', 'idclasse').get(id=idetat)
+        data = [etatpaie.id, etatpaie.anneescolaire.descript_annee, etatpaie.mateleve.matricule, etatpaie.idclasse, etatpaie.mateleve.nom,
+                etatpaie.mateleve.prenom,
+                etatpaie.mateleve.tuteur, etatpaie.mateleve.contact_pere,etatpaie.mateleve.email_pere
+                ]
+        
+        if nom_tranche == DEUX_TRANCHES_CHOICES[0][0]: # Si c'est la première tranche qui a été choisie, je recupère le montant de la tranche dans la table classe
+            montant_tranche = etatpaie.idclasse.tranche1
+        elif nom_tranche == DEUX_TRANCHES_CHOICES[1][0]: # Si c'est la deuxième tranche, je recupère le montant correspondant dans la table classe
+            montant_tranche = etatpaie.idclasse.tranche2
+
+        montant_paye     = Decimal(mont_paye)
+        reste_a_payer     = montant_tranche - montant_paye
+        montant_tranche_formate   = '{:,} GNF'.format(montant_tranche)
+        montant_paye_formate = '{:,} GNF'.format(montant_paye)
+        reste_formate     = '{:,} GNF'.format(reste_a_payer)
+
+        
+        ch = str(data[1])  # Je recupère le nom de l'année scolaire i.e 2023-2024 par exemple
+        ch = ch.split('-')  # Je découpe la chaine obtenue en deux sous chaines tenant compte du séparateur (-)
+        ane = ch[1]  # Je recupère la deuxième sous chaine i.e 2024 par exemple
+
+        # Create a file-like buffer to receive PDF data.
+        buffer = io.BytesIO()
+        # Create the PDF object, using the buffer as its "file."
+        p = canvas.Canvas(buffer)
+        p.setTitle('Reçu Paiement Scolarité')  # Permet de définir le Titre du Document
+
+        numrecu = data[0]  # Ici je recupère le numéro de l'inscription
+        ansco = datetime.now().strftime('%y')  # Je recupère uniquement l'année de la date courante
+        numero_recu = ''
+
+        if numrecu < 10:
+            numero_recu = ansco + '00' + str(numrecu)
+        elif numrecu < 100:
+            numero_recu = ansco + '0' + str(numrecu)
+        elif numrecu < 1000:
+            numero_recu = ansco + '0' + str(numrecu)
+        elif numrecu < 10000:
+            numero_recu = ansco + '0' + str(numrecu)
+        
+        def draw_recu(y_offset):
+            """Dessine un reçu complet. y_offset=0 pour le haut, -420 pour le bas"""
+
+            # ── ENTETE GAUCHE ──
+            p.setFillColor(colors.black)
+            p.setFont('Helvetica-Bold', 10)
+            p.drawString(20, 815 + y_offset, 'MEPU-A')
+            p.drawString(20, 800 + y_offset, 'IRE : ')
+            p.setFont('Helvetica', 10)
+            p.drawString(55, 800 + y_offset, str(data_ecole[1]))
+            p.setFont('Helvetica-Bold', 10)
+            p.drawString(20, 787 + y_offset, 'DCE : ')
+            p.setFont('Helvetica', 10)
+            p.drawString(55, 787 + y_offset, str(data_ecole[2]))
+            p.setFont('Helvetica-Bold', 10)
+            p.drawString(20, 772 + y_offset, 'DSEE : ')
+            p.setFont('Helvetica', 10)
+            p.drawString(55, 772 + y_offset, str(data_ecole[7]))
+            p.setFont('Helvetica-Bold', 10)
+            p.drawString(20, 757 + y_offset, 'TEL : ')
+            p.setFont('Helvetica', 10)
+            p.drawString(55, 757 + y_offset, str(data_ecole[3]) + ' / ' + str(data_ecole[4]))
+
+            # ── LOGO ──
+            try:
+                logo = Image.open(data_ecole[5])
+                logo = logo.resize((90, 60), Image.LANCZOS)
+                if logo.mode in ('RGBA', 'P'):
+                    logo = logo.convert('RGB')
+                elif logo.mode != 'RGB':
+                    logo = logo.convert('RGB')
+                logo_buffer = io.BytesIO()
+                logo.save(logo_buffer, format='PNG')
+                logo_buffer.seek(0)
+                p.drawImage(ImageReader(logo_buffer), 245, 770 + y_offset, 90, 60)
+            except (FileNotFoundError, OSError):
+                p.drawString(data_ecole[5], 245, 770 + y_offset)
+
+            # ── DRAPEAU ──
+            p.setFillColor('Red')
+            p.rect(449, 815 + y_offset, 30, 10, stroke=False, fill=True)
+            p.setFillColor('yellow')
+            p.rect(479, 815 + y_offset, 30, 10, stroke=False, fill=True)
+            p.setFillColor('green')
+            p.rect(509, 815 + y_offset, 30, 10, stroke=False, fill=True)
+            p.setFillColor(colors.black)
+
+            # ── ENTETE DROITE ──
+            p.setFont('Helvetica-Bold', 10)
+            p.drawString(450, 800 + y_offset, 'République de Guinée')
+            p.setFont('Helvetica-Oblique', 9)
+            p.drawString(450, 785 + y_offset, 'Travail-Justice-Solidarité')
+
+            # ── NOM ET DEVISE ECOLE ──
+            p.setFont('Helvetica-Bold', 11)
+            p.drawString(200, 740 + y_offset, str(data_ecole[0]))
+            p.setFont('Helvetica-Oblique', 9)
+            p.drawString(220, 725 + y_offset, str(data_ecole[6]))
+
+            # ── LIGNE SEPARATRICE ──
+            p.line(140, 715 + y_offset, 440, 715 + y_offset)
+
+            # ── ANNEE SCOLAIRE ──
+            p.setFont('Helvetica-Bold', 11)
+            p.drawString(150, 700 + y_offset, 'Année Scolaire :')
+            p.setFont('Helvetica', 11)
+            p.drawString(255, 700 + y_offset, str(data[1]))
+            p.setFont('Helvetica-Bold',11)
+            p.drawString(330, 700 + y_offset, 'Session : ')
+            p.setFont('Helvetica',11)
+            p.drawString(385, 700 + y_offset, str(ane))
+
+            # ── TITRE RECU ──
+            p.setFont('Helvetica-Bold', 12)
+            p.rect(150, 673 + y_offset, 280, 18, stroke=True, fill=False)
+            p.drawString(165, 677 + y_offset,f'RECU DE PAIEMENT N° {numero_recu}')
+
+            # ── INFOS ELEVE ──
+            p.setFont('Helvetica-Bold', 11)
+            p.drawString(120, 650 + y_offset, 'Matricule :')
+            p.setFont('Helvetica', 11)
+            p.drawString(195, 650 + y_offset, str(data[2]))
+
+            p.setFont('Helvetica-Bold', 11)
+            p.drawString(120, 634 + y_offset, 'Nom :')
+            p.setFont('Helvetica', 11)
+            p.drawString(195, 634 + y_offset, str(data[4]))
+
+            p.setFont('Helvetica-Bold', 11)
+            p.drawString(120, 618 + y_offset, 'Prénoms :')
+            p.setFont('Helvetica', 11)
+            p.drawString(195, 618 + y_offset, str(data[5]))
+
+            p.setFont('Helvetica-Bold', 11)
+            p.drawString(120, 600 + y_offset, 'Classe :')
+            p.setFont('Helvetica', 11)
+            p.drawString(195, 600 + y_offset, str(data[3]))
+
+            # Infos droite
+            p.setFont('Helvetica-Bold', 11)
+            p.drawString(340, 634 + y_offset, 'Tuteur :')
+            p.setFont('Helvetica', 11)
+            p.drawString(390, 634 + y_offset, str(data[6]))
+
+            p.setFont('Helvetica-Bold', 11)
+            p.drawString(340, 618 + y_offset, 'Contact :')
+            p.setFont('Helvetica', 11)
+            p.drawString(395, 618 + y_offset, str(data[7]))
+            p.setFont('Helvetica-Bold', 11)
+            p.drawString(340, 600 + y_offset, 'Email :')
+            p.setFont('Helvetica', 11)
+            p.drawString(395, 600 + y_offset, str(data[8]))
+
+
+            # ── TABLEAU TRANCHE ──
+            # En-tête avec fond bleu et texte blanc
+            p.setFillColor(colors.HexColor('#2980b9'))
+            p.rect(80, 555 + y_offset, 440, 20, stroke=True, fill=True)
+            p.setFillColor(colors.white)
+            p.setFont('Helvetica-Bold', 11)
+            p.drawString(85,  560 + y_offset, 'Tranche')
+            p.drawString(195, 560 + y_offset, 'Montant tranche')
+            p.drawString(335, 560 + y_offset, 'Montant Payé')
+            p.drawString(450, 560 + y_offset, 'Reste à payer')
+
+            # Remettre noir pour la ligne de données
+            p.setFillColor(colors.black)
+            p.setFont('Helvetica', 10)
+            p.rect(80, 535 + y_offset, 440, 20, stroke=True, fill=False)
+            p.drawString(85,  540 + y_offset, nom_tranche)
+            p.drawString(195, 540 + y_offset, montant_tranche_formate)
+            p.drawString(335, 540 + y_offset, montant_paye_formate)
+            p.drawString(450, 540 + y_offset, reste_formate)
+
+            # Lignes verticales du tableau
+            p.line(180, 535 + y_offset, 180, 575 + y_offset)
+            p.line(320, 535 + y_offset, 320, 575 + y_offset)
+            p.line(435, 535 + y_offset, 435, 575 + y_offset)
+
+            # ── DATE ET SIGNATURE ──
+            p.setFont('Helvetica-Bold', 11)
+            p.drawString(375, 510 + y_offset, 'Conakry, le ')
+            p.drawString(450, 510 + y_offset, datetime.now().strftime('%d/%m/%Y'))
+            p.drawString(375, 475 + y_offset, 'La Comptabilité')
+            p.drawString(375, 435 + y_offset, str(data_ecole[8]))
+
+        # ── PREMIER EXEMPLAIRE ──
+        draw_recu(0)
+
+        # ── LIGNE SEPARATRICE ENTRE LES DEUX EXEMPLAIRES ──
+        p.line(20, 420, 580, 420)
+
+        # ── DEUXIEME EXEMPLAIRE ──
+        draw_recu(-420)
+
+        p.showPage()
+        p.save()
+        buffer.seek(0)
+
+        # ── ENVOI EMAIL ──
+        try:
+            email = EmailMessage(
+                subject='Reçu de paiement scolarité',
+                body=f'Veuillez trouver votre reçu de paiement en pièce jointe.\n'
+                     f'Cordialement.\nLa Comptabilité : {data_ecole[8]}',
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[data[8]],
+            )
+            email.attach(f'Recu_paiement_{str(data[2])}.pdf', buffer.getvalue(), 'application/pdf')
+            email.send()
+            messages.success(request, 'Email envoyé avec succès!')
+        except SMTPException:
+            messages.warning(request, 'Erreur SMTP : impossible d\'envoyer l\'email.')
+        except socket.gaierror:
+            messages.warning(request, 'Pas de connexion internet. Email non envoyé.')
+        except TimeoutError:
+            messages.warning(request, 'Délai de connexion dépassé. Email non envoyé.')
+        except Exception as e:
+            messages.warning(request, f'Erreur inattendue : {str(e)}')
+
+        buffer.seek(0)
+        return FileResponse(buffer, as_attachment=False, filename=f'Recu_paiement_{str(data[2])}.pdf', content_type='application/pdf')
+
+
+def imprimerecuscolarite(request, idetat, nom_tranche, mont_paye):
+    return HttpResponseRedirect(reverse('recupaiementscolarite',args=(idetat,nom_tranche,str(mont_paye),)))
+
+
+
+        

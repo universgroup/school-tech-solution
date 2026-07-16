@@ -172,19 +172,25 @@
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label for="id_montant_premiere_tranche">1ère Tranche payée</label>
-                                <input type="text" id="id_montant_premiere_tranche" name="montant_premiere_tranche" class="form-control" readonly title="Affiche le montant de la première tranche payée par l'élève">
+                                <input type="text" id="id_montant_premiere_tranche" name="montant_premiere_tranche" class="form-control" readonly title="Affiche le montant de la première tranche payée par l'élève" style="color:red; font-weight:bold; font-size:12pt;">
                             </div>
                         </div>
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label for="id_montant_deuxieme_tranche">2ème Tranche payée</label>
-                                <input type="text" id="id_montant_deuxieme_tranche" name="montant_deuxieme_tranche" class="form-control" readonly title="Affiche le montant de la deuxième tranche payée par l'élève">
+                                <input type="text" id="id_montant_deuxieme_tranche" name="montant_deuxieme_tranche" class="form-control" readonly title="Affiche le montant de la deuxième tranche payée par l'élève" style="color:red; font-weight:bold; font-size:12pt;">
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-3">
                             <div class="form-group">
-                                <label for="id_montant_annuel">Frais de scolarité</label>
-                                <input type="text" id="id_montant_annuel" name="frais_scolarite" value="{{fscol|floatformat:2g}}" class="form-control" readonly title="Affiche le montant annuel de la scolarité">
+                                <label for="id_montant_annuel">Paiement annuel</label>
+                                <input type="text" id="id_montant_annuel" name="frais_scolarite" class="form-control" readonly title="Affiche le montant annuel de la scolarité" style="color:red; font-weight:bold; font-size:12pt;">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="id_montant_reliquat">Reste à payer</label>
+                                <input type="text" id="id_montant_reliquat" name="reste_a_payer" class="form-control" readonly title="Affiche le montant du reliquat de la scolarité après payement des différentes tranches" style="color:red; font-weight:bold; font-size:12pt;">
                             </div>
                         </div>
 
@@ -247,8 +253,9 @@
     });
 
     var defaultPhoto = "{% static 'assets/dist/img/avatar.png' %}";
+    const montant_a_formater = new Intl.NumberFormat('fr-FR',{minimumFractionDigits:2, maximumFractionDigits:2});
 
-    // Cette fonction permet d'afficher les infos de l'élève sélectionné
+    // Cette fonction permet d'afficher les infos de l'élève sélectionné y compris ses paiements de scolarité
     $("#cbomateleve").change(function(){
         var matricule = $(this).val();
         
@@ -264,8 +271,10 @@
                     $("#id_pere").val(data.pere)
                     $("#id_mere").val(data.mere)
                     $("#id_contact_pere").val(data.contact_pere)
-                    $("#id_montant_premiere_tranche").val(data.tranche1)
-                    $("#id_montant_deuxieme_tranche").val(data.tranche2)
+                    $("#id_montant_premiere_tranche").val(montant_a_formater.format(parseFloat(data.tranche1)))
+                    $("#id_montant_deuxieme_tranche").val(montant_a_formater.format(parseFloat(data.tranche2)))
+                    $("#id_montant_annuel").val(montant_a_formater.format(parseFloat(data.fscolarite)))
+                    $('#id_montant_reliquat').val(montant_a_formater.format(parseFloat(data.reliquat)))
 
                     if(data.photo){
                         $("#photoel").attr("src", "/media/" + data.photo);

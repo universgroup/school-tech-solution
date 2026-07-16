@@ -22,5 +22,8 @@ urlpatterns = [
     path('chargerlisteelevepaie/', chargerlisteelevepaiement, name='chargerlisteelevepaie'),
     path('chargerinfoelevepaie/', chargerinfoeleveclasse, name='chargerinfoelevepaie'), # url permettant de charger les prénoms, nom et photo, etc. de l'élève lors du paiement de la scolarité
     path('paiementscolarite/',validerpaiementscolarite,name='paiementscolarite'),
+    path('recupaiementscolarite/<int:idetat>/<str:nom_tranche>/<str:mont_paye>',recupaiementscolarite,name='recupaiementscolarite'),
+    path('imprimerecuscolarite/<int:idetat>/<str:nom_tranche>/<str:mont_paye>',imprimerecuscolarite, name='imprimerecuscolarite'),
+
 
 ]
