@@ -142,15 +142,6 @@ INSCRIPTION DES ELEVES
                         </div>
                     </div>
 
-                    
-                    <div class="row g-3">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                {{form.photo_eleve|as_crispy_field}}
-                            </div>
-                        </div>
-                   </div>
-
                     <div class="row g-3">
                         <div class="col-md-6">
                             <div class="form-group">
@@ -178,6 +169,29 @@ INSCRIPTION DES ELEVES
                             </div>
                         </div>
                     </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <div class="form-group text-center">
+
+                                {{form.photo_eleve|as_crispy_field}}
+
+                                <label for="id_photo_identite" class="photo-zone" id="photoZone">
+                                    <img id="photoPreview" src="" alt="" style="display:none;">
+                                    <div id="photoPlaceholder">
+                                            <div class="placeholder-icon">
+                                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#adb5bd" stroke-width="1.5">
+                                                        <path d="M4 7h3l2-2h6l2 2h3a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z"/>
+                                                        <circle cx="12" cy="13" r="4"/>
+                                                </svg>
+                                            </div>
+                                            <div class="placeholder-text">Cliquer pour ajouter la photo de l'élève</div>
+                                    </div>
+                                </label>
+                                
+                            </div>
+                        </div>
+                   </div>
                       
 
                     <!-- Bouton Suivant -->
@@ -266,7 +280,7 @@ INSCRIPTION DES ELEVES
         });
     });
 
-    // Mettre le nom en majuscule après saisie
+    // Mettre le nom en majuscule pendant la saisie
     $("#idnom").on('input', function(){
         $(this).val($(this).val().toUpperCase());
     });
@@ -278,8 +292,14 @@ INSCRIPTION DES ELEVES
             return l.toUpperCase();
         }));
     });
-    
 
+    $("#finscription")[0].addEventListener("reset", function(){
+        // On laisse le navigateur vider le input file lui-même,
+        // mais on doit remettre l'aperçu à zéro manuellement
+        setTimeout(resetPhotoZone, 0);
+    });
+    
+   
  </script>
 
  {% endblock %}

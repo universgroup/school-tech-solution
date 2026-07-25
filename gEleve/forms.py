@@ -68,8 +68,8 @@ class FormEleve(ModelForm):
                                               'title': 'Saisissez l\'adresse du tuteur'}),
             'ecole_origine': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ecole d\'origine',
                                                     'title': 'Saisissez le nom de l\'école d\'origine'}),
-            'photo_eleve': forms.FileInput(attrs={'class': 'form-control', 'accept': 'image/jpeg, image/png',
-                                                  'title': 'Importez la photo de l\'élève si disponible'}),
+            'photo_eleve': forms.FileInput(attrs={'class': 'd-none', 'accept': 'image/*',
+                                                  'title': 'Importez la photo de l\'élève si disponible','id':'id_photo_identite','onchange': 'previewPhoto(this)'}),
             'datenaissance': forms.DateInput(
                 attrs={'class': 'form-control', 'type': 'date', 'title': 'Sélectionnez la date de naissance'}),
             'lieu_naissance': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Lieu naissance',

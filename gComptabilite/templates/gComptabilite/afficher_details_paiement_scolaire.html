@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block titre_page %} CONSULTATION {% endblock %}
+{% block titre_formulaire %} DETAILS D'UN PAIEMENT DE SCOLARITE {% endblock %}
+{% block titre_cadre %}
+INFORMATIONS SUR LE PAIEMENT
+{% endblock %}
+
+{% block formulaire %}
+
+   <form class="needs-validation" action="" method="get">
+
+                {% csrf_token %}
+
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="IDpaie">ID</label>
+                            <input type="text" id="IDpaie" value="{{paie.id}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_annes">Année scolaire</label>
+                            <input type="text" name="annescolaire" id="id_annes" value="{{paie.anneescolaire}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="id_cycle">Cycle</label>
+                            <input type="text" name="cycle" id="id_cycle" value="{{paie.idcycle}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="id_classe">Classe</label>
+                            <input type="text" name="classe" id="id_classe" value="{{paie.idclasse}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_matricule">Elève</label>
+                            <input type="text" name="matricule" id="id_matricule" value="{{paie.mateleve.matricule}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                            <div class="form-group">
+                                <label for="idprenom">Prénom(s)</label>
+                                <input type="text" id="idprenom" value="{{paie.mateleve.prenom}}" class="form-control" name="prenom" readonly>
+                            </div>
+                    </div>
+                    <div class="col-md-2">
+                            <div class="form-group">
+                                <label for="idnom">Nom famille</label>
+                                <input type="text" id="idnom" value="{{paie.mateleve.nom}}" class="form-control" name="nomfamille" readonly>
+                            </div>
+                    </div>
+                    <div class="col-md-2">
+                            <div class="form-group text-center">
+                                <label>Photo</label><br>
+                                <img id="photoel" src="{{paie.mateleve.photo_eleve.url}}" 
+                                    width="95" height="95" 
+                                    style="border-radius: 50%; object-fit: cover; border: 2px solid #ddd;">
+                            </div>
+                    </div>
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="id_date_paie">Date paiement</label>
+                            <input type="text" name="date_paiement" id="id_date_paie" value="{{paie.date_paie|date:'j-n-Y'}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="id_montant_inscription">Inscription/reinscription</label>
+                            <input type="text" id="id_montant_inscription" name="montant_inscription" class="form-control" readonly value="{{paie.inscription|floatformat:'2g'}}" title="Affiche le montant de l'inscription ou de la reinscription payé par l'élève" style="color:red; font-weight:bold; font-size:12pt;">
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="id_montant_premiere_tranche">1ère Tranche payée</label>
+                            <input type="text" id="id_montant_premiere_tranche" name="montant_premiere_tranche" class="form-control" readonly value="{{paie.premiere_tranche|floatformat:'2g'}}" title="Affiche le montant de la première tranche payée par l'élève" style="color:red; font-weight:bold; font-size:12pt;">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="id_montant_deuxieme_tranche">2ème Tranche payée</label>
+                            <input type="text" id="id_montant_deuxieme_tranche" name="montant_deuxieme_tranche" class="form-control" readonly value="{{paie.deuxieme_tranche|floatformat:'2g'}}"  title="Affiche le montant de la deuxième tranche payée par l'élève" style="color:red; font-weight:bold; font-size:12pt;">
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_montant_annuel">Paiement annuel</label>
+                            <input type="text" id="id_montant_annuel" name="frais_scolarite" class="form-control" readonly value="{{paie.fscolarite|floatformat:'2g'}}" title="Affiche le montant annuel de la scolarité" style="color:red; font-weight:bold; font-size:12pt;">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="id_montant_reliquat">Reste à payer</label>
+                            <input type="text" id="id_montant_reliquat" name="reste_a_payer" class="form-control" readonly value="{{paie.reste_a_payer|floatformat:'2g'}}" title="Affiche le montant du reliquat de la scolarité après payement des différentes tranches" style="color:red; font-weight:bold; font-size:12pt;">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="id_montant_remise">Montant de la remise</label>
+                            <input type="number" id="id_montant_remise" name="montant_remise" class="form-control" value="{{paie.m_rabais|floatformat:'2g'}}" title="Saisissez le montant de la remise accordée s'il y en a">
+                        </div>
+                    </div>
+
+                </div>
+                    
+            
+            
+              <div class="card-footer text-center">
+                    <a href="{% url 'listepaiemensuel' %}" target="_self" class="btn btn-primary btn-md">Retour &nbsp;<i class="fa fa-arrow-circle-left"></i></a>
+              </div>
+
+   </form>
+
+{% endblock %}

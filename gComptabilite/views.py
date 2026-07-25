@@ -11,7 +11,7 @@ from gAdministration.models import AnneeScolaire, Historique, CycleScolaire, Eco
 from gEleve.models import Inscription
 
 #from django.utils.datastructures import MultiValueDictKeyError
-from datetime import datetime
+from datetime import datetime, date
 import re # Librairie contenant les fonctions de gestion des regex
 import socket
 from smtplib import SMTPException
@@ -418,6 +418,7 @@ def recherchersituationdepense(request):
     paginecais = Paginator(depense, 10)
     numpagecais = request.GET.get('page')
     depense = paginecais.get_page(numpagecais)
+
     return render(request, 'gComptabilite/liste_depenses.html',
                   dict(depense=depense, total_entree=total_entree, total_sortie=total_sortie, solde_dispo=solde_dispo, ddebut=debut, dfin=fin))
 
@@ -546,6 +547,8 @@ def validerpaiementscolarite(request):
         ane = request.POST.get('annee_scolaire')
         clas = request.POST.get('classe')
         mat = request.POST.get('matricule')
+        cycl = request.POST.get('cycle')
+
         nom_tranche = request.POST.get('cbo_tranche_paye')
         mont_paye = reformater_montant(request.POST.get('montant_paye')) 
         p_tranche = reformater_montant(request.POST.get('montant_premiere_tranche')) # Je recupère le montant de la première tranche affiché dans le template
@@ -556,6 +559,7 @@ def validerpaiementscolarite(request):
         anes = AnneeScolaire.objects.get(id=ane)
         cls = Classe.objects.get(id=clas)
         matel = Eleve.objects.get(matricule=mat)
+        cy = CycleScolaire.objects.get(id=cycl)
 
         # Je vais recuperer les frais de la première tranche et deuxième tranche ainsi que le frais de la scolarité dans la table Classe
         t1 = cls.tranche1
@@ -571,6 +575,7 @@ def validerpaiementscolarite(request):
                 etatpaie.anneescolaire = anes
                 etatpaie.idclasse = cls
                 etatpaie.mateleve = matel
+                etatpaie.idcycle = cy
                 etatpaie.date_paie = request.POST['date_paiement']                
                 etatpaie.premiere_tranche = p_tranche + mont_paye # Le montant de la première tranche sera égal au montant initial payé + le nouveau montant payé pour cette tranche 
 
@@ -603,6 +608,10 @@ def validerpaiementscolarite(request):
                 his.user_login = 'contact@universtechgroup.com'
                 his.save()
 
+                # Génération du reçu de paiement de la scolarité
+                idetat = etatpaie.id
+                return HttpResponseRedirect(reverse('recupaiementscolarite',args=(idetat,nom_tranche,str(mont_paye),)))
+
             else:
                 messages.error(request,'La première tranche est déjà complète. Veuillez passer à la seconde tranche !!!')
         
@@ -615,6 +624,7 @@ def validerpaiementscolarite(request):
                     etatpaie.anneescolaire = anes
                     etatpaie.idclasse = cls
                     etatpaie.mateleve = matel
+                    etatpaie.idcycle = cy
                     etatpaie.date_paie = request.POST['date_paiement'] 
                     etatpaie.deuxieme_tranche = d_tranche + mont_paye # Le montant de la deuxième tranche sera égal au montant initial payé + le nouveau montant payé pour cette tranche
 
@@ -647,6 +657,10 @@ def validerpaiementscolarite(request):
                     his.user_login = 'contact@universtechgroup.com'
                     his.save()
 
+                    # Génération du reçu de paiement de la scolarité
+                    idetat = etatpaie.id
+                    return HttpResponseRedirect(reverse('recupaiementscolarite',args=(idetat,nom_tranche,str(mont_paye),)))
+
                 else:
                     messages.error(request,'La scolarité est déjà complète!! cet élève ne doit plus rien pour cette année scolaire')
         
@@ -655,12 +669,7 @@ def validerpaiementscolarite(request):
         annee = AnneeScolaire.objects.all().order_by('id')
         cycle = CycleScolaire.objects.all().order_by('id')
 
-        # Génération du reçu de paiement de la scolarité après
-        idetat = etatpaie.id
-        return HttpResponseRedirect(reverse('recupaiementscolarite',args=(idetat,nom_tranche,str(mont_paye),)))
-
-
-    
+            
     else:
         annee = AnneeScolaire.objects.all().order_by('id')
         cycle = CycleScolaire.objects.all().order_by('id')    
@@ -698,7 +707,7 @@ def recupaiementscolarite(request, idetat, nom_tranche, mont_paye):
             montant_tranche = etatpaie.idclasse.tranche2
 
         montant_paye     = Decimal(mont_paye)
-        reste_a_payer     = montant_tranche - montant_paye
+        reste_a_payer     = montant_tranche - (etatpaie.fscolarite + montant_paye)
         montant_tranche_formate   = '{:,} GNF'.format(montant_tranche)
         montant_paye_formate = '{:,} GNF'.format(montant_paye)
         reste_formate     = '{:,} GNF'.format(reste_a_payer)
@@ -842,30 +851,33 @@ def recupaiementscolarite(request, idetat, nom_tranche, mont_paye):
 
 
             # ── TABLEAU TRANCHE ──
+            # Largeurs ajustées : total = 520 points
+            col_x = [20, 155, 295, 405, 520]  # Positions X des séparateurs verticaux
+            col_w = [135, 140, 110, 115]      # Largeurs des 4 colonnes
+
             # En-tête avec fond bleu et texte blanc
             p.setFillColor(colors.HexColor('#2980b9'))
-            p.rect(80, 555 + y_offset, 440, 20, stroke=True, fill=True)
+            p.rect(20, 555 + y_offset, 500, 20, stroke=True, fill=True)
             p.setFillColor(colors.white)
-            p.setFont('Helvetica-Bold', 11)
-            p.drawString(85,  560 + y_offset, 'Tranche')
-            p.drawString(195, 560 + y_offset, 'Montant tranche')
-            p.drawString(335, 560 + y_offset, 'Montant Payé')
-            p.drawString(450, 560 + y_offset, 'Reste à payer')
-
+            p.setFont('Helvetica-Bold', 10)
+            p.drawString(25,  560 + y_offset, 'Tranche')
+            p.drawString(160, 560 + y_offset, 'Montant tranche')
+            p.drawString(300, 560 + y_offset, 'Montant Payé')
+            p.drawString(410, 560 + y_offset, 'Reste à payer')
+            
             # Remettre noir pour la ligne de données
             p.setFillColor(colors.black)
             p.setFont('Helvetica', 10)
-            p.rect(80, 535 + y_offset, 440, 20, stroke=True, fill=False)
-            p.drawString(85,  540 + y_offset, nom_tranche)
-            p.drawString(195, 540 + y_offset, montant_tranche_formate)
-            p.drawString(335, 540 + y_offset, montant_paye_formate)
-            p.drawString(450, 540 + y_offset, reste_formate)
+            p.rect(20, 535 + y_offset, 500, 20, stroke=True, fill=False)
+            p.drawString(25,  540 + y_offset, nom_tranche)
+            p.drawString(160, 540 + y_offset, montant_tranche_formate)
+            p.drawString(300, 540 + y_offset, montant_paye_formate)
+            p.drawString(410, 540 + y_offset, reste_formate)
 
             # Lignes verticales du tableau
-            p.line(180, 535 + y_offset, 180, 575 + y_offset)
-            p.line(320, 535 + y_offset, 320, 575 + y_offset)
-            p.line(435, 535 + y_offset, 435, 575 + y_offset)
-
+            for x in col_x:
+                p.line(x, 535 + y_offset, x, 575 + y_offset)
+            
             # ── DATE ET SIGNATURE ──
             p.setFont('Helvetica-Bold', 11)
             p.drawString(375, 510 + y_offset, 'Conakry, le ')
@@ -913,6 +925,136 @@ def recupaiementscolarite(request, idetat, nom_tranche, mont_paye):
 
 def imprimerecuscolarite(request, idetat, nom_tranche, mont_paye):
     return HttpResponseRedirect(reverse('recupaiementscolarite',args=(idetat,nom_tranche,str(mont_paye),)))
+
+
+def listepaiementmensuel(request):
+    
+    anne = {}
+    cy = {}
+    listepaiemensuel = {}
+    t_premiere_tranche = {}
+    t_deuxieme_tranche = {}
+    t_reste_a_payer = {}
+
+    total_tranche1 = 0
+    total_tranche2 = 0
+    total_reste_a_payer = 0
+
+    anne = AnneeScolaire.objects.none()
+    cy = CycleScolaire.objects.none()
+    listepaiemensuel = EtatPaiementTranche.objects.none()
+
+    mois = date.today()
+    mois_actuel = mois.strftime('%m')
+    listepaiemensuel = EtatPaiementTranche.objects.select_related('anneescolaire','mateleve','idclasse','idcycle').filter(date_paie__month=mois_actuel).order_by('-date_paie')
+
+    t_premiere_tranche = EtatPaiementTranche.objects.filter(date_paie__month=mois_actuel).aggregate(pt=Sum('premiere_tranche')) # pt correspond à la clé du dictionnaire resultant de la requếte
+    t_deuxieme_tranche = EtatPaiementTranche.objects.filter(date_paie__month=mois_actuel).aggregate(dt=Sum('deuxieme_tranche')) # dt de même
+    t_reste_a_payer = EtatPaiementTranche.objects.filter(date_paie__month=mois_actuel).aggregate(tr=Sum('reste_a_payer'))
+
+    if t_premiere_tranche['pt'] is not None:
+        total_tranche1 = t_premiere_tranche['pt']
+    else:
+        total_tranche1 = 0
+    
+    if t_deuxieme_tranche['dt'] is not None:
+        total_tranche2 = t_deuxieme_tranche['dt']
+    else:
+        total_tranche2 = 0
+    
+    if t_reste_a_payer['tr'] is not None:
+        total_reste_a_payer = t_reste_a_payer['tr']
+    else:
+        total_reste_a_payer = 0
+    
+
+    anne = AnneeScolaire.objects.all().order_by('id')
+    cy = CycleScolaire.objects.all().order_by('id')
+
+    paginepaie = Paginator(listepaiemensuel, 10)
+    numpagepaie = request.GET.get('page')
+    listepaiemensuel = paginepaie.get_page(numpagepaie)
+
+    return render(request,'gComptabilite/liste_etat_paiement_scolarite.html',dict(ans=anne, cycles=cy, listepaiementmensuel=listepaiemensuel, total_tranche1=total_tranche1, total_tranche2=total_tranche2, total_reste_a_payer=total_reste_a_payer))
+
+
+def filtrelistepaiementclasse(request):
+
+    anne = request.GET.get('annee_scolaire')
+    clas = request.GET.get('id_classe')
+
+    an = {}
+    cy = {}
+    t_premiere_tranche = {}
+    t_deuxieme_tranche = {}
+    t_reste_a_payer = {}
+
+    total_tranche1 = 0
+    total_tranche2 = 0
+    total_reste_a_payer = 0
+
+    an = AnneeScolaire.objects.none()
+    cy = CycleScolaire.objects.none()
+
+    listepaieclasse = {}
+    listepaieclasse = EtatPaiementTranche.objects.none()
+
+    listepaieclasse = EtatPaiementTranche.objects.select_related('anneescolaire','mateleve','idclasse','idcycle').filter(Q(anneescolaire__exact=anne),Q(idclasse__exact=clas)).order_by('-date_paie')
+
+    t_premiere_tranche = EtatPaiementTranche.objects.select_related('anneescolaire','mateleve','idclasse','idcycle').filter(Q(anneescolaire__exact=anne),Q(idclasse__exact=clas)).aggregate(pt=Sum('premiere_tranche')) # pt correspond à la clé du dictionnaire resultant de la requếte
+
+    t_deuxieme_tranche = EtatPaiementTranche.objects.select_related('anneescolaire','mateleve','idclasse','idcycle').filter(Q(anneescolaire__exact=anne),Q(idclasse__exact=clas)).aggregate(dt=Sum('deuxieme_tranche')) # dt de même
+
+    t_reste_a_payer = EtatPaiementTranche.objects.select_related('anneescolaire','mateleve','idclasse','idcycle').filter(Q(anneescolaire__exact=anne),Q(idclasse__exact=clas)).aggregate(tr=Sum('reste_a_payer'))
+
+    if t_premiere_tranche['pt'] is not None:
+        total_tranche1 = t_premiere_tranche['pt']
+    else:
+        total_tranche1 = 0
+    
+    if t_deuxieme_tranche['dt'] is not None:
+        total_tranche2 = t_deuxieme_tranche['dt']
+    else:
+        total_tranche2 = 0
+    
+    if t_reste_a_payer['tr'] is not None:
+        total_reste_a_payer = t_reste_a_payer['tr']
+    else:
+        total_reste_a_payer = 0
+
+    an = AnneeScolaire.objects.all().order_by('id')
+    cy = CycleScolaire.objects.all().order_by('id')
+
+    paginepaie = Paginator(listepaieclasse, 10)
+    numpagepaie = request.GET.get('page')
+    listepaieclasse = paginepaie.get_page(numpagepaie)
+
+    return render(request,'gComptabilite/liste_etat_paiement_scolarite.html',{'listepaiementclasse':listepaieclasse, 'ans': an, 'cycles': cy, 'total_tranche1': total_tranche1, 'total_tranche2': total_tranche2, 'total_reste_a_payer': total_reste_a_payer})
+
+def detailpaiementscolaire(request, idpaie):
+    etatpaie = EtatPaiementTranche.objects.select_related('anneescolaire','mateleve','idclasse','idcycle').get(id=idpaie)
+    return render(request,'gComptabilite/afficher_details_paiement_scolaire.html', dict(paie=etatpaie))
+
+def editerpaiementscolaire(request, idpaie):
+    etatpaie = EtatPaiementTranche.objects.select_related('anneescolaire','mateleve','idclasse','idcycle').get(id=idpaie)
+    return render(request,'gComptabilite/modifier_paiement_scolaire.html',dict(paie=etatpaie, tranche_paye=DEUX_TRANCHES_CHOICES))
+
+def supprimerpaiementscolaire(request, idpaie):
+    etatpaie = EtatPaiementTranche.objects.get(id=idpaie)
+    etatpaie.delete()
+    return redirect('../listepaiemensuel/')
+
+    
+
+
+
+
+
+
+
+
+    
+
 
 
 

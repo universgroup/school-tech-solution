@@ -1,5 +1,5 @@
 from django.db import models
-from gAdministration.models import AnneeScolaire, Classe
+from gAdministration.models import AnneeScolaire, Classe, CycleScolaire
 from gEleve.models import Eleve
 
 TYPE_OPERATION_CAISSE_CHOICES = (
@@ -90,6 +90,7 @@ class EtatPaiementTranche(models.Model):
     date_paie = models.DateField()
     mateleve = models.ForeignKey(Eleve, on_delete=models.CASCADE)
     idclasse = models.ForeignKey(Classe, on_delete=models.CASCADE)
+    idcycle = models.ForeignKey(CycleScolaire, on_delete=models.CASCADE)
 
     def __str__(self):
         return '{} | {} | {} | {}'.format(self.mateleve, self.inscription, self.premiere_tranche, self.deuxieme_tranche)
@@ -105,3 +106,7 @@ class EtatPaiementTranche(models.Model):
     @property
     def annee(self):
         return self.anneescolaire
+    
+    @property
+    def cycle(self):
+        return self.idcycle

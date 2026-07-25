@@ -257,6 +257,9 @@ def enregistrerinfosecole(request):
 
 
 def listeinfosecole(request):
+    infos = {}
+    infos = Ecole.objects.none()
+
     infos = Ecole.objects.all()
     pagineecole = Paginator(infos, 10)
     numpageecole = request.GET.get('page')

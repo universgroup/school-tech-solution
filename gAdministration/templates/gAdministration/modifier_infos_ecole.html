@@ -123,7 +123,7 @@ EDITION DES INFORMATIONS DE L'ECOLE
                     </div>
                 </div>
 
-                <div class="row g-3"></div>
+                <div class="row g-3">
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="id_coordo_primaire">Coordinateur Primaire</label>
@@ -146,37 +146,35 @@ EDITION DES INFORMATIONS DE L'ECOLE
                 </div>
 
                 <div class="row g-3">
-                    <div class="col-md-12">
+                    <div class="col-md-6">
                         <div class="form-group">
                             <div class="text-center">
                                 {% if ecole.logo_ecole %}
                                 <img src="{{ecole.logo_ecole.url}}" width="90px" title="Logo ecole" name="logo_old">
                                 {% endif %}
-                                <input type="file" accept="image/jpeg, image/png" name="logo_new" title="Téléverser ici le nouveau logo de l'école">
+                                <input type="file" accept="image/*" name="logo_new" title="Téléverser ici le nouveau logo de l'école">
                             </div>
                         </div>
                     </div>
-                </div>
-                
-                <div class="row g-3">
-                    <div class="col-md-6">
+
+                    <div class="col-md-3">
                         <div class="form-group">
                             <div class="text-left">
                                 {% if ecole.signa_dg %}
                                 <img src="{{ecole.signa_dg.url}}" width="90px" title="Signature du DG" name="signe_dg_old">
                                 {% endif %}
-                                <input type="file" accept="image/jpeg, image/png" name="signe_dg" title="Téléverser ici la signature du directeur général">
+                                <input type="file" accept="image/*" name="signe_dg" title="Téléverser ici la signature du directeur général">
                             </div>
                         </div>
                     </div>
 
-                    <div class="col-md-6">
+                    <div class="col-md-3">
                         <div class="form-group">
                            <div class="text-right"> 
                                 {% if ecole.signa_de %}
                                 <img src="{{ecole.signa_de.url}}" width="90px" title="Signature du DE" name="signe_de_old">
                                 {% endif %}
-                                <input type="file" accept="image/jpeg, image/png" name="signe_de" alt="Téléverser ici la signature du directeur des études">
+                                <input type="file" accept="image/*" name="signe_de" alt="Téléverser ici la signature du directeur des études">
                             </div>
                         </div>
                     </div>

@@ -57,6 +57,7 @@
                 <a id="dropdownSubMenu2" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-item dropdown-toggle">Gestion des cours</a>
                 <ul aria-labelledby="dropdownSubMenu2" class="dropdown-menu border-0 shadow">
                   <li><a tabindex="-1" href="{% url 'listeanneescolaire' %}" class="dropdown-item">Ajouter une année scolaire</a></li>
+                  <li><a href="{% url 'listecycle' %}" class="dropdown-item">Ajouter un cycle scolaire</a></li>
                   <li><a href="{% url 'listeclasse' %}" class="dropdown-item">Ajouter une classe</a></li>
                   <li><a href="#" class="dropdown-item">Ajouter une matière</a></li>
                 </ul>
@@ -80,7 +81,7 @@
       <li class="nav-item dropdown">
             <a id="dropdownSubMenu4" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle">Comptabilité</a>
             <ul aria-labelledby="dropdownSubMenu4" class="dropdown-menu border-0 shadow">
-              <li><a href="#" class="dropdown-item">Paiement de la scolarité</a></li>
+              <li><a href="{% url 'listepaiemensuel' %}" class="dropdown-item">Paiement de la scolarité</a></li>
               <li><a href="{% url 'listerecette' %}" class="dropdown-item">Situation de la scolarité</a></li>
               <li><a href="#" class="dropdown-item">Situation de la cantine scolaire</a></li>
               <li><a href="#" class="dropdown-item">Situation des activités extra scolaires</a></li>
@@ -332,6 +333,13 @@
                 </a>
               </li>
               <li class="nav-item">
+                <a href="{% url 'listecycle' %}" class="nav-link" title="Permet d'ajouter un nouveau cycle scolaire">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Créer un cycle scolaire &nbsp;</p>
+                  <i class="fa-brands fa-google-scholar"></i>
+                </a>
+              </li>
+              <li class="nav-item">
                 <a href="{% url 'listeclasse' %}" class="nav-link" title="Permet d'ajouter de nouvelles classes dans le système">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Créer une classe &nbsp;</p>
@@ -421,7 +429,7 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="#" class="nav-link" title="Permet de procéder au paiement des frais de scolarité">
+                <a href="{% url 'listepaiemensuel' %}" class="nav-link" title="Permet de procéder au paiement des frais de scolarité">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Paiement scolarité &nbsp;</p>
                   <i class="fa-brands fa-cc-visa"></i>
@@ -666,15 +674,15 @@
                             
                         <div class="d-flex align-items-center">
 
-                            <form class="form-inline ml-3" action="{% url 'filtrerlisteinscrits' %}" method="GET" id="flisteinscrits" data-classe-url="{% url 'chargerlisteclasse' %}">
+                            <form class="form-inline ml-3" action="{% url 'filtrerlistepaieclasse' %}" method="GET" id="fetatpaiement" data-classe-url="{% url 'chargerlisteclasse' %}">
 
                                 <div class="d-flex align-items-center">
                                     
                                     <label for="idannee" class="mr-2 mb-0">Année scolaire</label>
-                                    <select class="form-control form-control-sm mr-3" name="annee_scolaire" id="idannee" title="Sélectionnez une année scolaire pour afficher la liste des élèves inscrits">
+                                    <select class="form-control form-control-sm mr-3" name="annee_scolaire" id="idannee" title="Sélectionnez une année scolaire pour afficher les états de paiement">
                                         <option value="" selected>Sélectionnez</option>
                                         {% for an in ans %}
-                                        <option value="{{an.annee_scolaire.id}}">{{an.annee_scolaire.descript_annee}}</option>
+                                        <option value="{{an.id}}">{{an.descript_annee}}</option>
                                         {% endfor %}
                                     </select>
 
@@ -691,9 +699,9 @@
                                       <option value="" selected>Selectionnez</option>
                                     </select>
 
-                                    <button type="submit" id="btn_rechercher" class="btn btn-secondary btn-sm mr-2" title="Filtrer la liste des élèves par année scolaire et cycle">Rechercher &nbsp;<i class="fas fa-search"></i></button>
-                                    <a href="{% url  'chargeranneecourante' %}" target="_self" class="btn btn-warning btn-sm mr-3" title="Actualiser la liste des inscrits">Actualiser &nbsp;<i class="fas fa-refresh"></i></a>
-                                    <a href="{% url 'registrematricule' %}" class="btn btn-info btn-sm mr-2" target="_self" title="Afficher le Registre de matricule"><i class="fas fa-list-ol mr-1"></i> Registre matricule</a>
+                                    <button type="submit" id="btn_rechercher" class="btn btn-secondary btn-md mr-2" title="Filtrer la liste des paiements par année scolaire et classe">Rechercher &nbsp;<i class="fas fa-search"></i></button>
+                                    <a href="{% url  'listepaiemensuel' %}" target="_self" class="btn btn-warning btn-md mr-3" title="Actualiser la liste des paiements">Actualiser &nbsp;<i class="fas fa-refresh"></i></a>
+                                    
                                     
                                 </div>
 
@@ -701,7 +709,7 @@
                         </div>
 
                             <div class="text-right">
-                                <a href="{% url 'enregistrereleve' %}" class="btn btn-success btn-sm" target="_self" title="Cliquez ici pour inscrire un élève">Nouvelle inscription &nbsp;<i class="fas fa-graduation-cap"></i></a>
+                                <a href="{% url 'paiementscolarite' %}" class="btn btn-success btn-md" target="_self" title="Cliquez ici pour enregistrer le paiement de la scolarité">Nouveau paiement &nbsp;<i class="fa-brands fa-cc-visa"></i></a>
                             </div>
             
                 </div>
@@ -711,88 +719,61 @@
 
         <div class="card-body">
 
-        {% if listeinscrits %}
-             <table id="listeinscritsannee" class="table table-bordered table-striped">
+        {% if listepaiementmensuel %}
+
+             <table id="listepaiemensuel" class="table table-bordered table-striped">
                     <thead class="table-success">
                 
                         <tr>
-                                <th>Statut</th>
                                 <th>Matricule</th>
                                 <th>Nom Famille</th>
                                 <th>Prénom(s)</th>
                                 <th>Sexe</th>
                                 <th>Prénom(s) Père</th>
                                 <th>Prénom(s) & Nom Mère</th>
-                                <th>Prénom(s) & Nom Tuteur</th>
                                 <th>Contact père</th>
                                 <th>Contact mère</th>
-                                <th>Email père</th>
-                                <th>Email mère</th>
-                                <th>Profession père</th>
-                                <th>Profession mère</th>
-                                <th>Personne contact</th>
-                                <th>Adresse</th>
-                                <th>Ecole d'origine</th>
-                                <th>Photo ID</th>
-                                <th>Date naissance</th>
-                                <th>Lieu naissance</th>
-                                <th>Date entrée</th>
-                                <th>Pays naissance</th>
-                                <th>Classe</th>
+                                <th>Ins/Reins</th>
+                                <th>1ère tranche</th>
+                                <th>2ème tranche</th>
+                                <th>Scolarité</th>
+                                <th>Reliquat</th>
                                 <th>Cycle</th>
+                                <th>Classe</th>
                                 <th>Année scolaire</th>
-                                <th>Date inscription</th>
-                                <th>ID Inscription</th>
+                                <th>Date paiement</th>
+                                <th>ID paie</th>
                                 <th>Actions</th>
                         </tr>
 
                     </thead>
                     <tbody>
                     
-                        {% for le in listeinscrits %}
+                        {% for lp in listepaiementmensuel %}
                                           <tr>
-                                              <td>{{le.etat_inscription}}</td>
-                                              <td>{{le.mateleve.matricule}}</td>
-                                              <td>{{le.mateleve.nom}}</td>
-                                              <td>{{le.mateleve.prenom}}</td>
-                                              <td>{{le.mateleve.sexe_eleve}}</td>
-                                              <td>{{le.mateleve.pere}}</td>
-                                              <td>{{le.mateleve.mere}}</td>
-                                              <td>{{le.mateleve.tuteur}}</td>
-                                              <td>{{le.mateleve.contact_pere}}</td>
-                                              <td>{{le.mateleve.contact_mere}}</td>
-                                              <td>{{le.mateleve.email_pere}}</td>
-                                              <td>{{le.mateleve.email_mere}}</td>
-                                              <td>{{le.mateleve.profes_pere}}</td>
-                                              <td>{{le.mateleve.profes_mere}}</td>
-                                              <td>{{le.mateleve.personne_contact}}</td>
-                                              <td>{{le.mateleve.adresse}}</td>
-                                              <td>{{le.mateleve.ecole_origine}}</td>
-
-                                              {% if le.mateleve.photo_eleve %}
+                                              <td>{{lp.mateleve.matricule}}</td>
+                                              <td>{{lp.mateleve.nom}}</td>
+                                              <td>{{lp.mateleve.prenom}}</td>
+                                              <td>{{lp.mateleve.sexe_eleve}}</td>
+                                              <td>{{lp.mateleve.pere}}</td>
+                                              <td>{{lp.mateleve.mere}}</td>
+                                              <td>{{lp.mateleve.contact_pere}}</td>
+                                              <td>{{lp.mateleve.contact_mere}}</td>
+                                              <td>{{lp.inscription|floatformat:'2g'}}</td>
+                                              <td>{{lp.premiere_tranche|floatformat:'2g'}}</td>
+                                              <td>{{lp.deuxieme_tranche|floatformat:'2g'}}</td>
+                                              <td>{{lp.fscolarite|floatformat:'2g'}}</td>
+                                              <td>{{lp.reste_a_payer|floatformat:'2g'}}</td>
+                                              <td>{{lp.idcycle}}</td>
+                                              <td>{{lp.idclasse}}</td>
+                                              <td>{{lp.anneescolaire}}</td>
+                                              <td>{{lp.date_paie|date:'j-n-Y'}}</td>
+                                              <td>{{lp.id}}</td>
                                               <td>
-                                                    <a href="{{ le.mateleve.photo_eleve.url }}" target="_blank" title="Agrandir la photo de l'élève">
-                                                        <img src="{{le.mateleve.photo_eleve.url}}" width="40px">
-                                                    </a>
-                                              </td>
-                                              {% else %}
-                                              <td>Photo indisponible</td>
-                                              {% endif %}
-
-                                              <td>{{le.mateleve.datenaissance|date:'j-n-Y'}}</td>
-                                              <td>{{le.mateleve.lieu_naissance}}</td>
-                                              <td>{{le.mateleve.date_arrivee|date:'j-n-Y'}}</td>
-                                              <td>{{le.mateleve.pays_naissance}}</td>
-                                              <td>{{le.idclasse}}</td>
-                                              <td>{{le.idcycle}}</td>
-                                              <td>{{le.annee_scolaire}}</td>
-                                              <td>{{le.date_inscription|date:'j-n-Y'}}</td>
-                                              <td>{{le.id}}</td>
-                                              <td>
-                                                  <a class="btn btn-primary" href="{% url 'afficherdetailsinscription' le.id %}" title="Voir/Afficher"><i class="fa fa-eye fa-sm"></i></a>
-                                                  <a class="btn btn-info" href="{% url 'editioninscription' le.id %}" title="Modifier/Editer"><i class="fa fa-edit fa-sm"></i></a>
-                                                  <a class="btn btn-danger" href=" {% url 'suppinscription' le.id %}" title="Supprimer"><i class="fa fa-remove fa-sm"></i></a>
-                                                  <a class="btn btn-secondary" target="_blank" href="{% url 'imprimerecuinscription' le.id %}" title="Imprimer le recu d'inscription"><i class="fa fa-print fa-sm"></i></a>
+                                                  <a class="btn btn-primary" href="{% url 'detailspaiement' lp.id %}" title="Voir/Afficher"><i class="fa fa-eye fa-sm"></i></a>
+                                                  <a class="btn btn-info" href="{% url 'editionpaiement' lp.id %}" title="Modifier/Editer"><i class="fa fa-edit fa-sm"></i></a>
+                                                  <a class="btn btn-danger" href=" {% url 'supprimerpaiement' lp.id %}" title="Supprimer"><i class="fa fa-remove fa-sm"></i></a>
+                                                  <a class="btn btn-secondary" target="_blank" href="#" title="Imprimer le recu de scolarité"><i class="fa fa-print fa-sm"></i></a>
                                               </td>
 
                                           </tr>
@@ -802,33 +783,24 @@
                     </tbody>
                     <tfoot>
                         <tr>
-                            <th>Statut</th>
                             <th>Matricule</th>
                             <th>Nom Famille</th>
                             <th>Prénom(s)</th>
                             <th>Sexe</th>
                             <th>Prénom(s) Père</th>
                             <th>Prénom(s) & Nom Mère</th>
-                            <th>Prénom(s) & Nom Tuteur</th>
                             <th>Contact père</th>
                             <th>Contact mère</th>
-                            <th>Email père</th>
-                            <th>Email mère</th>
-                            <th>Profession père</th>
-                            <th>Profession mère</th>
-                            <th>Personne contact</th>
-                            <th>Adresse</th>
-                            <th>Ecole d'origine</th>
-                            <th>Photo ID</th>
-                            <th>Date naissance</th>
-                            <th>Lieu naissance</th>
-                            <th>Date entrée</th>
-                            <th>Pays naissance</th>
-                            <th>Classe</th>
+                            <th>Ins/Reins</th>
+                            <th>1ère tranche</th>
+                            <th>2ème tranche</th>
+                            <th>Scolarité</th>
+                            <th>Reliquat</th>
                             <th>Cycle</th>
+                            <th>Classe</th>
                             <th>Année scolaire</th>
-                            <th>Date inscription</th>
-                            <th>ID Inscription</th>
+                            <th>Date paiement</th>
+                            <th>ID paie</th>
                             <th>Actions</th>
                         </tr>
                    </tfoot>
@@ -837,11 +809,11 @@
             <div class="row mt-3 mb-2">
                 <div class="col-md-4">
                     <div class="form-group">
-                        <label for="effgarcons">Effectif total garçons</label>
-                        {% if effectif_total_garcons %}
-                        <input type="text" id="effgarcons" name="effectif_total_garcons" value="{{ effectif_total_garcons }}" maxlength="25" class="form-control" readonly style="color:red">
+                        <label for="id_total_t1">Total première tranche</label>
+                        {% if total_tranche1 %}
+                        <input type="text" id="id_total_t1" name="total_tranche1" value="{{ total_tranche1 }}" class="form-control" readonly style="color:red">
                         {% else %}
-                        <input type="text" name="effectif_total_garcons" value="0" maxlength="25" class="form-control" readonly style="color:red">
+                        <input type="text" id="id_total_t1" name="total_tranche1" value="0" class="form-control" readonly style="color:red">
                         {% endif %}
                     </div>
                 </div>
@@ -849,22 +821,22 @@
 
                 <div class="col-md-4">
                     <div class="form-group">
-                        <label for="eff_filles">Effectif total filles</label>
-                        {% if effectif_total_filles %}
-                        <input type="text" id="eff_filles" name="effectif_total_filles" value="{{ effectif_total_filles }}" maxlength="25" class="form-control" readonly style="color:red">
+                        <label for="id_total_t2">Total deuxième tranche</label>
+                        {% if total_tranche2 %}
+                        <input type="text" id="id_total_t2" name="total_tranche2" value="{{ total_tranche2 }}" class="form-control" readonly style="color:red">
                         {% else %}
-                        <input type="text" name="effectif_total_filles" value="0" maxlength="25" class="form-control" readonly style="color:red">
+                        <input type="text" id="id_total_t2" name="total_tranche2" value="0" class="form-control" readonly style="color:red">
                         {% endif %}
                     </div>
                 </div>
 
                 <div class="col-md-4">
                     <div class="form-group">
-                        <label for="efftotal">Effectif total</label>
-                        {% if effectif_total %}
-                        <input type="text" id="efftotal" name="effectif_total" value="{{ effectif_total }}" maxlength="25" class="form-control" readonly style="color:red;">
+                        <label for="id_total_reste">Total reliquat</label>
+                        {% if total_reste_a_payer %}
+                        <input type="text" id="id_total_reste" name="total_reste_a_payer" value="{{ total_reste_a_payer }}" class="form-control" readonly style="color:red;">
                         {% else %}
-                        <input type="text" name="effectif_total" value="0" maxlength="25" class="form-control" readonly style="color:red;">
+                        <input type="text" id="id_total_reste" name="total_reste_a_payer" value="0" class="form-control" readonly style="color:red;">
                         {% endif %}
                     </div>
                 </div>
@@ -875,31 +847,31 @@
                       <nav aria-label="">
                           <ul class="pagination">
 
-                              {% if listeinscrits.has_previous %}
+                              {% if listepaiementmensuel.has_previous %}
 
                               <li class="page-item">
                                   <a class="page-link" href="?page=1">1</a>
                               </li>
                               <li class="page-item">
-                                  <a class="page-link" href="?page={{ listeinscrits.previous_page_number }}"><i class="fa-solid fa-backward fa-sm"></i>&nbsp; Précédent</a>
+                                  <a class="page-link" href="?page={{ listepaiementmensuel.previous_page_number }}"><i class="fa-solid fa-backward fa-sm"></i>&nbsp; Précédent</a>
                               </li>
 
                               {% endif %}
 
                               <li class="page-item active" aria-current="page">
                                   <a class="page-link" href="#">
-                                      Page {{ listeinscrits.number }} sur {{ listeinscrits.paginator.num_pages }}
+                                      Page {{ listepaiementmensuel.number }} sur {{ listepaiementmensuel.paginator.num_pages }}
                                   </a>
                               </li>
 
-                              {% if listeinscrits.has_next %}
+                              {% if listepaiementmensuel.has_next %}
 
                               <li class="page-item">
-                                  <a class="page-link" href="?page={{ listeinscrits.next_page_number }}"><i class="fa-solid fa-forward fa-sm"></i>&nbsp; Suivant</a>
+                                  <a class="page-link" href="?page={{ listepaiementmensuel.next_page_number }}"><i class="fa-solid fa-forward fa-sm"></i>&nbsp; Suivant</a>
                               </li>
 
                               <li class="page-item">
-                                  <a class="page-link" href="?page={{ listeinscrits.paginator.num_pages }}"><i class="fa-solid fa-step-forward fa-sm"></i>&nbsp; Dernier</a>
+                                  <a class="page-link" href="?page={{ listepaiementmensuel.paginator.num_pages }}"><i class="fa-solid fa-step-forward fa-sm"></i>&nbsp; Dernier</a>
                               </li>
 
                               {% endif %}
@@ -909,89 +881,63 @@
               </div>
           </div>
 
-        {% elif listeeleves %}
+        {% elif listepaiementclasse %}
 
-          <table id="listeinscritmensuel" class="table table-bordered table-striped">
+          <table id="listepaieclasse" class="table table-bordered table-striped">
                     <thead class="table-success">
                 
                         <tr>
-                                <th>Statut</th>
                                 <th>Matricule</th>
                                 <th>Nom Famille</th>
                                 <th>Prénom(s)</th>
                                 <th>Sexe</th>
                                 <th>Prénom(s) Père</th>
                                 <th>Prénom(s) & Nom Mère</th>
-                                <th>Prénom(s) & Nom Tuteur</th>
                                 <th>Contact père</th>
                                 <th>Contact mère</th>
-                                <th>Email père</th>
-                                <th>Email mère</th>
-                                <th>Profession père</th>
-                                <th>Profession mère</th>
-                                <th>Personne contact</th>
-                                <th>Adresse</th>
-                                <th>Ecole d'origine</th>
-                                <th>Photo ID</th>
-                                <th>Date naissance</th>
-                                <th>Lieu naissance</th>
-                                <th>Date entrée</th>
-                                <th>Pays naissance</th>
-                                <th>Classe</th>
+                                <th>Ins/Reins</th>
+                                <th>1ère tranche</th>
+                                <th>2ème tranche</th>
+                                <th>Scolarité</th>
+                                <th>Reliquat</th>
                                 <th>Cycle</th>
+                                <th>Classe</th>
                                 <th>Année scolaire</th>
-                                <th>Date inscription</th>
-                                <th>ID Inscription</th>
+                                <th>Date paiement</th>
+                                <th>ID paie</th>
                                 <th>Actions</th>
                         </tr>
 
                     </thead>
                     <tbody>
                     
-                        {% for le in listeeleves %}
+                        {% for le in listepaiementclasse %}
                                           <tr>
-                                              <td>{{le.etat_inscription}}</td>
-                                              <td>{{le.mateleve.matricule}}</td>
-                                              <td>{{le.mateleve.nom}}</td>
-                                              <td>{{le.mateleve.prenom}}</td>
-                                              <td>{{le.mateleve.sexe_eleve}}</td>
-                                              <td>{{le.mateleve.pere}}</td>
-                                              <td>{{le.mateleve.mere}}</td>
-                                              <td>{{le.mateleve.tuteur}}</td>
-                                              <td>{{le.mateleve.contact_pere}}</td>
-                                              <td>{{le.mateleve.contact_mere}}</td>
-                                              <td>{{le.mateleve.email_pere}}</td>
-                                              <td>{{le.mateleve.email_mere}}</td>
-                                              <td>{{le.mateleve.profes_pere}}</td>
-                                              <td>{{le.mateleve.profes_mere}}</td>
-                                              <td>{{le.mateleve.personne_contact}}</td>
-                                              <td>{{le.mateleve.adresse}}</td>
-                                              <td>{{le.mateleve.ecole_origine}}</td>
-
-                                              {% if le.mateleve.photo_eleve %}
+                                              
+                                              <td>{{lp.mateleve.matricule}}</td>
+                                              <td>{{lp.mateleve.nom}}</td>
+                                              <td>{{lp.mateleve.prenom}}</td>
+                                              <td>{{lp.mateleve.sexe_eleve}}</td>
+                                              <td>{{lp.mateleve.pere}}</td>
+                                              <td>{{lp.mateleve.mere}}</td>
+                                              <td>{{lp.mateleve.contact_pere}}</td>
+                                              <td>{{lp.mateleve.contact_mere}}</td>
+                                              <td>{{lp.inscription|floatformat:'2g'}}</td>
+                                              <td>{{lp.premiere_tranche|floatformat:'2g'}}</td>
+                                              <td>{{lp.deuxieme_tranche|floatformat:'2g'}}</td>
+                                              <td>{{lp.fscolarite|floatformat:'2g'}}</td>
+                                              <td>{{lp.reste_a_payer|floatformat:'2g'}}</td>
+                                              <td>{{lp.idcycle}}</td>
+                                              <td>{{lp.idclasse}}</td>
+                                              <td>{{lp.anneescolaire}}</td>
+                                              <td>{{lp.date_paie|date:'j-n-Y'}}</td>
+                                              <td>{{lp.id}}</td>
+                                              
                                               <td>
-                                                    <a href="{{ le.mateleve.photo_eleve.url }}" target="_blank" title="Agrandir la photo de l'élève">
-                                                        <img src="{{le.mateleve.photo_eleve.url}}" width="40px">
-                                                    </a>
-                                              </td>
-                                              {% else %}
-                                              <td>Photo indisponible</td>
-                                              {% endif %}
-
-                                              <td>{{le.mateleve.datenaissance|date:'j-n-Y'}}</td>
-                                              <td>{{le.mateleve.lieu_naissance}}</td>
-                                              <td>{{le.mateleve.date_arrivee|date:'j-n-Y'}}</td>
-                                              <td>{{le.mateleve.pays_naissance}}</td>
-                                              <td>{{le.idclasse}}</td>
-                                              <td>{{le.idcycle}}</td>
-                                              <td>{{le.annee_scolaire}}</td>
-                                              <td>{{le.date_inscription|date:'j-n-Y'}}</td>
-                                              <td>{{le.id}}</td>
-                                              <td>
-                                                  <a class="btn btn-primary" href="{% url 'afficherdetailsinscription' le.id %}" title="Voir/Afficher"><i class="fa fa-eye fa-sm"></i></a>
-                                                  <a class="btn btn-info" href="{% url 'editioninscription' le.id %}" title="Modifier/Editer"><i class="fa fa-edit fa-sm"></i></a>
-                                                  <a class="btn btn-danger" href=" {% url 'suppinscription' le.id %}" title="Supprimer"><i class="fa fa-remove fa-sm"></i></a>
-                                                  <a class="btn btn-secondary" target="_blank" href="{% url 'imprimerecuinscription' le.id %}" title="Imprimer le recu d'inscription"><i class="fa fa-print fa-sm"></i></a>
+                                                  <a class="btn btn-primary" href="{% url 'detailspaiement' lp.id %}" title="Voir/Afficher"><i class="fa fa-eye fa-sm"></i></a>
+                                                  <a class="btn btn-info" href="{% url 'editionpaiement' lp.id %}" title="Modifier/Editer"><i class="fa fa-edit fa-sm"></i></a>
+                                                  <a class="btn btn-danger" href=" {% url 'supprimerpaiement' lp.id %}" title="Supprimer"><i class="fa fa-remove fa-sm"></i></a>
+                                                  <a class="btn btn-secondary" target="_blank" href="#" title="Imprimer le recu de scolarité"><i class="fa fa-print fa-sm"></i></a>
                                               </td>
 
                                           </tr>
@@ -1001,33 +947,24 @@
                     </tbody>
                     <tfoot>
                         <tr>
-                            <th>Statut</th>
                             <th>Matricule</th>
                             <th>Nom Famille</th>
                             <th>Prénom(s)</th>
                             <th>Sexe</th>
                             <th>Prénom(s) Père</th>
                             <th>Prénom(s) & Nom Mère</th>
-                            <th>Prénom(s) & Nom Tuteur</th>
                             <th>Contact père</th>
                             <th>Contact mère</th>
-                            <th>Email père</th>
-                            <th>Email mère</th>
-                            <th>Profession père</th>
-                            <th>Profession mère</th>
-                            <th>Personne contact</th>
-                            <th>Adresse</th>
-                            <th>Ecole d'origine</th>
-                            <th>Photo ID</th>
-                            <th>Date naissance</th>
-                            <th>Lieu naissance</th>
-                            <th>Date entrée</th>
-                            <th>Pays naissance</th>
-                            <th>Classe</th>
+                            <th>Ins/Reins</th>
+                            <th>1ère tranche</th>
+                            <th>2ème tranche</th>
+                            <th>Scolarité</th>
+                            <th>Reliquat</th>
                             <th>Cycle</th>
+                            <th>Classe</th>
                             <th>Année scolaire</th>
-                            <th>Date inscription</th>
-                            <th>ID Inscription</th>
+                            <th>Date paiement</th>
+                            <th>ID paie</th>
                             <th>Actions</th>
                         </tr>
                    </tfoot>
@@ -1036,11 +973,11 @@
             <div class="row mt-3 mb-2">
                 <div class="col-md-4">
                     <div class="form-group">
-                        <label for="effgarcons">Effectif total garçons</label>
-                        {% if effectif_total_garcons %}
-                        <input type="text" id="effgarcons" name="effectif_total_garcons" value="{{ effectif_total_garcons }}" maxlength="25" class="form-control" readonly style="color:red">
+                        <label for="id_total_t1">Total première tranche</label>
+                        {% if total_tranche1 %}
+                        <input type="text" id="id_total_t1" name="total_tranche1" value="{{ total_tranche1 }}" class="form-control" readonly style="color:red">
                         {% else %}
-                        <input type="text" name="effectif_total_garcons" value="0" maxlength="25" class="form-control" readonly style="color:red">
+                        <input type="text" id="id_total_t1" name="total_tranche1" value="0" class="form-control" readonly style="color:red">
                         {% endif %}
                     </div>
                 </div>
@@ -1048,22 +985,22 @@
 
                 <div class="col-md-4">
                     <div class="form-group">
-                        <label for="eff_filles">Effectif total filles</label>
-                        {% if effectif_total_filles %}
-                        <input type="text" id="eff_filles" name="effectif_total_filles" value="{{ effectif_total_filles }}" maxlength="25" class="form-control" readonly style="color:red">
+                        <label for="id_total_t2">Total deuxième tranche</label>
+                        {% if total_tranche2 %}
+                        <input type="text" id="id_total_t2" name="total_tranche2" value="{{ total_tranche2 }}" class="form-control" readonly style="color:red">
                         {% else %}
-                        <input type="text" name="effectif_total_filles" value="0" maxlength="25" class="form-control" readonly style="color:red">
+                        <input type="text" id="id_total_t2" name="total_tranche2" value="0" class="form-control" readonly style="color:red">
                         {% endif %}
                     </div>
                 </div>
 
                 <div class="col-md-4">
                     <div class="form-group">
-                        <label for="efftotal">Effectif total</label>
-                        {% if effectif_total %}
-                        <input type="text" id="efftotal" name="effectif_total" value="{{ effectif_total }}" maxlength="25" class="form-control" readonly style="color:red;">
+                        <label for="id_total_reste">Total reliquat</label>
+                        {% if total_reste_a_payer %}
+                        <input type="text" id="id_total_reste" name="total_reste_a_payer" value="{{ total_reste_a_payer }}" class="form-control" readonly style="color:red;">
                         {% else %}
-                        <input type="text" name="effectif_total" value="0" maxlength="25" class="form-control" readonly style="color:red;">
+                        <input type="text" id="id_total_reste" name="total_reste_a_payer" value="0" class="form-control" readonly style="color:red;">
                         {% endif %}
                     </div>
                 </div>
@@ -1074,31 +1011,31 @@
                       <nav aria-label="">
                           <ul class="pagination">
 
-                              {% if listeeleves.has_previous %}
+                              {% if listepaiementclasse.has_previous %}
 
                               <li class="page-item">
                                   <a class="page-link" href="?page=1">1</a>
                               </li>
                               <li class="page-item">
-                                  <a class="page-link" href="?page={{ listeeleves.previous_page_number }}"><i class="fa-solid fa-backward fa-sm"></i>&nbsp; Précédent</a>
+                                  <a class="page-link" href="?page={{ listepaiementclasse.previous_page_number }}"><i class="fa-solid fa-backward fa-sm"></i>&nbsp; Précédent</a>
                               </li>
 
                               {% endif %}
 
                               <li class="page-item active" aria-current="page">
                                   <a class="page-link" href="#">
-                                      Page {{ listeeleves.number }} sur {{ listeeleves.paginator.num_pages }}
+                                      Page {{ listepaiementclasse.number }} sur {{ listepaiementclasse.paginator.num_pages }}
                                   </a>
                               </li>
 
-                              {% if listeeleves.has_next %}
+                              {% if listepaiementclasse.has_next %}
 
                               <li class="page-item">
-                                  <a class="page-link" href="?page={{ listeeleves.next_page_number }}"><i class="fa-solid fa-forward fa-sm"></i>&nbsp; Suivant</a>
+                                  <a class="page-link" href="?page={{ listepaiementclasse.next_page_number }}"><i class="fa-solid fa-forward fa-sm"></i>&nbsp; Suivant</a>
                               </li>
 
                               <li class="page-item">
-                                  <a class="page-link" href="?page={{ listeeleves.paginator.num_pages }}"><i class="fa-solid fa-step-forward fa-sm"></i>&nbsp; Dernier</a>
+                                  <a class="page-link" href="?page={{ listepaiementclasse.paginator.num_pages }}"><i class="fa-solid fa-step-forward fa-sm"></i>&nbsp; Dernier</a>
                               </li>
 
                               {% endif %}
@@ -1165,7 +1102,7 @@
 
 <script>
   $(function () {
-    $("#listeinscritsannee").DataTable({
+    $("#listepaiemensuel").DataTable({
       "paging": true,
       "lengthChange": true,
       "lengthMenu": [10, 25, 50, 100],
@@ -1186,7 +1123,7 @@
   });
 
   $(function () {
-    $("#listeinscritmensuel").DataTable({
+    $("#listepaieclasse").DataTable({
       "paging": true,
       "lengthChange": true,
       "lengthMenu": [10, 25, 50, 100],
@@ -1208,7 +1145,7 @@
 
   // Cette fonction javascript (JQuery) m'a permis de filtrer les classes selon le cycle choisi
     $("#cbocycle").change(function(){
-        var url = $("#flisteinscrits").attr("data-classe-url");
+        var url = $("#fetatpaiement").attr("data-classe-url");
         var idcycle = $(this).val();
 
         $.ajax({
@@ -1226,12 +1163,12 @@
 
     // Cette fonction javascript (JQuery) m'a permis de masquer le tableau d'affichage au chargement de la page
     $("window").on("load",function(){
-        $('#listeinscritsannee').hide();
+        $('#listepaieclasse').hide();
     });
 
     // Cette fonction me permet d'afficher le tableau d'affichage auparavant masqué lors du chargement
   $("#btn_rechercher").click(function(){
-    $('#listeinscritsannee').show();
+    $('#listepaieclasse').show();
   });
 
 </script> 

@@ -146,14 +146,14 @@ class FormEcole(ModelForm):
             'comptable': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Prénoms et Nom Comptable',
                                                 'title': 'Saisissez le prénoms et nom du/de la comptable'}),
             'logo_ecole': forms.FileInput(
-                attrs={'class': 'form-control', 'title': 'Importez le logo de l\'école',
-                       'accept': 'image/jpeg, image/png'}),
+                attrs={'class': 'd-none', 'title': 'Importez le logo de l\'école',
+                       'accept': 'image/*', 'id':'id_logo_ecole', 'onchange': 'previewLogoEcole(this)'}),
             'signa_dg': forms.FileInput(
-                attrs={'class': 'form-control', 'title': 'Importez la signature du DG',
-                       'accept': 'image/jpeg, image/png'}),
+                attrs={'class': 'd-none', 'title': 'Importez la signature du DG',
+                       'accept': 'image/*', 'id':'id_signa_dg', 'onchange': 'previewSignatureDG(this)'}),
             'signa_de': forms.FileInput(
-                attrs={'class': 'form-control', 'title': 'Importez la signature du DE',
-                       'accept': 'image/jpeg, image/png'})  # 'accept': 'image/jpeg, image/png, image/*'
+                attrs={'class': 'd-none', 'title': 'Importez la signature du DE',
+                       'accept': 'image/*', 'id':'id_signa_de', 'onchange': 'previewSignatureDE(this)'})  # 'accept': 'image/jpeg, image/png, image/*'
 
         }
 
@@ -167,5 +167,7 @@ class FormEcole(ModelForm):
         self.fields['email_ecole'].required=False
         self.fields['site_internet'].required=False
         self.fields['coordo_primaire'].required=False
+        self.fields['coordo_maternelle'].required=False
+        self.fields['coordo_secondaire'].required=False
         
         
