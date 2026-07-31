@@ -773,12 +773,59 @@
                                                   <a class="btn btn-primary" href="{% url 'detailspaiement' lp.id %}" title="Voir/Afficher"><i class="fa fa-eye fa-sm"></i></a>
                                                   <a class="btn btn-info" href="{% url 'editionpaiement' lp.id %}" title="Modifier/Editer"><i class="fa fa-edit fa-sm"></i></a>
                                                   <a class="btn btn-danger" href=" {% url 'supprimerpaiement' lp.id %}" title="Supprimer"><i class="fa fa-remove fa-sm"></i></a>
-                                                  <a class="btn btn-secondary" target="_blank" href="#" title="Imprimer le recu de scolarité"><i class="fa fa-print fa-sm"></i></a>
+                                                  
+                                                  <button type="button" class="btn btn-secondary btn-recu"
+                                                          data-idetat="{{lp.id}}" title="Imprimer le recu de paiement de scolarité"
+                                                          data-toggle="modal"
+                                                          data-target="#modalRecuPaiement">
+                                                      <i class="fa fa-print fa-sm"></i>
+                                                  </button>
+                                                
                                               </td>
 
                                           </tr>
 
+                        {% endfor %}
+
+                      <div class="modal fade" id="modalRecuPaiement" tabindex="-1" role="dialog" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                          
+                          <div class="modal-content">
+
+                              <div class="modal-header">
+                                <h5 class="modal-title">Assistant impression du reçu de paiement</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
+                                  <span aria-hidden="true">&times;</span>
+                                </button>
+                              </div>
+
+                              <div class="modal-body">
+                                  <div class="form-group">
+                                    <label for="modal_nom_tranche">Tranche payée<strong style="color:red;font-weight: bold;">*</strong></label>
+                                    <select id="modal_nom_tranche" class="form-control">
+                                      <option value="" selected>Sélectionnez</option>
+                                      {% for tranche in tranche_paye %}
+                                      <option value="{{tranche.0}}">{{tranche.1}}</option>
                                       {% endfor %}
+                                    </select>
+                                  </div>
+                                  <div class="form-group">
+                                    <label for="modal_montant_paye">Montant payé<strong style="color:red;font-weight: bold;">*</strong></label>
+                                    <input type="number" step="0.01" min="0" id="modal_montant_paye" class="form-control" placeholder="Montant payé">
+                                  </div>
+                                  <div id="modal_erreur" class="text-danger" style="display:none;"></div>
+                              </div>
+
+                              <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                                <button type="button" class="btn btn-primary" id="btnGenererRecu">
+                                    Imprimer <i class="fa fa-print"></i>
+                                </button>
+                              </div>
+                          </div>
+
+                         </div>
+                      </div>
 
                     </tbody>
                     <tfoot>
@@ -807,11 +854,11 @@
             </table>
 
             <div class="row mt-3 mb-2">
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="form-group">
                         <label for="id_total_t1">Total première tranche</label>
                         {% if total_tranche1 %}
-                        <input type="text" id="id_total_t1" name="total_tranche1" value="{{ total_tranche1 }}" class="form-control" readonly style="color:red">
+                        <input type="text" id="id_total_t1" name="total_tranche1" value="{{ total_tranche1|floatformat:'2g' }}" class="form-control" readonly style="color:red">
                         {% else %}
                         <input type="text" id="id_total_t1" name="total_tranche1" value="0" class="form-control" readonly style="color:red">
                         {% endif %}
@@ -819,22 +866,33 @@
                 </div>
            
 
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="form-group">
                         <label for="id_total_t2">Total deuxième tranche</label>
                         {% if total_tranche2 %}
-                        <input type="text" id="id_total_t2" name="total_tranche2" value="{{ total_tranche2 }}" class="form-control" readonly style="color:red">
+                        <input type="text" id="id_total_t2" name="total_tranche2" value="{{ total_tranche2|floatformat:'2g' }}" class="form-control" readonly style="color:red">
                         {% else %}
                         <input type="text" id="id_total_t2" name="total_tranche2" value="0" class="form-control" readonly style="color:red">
                         {% endif %}
                     </div>
                 </div>
 
-                <div class="col-md-4">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="id_total_annuel">Total paiement annuel</label>
+                        {% if total_paiement_annuel %}
+                        <input type="text" id="id_total_annuel" name="total_paie_annuel" value="{{ total_paiement_annuel|floatformat:'2g' }}" class="form-control" readonly style="color:red;">
+                        {% else %}
+                        <input type="text" id="id_total_annuel" name="total_paie_annuel" value="0" class="form-control" readonly style="color:red;">
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="col-md-3">
                     <div class="form-group">
                         <label for="id_total_reste">Total reliquat</label>
                         {% if total_reste_a_payer %}
-                        <input type="text" id="id_total_reste" name="total_reste_a_payer" value="{{ total_reste_a_payer }}" class="form-control" readonly style="color:red;">
+                        <input type="text" id="id_total_reste" name="total_reste_a_payer" value="{{ total_reste_a_payer|floatformat:'2g' }}" class="form-control" readonly style="color:red;">
                         {% else %}
                         <input type="text" id="id_total_reste" name="total_reste_a_payer" value="0" class="form-control" readonly style="color:red;">
                         {% endif %}
@@ -911,7 +969,7 @@
                     </thead>
                     <tbody>
                     
-                        {% for le in listepaiementclasse %}
+                        {% for lp in listepaiementclasse %}
                                           <tr>
                                               
                                               <td>{{lp.mateleve.matricule}}</td>
@@ -937,12 +995,61 @@
                                                   <a class="btn btn-primary" href="{% url 'detailspaiement' lp.id %}" title="Voir/Afficher"><i class="fa fa-eye fa-sm"></i></a>
                                                   <a class="btn btn-info" href="{% url 'editionpaiement' lp.id %}" title="Modifier/Editer"><i class="fa fa-edit fa-sm"></i></a>
                                                   <a class="btn btn-danger" href=" {% url 'supprimerpaiement' lp.id %}" title="Supprimer"><i class="fa fa-remove fa-sm"></i></a>
-                                                  <a class="btn btn-secondary" target="_blank" href="#" title="Imprimer le recu de scolarité"><i class="fa fa-print fa-sm"></i></a>
+
+                                                  <button type="button" class="btn btn-secondary btn-recu"
+                                                          data-idetat="{{lp.id}}" title="Imprimer le recu de paiement de scolarité"
+                                                          data-toggle="modal"
+                                                          data-target="#modalRecuPaiement">
+                                                      <i class="fa fa-print fa-sm"></i>
+                                                  </button>
+                                    
                                               </td>
 
                                           </tr>
 
+                        {% endfor %}
+
+
+                        <div class="modal fade" id="modalRecuPaiement" tabindex="-1" role="dialog" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                          
+                          <div class="modal-content">
+
+                              <div class="modal-header">
+                                <h5 class="modal-title">Assistant impression du reçu de paiement</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
+                                  <span aria-hidden="true">&times;</span>
+                                </button>
+                              </div>
+
+                              <div class="modal-body">
+                                  <div class="form-group">
+                                    <label for="modal_nom_tranche">Tranche payée<strong style="color:red; font-weight: bold;">*</strong></label>
+                                    <select id="modal_nom_tranche" class="form-control">
+                                      <option value="" selected>Sélectionnez</option>
+                                      {% for tranche in tranche_paye %}
+                                      <option value="{{tranche.0}}">{{tranche.1}}</option>
                                       {% endfor %}
+                                    </select>
+                                  </div>
+                                  <div class="form-group">
+                                    <label for="modal_montant_paye">Montant payé<strong style="color:red; font-weight: bold;">*</strong></label>
+                                    <input type="number" step="0.01" min="0" id="modal_montant_paye" class="form-control" placeholder="Montant payé">
+                                  </div>
+                                  <div id="modal_erreur" class="text-danger" style="display:none;"></div>
+                              </div>
+
+                              <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                                <button type="button" class="btn btn-primary" id="btnGenererRecu">
+                                    Imprimer <i class="fa fa-print"></i>
+                                </button>
+                              </div>
+                          </div>
+
+                         </div>
+                      </div>
+                        
 
                     </tbody>
                     <tfoot>
@@ -971,11 +1078,11 @@
             </table>
 
             <div class="row mt-3 mb-2">
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="form-group">
                         <label for="id_total_t1">Total première tranche</label>
                         {% if total_tranche1 %}
-                        <input type="text" id="id_total_t1" name="total_tranche1" value="{{ total_tranche1 }}" class="form-control" readonly style="color:red">
+                        <input type="text" id="id_total_t1" name="total_tranche1" value="{{ total_tranche1|floatformat:'2g' }}" class="form-control" readonly style="color:red">
                         {% else %}
                         <input type="text" id="id_total_t1" name="total_tranche1" value="0" class="form-control" readonly style="color:red">
                         {% endif %}
@@ -983,22 +1090,33 @@
                 </div>
            
 
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="form-group">
                         <label for="id_total_t2">Total deuxième tranche</label>
                         {% if total_tranche2 %}
-                        <input type="text" id="id_total_t2" name="total_tranche2" value="{{ total_tranche2 }}" class="form-control" readonly style="color:red">
+                        <input type="text" id="id_total_t2" name="total_tranche2" value="{{ total_tranche2|floatformat:'2g' }}" class="form-control" readonly style="color:red">
                         {% else %}
                         <input type="text" id="id_total_t2" name="total_tranche2" value="0" class="form-control" readonly style="color:red">
                         {% endif %}
                     </div>
                 </div>
 
-                <div class="col-md-4">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="id_total_paie_annuel">Total paiement annuel</label>
+                        {% if total_paiement_annuel %}
+                        <input type="text" id="id_total_paie_annuel" name="total_paiement_annuel" value="{{ total_paiement_annuel|floatformat:'2g' }}" class="form-control" readonly style="color:red;">
+                        {% else %}
+                        <input type="text" id="id_total_paie_annuel" name="total_paiement_annuel" value="0" class="form-control" readonly style="color:red;">
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="col-md-3">
                     <div class="form-group">
                         <label for="id_total_reste">Total reliquat</label>
                         {% if total_reste_a_payer %}
-                        <input type="text" id="id_total_reste" name="total_reste_a_payer" value="{{ total_reste_a_payer }}" class="form-control" readonly style="color:red;">
+                        <input type="text" id="id_total_reste" name="total_reste_a_payer" value="{{ total_reste_a_payer|floatformat:'2g' }}" class="form-control" readonly style="color:red;">
                         {% else %}
                         <input type="text" id="id_total_reste" name="total_reste_a_payer" value="0" class="form-control" readonly style="color:red;">
                         {% endif %}
@@ -1169,6 +1287,37 @@
     // Cette fonction me permet d'afficher le tableau d'affichage auparavant masqué lors du chargement
   $("#btn_rechercher").click(function(){
     $('#listepaieclasse').show();
+  });
+
+  // Mémorise l'idetat de la ligne qui a ouvert la pop-up
+  var idetatCourant = null;
+
+  $(document).on("click", ".btn-recu", function(){
+      idetatCourant = $(this).data("idetat");
+      $("#modal_nom_tranche").val("");
+      $("#modal_montant_paye").val("");
+      $("#modal_erreur").hide();
+  });
+
+  // URL "modèle" générée par Django, avec des valeurs bidon à remplacer côté JS
+  var urlRecu = "{% url 'imprimerecuscolarite' idetat=999999 nom_tranche='TRANCHE_PLACEHOLDER' mont_paye='MONTANT_PLACEHOLDER' %}";
+
+  $("#btnGenererRecu").click(function(){
+      var tranche = $("#modal_nom_tranche").val();
+      var montant = $("#modal_montant_paye").val();
+
+      if (!tranche || !montant) {
+          $("#modal_erreur").text("Veuillez sélectionner la tranche et saisir le montant payé.").show();
+          return;
+      }
+
+      var url = urlRecu
+          .replace("999999", idetatCourant)
+          .replace("TRANCHE_PLACEHOLDER", encodeURIComponent(tranche))
+          .replace("MONTANT_PLACEHOLDER", encodeURIComponent(montant));
+
+      window.open(url, "_blank");   // ouvre le reçu dans un nouvel onglet, comme le target="_blank" d'origine
+      $("#modalRecuPaiement").modal("hide");
   });
 
 </script> 

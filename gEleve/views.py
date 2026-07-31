@@ -163,6 +163,7 @@ def enregistrereleve(request):
                 # Ici je vais enregistrer les frais d'inscription de l'élève dans son etat de paiement de la scolarité
                 etatscol = EtatPaiementTranche()
                 etatscol.anneescolaire = an
+                etatscol.idcycle = cy
                 etatscol.idclasse = cl
                 etatscol.mateleve = el
                 etatscol.inscription = Decimal(frais)
@@ -551,7 +552,7 @@ def recuinscription(request, idinsc):
             p.drawString(450, 510 + y_offset,
                 datetime.now().strftime('%d/%m/%Y'))
             p.drawString(120, 475 + y_offset, 'Le Parent')
-            p.drawString(375, 475 + y_offset, 'La Comptabilité')
+            p.drawString(375, 475 + y_offset, 'Le Service Scolarité')
             p.drawString(375, 435 + y_offset, str(data_ecole[8]))
 
         # ── PREMIER EXEMPLAIRE ──
@@ -871,7 +872,7 @@ def recureinscription(request, idinsc):
             p.drawString(450, 510 + y_offset,
                 datetime.now().strftime('%d/%m/%Y'))
             p.drawString(120, 475 + y_offset, 'Le Parent')
-            p.drawString(375, 475 + y_offset, 'La Comptabilité')
+            p.drawString(375, 475 + y_offset, 'Le Service Scolarité')
             p.drawString(375, 435 + y_offset, str(data_ecole[8]))
 
         # ── PREMIER EXEMPLAIRE ──

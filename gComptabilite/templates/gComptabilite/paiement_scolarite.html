@@ -18,7 +18,7 @@
                     <div class="row g-3">
                         <div class="col-md-3">
                             <div class="form-group">
-                              <label for="cboanne">Année scolaire<strong style="color:red">*</strong></label>
+                              <label for="cboanne">Année scolaire<strong style="color:red; font-weight: bold;">*</strong></label>
                               <select class="form-control" name="annee_scolaire" id="cboanne" required title="Sélectionnez l'année scolaire">
                                   <option value="" selected>Sélectionnez</option>
                                     {% for an in ans %}
@@ -30,7 +30,7 @@
 
                         <div class="col-md-3">
                           <div class="form-group">
-                              <label for="cbocycle">Cycle<strong style="color:red">*</strong></label>
+                              <label for="cbocycle">Cycle<strong style="color:red; font-weight:bold;">*</strong></label>
                               <select class="form-control" name="cycle" id="cbocycle" required title="Sélectionnez le cycle de l'élève">
                                   <option value="" selected>Sélectionnez</option>
                                   {% for cl in cycles %}
@@ -42,7 +42,7 @@
 
                         <div class="col-md-6">
                           <div class="form-group">
-                              <label for="cboclasse">Classe<strong style="color:red">*</strong></label>
+                              <label for="cboclasse">Classe<strong style="color:red; font-weight: bold;">*</strong></label>
                               <select class="form-control" name="classe" id="cboclasse" required title="Sélectionnez sa classe">
                                 <option value="" selected>Sélectionnez</option>
                               </select>
@@ -54,7 +54,7 @@
                     <div class="row g-3">
                         <div class="col-md-6">
                             <div class="form-group">
-                                  <label for="cbomateleve">Elève<strong style="color:red">*</strong></label>
+                                  <label for="cbomateleve">Elève<strong style="color:red; font-weight: bold;">*</strong></label>
                                   <select class="form-control" name="matricule" id="cbomateleve" required title="Sélectionnez l'élève ayant effectué le paiement">
                                     <option value="" selected>Sélectionnez</option>
                                   </select>
@@ -135,14 +135,14 @@
 
                         <div class="col-md-3">
                             <div class="form-group">
-                                <label for="id_date_paie">Date paiement<strong style="color:red">*</strong></label>
+                                <label for="id_date_paie">Date paiement<strong style="color:red; font-weight: bold;">*</strong></label>
                                 <input type="date" class="form-control" id="id_date_paie" name="date_paiement" required title="Sélectionnez la date de paiement">
                             </div>
                         </div>
 
                         <div class="col-md-3">
                             <div class="form-group">
-                                <label for="id_tranche_paye">Tranche payée<strong style="color:red">*</strong></label>
+                                <label for="id_tranche_paye">Tranche payée<strong style="color:red; font-weight: bold;">*</strong></label>
                                 <select id="id_tranche_paye" name="cbo_tranche_paye" class="form-control" required title="Sélectionnez la tranche à payer">
                                     <option value="" selected>Sélectionnez</option>
                                     {% for tranche in tranche_paye %}
@@ -154,7 +154,7 @@
 
                         <div class="col-md-3">
                             <div class="form-group">
-                                <label for="id_montant_paye">Montant payé<strong style="color:red">*</strong></label>
+                                <label for="id_montant_paye">Montant payé<strong style="color:red; font-weight: bold;">*</strong></label>
                                 <input type="number" id="id_montant_paye" name="montant_paye" class="form-control" required title="Saisissez le montant payé dans la tranche indiquée">
                             </div>
                         </div>

@@ -1,13 +1,14 @@
 {% extends "base.html" %}
-{% block titre_page %} CONSULTATION {% endblock %}
-{% block titre_formulaire %} DETAILS D'UN PAIEMENT DE SCOLARITE {% endblock %}
+{% block titre_page %} MIS A JOUR {% endblock %}
+{% block titre_formulaire %} EDITION D'UN PAIEMENT DE SCOLARITE {% endblock %}
 {% block titre_cadre %}
 INFORMATIONS SUR LE PAIEMENT
 {% endblock %}
+{% load static %}
 
 {% block formulaire %}
 
-   <form class="needs-validation" action="" method="post" id="fscolarite" data-classe-url="{% url 'chargerlisteclassepaie' %}" data-eleve-classe-url="{% url 'chargerlisteelevepaie' %}">
+   <form class="needs-validation" action="{% url 'modifierpaiement' paie.id %}" method="post" id="fscolarite" data-classe-url="{% url 'chargerlisteclassepaie' %}" data-eleve-classe-url="{% url 'chargerlisteelevepaie' %}">
 
                 {% csrf_token %}
 
@@ -103,7 +104,7 @@ INFORMATIONS SUR LE PAIEMENT
                     <div class="col-md-3">
                         <div class="form-group">
                             <label for="id_date_paie">Date paiement</label>
-                            <input type="text" name="date_paiement" id="id_date_paie" value="{{paie.date_paie|date:'j-n-Y'}}" class="form-control">
+                            <input type="text" name="date_paiement" id="id_date_paie" value="{{paie.date_paie|date:'Y-n-j'}}" class="form-control">
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -130,7 +131,7 @@ INFORMATIONS SUR LE PAIEMENT
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="id_montant_annuel">Paiement annuel</label>
-                            <input type="text" id="id_montant_annuel" name="frais_scolarite" class="form-control" readonly value="{{paie.fscolarite|floatformat:'2g'}}" title="Affiche le montant annuel de la scolarité" style="color:red; font-weight:bold; font-size:12pt;">
+                            <input type="text" id="id_montant_annuel" name="frais_scolarite" class="form-control" readonly title="Affiche le montant annuel de la scolarité" style="color:red; font-weight:bold; font-size:12pt;">
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -148,11 +149,12 @@ INFORMATIONS SUR LE PAIEMENT
 
                 </div>
                     
+            </div>
             
-            
-              <div class="card-footer text-center">
-                    <a href="{% url 'listepaiemensuel' %}" target="_self" class="btn btn-primary btn-md">Retour &nbsp;<i class="fa fa-arrow-circle-left"></i></a>
-              </div>
+            <div class="card-footer text-center">
+            <button type="submit" class="btn btn-success btn-md">Modifier &nbsp;<i class="fa fa-edit"></i></button>
+            <a href="{% url 'listepaiemensuel' %}" target="_self" class="btn btn-primary btn-md">Retour &nbsp;<i class="fa fa-arrow-circle-left"></i></a>
+            </div>
 
    </form>
 
@@ -254,22 +256,64 @@ INFORMATIONS SUR LE PAIEMENT
             if (tranche === "Premiere tranche") {
                 // 1ère tranche sélectionnée -> on active uniquement ce champ
                 $premiere.prop("readonly", false);
+                $deuxieme.prop("readonly",true); // On maintient le champ deuxième tranche en readonly
+
             } else if (tranche === "Deuxieme tranche") {
                 // 2ème tranche sélectionnée -> on active uniquement ce champ
                 $deuxieme.prop("readonly", false);
+                $premiere.prop("readonly",true); // On maintient le champ première tranche en readonly
             }
-            // Si tranche === "" (Sélectionnez), les deux restent en readonly
+            else if(tranche === "Sélectionnez"){
+                 // Si tranche === "" (Sélectionnez), les deux restent en readonly
+                 $premiere.prop("readonly",true);
+                 $deuxieme.prop("readonly", true);
+            }
+           
     });
+
+    // Permet de convertir les montants affichés du texte en numerique pour eviter la troncature et faire une opération correcte dans la fonction calculerScolarite
+    function nettoyerMontant(valeur) {
+
+        if (!valeur) return 0;
+        var str = valeur.toString().trim();
+
+        var lastComma = str.lastIndexOf(",");
+        var lastDot = str.lastIndexOf(".");
+
+        if (lastComma > -1 && lastDot > -1) {
+            // Les deux séparateurs présents : le dernier rencontré est forcément le décimal
+            if (lastComma > lastDot) {
+                // 300.000,00 -> format français
+                str = str.replace(/\./g, "").replace(",", ".");
+            } else {
+                // 300,000.00 -> format anglo-saxon
+                str = str.replace(/,/g, "");
+            }
+        } else if (lastComma > -1) {
+            // Seule la virgule présente : décimale si 1-2 chiffres après, sinon milliers
+            var decimales = str.length - lastComma - 1;
+            str = decimales <= 2 ? str.replace(",", ".") : str.replace(/,/g, "");
+        } else if (lastDot > -1) {
+            // Seul le point présent : décimale si 1-2 chiffres après, sinon milliers
+            var decimales2 = str.length - lastDot - 1;
+            if (decimales2 > 2) {
+                str = str.replace(/\./g, "");
+            }
+            // sinon : déjà un point décimal valide, on ne touche à rien
+        }
+
+        return parseFloat(str) || 0;
+    }
 
     function calculerScolarite() {
             // Récupération des valeurs, en gérant les champs vides ou non numériques
-            var inscription = parseFloat($("#id_montant_inscription").val()) || 0;
-            var premiereTranche = parseFloat($("#id_montant_premiere_tranche").val()) || 0;
-            var deuxiemeTranche = parseFloat($("#id_montant_deuxieme_tranche").val()) || 0;
+            var inscription = nettoyerMontant($("#id_montant_inscription").val());
+            var premiereTranche = nettoyerMontant($("#id_montant_premiere_tranche").val());
+            var deuxiemeTranche = nettoyerMontant($("#id_montant_deuxieme_tranche").val());
 
             var total = inscription + premiereTranche + deuxiemeTranche;
 
-            $("#id_montant_annuel").val(total);
+            $("#id_montant_annuel").val(total.toFixed(2));
         }
 
         // Recalcul à chaque saisie (au fur et à mesure que l'utilisateur tape)

@@ -72,7 +72,7 @@ INFORMATIONS SUR LE PAIEMENT
                     <div class="col-md-3">
                         <div class="form-group">
                             <label for="id_date_paie">Date paiement</label>
-                            <input type="text" name="date_paiement" id="id_date_paie" value="{{paie.date_paie|date:'j-n-Y'}}" class="form-control" readonly>
+                            <input type="text" name="date_paiement" id="id_date_paie" value="{{paie.date_paie|date:'Y-n-j'}}" class="form-control" readonly>
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -111,7 +111,7 @@ INFORMATIONS SUR LE PAIEMENT
                     <div class="col-md-3">
                         <div class="form-group">
                             <label for="id_montant_remise">Montant de la remise</label>
-                            <input type="number" id="id_montant_remise" name="montant_remise" class="form-control" value="{{paie.m_rabais|floatformat:'2g'}}" title="Saisissez le montant de la remise accordée s'il y en a">
+                            <input type="number" id="id_montant_remise" name="montant_remise" class="form-control" value="{{paie.m_rabais|floatformat:'2g'}}" title="Saisissez le montant de la remise accordée s'il y en a" readonly>
                         </div>
                     </div>
 

@@ -524,7 +524,7 @@ def reformater_montant(valeur):
     montant_a_reformater = montant_a_reformater.replace(',','.') # remplace la virgule par les points.
     return Decimal(montant_a_reformater)
 
-
+erreur = None
 # Fonction permettant de valider le paiement de la scolarite
 def validerpaiementscolarite(request):
 
@@ -538,6 +538,7 @@ def validerpaiementscolarite(request):
     fscol = 0
     annee = {}
     cycle = {}
+    global erreur
 
     annee = AnneeScolaire.objects.none()
     cycle = CycleScolaire.objects.none()
@@ -567,109 +568,85 @@ def validerpaiementscolarite(request):
         fannuel = cls.frais_scolarite
 
         etatpaie = EtatPaiementTranche.objects.get(mateleve=matel.matricule) # matel.matricule car matel renvoi les données du str de la classe Eleve au lieu de matricule seulement
-               
+
+        etatpaie.anneescolaire = anes
+        etatpaie.idclasse = cls
+        etatpaie.mateleve = matel
+        etatpaie.idcycle = cy
+        etatpaie.date_paie = request.POST['date_paiement'] 
+
+        erreur = False     
+
+                       
         if nom_tranche == DEUX_TRANCHES_CHOICES[0][0]: # Permet de verifier la première tranche
             
-            if p_tranche < t1: # Je verifie que le montant de la première tranche payée est inférieur au montant de la tranche 1 défini dans la table classe
-                
-                etatpaie.anneescolaire = anes
-                etatpaie.idclasse = cls
-                etatpaie.mateleve = matel
-                etatpaie.idcycle = cy
-                etatpaie.date_paie = request.POST['date_paiement']                
+            if p_tranche < t1: # Je verifie que le montant de la première tranche payée est inférieur au montant de la tranche 1 défini dans la table classe                                        
                 etatpaie.premiere_tranche = p_tranche + mont_paye # Le montant de la première tranche sera égal au montant initial payé + le nouveau montant payé pour cette tranche 
-
-                fscol = (etatpaie.premiere_tranche + etatpaie.deuxieme_tranche)- mremise # Permet de calculer le paiement total effectué par l'élève
-                etatpaie.fscolarite = fscol
-                etatpaie.reste_a_payer = fannuel - fscol # Le reste à payer annuel est le montant annuel dû moins le total de ses paiements
-                etatpaie.m_rabais = mremise
-                etatpaie.save()
-
-                solde_dispo= Decimal(affichersoldecaisse())
-                # Je vais enregistrer ensuite l'opération dans la table caisse
-                cais = Caisse()
-                cais.type_operation = TYPE_OPERATION_CAISSE_CHOICES[1][1]
-                cais.libelle_operation = 'Paiement des frais de scolarité de l\'élève:  {},  {} , {} '.format(
-                    matel.matricule, matel.nom, matel.prenom)
-                cais.montant_encaisse = Decimal(mont_paye)
-                cais.anscolaire = anes
-                cais.categ_depense = CATEGORIE_RECETTE_CHOICES[1][1]
-                cais.solde_actuel = Decimal(solde_dispo) + Decimal(mont_paye)
-                cais.date_operation = request.POST['date_paiement']
-                cais.save()
-
-                messages.success(request,'Paiement validé avec succès !!!')
-
-                # Ici je vais enregistrer l'evenement dans la table Historique
-                his = Historique()
-                his.nature_operation = CATEGORIE_RECETTE_CHOICES[1][1]
-                his.detail_operation = 'Paiement des frais de scolarité de l\'élève:  {},  {} , {} '.format(
-                    matel.matricule, matel.nom, matel.prenom)
-                his.user_login = 'contact@universtechgroup.com'
-                his.save()
-
-                # Génération du reçu de paiement de la scolarité
-                idetat = etatpaie.id
-                return HttpResponseRedirect(reverse('recupaiementscolarite',args=(idetat,nom_tranche,str(mont_paye),)))
 
             else:
                 messages.error(request,'La première tranche est déjà complète. Veuillez passer à la seconde tranche !!!')
+                erreur = True
+                
         
         elif nom_tranche == DEUX_TRANCHES_CHOICES[1][0]: # Permet de vérifier la deuxième tranche
+
             if p_tranche < t1: # Je verifie ici si la première tranche n'est pas bouclée alors je renvoie une alerte pour completer celle-ci
                 messages.error(request,'Vous devez finaliser le paiement de la première tranche avant de passer à la suivante')
+                erreur = True
             else:
                 if d_tranche < t2:
-
-                    etatpaie.anneescolaire = anes
-                    etatpaie.idclasse = cls
-                    etatpaie.mateleve = matel
-                    etatpaie.idcycle = cy
-                    etatpaie.date_paie = request.POST['date_paiement'] 
                     etatpaie.deuxieme_tranche = d_tranche + mont_paye # Le montant de la deuxième tranche sera égal au montant initial payé + le nouveau montant payé pour cette tranche
-
-                    fscol = (etatpaie.premiere_tranche + etatpaie.deuxieme_tranche)- mremise # Permet de calculer le paiement total effectué par l'élève
-                    etatpaie.fscolarite = fscol
-                    etatpaie.reste_a_payer = fannuel - fscol # Le reste à payer annuel est le montant annuel dû moins le total de ses paiements
-                    etatpaie.m_rabais = mremise
-                    etatpaie.save()
-
-                    solde_dispo= Decimal(affichersoldecaisse())
-                    # Je vais enregistrer ensuite l'opération dans la table caisse
-                    cais = Caisse()
-                    cais.type_operation = TYPE_OPERATION_CAISSE_CHOICES[1][1]
-                    cais.libelle_operation = 'Paiement des frais de scolarité de l\'élève:  {},  {} , {} '.format(
-                        matel.matricule, matel.nom, matel.prenom)
-                    cais.montant_encaisse = Decimal(mont_paye)
-                    cais.anscolaire = anes
-                    cais.categ_depense = CATEGORIE_RECETTE_CHOICES[1][1]
-                    cais.solde_actuel = Decimal(solde_dispo) + Decimal(mont_paye)
-                    cais.date_operation = request.POST['date_paiement']
-                    cais.save()
-
-                    messages.success(request,'Paiement validé avec succès !!!')
-
-                    # Ici je vais enregistrer l'evenement dans la table Historique
-                    his = Historique()
-                    his.nature_operation = CATEGORIE_RECETTE_CHOICES[1][1]
-                    his.detail_operation = 'Paiement des frais de scolarité de l\'élève:  {},  {} , {} '.format(
-                        matel.matricule, matel.nom, matel.prenom)
-                    his.user_login = 'contact@universtechgroup.com'
-                    his.save()
-
-                    # Génération du reçu de paiement de la scolarité
-                    idetat = etatpaie.id
-                    return HttpResponseRedirect(reverse('recupaiementscolarite',args=(idetat,nom_tranche,str(mont_paye),)))
 
                 else:
                     messages.error(request,'La scolarité est déjà complète!! cet élève ne doit plus rien pour cette année scolaire')
-        
-        
+                    erreur = True
 
-        annee = AnneeScolaire.objects.all().order_by('id')
-        cycle = CycleScolaire.objects.all().order_by('id')
-
+        if not erreur: # Si aucun message d'erreur ne s'affiche, alors on enregistre le paiement
+            annee = AnneeScolaire.objects.all().order_by('id')
+            cycle = CycleScolaire.objects.all().order_by('id')
             
+            fscol = (etatpaie.premiere_tranche + etatpaie.deuxieme_tranche) # Permet de calculer le paiement total effectué par l'élève
+            etatpaie.fscolarite = fscol
+
+            if mremise:
+                etatpaie.reste_a_payer = (fannuel - fscol)- mremise # Le reste à payer annuel est le montant annuel dû moins le total de ses paiements oté de la remise s'il existe
+                etatpaie.m_rabais = mremise
+            else:
+                etatpaie.reste_a_payer = fannuel - fscol
+
+            etatpaie.save()
+
+            solde_dispo= Decimal(affichersoldecaisse())
+            # Je vais enregistrer ensuite l'opération dans la table caisse
+            cais = Caisse()
+            cais.type_operation = TYPE_OPERATION_CAISSE_CHOICES[1][1]
+            cais.libelle_operation = 'Paiement des frais de scolarité de l\'élève:  {},  {} , {} '.format(
+                matel.matricule, matel.nom, matel.prenom)
+            cais.montant_encaisse = Decimal(mont_paye)
+            cais.anscolaire = anes
+            cais.categ_depense = CATEGORIE_RECETTE_CHOICES[1][1]
+            cais.solde_actuel = Decimal(solde_dispo) + Decimal(mont_paye)
+            cais.date_operation = request.POST['date_paiement']
+            cais.save()
+
+            messages.success(request,'Paiement validé avec succès !!!')
+
+            # Ici je vais enregistrer l'evenement dans la table Historique
+            his = Historique()
+            his.nature_operation = CATEGORIE_RECETTE_CHOICES[1][1]
+            his.detail_operation = 'Paiement des frais de scolarité de l\'élève:  {},  {} , {} '.format(
+                matel.matricule, matel.nom, matel.prenom)
+            his.user_login = 'contact@universtechgroup.com'
+            his.save()
+
+            # Génération du reçu de paiement de la scolarité
+            idetat = etatpaie.id
+            return HttpResponseRedirect(reverse('recupaiementscolarite',args=(idetat,nom_tranche,str(mont_paye),)))
+
+        else: # Si un message d'erreur s'affiche, on recharge les données de base
+            annee = AnneeScolaire.objects.all().order_by('id')
+            cycle = CycleScolaire.objects.all().order_by('id')
+   
     else:
         annee = AnneeScolaire.objects.all().order_by('id')
         cycle = CycleScolaire.objects.all().order_by('id')    
@@ -707,7 +684,12 @@ def recupaiementscolarite(request, idetat, nom_tranche, mont_paye):
             montant_tranche = etatpaie.idclasse.tranche2
 
         montant_paye     = Decimal(mont_paye)
-        reste_a_payer     = montant_tranche - (etatpaie.fscolarite + montant_paye)
+
+        if etatpaie.m_rabais:
+            reste_a_payer     = (montant_tranche - montant_paye)-etatpaie.m_rabais
+        else:
+            reste_a_payer     = montant_tranche - montant_paye
+
         montant_tranche_formate   = '{:,} GNF'.format(montant_tranche)
         montant_paye_formate = '{:,} GNF'.format(montant_paye)
         reste_formate     = '{:,} GNF'.format(reste_a_payer)
@@ -882,7 +864,7 @@ def recupaiementscolarite(request, idetat, nom_tranche, mont_paye):
             p.setFont('Helvetica-Bold', 11)
             p.drawString(375, 510 + y_offset, 'Conakry, le ')
             p.drawString(450, 510 + y_offset, datetime.now().strftime('%d/%m/%Y'))
-            p.drawString(375, 475 + y_offset, 'La Comptabilité')
+            p.drawString(375, 475 + y_offset, 'Le Service Scolarité')
             p.drawString(375, 435 + y_offset, str(data_ecole[8]))
 
         # ── PREMIER EXEMPLAIRE ──
@@ -935,10 +917,12 @@ def listepaiementmensuel(request):
     t_premiere_tranche = {}
     t_deuxieme_tranche = {}
     t_reste_a_payer = {}
+    t_paiement_annuel = {}
 
     total_tranche1 = 0
     total_tranche2 = 0
     total_reste_a_payer = 0
+    total_paiement_annuel = 0
 
     anne = AnneeScolaire.objects.none()
     cy = CycleScolaire.objects.none()
@@ -951,6 +935,7 @@ def listepaiementmensuel(request):
     t_premiere_tranche = EtatPaiementTranche.objects.filter(date_paie__month=mois_actuel).aggregate(pt=Sum('premiere_tranche')) # pt correspond à la clé du dictionnaire resultant de la requếte
     t_deuxieme_tranche = EtatPaiementTranche.objects.filter(date_paie__month=mois_actuel).aggregate(dt=Sum('deuxieme_tranche')) # dt de même
     t_reste_a_payer = EtatPaiementTranche.objects.filter(date_paie__month=mois_actuel).aggregate(tr=Sum('reste_a_payer'))
+    t_paiement_annuel = EtatPaiementTranche.objects.filter(date_paie__month=mois_actuel).aggregate(ta=Sum('fscolarite')) # ta est ici la clé du dictionnaire correspondant au total des paiements annuels
 
     if t_premiere_tranche['pt'] is not None:
         total_tranche1 = t_premiere_tranche['pt']
@@ -966,6 +951,11 @@ def listepaiementmensuel(request):
         total_reste_a_payer = t_reste_a_payer['tr']
     else:
         total_reste_a_payer = 0
+
+    if t_paiement_annuel['ta'] is not None:
+        total_paiement_annuel = t_paiement_annuel['ta']
+    else:
+        total_paiement_annuel = 0
     
 
     anne = AnneeScolaire.objects.all().order_by('id')
@@ -975,7 +965,7 @@ def listepaiementmensuel(request):
     numpagepaie = request.GET.get('page')
     listepaiemensuel = paginepaie.get_page(numpagepaie)
 
-    return render(request,'gComptabilite/liste_etat_paiement_scolarite.html',dict(ans=anne, cycles=cy, listepaiementmensuel=listepaiemensuel, total_tranche1=total_tranche1, total_tranche2=total_tranche2, total_reste_a_payer=total_reste_a_payer))
+    return render(request,'gComptabilite/liste_etat_paiement_scolarite.html',dict(ans=anne, cycles=cy, listepaiementmensuel=listepaiemensuel, total_tranche1=total_tranche1, total_tranche2=total_tranche2, total_reste_a_payer=total_reste_a_payer, tranche_paye=DEUX_TRANCHES_CHOICES, total_paiement_annuel=total_paiement_annuel))
 
 
 def filtrelistepaiementclasse(request):
@@ -988,10 +978,12 @@ def filtrelistepaiementclasse(request):
     t_premiere_tranche = {}
     t_deuxieme_tranche = {}
     t_reste_a_payer = {}
+    t_paiement_annuel = {}
 
     total_tranche1 = 0
     total_tranche2 = 0
     total_reste_a_payer = 0
+    total_paiement_annuel = 0
 
     an = AnneeScolaire.objects.none()
     cy = CycleScolaire.objects.none()
@@ -1007,6 +999,8 @@ def filtrelistepaiementclasse(request):
 
     t_reste_a_payer = EtatPaiementTranche.objects.select_related('anneescolaire','mateleve','idclasse','idcycle').filter(Q(anneescolaire__exact=anne),Q(idclasse__exact=clas)).aggregate(tr=Sum('reste_a_payer'))
 
+    t_paiement_annuel = EtatPaiementTranche.objects.select_related('anneescolaire','mateleve','idclasse','idcycle').filter(Q(anneescolaire__exact=anne),Q(idclasse__exact=clas)).aggregate(ta=Sum('fscolarite'))
+
     if t_premiere_tranche['pt'] is not None:
         total_tranche1 = t_premiere_tranche['pt']
     else:
@@ -1022,6 +1016,11 @@ def filtrelistepaiementclasse(request):
     else:
         total_reste_a_payer = 0
 
+    if t_paiement_annuel['ta'] is not None:
+        total_paiement_annuel = t_paiement_annuel['ta']
+    else:
+        total_paiement_annuel = 0
+
     an = AnneeScolaire.objects.all().order_by('id')
     cy = CycleScolaire.objects.all().order_by('id')
 
@@ -1029,7 +1028,7 @@ def filtrelistepaiementclasse(request):
     numpagepaie = request.GET.get('page')
     listepaieclasse = paginepaie.get_page(numpagepaie)
 
-    return render(request,'gComptabilite/liste_etat_paiement_scolarite.html',{'listepaiementclasse':listepaieclasse, 'ans': an, 'cycles': cy, 'total_tranche1': total_tranche1, 'total_tranche2': total_tranche2, 'total_reste_a_payer': total_reste_a_payer})
+    return render(request,'gComptabilite/liste_etat_paiement_scolarite.html',{'listepaiementclasse':listepaieclasse, 'ans': an, 'cycles': cy, 'total_tranche1': total_tranche1, 'total_tranche2': total_tranche2, 'total_reste_a_payer': total_reste_a_payer, 'tranche_paye': DEUX_TRANCHES_CHOICES, 'total_paiement_annuel': total_paiement_annuel})
 
 def detailpaiementscolaire(request, idpaie):
     etatpaie = EtatPaiementTranche.objects.select_related('anneescolaire','mateleve','idclasse','idcycle').get(id=idpaie)
@@ -1037,7 +1036,68 @@ def detailpaiementscolaire(request, idpaie):
 
 def editerpaiementscolaire(request, idpaie):
     etatpaie = EtatPaiementTranche.objects.select_related('anneescolaire','mateleve','idclasse','idcycle').get(id=idpaie)
-    return render(request,'gComptabilite/modifier_paiement_scolaire.html',dict(paie=etatpaie, tranche_paye=DEUX_TRANCHES_CHOICES))
+    ans = AnneeScolaire.objects.all().order_by('id')
+    cy = CycleScolaire.objects.all().order_by('id')
+    return render(request,'gComptabilite/modifier_paiement_scolaire.html',dict(paie=etatpaie, tranche_paye=DEUX_TRANCHES_CHOICES, annee=ans, cycles=cy))
+
+
+def modifieretatpaiement(request, idpaie):
+
+    p_tranche = 0
+    d_tranche = 0
+    mremise = 0
+    fscol = 0
+
+    if request.method == 'POST':
+        etatpaie = EtatPaiementTranche.objects.get(id=idpaie)
+        ans = request.POST.get('annee_scolaire')
+        cycl = request.POST.get('cycle_scolaire')
+        clas = request.POST.get('classe')
+        mat = request.POST.get('matricule')
+        nom_tranche = request.POST.get('nom_tranche')
+        datepaie = request.POST.get('date_paiement')
+        mremise = reformater_montant(request.POST.get('montant_remise'))
+        
+
+        ane = AnneeScolaire.objects.get(id=ans)
+        cy = CycleScolaire.objects.get(id=cycl)
+        cl = Classe.objects.get(id=clas)
+        matel = Eleve.objects.get(matricule=mat)
+
+        etatpaie.anneescolaire = ane
+        etatpaie.idcycle = cy
+        etatpaie.idclasse = cl
+        etatpaie.mateleve = matel
+        etatpaie.date_paie = datetime.strptime(datepaie,'%Y-%m-%d')
+
+        # Je vais recuperer les frais de la première tranche et deuxième tranche ainsi que le frais de la scolarité dans la table Classe
+        fannuel = cl.frais_scolarite
+
+
+        if nom_tranche == DEUX_TRANCHES_CHOICES[0][0]: # Si c'est la premiere tranche qui est selectionnee
+
+            p_tranche = reformater_montant(request.POST.get('montant_premiere_tranche'))
+            etatpaie.premiere_tranche = p_tranche
+
+        elif nom_tranche == DEUX_TRANCHES_CHOICES[1][0]: # Si c'est la deuxieme tranche qui est selectionnee
+
+            d_tranche = reformater_montant(request.POST.get('montant_deuxieme_tranche'))
+            etatpaie.deuxieme_tranche = d_tranche
+
+
+        fscol = (etatpaie.premiere_tranche + etatpaie.deuxieme_tranche) # Permet de calculer le paiement total effectué par l'élève
+        etatpaie.fscolarite = fscol
+        etatpaie.reste_a_payer = (fannuel - fscol)- mremise # Le reste à payer annuel est le montant annuel dû moins le total de ses paiements oté de la remise
+        etatpaie.m_rabais = mremise
+        etatpaie.save()
+        
+
+        return redirect('../listepaiemensuel/')
+
+
+    else:
+        return redirect('../listepaiemensuel/')
+    
 
 def supprimerpaiementscolaire(request, idpaie):
     etatpaie = EtatPaiementTranche.objects.get(id=idpaie)

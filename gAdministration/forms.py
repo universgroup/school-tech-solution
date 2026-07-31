@@ -1,6 +1,7 @@
 from django import forms
 from django.forms import ModelForm
 from .models import *
+
 class FormCycle(ModelForm):
     class Meta:
         model = CycleScolaire
