@@ -28,6 +28,10 @@
 
     <!--begin::Third Party Plugin(Bootstrap Icons)-->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"/>
+
+    <!-- Ce style est mis pour les boutons d'exportation en excel et PDF de la datatable-->
+    <link rel="stylesheet" href="{% static 'assets/css/datatablesbuttons.css' %}">
+  
 </head>
 <body class="hold-transition sidebar-mini">
     
@@ -71,7 +75,7 @@
             <ul aria-labelledby="dropdownSubMenu3" class="dropdown-menu border-0 shadow">
               <li><a href="{% url 'chargeranneecourante' %}" class="dropdown-item">Inscription</a></li>
               <li><a href="{% url 'listereinscritsanneecourante' %}" class="dropdown-item">Reinscription</a></li>
-              <li><a href="#" class="dropdown-item">Etat des paiements</a></li>
+              <li><a href="{% url 'listepaiemensuel' %}" class="dropdown-item">Etat des paiements</a></li>
               <li><a href="#" class="dropdown-item">Etat des inscriptions/reinscriptions</a></li>
               <li><a href="#" class="dropdown-item">Liste des élèves par classe</a></li>
               <li><a href="{% url 'registrematricule' %}" class="dropdown-item">Registre de matriculation</a></li>
@@ -388,7 +392,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="#" class="nav-link" title="Permet de consulter l'état des paiements de la scolarité">
+                <a href="{% url 'listepaiemensuel' %}" class="nav-link" title="Permet de consulter l'état des paiements de la scolarité">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Etat des paiements &nbsp;</p>
                   <i class="fas fa-file-invoice-dollar"></i>
@@ -733,15 +737,15 @@
                                 <th>Prénom(s) & Nom Mère</th>
                                 <th>Prénom(s) & Nom Tuteur</th>
                                 <th>Contact père</th>
-                                <th>Contact mère</th>
+                                <th class="no-export">Contact mère</th>
                                 <th>Email père</th>
-                                <th>Email mère</th>
+                                <th class="no-export">Email mère</th>
                                 <th>Profession père</th>
-                                <th>Profession mère</th>
+                                <th class="no-export">Profession mère</th>
                                 <th>Personne contact</th>
                                 <th>Adresse</th>
-                                <th>Ecole d'origine</th>
-                                <th>Photo ID</th>
+                                <th class="no-export">Ecole d'origine</th>
+                                <th class="no-export">Photo ID</th>
                                 <th>Date naissance</th>
                                 <th>Lieu naissance</th>
                                 <th>Date entrée</th>
@@ -751,7 +755,7 @@
                                 <th>Année scolaire</th>
                                 <th>Date inscription</th>
                                 <th>ID Inscription</th>
-                                <th>Actions</th>
+                                <th class="no-export">Actions</th>
                         </tr>
 
                     </thead>
@@ -768,23 +772,23 @@
                                               <td>{{le.mateleve.mere}}</td>
                                               <td>{{le.mateleve.tuteur}}</td>
                                               <td>{{le.mateleve.contact_pere}}</td>
-                                              <td>{{le.mateleve.contact_mere}}</td>
+                                              <td class="no-export">{{le.mateleve.contact_mere}}</td>
                                               <td>{{le.mateleve.email_pere}}</td>
-                                              <td>{{le.mateleve.email_mere}}</td>
+                                              <td class="no-export">{{le.mateleve.email_mere}}</td>
                                               <td>{{le.mateleve.profes_pere}}</td>
-                                              <td>{{le.mateleve.profes_mere}}</td>
+                                              <td class="no-export">{{le.mateleve.profes_mere}}</td>
                                               <td>{{le.mateleve.personne_contact}}</td>
                                               <td>{{le.mateleve.adresse}}</td>
-                                              <td>{{le.mateleve.ecole_origine}}</td>
+                                              <td class="no-export">{{le.mateleve.ecole_origine}}</td>
 
                                               {% if le.mateleve.photo_eleve %}
-                                              <td>
+                                              <td class="no-export">
                                                     <a href="{{ le.mateleve.photo_eleve.url }}" target="_blank" title="Agrandir la photo de l'élève">
                                                         <img src="{{le.mateleve.photo_eleve.url}}" width="40px">
                                                     </a>
                                               </td>
                                               {% else %}
-                                              <td>Photo indisponible</td>
+                                              <td class="no-export">Photo indisponible</td>
                                               {% endif %}
 
                                               <td>{{le.mateleve.datenaissance|date:'j-n-Y'}}</td>
@@ -796,7 +800,7 @@
                                               <td>{{le.annee_scolaire}}</td>
                                               <td>{{le.date_inscription|date:'j-n-Y'}}</td>
                                               <td>{{le.id}}</td>
-                                              <td>
+                                              <td class="no-export">
                                                   <a class="btn btn-primary" href="{% url 'afficherdetailsinscription' le.id %}" title="Voir/Afficher"><i class="fa fa-eye fa-sm"></i></a>
                                                   <a class="btn btn-info" href="{% url 'editioninscription' le.id %}" title="Modifier/Editer"><i class="fa fa-edit fa-sm"></i></a>
                                                   <a class="btn btn-danger" href=" {% url 'suppinscription' le.id %}" title="Supprimer"><i class="fa fa-remove fa-sm"></i></a>
@@ -819,15 +823,15 @@
                             <th>Prénom(s) & Nom Mère</th>
                             <th>Prénom(s) & Nom Tuteur</th>
                             <th>Contact père</th>
-                            <th>Contact mère</th>
+                            <th class="no-export">Contact mère</th>
                             <th>Email père</th>
-                            <th>Email mère</th>
+                            <th class="no-export">Email mère</th>
                             <th>Profession père</th>
-                            <th>Profession mère</th>
+                            <th class="no-export">Profession mère</th>
                             <th>Personne contact</th>
                             <th>Adresse</th>
-                            <th>Ecole d'origine</th>
-                            <th>Photo ID</th>
+                            <th class="no-export">Ecole d'origine</th>
+                            <th class="no-export">Photo ID</th>
                             <th>Date naissance</th>
                             <th>Lieu naissance</th>
                             <th>Date entrée</th>
@@ -837,7 +841,7 @@
                             <th>Année scolaire</th>
                             <th>Date inscription</th>
                             <th>ID Inscription</th>
-                            <th>Actions</th>
+                            <th class="no-export">Actions</th>
                         </tr>
                    </tfoot>
             </table>
@@ -847,9 +851,9 @@
                     <div class="form-group">
                         <label for="effgarcons">Effectif total garçons</label>
                         {% if effectif_total_garcons %}
-                        <input type="text" id="effgarcons" name="effectif_total_garcons" value="{{ effectif_total_garcons }}" maxlength="25" class="form-control" readonly style="color:red">
+                        <input type="text" id="effgarcons" name="effectif_total_garcons" value="{{ effectif_total_garcons }}" class="form-control" readonly style="color:red; font-size: 12pt; font-weight: bold;">
                         {% else %}
-                        <input type="text" name="effectif_total_garcons" value="0" maxlength="25" class="form-control" readonly style="color:red">
+                        <input type="text" name="effectif_total_garcons" value="0" class="form-control" readonly style="color:red; font-size: 12pt; font-weight: bold;">
                         {% endif %}
                     </div>
                 </div>
@@ -859,9 +863,9 @@
                     <div class="form-group">
                         <label for="eff_filles">Effectif total filles</label>
                         {% if effectif_total_filles %}
-                        <input type="text" id="eff_filles" name="effectif_total_filles" value="{{ effectif_total_filles }}" maxlength="25" class="form-control" readonly style="color:red">
+                        <input type="text" id="eff_filles" name="effectif_total_filles" value="{{ effectif_total_filles }}" class="form-control" readonly style="color:red; font-size: 12pt; font-weight: bold;">
                         {% else %}
-                        <input type="text" name="effectif_total_filles" value="0" maxlength="25" class="form-control" readonly style="color:red">
+                        <input type="text" name="effectif_total_filles" value="0" class="form-control" readonly style="color:red; font-size: 12pt; font-weight: bold;">
                         {% endif %}
                     </div>
                 </div>
@@ -870,9 +874,9 @@
                     <div class="form-group">
                         <label for="efftotal">Effectif total</label>
                         {% if effectif_total %}
-                        <input type="text" id="efftotal" name="effectif_total" value="{{ effectif_total }}" maxlength="25" class="form-control" readonly style="color:red;">
+                        <input type="text" id="efftotal" name="effectif_total" value="{{ effectif_total }}" class="form-control" readonly style="color:red; font-size: 12pt; font-weight: bold;">
                         {% else %}
-                        <input type="text" name="effectif_total" value="0" maxlength="25" class="form-control" readonly style="color:red;">
+                        <input type="text" name="effectif_total" value="0" class="form-control" readonly style="color:red; font-size: 12pt; font-weight: bold;">
                         {% endif %}
                     </div>
                 </div>
@@ -932,15 +936,15 @@
                                 <th>Prénom(s) & Nom Mère</th>
                                 <th>Prénom(s) & Nom Tuteur</th>
                                 <th>Contact père</th>
-                                <th>Contact mère</th>
+                                <th class="no-export">Contact mère</th>
                                 <th>Email père</th>
-                                <th>Email mère</th>
+                                <th class="no-export">Email mère</th>
                                 <th>Profession père</th>
-                                <th>Profession mère</th>
+                                <th class="no-export">Profession mère</th>
                                 <th>Personne contact</th>
                                 <th>Adresse</th>
-                                <th>Ecole d'origine</th>
-                                <th>Photo ID</th>
+                                <th class="no-export">Ecole d'origine</th>
+                                <th class="no-export">Photo ID</th>
                                 <th>Date naissance</th>
                                 <th>Lieu naissance</th>
                                 <th>Date entrée</th>
@@ -950,7 +954,7 @@
                                 <th>Année scolaire</th>
                                 <th>Date inscription</th>
                                 <th>ID Inscription</th>
-                                <th>Actions</th>
+                                <th class="no-export">Actions</th>
                         </tr>
 
                     </thead>
@@ -967,23 +971,23 @@
                                               <td>{{le.mateleve.mere}}</td>
                                               <td>{{le.mateleve.tuteur}}</td>
                                               <td>{{le.mateleve.contact_pere}}</td>
-                                              <td>{{le.mateleve.contact_mere}}</td>
+                                              <td class="no-export">{{le.mateleve.contact_mere}}</td>
                                               <td>{{le.mateleve.email_pere}}</td>
-                                              <td>{{le.mateleve.email_mere}}</td>
+                                              <td class="no-export">{{le.mateleve.email_mere}}</td>
                                               <td>{{le.mateleve.profes_pere}}</td>
-                                              <td>{{le.mateleve.profes_mere}}</td>
+                                              <td class="no-export">{{le.mateleve.profes_mere}}</td>
                                               <td>{{le.mateleve.personne_contact}}</td>
                                               <td>{{le.mateleve.adresse}}</td>
-                                              <td>{{le.mateleve.ecole_origine}}</td>
+                                              <td class="no-export">{{le.mateleve.ecole_origine}}</td>
 
                                               {% if le.mateleve.photo_eleve %}
-                                              <td>
+                                              <td class="no-export">
                                                     <a href="{{ le.mateleve.photo_eleve.url }}" target="_blank" title="Agrandir la photo de l'élève">
                                                         <img src="{{le.mateleve.photo_eleve.url}}" width="40px">
                                                     </a>
                                               </td>
                                               {% else %}
-                                              <td>Photo indisponible</td>
+                                              <td class="no-export">Photo indisponible</td>
                                               {% endif %}
 
                                               <td>{{le.mateleve.datenaissance|date:'j-n-Y'}}</td>
@@ -995,7 +999,7 @@
                                               <td>{{le.annee_scolaire}}</td>
                                               <td>{{le.date_inscription|date:'j-n-Y'}}</td>
                                               <td>{{le.id}}</td>
-                                              <td>
+                                              <td class="no-export">
                                                   <a class="btn btn-primary" href="{% url 'afficherdetailsinscription' le.id %}" title="Voir/Afficher"><i class="fa fa-eye fa-sm"></i></a>
                                                   <a class="btn btn-info" href="{% url 'editioninscription' le.id %}" title="Modifier/Editer"><i class="fa fa-edit fa-sm"></i></a>
                                                   <a class="btn btn-danger" href=" {% url 'suppinscription' le.id %}" title="Supprimer"><i class="fa fa-remove fa-sm"></i></a>
@@ -1018,15 +1022,15 @@
                             <th>Prénom(s) & Nom Mère</th>
                             <th>Prénom(s) & Nom Tuteur</th>
                             <th>Contact père</th>
-                            <th>Contact mère</th>
+                            <th class="no-export">Contact mère</th>
                             <th>Email père</th>
-                            <th>Email mère</th>
+                            <th class="no-export">Email mère</th>
                             <th>Profession père</th>
-                            <th>Profession mère</th>
+                            <th class="no-export">Profession mère</th>
                             <th>Personne contact</th>
                             <th>Adresse</th>
-                            <th>Ecole d'origine</th>
-                            <th>Photo ID</th>
+                            <th class="no-export">Ecole d'origine</th>
+                            <th class="no-export">Photo ID</th>
                             <th>Date naissance</th>
                             <th>Lieu naissance</th>
                             <th>Date entrée</th>
@@ -1036,7 +1040,7 @@
                             <th>Année scolaire</th>
                             <th>Date inscription</th>
                             <th>ID Inscription</th>
-                            <th>Actions</th>
+                            <th class="no-export">Actions</th>
                         </tr>
                    </tfoot>
             </table>
@@ -1046,9 +1050,9 @@
                     <div class="form-group">
                         <label for="effgarcons">Effectif total garçons</label>
                         {% if effectif_total_garcons %}
-                        <input type="text" id="effgarcons" name="effectif_total_garcons" value="{{ effectif_total_garcons }}" maxlength="25" class="form-control" readonly style="color:red">
+                        <input type="text" id="effgarcons" name="effectif_total_garcons" value="{{ effectif_total_garcons }}" class="form-control" readonly style="color:red; font-size: 12pt; font-weight: bold;">
                         {% else %}
-                        <input type="text" name="effectif_total_garcons" value="0" maxlength="25" class="form-control" readonly style="color:red">
+                        <input type="text" name="effectif_total_garcons" value="0" class="form-control" readonly style="color:red; font-size: 12pt; font-weight: bold;">
                         {% endif %}
                     </div>
                 </div>
@@ -1058,9 +1062,9 @@
                     <div class="form-group">
                         <label for="eff_filles">Effectif total filles</label>
                         {% if effectif_total_filles %}
-                        <input type="text" id="eff_filles" name="effectif_total_filles" value="{{ effectif_total_filles }}" maxlength="25" class="form-control" readonly style="color:red">
+                        <input type="text" id="eff_filles" name="effectif_total_filles" value="{{ effectif_total_filles }}" class="form-control" readonly style="color:red; font-size: 12pt; font-weight: bold;">
                         {% else %}
-                        <input type="text" name="effectif_total_filles" value="0" maxlength="25" class="form-control" readonly style="color:red">
+                        <input type="text" name="effectif_total_filles" value="0" class="form-control" readonly style="color:red; font-size: 12pt; font-weight: bold;">
                         {% endif %}
                     </div>
                 </div>
@@ -1069,9 +1073,9 @@
                     <div class="form-group">
                         <label for="efftotal">Effectif total</label>
                         {% if effectif_total %}
-                        <input type="text" id="efftotal" name="effectif_total" value="{{ effectif_total }}" maxlength="25" class="form-control" readonly style="color:red;">
+                        <input type="text" id="efftotal" name="effectif_total" value="{{ effectif_total }}" class="form-control" readonly style="color:red; font-size: 12pt; font-weight: bold;">
                         {% else %}
-                        <input type="text" name="effectif_total" value="0" maxlength="25" class="form-control" readonly style="color:red;">
+                        <input type="text" name="effectif_total" value="0" class="form-control" readonly style="color:red; font-size: 12pt; font-weight: bold;">
                         {% endif %}
                     </div>
                 </div>
@@ -1170,6 +1174,26 @@
 <script src="{% static 'assets/plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
 <script src="{% static 'assets/plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
 
+<!-- 1. Cœur de l'extension Buttons (obligatoire, sans lui rien ne fonctionne) -->
+<script src="{% static 'assets/plugins/datatables-buttons/js/dataTables.buttons.min.js' %}"></script>
+
+<!-- 2. Intégration visuelle Bootstrap 4 (celui que vous avez déjà en local) -->
+<script src="{% static 'assets/plugins/datatables-buttons/js/buttons.bootstrap4.min.js' %}"></script>
+
+<!-- 3. Export Excel (HTML5) -->
+<script src="{% static 'assets/plugins/datatables-buttons/js/buttons.html5.min.js' %}"></script>
+
+<!-- 4. Export PDF -->
+<script src="{% static 'assets/plugins/datatables-buttons/js/buttons.print.min.js' %}"></script>
+
+<!-- Export Excel -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+
+<!-- Export PDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+
 
 <script>
   $(function () {
@@ -1181,6 +1205,47 @@
       "info": true,
       "responsive": true,
       "autoWidth": true,
+      "dom": //'Blfrtip',   // B = Boutons, placés juste au-dessus du tableau, avant l/f (longueur/recherche)
+            "<'row'<'col-sm-6'l><'col-sm-6'f>>" +   // ligne 1 : longueur (gauche) + recherche (droite)
+            "<'row'<'col-sm-12 text-right export-buttons-row'B>>" +  // ligne 2 : boutons Excel/PDF, alignés à droite
+            "rt" +                                   // r = processing, t = le tableau lui-même
+            "<'row'<'col-sm-5'i><'col-sm-7'p>>",     // ligne finale : info + pagination
+      "buttons": [
+            {
+              extend: 'excelHtml5',
+              text: '<i class="fa fa-file-excel"></i> Export Excel',
+              titleAttr: 'Télécharger la liste des élèves au format Excel',
+              className: 'btn btn-success btn-sm mr-1',
+              title: 'Situation des inscrits de l\'annee scolaire en cours',
+              exportOptions: {
+                      columns: ':not(.no-export)',
+                  }
+            },
+            {
+              extend: 'pdfHtml5',
+              text: '<i class="fa fa-file-pdf"></i> Export PDF',
+              titleAttr: 'Télécharger la liste des élèves au format PDF',
+              className: 'btn btn-danger btn-sm',
+              title: 'Situation des inscrits de l\'annee scolaire en cours ',
+              orientation: 'landscape',
+              pageSize: 'A4',
+              exportOptions: {
+                    columns: ':not(.no-export)',
+                },
+                customize: function (doc) {
+                    // Force toutes les colonnes à se partager équitablement la largeur de la page
+                    doc.content[1].table.widths = Array(doc.content[1].table.body[0].length).fill('*');
+
+                    // Réduit la taille de police pour que le contenu tienne mieux
+                    doc.defaultStyle.fontSize = 2;
+                    doc.styles.tableHeader.fontSize = 3;
+
+                    // Réduit les marges de page pour gagner de la place
+                    doc.pageMargins = [10, 20, 10, 20];
+                      }
+            }
+          ],
+
       "language": {
         "paginate": {
           "previous": "Précédent",
@@ -1188,7 +1253,11 @@
         },
         "search": "Rechercher :",
         "info": "Affichage de  _START_ à _END_ sur _TOTAL_ entrées",
-        "lengthMenu": "Afficher  _MENU_ entrées"
+        "lengthMenu": "Afficher  _MENU_ entrées",
+        "buttons": {
+        "excel": "Excel",
+        "pdf": "PDF"
+          }
       }
     });
   });
@@ -1202,6 +1271,45 @@
       "info": true,
       "responsive": true,
       "autoWidth": true,
+      "dom": "<'row'<'col-sm-6'l><'col-sm-6'f>>" +   // ligne 1 : longueur (gauche) + recherche (droite)
+            "<'row'<'col-sm-12 text-right export-buttons-row'B>>" +  // ligne 2 : boutons Excel/PDF, alignés à droite
+            "rt" +                                   // r = processing, t = le tableau lui-même
+            "<'row'<'col-sm-5'i><'col-sm-7'p>>",     // ligne finale : info + pagination
+      "buttons": [
+            {
+              extend: 'excelHtml5',
+              text: '<i class="fa fa-file-excel"></i> Export Excel',
+              titleAttr: 'Télécharger la liste des élèves au format Excel',
+              className: 'btn btn-success btn-sm mr-1',
+              title: 'Situation des inscrits mensuels par classe',
+              exportOptions: {
+                      columns: ':not(.no-export)',
+                  }
+            },
+            {
+              extend: 'pdfHtml5',
+              text: '<i class="fa fa-file-pdf"></i> Export PDF',
+              titleAttr: 'Télécharger la liste des élèves au format PDF',
+              className: 'btn btn-danger btn-sm',
+              title: 'Situation des inscrits mensuels par classe',
+              orientation: 'landscape',
+              pageSize: 'A4',
+              exportOptions: {
+                    columns: ':not(.no-export)',
+                },
+                customize: function (doc) {
+                    // Force toutes les colonnes à se partager équitablement la largeur de la page
+                    doc.content[1].table.widths = Array(doc.content[1].table.body[0].length).fill('*');
+
+                    // Réduit la taille de police pour que le contenu tienne mieux
+                    doc.defaultStyle.fontSize = 2;
+                    doc.styles.tableHeader.fontSize = 3;
+
+                    // Réduit les marges de page pour gagner de la place
+                    doc.pageMargins = [10, 20, 10, 20];
+                      }
+            }
+          ],
       "language": {
         "paginate": {
           "previous": "Précédent",
@@ -1209,7 +1317,11 @@
         },
         "search": "Rechercher :",
         "info": "Affichage de  _START_ à _END_ sur _TOTAL_ entrées",
-        "lengthMenu": "Afficher  _MENU_ entrées"
+        "lengthMenu": "Afficher  _MENU_ entrées",
+        "buttons": {
+        "excel": "Excel",
+        "pdf": "PDF"
+          }
       }
     });
   });

@@ -8,7 +8,7 @@
 
  {% block formulaire %}
 
-  <form action="" method="POST" class="needs-validation" enctype="multipart/form-data" autocomplete="on">
+  <form action="" method="post" class="needs-validation" enctype="multipart/form-data" autocomplete="on" id="fdepense">
 
                     {% csrf_token %}
 
@@ -85,8 +85,22 @@
 
                     <div class="row g-3">
                         <div class="col-md-12">
-                            <div class="form-group">
+                            <div class="form-group text-center">
                                 {{form.piece_jointe|as_crispy_field}}
+
+                                <label for="id_piece_jointe" class="photo-zone" id="piecejointeZone">
+                                    <img id="PJPreview" src="" alt="" style="display:none;">
+                                    <div id="PJPlaceholder">
+                                            <div class="placeholder-icon">
+                                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#adb5bd" stroke-width="1.5">
+                                                        <path d="M4 7h3l2-2h6l2 2h3a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z"/>
+                                                        <circle cx="12" cy="13" r="4"/>
+                                                </svg>
+                                            </div>
+                                            <div class="placeholder-text">Cliquer pour ajouter la pièce jointe</div>
+                                    </div>
+                                </label>
+
                             </div>
                         </div>
                     </div>
@@ -98,6 +112,21 @@
                 <a href="{% url 'listedepense' %}" target="_self" class="btn btn-primary btn-md">Situation globale dépenses &nbsp;<i class="fas fa-arrow-circle-left"></i></a>
             </div>
   </form>
+
+ {% endblock %}
+
+ {% block javascript %}
+
+    <script>
+
+        $("#fdepense")[0].addEventListener("reset", function(){
+            // On laisse le navigateur vider le input file lui-même,
+            // mais on doit remettre l'aperçu à zéro manuellement
+            setTimeout(resetPJZone, 0);
+        });
+
+
+    </script>
 
  {% endblock %}
 

@@ -685,10 +685,10 @@ def recupaiementscolarite(request, idetat, nom_tranche, mont_paye):
 
         montant_paye     = Decimal(mont_paye)
 
-        if etatpaie.m_rabais:
-            reste_a_payer     = (montant_tranche - montant_paye)-etatpaie.m_rabais
-        else:
-            reste_a_payer     = montant_tranche - montant_paye
+        # if etatpaie.m_rabais:
+        #     reste_a_payer     = (montant_tranche - montant_paye)-etatpaie.m_rabais
+        # else:
+        reste_a_payer     = montant_tranche - montant_paye
 
         montant_tranche_formate   = '{:,} GNF'.format(montant_tranche)
         montant_paye_formate = '{:,} GNF'.format(montant_paye)
@@ -1087,8 +1087,11 @@ def modifieretatpaiement(request, idpaie):
 
         fscol = (etatpaie.premiere_tranche + etatpaie.deuxieme_tranche) # Permet de calculer le paiement total effectué par l'élève
         etatpaie.fscolarite = fscol
-        etatpaie.reste_a_payer = (fannuel - fscol)- mremise # Le reste à payer annuel est le montant annuel dû moins le total de ses paiements oté de la remise
-        etatpaie.m_rabais = mremise
+        if mremise:
+            etatpaie.reste_a_payer = (fannuel - fscol)- mremise # Le reste à payer annuel est le montant annuel dû moins le total de ses paiements oté de la remise
+            etatpaie.m_rabais = mremise
+        else:
+            etatpaie.reste_a_payer = fannuel - fscol
         etatpaie.save()
         
 

@@ -954,7 +954,7 @@ def listeinscritsanneescolairecourante(request):
 def listereinscritsanneescolairecourante(request):
 
     ans = Inscription.objects.all().distinct('annee_scolaire')
-    cy = CycleScolaire.objects.all()
+    cy = CycleScolaire.objects.all().order_by('id')
 
     listeeleves = {}
     listeeleves = Inscription.objects.none()
@@ -989,6 +989,10 @@ def filtrelisteinscrits(request):
     listeinsclasse = {}
     listeinsclasse = Inscription.objects.none()
 
+    # Pour permettre un rechargement des donnees relatives a l'annee scolaire et le cycle
+    ans = Inscription.objects.all().distinct('annee_scolaire')
+    cy = CycleScolaire.objects.all().order_by('id')
+
     global effectif_total
     global effectif_total_garcons
     global effectif_total_filles
@@ -1010,7 +1014,7 @@ def filtrelisteinscrits(request):
         
     return render(request, 'gEleve/liste_eleves_inscrits.html',
                   dict(listeinscrits=listeinsclasse, effectif_total=effectif_total,
-                       effectif_total_garcons=effectif_total_garcons, effectif_total_filles=effectif_total_filles))
+                       effectif_total_garcons=effectif_total_garcons, effectif_total_filles=effectif_total_filles, ans=ans, cycles=cy))
 
 
 def filtrelistereinscrits(request):
@@ -1018,6 +1022,9 @@ def filtrelistereinscrits(request):
     idclass = request.GET.get('id_classe')
     idcy = request.GET.get('cycle')
     idansc = request.GET.get('annee_scolaire')
+
+    ans = Inscription.objects.all().distinct('annee_scolaire')
+    cy = CycleScolaire.objects.all().order_by('id')
 
     listeinsclasse = {}
     listeinsclasse = Inscription.objects.none()
@@ -1043,4 +1050,4 @@ def filtrelistereinscrits(request):
         
     return render(request, 'gEleve/liste_eleves_reinscrits.html',
                   dict(listereinscrits=listeinsclasse, effectif_total=effectif_total,
-                       effectif_total_garcons=effectif_total_garcons, effectif_total_filles=effectif_total_filles))
+                       effectif_total_garcons=effectif_total_garcons, effectif_total_filles=effectif_total_filles, ans=ans, cycles=cy))

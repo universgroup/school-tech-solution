@@ -1,0 +1,4 @@
+.export-buttons-row .dt-buttons {
+                  float: none !important;
+                  display: inline-flex;
+              }

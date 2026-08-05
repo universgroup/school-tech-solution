@@ -72,7 +72,7 @@
             <ul aria-labelledby="dropdownSubMenu3" class="dropdown-menu border-0 shadow">
               <li><a href="{% url 'chargeranneecourante' %}" class="dropdown-item">Inscription</a></li>
               <li><a href="{% url 'listereinscritsanneecourante' %}" class="dropdown-item">Reinscription</a></li>
-              <li><a href="#" class="dropdown-item">Etat des paiements</a></li>
+              <li><a href="{% url 'listepaiemensuel' %}" class="dropdown-item">Etat des paiements</a></li>
               <li><a href="#" class="dropdown-item">Etat des inscriptions/reinscriptions</a></li>
               <li><a href="#" class="dropdown-item">Liste des élèves par classe</a></li>
               <li><a href="{% url 'registrematricule' %}" class="dropdown-item">Registre de matriculation</a></li>
@@ -389,7 +389,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="#" class="nav-link" title="Permet de consulter l'état des paiements de la scolarité">
+                <a href="{% url 'listepaiemensuel' %}" class="nav-link" title="Permet de consulter l'état des paiements de la scolarité">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Etat des paiements &nbsp;</p>
                   <i class="fas fa-file-invoice-dollar"></i>

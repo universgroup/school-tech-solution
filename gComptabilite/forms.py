@@ -81,7 +81,7 @@ class FormDepense(ModelForm):
                                               'title': 'Saisissez le bénéficiaire'}),
             'observ': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Observation/Mémo',
                                              'title': 'Saisissez une observation/mémo pour votre opération'}),
-            'piece_jointe': forms.FileInput(attrs={'class': 'form-control', 'title': 'Importez la pièce justificative'})
+            'piece_jointe': forms.FileInput(attrs={'class': 'd-none','accept':'image/*', 'title': 'Importez la pièce justificative', 'id': 'id_piece_jointe', 'onchange':'previewPieceJointe(this)'})
         }
 
     def __init__(self, *args, **kwargs):

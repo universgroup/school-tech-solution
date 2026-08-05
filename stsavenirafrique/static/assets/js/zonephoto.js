@@ -243,3 +243,66 @@
         $("#SignaDEPreview").attr("src", "").hide();  // masque et vide l'aperçu
         $("#SignaDEPlaceholder").show();               // réaffiche l'icône + le texte par défaut
     }
+
+
+    // Pour le cas des pièces jointes au niveau de la gestion des dépenses en comptabilité
+
+    // Fonction commune : affiche l'aperçu de la pièce jointe
+    function afficherApercuPJ(file) {
+    if (!file || !file.type.startsWith("image/")) return;
+        var reader = new FileReader();
+        reader.onload = function(e) {
+        $("#PJPreview").attr("src", e.target.result).show();
+        $("#PJPlaceholder").hide();
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // Pièce Justificative de l'écriture comptable (dépense)
+    function previewPieceJointe(input) {
+        if (input.files && input.files[0]) {
+        afficherApercuPJ(input.files[0]);
+        }
+    }
+
+    // Cas du template enregsitrer les dépenses
+    var PJZone = document.getElementById("piecejointeZone");
+    var PJinputFile = document.getElementById("id_piece_jointe");
+
+    // Empêcher le navigateur d'ouvrir l'image dans un nouvel onglet
+    ["dragenter", "dragover", "dragleave", "drop"].forEach(function(evt){
+                PJZone.addEventListener(evt, function(e){
+                e.preventDefault();
+                e.stopPropagation();
+                });
+    });
+
+    // Effet visuel pendant le survol avec un fichier
+    ["dragenter", "dragover"].forEach(function(evt){
+                PJZone.addEventListener(evt, function(){
+                PJZone.classList.add("drag-over");
+                });
+    });
+    
+    ["dragleave", "drop"].forEach(function(evt){
+                PJZone.addEventListener(evt, function(){
+                PJZone.classList.remove("drag-over");
+                });
+    });
+   
+    // Cas 2 : dépôt du fichier (drag & drop)
+    PJZone.addEventListener("drop", function(e){
+            var files = e.dataTransfer.files;
+            if (files.length > 0) {
+            deinputFile.files = files;
+            // injecte le fichier dans l'input Django
+            afficherApercu(files[0]);
+            }
+    });
+
+    // Reinitialisation de la zone pièce jointe
+    function resetPJZone() {
+        $("#id_piece_jointe").val("");            // vide le contenu du input file
+        $("#PJPreview").attr("src", "").hide();  // masque et vide l'aperçu
+        $("#PJPlaceholder").show();               // réaffiche l'icône + le texte par défaut
+    }

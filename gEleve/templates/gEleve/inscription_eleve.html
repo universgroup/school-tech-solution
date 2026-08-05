@@ -8,7 +8,7 @@ INSCRIPTION DES ELEVES
 
 {% block formulaire %}
 
-<form class="needs-validation" action="" method="POST" enctype="multipart/form-data" autocomplete="on" id="finscription" data-classe-url="{% url 'chargerlisteclasse' %}">
+<form class="needs-validation" action="" method="post" enctype="multipart/form-data" autocomplete="on" id="finscription" data-classe-url="{% url 'chargerlisteclasse' %}">
                     
                     {% csrf_token %}
 

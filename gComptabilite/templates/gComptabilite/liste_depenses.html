@@ -29,6 +29,9 @@
   <!--begin::Third Party Plugin(Bootstrap Icons)-->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"/>
 
+  <!-- Ce style est mis pour les boutons d'exportation en excel et PDF de la datatable-->
+  <link rel="stylesheet" href="{% static 'assets/css/datatablesbuttons.css' %}">
+
 </head>
 <body class="hold-transition sidebar-mini">
     
@@ -72,7 +75,7 @@
             <ul aria-labelledby="dropdownSubMenu3" class="dropdown-menu border-0 shadow">
               <li><a href="{% url 'chargeranneecourante' %}" class="dropdown-item">Inscription</a></li>
               <li><a href="{% url 'listereinscritsanneecourante' %}" class="dropdown-item">Reinscription</a></li>
-              <li><a href="#" class="dropdown-item">Etat des paiements</a></li>
+              <li><a href="{% url 'listepaiemensuel' %}" class="dropdown-item">Etat des paiements</a></li>
               <li><a href="#" class="dropdown-item">Etat des inscriptions/reinscriptions</a></li>
               <li><a href="#" class="dropdown-item">Liste des élèves par classe</a></li>
               <li><a href="#" class="dropdown-item">Registre de matriculation</a></li>
@@ -389,7 +392,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="#" class="nav-link" title="Permet de consulter l'état des paiements de la scolarité">
+                <a href="{% url 'listepaiemensuel' %}" class="nav-link" title="Permet de consulter l'état des paiements de la scolarité">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Etat des paiements &nbsp;</p>
                   <i class="fas fa-file-invoice-dollar"></i>
@@ -742,9 +745,9 @@
                                 <th>Solde progressif</th>
                                 <th>Observation/Mémo</th>
                                 <th>Année scolaire</th>
-                                <th>Pièce jointe</th>
+                                <th class="no-export">Pièce jointe</th>
                                 <th>ID</th>
-                                <th>Actions</th>
+                                <th class="no-export">Actions</th>
                         </tr>
 
                     </thead>
@@ -765,16 +768,16 @@
                                     <td>{{ c.observ }}</td>
                                     <td>{{ c.anscolaire }}</td>
                                     {% if c.piece_jointe %}
-                                    <td>
+                                    <td class="no-export">
                                       <a href="{{ c.piece_jointe.url }}" target="_blank" title="Afficher la pièce justificative">
                                         <img src="{{ c.piece_jointe.url }}" width="40px" id="photo_piece">
                                       </a>
                                     </td>
                                     {% else %}
-                                    <td>Pièce indisponible</td>
+                                    <td class="no-export">Pièce indisponible</td>
                                     {% endif %}
                                     <td>{{c.id}}</td>
-                                    <td>
+                                    <td class="no-export">
                                         <a class="btn btn-primary" href="{% url 'detailsdepense' c.id %}" title="Voir/Afficher" target="_self"><i class="fa-solid fa-eye fa-sm"></i></a>
                                         <a class="btn btn-info" href="{% url 'editiondepense' c.id %}" title="Modifier/Editer" target="_self"><i class="fa-solid fa-edit fa-sm"></i></a>
                                         <a class="btn btn-danger" href="{% url 'supprimedepense' c.id %}" title="Supprimer" target="_self"><i class="fa-solid fa-remove fa-sm"></i></a>
@@ -797,9 +800,9 @@
                             <th>Solde progressif</th>
                             <th>Observation/Mémo</th>
                             <th>Année scolaire</th>
-                            <th>Pièce jointe</th>
+                            <th class="no-export">Pièce jointe</th>
                             <th>ID</th>
-                            <th>Actions</th>
+                            <th class="no-export">Actions</th>
                         </tr>
                    </tfoot>
             </table>
@@ -914,9 +917,9 @@
                             <th>Solde progressif</th>
                             <th>Observation/Mémo</th>
                             <th>Année scolaire</th>
-                            <th>Pièce jointe</th>
+                            <th class="no-export">Pièce jointe</th>
                             <th>ID</th>
-                            <th>Actions</th>
+                            <th class="no-export">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -935,16 +938,16 @@
                                     <td>{{ d.observ }}</td>
                                     <td>{{ d.anscolaire }}</td>
                                     {% if d.piece_jointe %}
-                                    <td>
+                                    <td class="no-export">
                                       <a href="{{ d.piece_jointe.url }}" target="_blank" title="Afficher la pièce justificative">
                                          <img src="{{ d.piece_jointe.url }}" width="40px" id="photo_piece_2">
                                       </a>
                                     </td>
                                     {% else %}
-                                    <td>Pièce indisponible</td>
+                                    <td class="no-export">Pièce indisponible</td>
                                     {% endif %}
                                     <td>{{d.id}}</td>
-                                    <td>
+                                    <td class="no-export">
                                         <a class="btn btn-primary" href="{% url 'detailsdepense' d.id %}" title="Voir/Afficher" target="_self"><i class="fa-solid fa-eye fa-sm"></i></a>
                                         <a class="btn btn-info" href="{% url 'editiondepense' d.id %}" title="Modifier/Editer" target="_self"><i class="fa-solid fa-edit fa-sm"></i></a>
                                         <a class="btn btn-danger" href="{% url 'supprimedepense' d.id %}" title="Supprimer" target="_self"><i class="fa-solid fa-remove fa-sm"></i></a>
@@ -966,9 +969,9 @@
                             <th>Solde progressif</th>
                             <th>Observation/Mémo</th>
                             <th>Année scolaire</th>
-                            <th>Pièce jointe</th>
+                            <th class="no-export">Pièce jointe</th>
                             <th>ID</th>
-                            <th>Actions</th>
+                            <th class="no-export">Actions</th>
                         </tr>
                     </tfoot>
             </table>
@@ -1120,6 +1123,26 @@
 <script src="{% static 'assets/plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
 <script src="{% static 'assets/plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
 
+<!-- 1. Cœur de l'extension Buttons (obligatoire, sans lui rien ne fonctionne) -->
+<script src="{% static 'assets/plugins/datatables-buttons/js/dataTables.buttons.min.js' %}"></script>
+
+<!-- 2. Intégration visuelle Bootstrap 4 (celui que vous avez déjà en local) -->
+<script src="{% static 'assets/plugins/datatables-buttons/js/buttons.bootstrap4.min.js' %}"></script>
+
+<!-- 3. Export Excel (HTML5) -->
+<script src="{% static 'assets/plugins/datatables-buttons/js/buttons.html5.min.js' %}"></script>
+
+<!-- 4. Export PDF -->
+<script src="{% static 'assets/plugins/datatables-buttons/js/buttons.print.min.js' %}"></script>
+
+<!-- Export Excel -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+
+<!-- Export PDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+
 
 <script>
   $(function () {
@@ -1131,6 +1154,36 @@
       "info": true,
       "responsive": true,
       "autoWidth": true,
+      "dom": //'Blfrtip',   // B = Boutons, placés juste au-dessus du tableau, avant l/f (longueur/recherche)
+            "<'row'<'col-sm-6'l><'col-sm-6'f>>" +   // ligne 1 : longueur (gauche) + recherche (droite)
+            "<'row'<'col-sm-12 text-right export-buttons-row'B>>" +  // ligne 2 : boutons Excel/PDF, alignés à droite
+            "rt" +                                   // r = processing, t = le tableau lui-même
+            "<'row'<'col-sm-5'i><'col-sm-7'p>>",     // ligne finale : info + pagination
+      "buttons": [
+            {
+              extend: 'excelHtml5',
+              text: '<i class="fa fa-file-excel"></i> Export Excel',
+              titleAttr: 'Télécharger la situation des dépenses au format Excel',
+              className: 'btn btn-success btn-sm mr-1',
+              title: 'Situation des dépenses de l\'année scolaire en cours',
+              exportOptions: {
+                      columns: ':not(.no-export)',
+                  }
+            },
+            {
+              extend: 'pdfHtml5',
+              text: '<i class="fa fa-file-pdf"></i> Export PDF',
+              titleAttr: 'Télécharger la situation des dépenses au format PDF',
+              className: 'btn btn-danger btn-sm',
+              title: 'Situation des dépenses de l\'année scolaire en cours',
+              orientation: 'landscape',
+              pageSize: 'A4',
+              exportOptions: {
+                    columns: ':not(.no-export)',
+                }
+            }
+          ],
+
       "language": {
         "paginate": {
           "previous": "Précédent",
@@ -1138,7 +1191,11 @@
         },
         "search": "Rechercher :",
         "info": "Affichage de  _START_ à _END_ sur _TOTAL_ entrées",
-        "lengthMenu": "Afficher  _MENU_ entrées"
+        "lengthMenu": "Afficher  _MENU_ entrées",
+        "buttons": {
+        "excel": "Excel",
+        "pdf": "PDF"
+          }
       }
     });
   });
@@ -1152,6 +1209,35 @@
       "info": true,
       "responsive": true,
       "autoWidth": true,
+      "dom": //'Blfrtip',   // B = Boutons, placés juste au-dessus du tableau, avant l/f (longueur/recherche)
+            "<'row'<'col-sm-6'l><'col-sm-6'f>>" +   // ligne 1 : longueur (gauche) + recherche (droite)
+            "<'row'<'col-sm-12 text-right export-buttons-row'B>>" +  // ligne 2 : boutons Excel/PDF, alignés à droite
+            "rt" +                                   // r = processing, t = le tableau lui-même
+            "<'row'<'col-sm-5'i><'col-sm-7'p>>",     // ligne finale : info + pagination
+      "buttons": [
+            {
+              extend: 'excelHtml5',
+              text: '<i class="fa fa-file-excel"></i> Export Excel',
+              titleAttr: 'Télécharger la situation des dépenses au format Excel',
+              className: 'btn btn-success btn-sm mr-1',
+              title: 'Situation des dépenses de l\'année scolaire sélectionnée',
+              exportOptions: {
+                      columns: ':not(no-export)',
+                  }
+            },
+            {
+              extend: 'pdfHtml5',
+              text: '<i class="fa fa-file-pdf"></i> Export PDF',
+              titleAttr: 'Télécharger la situation des dépenses au format PDF',
+              className: 'btn btn-danger btn-sm',
+              title: 'Situation des dépenses de l\'année scolaire sélectionnée',
+              orientation: 'landscape',
+              pageSize: 'A4',
+              exportOptions: {
+                    columns: ':not(.no-export)',
+                }
+            }
+          ],
       "language": {
         "paginate": {
           "previous": "Précédent",
@@ -1159,7 +1245,11 @@
         },
         "search": "Rechercher :",
         "info": "Affichage de  _START_ à _END_ sur _TOTAL_ entrées",
-        "lengthMenu": "Afficher  _MENU_ entrées"
+        "lengthMenu": "Afficher  _MENU_ entrées",
+        "buttons": {
+        "excel": "Excel",
+        "pdf": "PDF"
+          }
       }
     });
   });
