@@ -23,37 +23,39 @@
     var dropZone = document.getElementById("photoZone");
     var inputFile = document.getElementById("id_photo_identite");
 
-    // Empêcher le navigateur d'ouvrir l'image dans un nouvel onglet
-    ["dragenter", "dragover", "dragleave", "drop"].forEach(function(evt){
-                dropZone.addEventListener(evt, function(e){
-                e.preventDefault();
-                e.stopPropagation();
-                });
-    });
 
-    // Effet visuel pendant le survol avec un fichier
-    ["dragenter", "dragover"].forEach(function(evt){
-                dropZone.addEventListener(evt, function(){
-                dropZone.classList.add("drag-over");
-                });
-    });
-    
-    ["dragleave", "drop"].forEach(function(evt){
-                dropZone.addEventListener(evt, function(){
-                dropZone.classList.remove("drag-over");
-                });
-    });
-   
-    // Cas 2 : dépôt du fichier (drag & drop)
-    dropZone.addEventListener("drop", function(e){
-            var files = e.dataTransfer.files;
-            if (files.length > 0) {
-            inputFile.files = files;
-            // injecte le fichier dans l'input Django
-            afficherApercu(files[0]);
-            }
-    });
+    if(dropZone){
+            // Empêcher le navigateur d'ouvrir l'image dans un nouvel onglet
+            ["dragenter", "dragover", "dragleave", "drop"].forEach(function(evt){
+                        dropZone.addEventListener(evt, function(e){
+                        e.preventDefault();
+                        e.stopPropagation();
+                        });
+            });
 
+            // Effet visuel pendant le survol avec un fichier
+            ["dragenter", "dragover"].forEach(function(evt){
+                        dropZone.addEventListener(evt, function(){
+                        dropZone.classList.add("drag-over");
+                        });
+            });
+            
+            ["dragleave", "drop"].forEach(function(evt){
+                        dropZone.addEventListener(evt, function(){
+                        dropZone.classList.remove("drag-over");
+                        });
+            });
+        
+            // Cas 2 : dépôt du fichier (drag & drop)
+            dropZone.addEventListener("drop", function(e){
+                    var files = e.dataTransfer.files;
+                    if (files.length > 0) {
+                    inputFile.files = files;
+                    // injecte le fichier dans l'input Django
+                    afficherApercuPhoto(files[0]);
+                    }
+            });
+    } // fin de if(dropZone)
 
     // Fonction commune : affiche l'aperçu du logo de l'ecole
     function afficherApercuLogo(file) {
@@ -77,37 +79,39 @@
     var logoZone = document.getElementById("logoZone");
     var logoinputFile = document.getElementById("id_logo_ecole");
 
-    // Empêcher le navigateur d'ouvrir l'image dans un nouvel onglet
-    ["dragenter", "dragover", "dragleave", "drop"].forEach(function(evt){
-                logoZone.addEventListener(evt, function(e){
-                e.preventDefault();
-                e.stopPropagation();
-                });
-    });
 
-    // Effet visuel pendant le survol avec un fichier
-    ["dragenter", "dragover"].forEach(function(evt){
-                logoZone.addEventListener(evt, function(){
-                logoZone.classList.add("drag-over");
-                });
-    });
-    
-    ["dragleave", "drop"].forEach(function(evt){
-                logoZone.addEventListener(evt, function(){
-                logoZone.classList.remove("drag-over");
-                });
-    });
-   
-    // Cas 2 : dépôt du fichier (drag & drop)
-    logoZone.addEventListener("drop", function(e){
-            var files = e.dataTransfer.files;
-            if (files.length > 0) {
-            logoinputFile.files = files;
-            // injecte le fichier dans l'input Django
-            afficherApercu(files[0]);
-            }
-    });
+    if(logoZone){
+            // Empêcher le navigateur d'ouvrir l'image dans un nouvel onglet
+            ["dragenter", "dragover", "dragleave", "drop"].forEach(function(evt){
+                        logoZone.addEventListener(evt, function(e){
+                        e.preventDefault();
+                        e.stopPropagation();
+                        });
+            });
 
+            // Effet visuel pendant le survol avec un fichier
+            ["dragenter", "dragover"].forEach(function(evt){
+                        logoZone.addEventListener(evt, function(){
+                        logoZone.classList.add("drag-over");
+                        });
+            });
+            
+            ["dragleave", "drop"].forEach(function(evt){
+                        logoZone.addEventListener(evt, function(){
+                        logoZone.classList.remove("drag-over");
+                        });
+            });
+        
+            // Cas 2 : dépôt du fichier (drag & drop)
+            logoZone.addEventListener("drop", function(e){
+                    var files = e.dataTransfer.files;
+                    if (files.length > 0) {
+                    logoinputFile.files = files;
+                    // injecte le fichier dans l'input Django
+                    afficherApercuLogo(files[0]);
+                    }
+            });
+    } // Fin de if(logoZone)
 
     // Fonction commune : affiche l'aperçu de la signature du DG
     function afficherApercuDG(file) {
@@ -120,7 +124,7 @@
         reader.readAsDataURL(file);
     }
 
-    // Signqture DG
+    // Signature DG
     function previewSignatureDG(input) {
         if (input.files && input.files[0]) {
         afficherApercuDG(input.files[0]);
@@ -131,37 +135,38 @@
     var signaDGZone = document.getElementById("signaDGZone");
     var dginputFile = document.getElementById("id_signa_dg");
 
-    // Empêcher le navigateur d'ouvrir l'image dans un nouvel onglet
-    ["dragenter", "dragover", "dragleave", "drop"].forEach(function(evt){
-                signaDGZone.addEventListener(evt, function(e){
-                e.preventDefault();
-                e.stopPropagation();
-                });
-    });
+    if(signaDGZone){
+            // Empêcher le navigateur d'ouvrir l'image dans un nouvel onglet
+            ["dragenter", "dragover", "dragleave", "drop"].forEach(function(evt){
+                        signaDGZone.addEventListener(evt, function(e){
+                        e.preventDefault();
+                        e.stopPropagation();
+                        });
+            });
 
-    // Effet visuel pendant le survol avec un fichier
-    ["dragenter", "dragover"].forEach(function(evt){
-                signaDGZone.addEventListener(evt, function(){
-                signaDGZone.classList.add("drag-over");
-                });
-    });
-    
-    ["dragleave", "drop"].forEach(function(evt){
-                signaDGZone.addEventListener(evt, function(){
-                signaDGZone.classList.remove("drag-over");
-                });
-    });
-   
-    // Cas 2 : dépôt du fichier (drag & drop)
-    signaDGZone.addEventListener("drop", function(e){
-            var files = e.dataTransfer.files;
-            if (files.length > 0) {
-            dginputFile.files = files;
-            // injecte le fichier dans l'input Django
-            afficherApercu(files[0]);
-            }
-    });
-
+            // Effet visuel pendant le survol avec un fichier
+            ["dragenter", "dragover"].forEach(function(evt){
+                        signaDGZone.addEventListener(evt, function(){
+                        signaDGZone.classList.add("drag-over");
+                        });
+            });
+            
+            ["dragleave", "drop"].forEach(function(evt){
+                        signaDGZone.addEventListener(evt, function(){
+                        signaDGZone.classList.remove("drag-over");
+                        });
+            });
+        
+            // Cas 2 : dépôt du fichier (drag & drop)
+            signaDGZone.addEventListener("drop", function(e){
+                    var files = e.dataTransfer.files;
+                    if (files.length > 0) {
+                    dginputFile.files = files;
+                    // injecte le fichier dans l'input Django
+                    afficherApercuDG(files[0]);
+                    }
+            });
+    } // fin de if(signaDGZone)
 
     // Fonction commune : affiche l'aperçu de la signature du DE
     function afficherApercuDE(file) {
@@ -185,36 +190,38 @@
     var signaDEZone = document.getElementById("signaDEZone");
     var deinputFile = document.getElementById("id_signa_de");
 
-    // Empêcher le navigateur d'ouvrir l'image dans un nouvel onglet
-    ["dragenter", "dragover", "dragleave", "drop"].forEach(function(evt){
-                signaDEZone.addEventListener(evt, function(e){
-                e.preventDefault();
-                e.stopPropagation();
-                });
-    });
+    if(signaDEZone){
+            // Empêcher le navigateur d'ouvrir l'image dans un nouvel onglet
+            ["dragenter", "dragover", "dragleave", "drop"].forEach(function(evt){
+                        signaDEZone.addEventListener(evt, function(e){
+                        e.preventDefault();
+                        e.stopPropagation();
+                        });
+            });
 
-    // Effet visuel pendant le survol avec un fichier
-    ["dragenter", "dragover"].forEach(function(evt){
-                signaDEZone.addEventListener(evt, function(){
-                signaDEZone.classList.add("drag-over");
-                });
-    });
-    
-    ["dragleave", "drop"].forEach(function(evt){
-                signaDEZone.addEventListener(evt, function(){
-                signaDEZone.classList.remove("drag-over");
-                });
-    });
-   
-    // Cas 2 : dépôt du fichier (drag & drop)
-    signaDEZone.addEventListener("drop", function(e){
-            var files = e.dataTransfer.files;
-            if (files.length > 0) {
-            deinputFile.files = files;
-            // injecte le fichier dans l'input Django
-            afficherApercu(files[0]);
-            }
-    });
+            // Effet visuel pendant le survol avec un fichier
+            ["dragenter", "dragover"].forEach(function(evt){
+                        signaDEZone.addEventListener(evt, function(){
+                        signaDEZone.classList.add("drag-over");
+                        });
+            });
+            
+            ["dragleave", "drop"].forEach(function(evt){
+                        signaDEZone.addEventListener(evt, function(){
+                        signaDEZone.classList.remove("drag-over");
+                        });
+            });
+        
+            // Cas 2 : dépôt du fichier (drag & drop)
+            signaDEZone.addEventListener("drop", function(e){
+                    var files = e.dataTransfer.files;
+                    if (files.length > 0) {
+                    deinputFile.files = files;
+                    // injecte le fichier dans l'input Django
+                    afficherApercuDE(files[0]);
+                    }
+            });
+    } // fin de if(signaDEZone)
 
     // Pour la photo de l'élève
     function resetPhotoZone() {
@@ -269,36 +276,38 @@
     var PJZone = document.getElementById("piecejointeZone");
     var PJinputFile = document.getElementById("id_piece_jointe");
 
-    // Empêcher le navigateur d'ouvrir l'image dans un nouvel onglet
-    ["dragenter", "dragover", "dragleave", "drop"].forEach(function(evt){
-                PJZone.addEventListener(evt, function(e){
-                e.preventDefault();
-                e.stopPropagation();
-                });
-    });
+    if(PJZone){
+            // Empêcher le navigateur d'ouvrir l'image dans un nouvel onglet
+            ["dragenter", "dragover", "dragleave", "drop"].forEach(function(evt){
+                        PJZone.addEventListener(evt, function(e){
+                        e.preventDefault();
+                        e.stopPropagation();
+                        });
+            });
 
-    // Effet visuel pendant le survol avec un fichier
-    ["dragenter", "dragover"].forEach(function(evt){
-                PJZone.addEventListener(evt, function(){
-                PJZone.classList.add("drag-over");
-                });
-    });
-    
-    ["dragleave", "drop"].forEach(function(evt){
-                PJZone.addEventListener(evt, function(){
-                PJZone.classList.remove("drag-over");
-                });
-    });
-   
-    // Cas 2 : dépôt du fichier (drag & drop)
-    PJZone.addEventListener("drop", function(e){
-            var files = e.dataTransfer.files;
-            if (files.length > 0) {
-            deinputFile.files = files;
-            // injecte le fichier dans l'input Django
-            afficherApercu(files[0]);
-            }
-    });
+            // Effet visuel pendant le survol avec un fichier
+            ["dragenter", "dragover"].forEach(function(evt){
+                        PJZone.addEventListener(evt, function(){
+                        PJZone.classList.add("drag-over");
+                        });
+            });
+            
+            ["dragleave", "drop"].forEach(function(evt){
+                        PJZone.addEventListener(evt, function(){
+                        PJZone.classList.remove("drag-over");
+                        });
+            });
+        
+            // Cas 2 : dépôt du fichier (drag & drop)
+            PJZone.addEventListener("drop", function(e){
+                    var files = e.dataTransfer.files;
+                    if (files.length > 0) {
+                    deinputFile.files = files;
+                    // injecte le fichier dans l'input Django
+                    afficherApercuPJ(files[0]);
+                    }
+            });
+    } // fin de if(PJZone)
 
     // Reinitialisation de la zone pièce jointe
     function resetPJZone() {

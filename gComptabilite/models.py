@@ -20,7 +20,9 @@ CATEGORIE_DEPENSE_CHOICES = (
     ('Charges Recurrentes', 'Charges récurrentes'),  # 8
     ('Créances', 'Créances'),  # 9
     ('Dettes Fournisseurs', 'Dettes Fournisseurs'),  # 10
-    ('Autres Charges', 'Autres charges')  # 11
+    ('Autres Charges', 'Autres charges'),  # 11
+    ('Matériels Informatiques','Matériels Informatiques'), # 12
+    ('Matériels Didactiques','Matériels Didactiques'),
 )
 
 CATEGORIE_RECETTE_CHOICES = (

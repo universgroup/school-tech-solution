@@ -737,15 +737,15 @@
                                 <th>Prénom(s) & Nom Mère</th>
                                 <th>Prénom(s) & Nom Tuteur</th>
                                 <th>Contact père</th>
-                                <th>Contact mère</th>
+                                <th class="no-export">Contact mère</th>
                                 <th>Email père</th>
-                                <th>Email mère</th>
+                                <th class="no-export">Email mère</th>
                                 <th>Profession père</th>
-                                <th>Profession mère</th>
+                                <th class="no-export">Profession mère</th>
                                 <th>Personne contact</th>
                                 <th>Adresse</th>
-                                <th>Ecole d'origine</th>
-                                <th>Photo ID</th>
+                                <th class="no-export">Ecole d'origine</th>
+                                <th class="no-export">Photo ID</th>
                                 <th>Date naissance</th>
                                 <th>Lieu naissance</th>
                                 <th>Date entrée</th>
@@ -755,7 +755,7 @@
                                 <th>Année scolaire</th>
                                 <th>Date inscription</th>
                                 <th>ID Inscription</th>
-                                <th>Actions</th>
+                                <th class="no-export">Actions</th>
                         </tr>
 
                     </thead>
@@ -772,23 +772,23 @@
                                               <td>{{le.mateleve.mere}}</td>
                                               <td>{{le.mateleve.tuteur}}</td>
                                               <td>{{le.mateleve.contact_pere}}</td>
-                                              <td>{{le.mateleve.contact_mere}}</td>
+                                              <td class="no-export">{{le.mateleve.contact_mere}}</td>
                                               <td>{{le.mateleve.email_pere}}</td>
-                                              <td>{{le.mateleve.email_mere}}</td>
+                                              <td class="no-export">{{le.mateleve.email_mere}}</td>
                                               <td>{{le.mateleve.profes_pere}}</td>
-                                              <td>{{le.mateleve.profes_mere}}</td>
+                                              <td class="no-export">{{le.mateleve.profes_mere}}</td>
                                               <td>{{le.mateleve.personne_contact}}</td>
                                               <td>{{le.mateleve.adresse}}</td>
-                                              <td>{{le.mateleve.ecole_origine}}</td>
+                                              <td class="no-export">{{le.mateleve.ecole_origine}}</td>
 
                                               {% if le.mateleve.photo_eleve %}
-                                              <td>
+                                              <td class="no-export">
                                                     <a href="{{ le.mateleve.photo_eleve.url }}" target="_blank" title="Agrandir la photo de l'élève">
                                                         <img src="{{le.mateleve.photo_eleve.url}}" width="40px">
                                                     </a>
                                               </td>
                                               {% else %}
-                                              <td>Photo indisponible</td>
+                                              <td class="no-export">Photo indisponible</td>
                                               {% endif %}
 
                                               <td>{{le.mateleve.datenaissance|date:'j-n-Y'}}</td>
@@ -800,7 +800,7 @@
                                               <td>{{le.annee_scolaire}}</td>
                                               <td>{{le.date_inscription|date:'j-n-Y'}}</td>
                                               <td>{{le.id}}</td>
-                                              <td>
+                                              <td class="no-export">
                                                   <a class="btn btn-primary" href="{% url 'afficherdetailsinscription' le.id %}" title="Voir/Afficher"><i class="fa fa-eye fa-sm"></i></a>
                                                   <a class="btn btn-info" href="{% url 'editioninscription' le.id %}" title="Modifier/Editer"><i class="fa fa-edit fa-sm"></i></a>
                                                   <a class="btn btn-danger" href=" {% url 'suppinscription' le.id %}" title="Supprimer"><i class="fa fa-remove fa-sm"></i></a>
@@ -823,15 +823,15 @@
                             <th>Prénom(s) & Nom Mère</th>
                             <th>Prénom(s) & Nom Tuteur</th>
                             <th>Contact père</th>
-                            <th>Contact mère</th>
+                            <th class="no-export">Contact mère</th>
                             <th>Email père</th>
-                            <th>Email mère</th>
+                            <th class="no-export">Email mère</th>
                             <th>Profession père</th>
-                            <th>Profession mère</th>
+                            <th class="no-export">Profession mère</th>
                             <th>Personne contact</th>
                             <th>Adresse</th>
-                            <th>Ecole d'origine</th>
-                            <th>Photo ID</th>
+                            <th class="no-export">Ecole d'origine</th>
+                            <th class="no-export">Photo ID</th>
                             <th>Date naissance</th>
                             <th>Lieu naissance</th>
                             <th>Date entrée</th>
@@ -841,7 +841,7 @@
                             <th>Année scolaire</th>
                             <th>Date inscription</th>
                             <th>ID Inscription</th>
-                            <th>Actions</th>
+                            <th class="no-export">Actions</th>
                         </tr>
                    </tfoot>
             </table>
@@ -851,9 +851,9 @@
                     <div class="form-group">
                         <label for="effgarcons">Effectif total garçons</label>
                         {% if effectif_total_garcons %}
-                        <input type="text" id="effgarcons" name="effectif_total_garcons" value="{{ effectif_total_garcons }}" maxlength="25" class="form-control" readonly style="color:red">
+                        <input type="text" id="effgarcons" name="effectif_total_garcons" value="{{ effectif_total_garcons }}" class="form-control" readonly style="color:red; font-weight: bold; font-size: 12pt;">
                         {% else %}
-                        <input type="text" name="effectif_total_garcons" value="0" maxlength="25" class="form-control" readonly style="color:red">
+                        <input type="text" name="effectif_total_garcons" value="0" class="form-control" readonly style="color:red; font-weight: bold; font-size: 12pt;">
                         {% endif %}
                     </div>
                 </div>
@@ -863,9 +863,9 @@
                     <div class="form-group">
                         <label for="eff_filles">Effectif total filles</label>
                         {% if effectif_total_filles %}
-                        <input type="text" id="eff_filles" name="effectif_total_filles" value="{{ effectif_total_filles }}" maxlength="25" class="form-control" readonly style="color:red">
+                        <input type="text" id="eff_filles" name="effectif_total_filles" value="{{ effectif_total_filles }}" class="form-control" readonly style="color:red; font-weight: bold; font-size: 12pt;">
                         {% else %}
-                        <input type="text" name="effectif_total_filles" value="0" maxlength="25" class="form-control" readonly style="color:red">
+                        <input type="text" name="effectif_total_filles" value="0" class="form-control" readonly style="color:red; font-weight: bold; font-size: 12pt;">
                         {% endif %}
                     </div>
                 </div>
@@ -874,9 +874,9 @@
                     <div class="form-group">
                         <label for="efftotal">Effectif total</label>
                         {% if effectif_total %}
-                        <input type="text" id="efftotal" name="effectif_total" value="{{ effectif_total }}" maxlength="25" class="form-control" readonly style="color:red;">
+                        <input type="text" id="efftotal" name="effectif_total" value="{{ effectif_total }}" class="form-control" readonly style="color:red; font-weight: bold; font-size: 12pt;">
                         {% else %}
-                        <input type="text" name="effectif_total" value="0" maxlength="25" class="form-control" readonly style="color:red;">
+                        <input type="text" name="effectif_total" value="0" class="form-control" readonly style="color:red; font-weight: bold; font-size: 12pt;">
                         {% endif %}
                     </div>
                 </div>
@@ -936,15 +936,15 @@
                                 <th>Prénom(s) & Nom Mère</th>
                                 <th>Prénom(s) & Nom Tuteur</th>
                                 <th>Contact père</th>
-                                <th>Contact mère</th>
+                                <th class="no-export">Contact mère</th>
                                 <th>Email père</th>
-                                <th>Email mère</th>
+                                <th class="no-export">Email mère</th>
                                 <th>Profession père</th>
-                                <th>Profession mère</th>
+                                <th class="no-export">Profession mère</th>
                                 <th>Personne contact</th>
                                 <th>Adresse</th>
-                                <th>Ecole d'origine</th>
-                                <th>Photo ID</th>
+                                <th class="no-export">Ecole d'origine</th>
+                                <th class="no-export">Photo ID</th>
                                 <th>Date naissance</th>
                                 <th>Lieu naissance</th>
                                 <th>Date entrée</th>
@@ -954,7 +954,7 @@
                                 <th>Année scolaire</th>
                                 <th>Date inscription</th>
                                 <th>ID Inscription</th>
-                                <th>Actions</th>
+                                <th class="no-export">Actions</th>
                         </tr>
 
                     </thead>
@@ -971,23 +971,23 @@
                                               <td>{{le.mateleve.mere}}</td>
                                               <td>{{le.mateleve.tuteur}}</td>
                                               <td>{{le.mateleve.contact_pere}}</td>
-                                              <td>{{le.mateleve.contact_mere}}</td>
+                                              <td class="no-export">{{le.mateleve.contact_mere}}</td>
                                               <td>{{le.mateleve.email_pere}}</td>
-                                              <td>{{le.mateleve.email_mere}}</td>
+                                              <td class="no-export">{{le.mateleve.email_mere}}</td>
                                               <td>{{le.mateleve.profes_pere}}</td>
-                                              <td>{{le.mateleve.profes_mere}}</td>
+                                              <td class="no-export">{{le.mateleve.profes_mere}}</td>
                                               <td>{{le.mateleve.personne_contact}}</td>
                                               <td>{{le.mateleve.adresse}}</td>
-                                              <td>{{le.mateleve.ecole_origine}}</td>
+                                              <td class="no-export">{{le.mateleve.ecole_origine}}</td>
 
                                               {% if le.mateleve.photo_eleve %}
-                                              <td>
+                                              <td class="no-export">
                                                     <a href="{{ le.mateleve.photo_eleve.url }}" target="_blank" title="Agrandir la photo de l'élève">
                                                         <img src="{{le.mateleve.photo_eleve.url}}" width="40px">
                                                     </a>
                                               </td>
                                               {% else %}
-                                              <td>Photo indisponible</td>
+                                              <td class="no-export">Photo indisponible</td>
                                               {% endif %}
 
                                               <td>{{le.mateleve.datenaissance|date:'j-n-Y'}}</td>
@@ -999,7 +999,7 @@
                                               <td>{{le.annee_scolaire}}</td>
                                               <td>{{le.date_inscription|date:'j-n-Y'}}</td>
                                               <td>{{le.id}}</td>
-                                              <td>
+                                              <td class="no-export">
                                                   <a class="btn btn-primary" href="{% url 'afficherdetailsinscription' le.id %}" title="Voir/Afficher"><i class="fa fa-eye fa-sm"></i></a>
                                                   <a class="btn btn-info" href="{% url 'editioninscription' le.id %}" title="Modifier/Editer"><i class="fa fa-edit fa-sm"></i></a>
                                                   <a class="btn btn-danger" href=" {% url 'suppinscription' le.id %}" title="Supprimer"><i class="fa fa-remove fa-sm"></i></a>
@@ -1022,15 +1022,15 @@
                             <th>Prénom(s) & Nom Mère</th>
                             <th>Prénom(s) & Nom Tuteur</th>
                             <th>Contact père</th>
-                            <th>Contact mère</th>
+                            <th class="no-export">Contact mère</th>
                             <th>Email père</th>
-                            <th>Email mère</th>
+                            <th class="no-export">Email mère</th>
                             <th>Profession père</th>
-                            <th>Profession mère</th>
+                            <th class="no-export">Profession mère</th>
                             <th>Personne contact</th>
                             <th>Adresse</th>
-                            <th>Ecole d'origine</th>
-                            <th>Photo ID</th>
+                            <th class="no-export">Ecole d'origine</th>
+                            <th class="no-export">Photo ID</th>
                             <th>Date naissance</th>
                             <th>Lieu naissance</th>
                             <th>Date entrée</th>
@@ -1040,7 +1040,7 @@
                             <th>Année scolaire</th>
                             <th>Date inscription</th>
                             <th>ID Inscription</th>
-                            <th>Actions</th>
+                            <th class="no-export">Actions</th>
                         </tr>
                    </tfoot>
             </table>
@@ -1050,9 +1050,9 @@
                     <div class="form-group">
                         <label for="effgarcons">Effectif total garçons</label>
                         {% if effectif_total_garcons %}
-                        <input type="text" id="effgarcons" name="effectif_total_garcons" value="{{ effectif_total_garcons }}" maxlength="25" class="form-control" readonly style="color:red">
+                        <input type="text" id="effgarcons" name="effectif_total_garcons" value="{{ effectif_total_garcons }}" class="form-control" readonly style="color:red; font-weight: bold; font-size: 12pt;">
                         {% else %}
-                        <input type="text" name="effectif_total_garcons" value="0" maxlength="25" class="form-control" readonly style="color:red">
+                        <input type="text" name="effectif_total_garcons" value="0" class="form-control" readonly style="color:red; font-weight: bold; font-size: 12pt;">
                         {% endif %}
                     </div>
                 </div>
@@ -1062,9 +1062,9 @@
                     <div class="form-group">
                         <label for="eff_filles">Effectif total filles</label>
                         {% if effectif_total_filles %}
-                        <input type="text" id="eff_filles" name="effectif_total_filles" value="{{ effectif_total_filles }}" maxlength="25" class="form-control" readonly style="color:red">
+                        <input type="text" id="eff_filles" name="effectif_total_filles" value="{{ effectif_total_filles }}" class="form-control" readonly style="color:red; font-weight: bold; font-size: 12pt;">
                         {% else %}
-                        <input type="text" name="effectif_total_filles" value="0" maxlength="25" class="form-control" readonly style="color:red">
+                        <input type="text" name="effectif_total_filles" value="0" class="form-control" readonly style="color:red; font-weight: bold; font-size: 12pt;">
                         {% endif %}
                     </div>
                 </div>
@@ -1073,9 +1073,9 @@
                     <div class="form-group">
                         <label for="efftotal">Effectif total</label>
                         {% if effectif_total %}
-                        <input type="text" id="efftotal" name="effectif_total" value="{{ effectif_total }}" maxlength="25" class="form-control" readonly style="color:red;">
+                        <input type="text" id="efftotal" name="effectif_total" value="{{ effectif_total }}" class="form-control" readonly style="color:red; font-weight: bold; font-size: 12pt;">
                         {% else %}
-                        <input type="text" name="effectif_total" value="0" maxlength="25" class="form-control" readonly style="color:red;">
+                        <input type="text" name="effectif_total" value="0" class="form-control" readonly style="color:red; font-weight: bold; font-size: 12pt;">
                         {% endif %}
                     </div>
                 </div>
@@ -1218,9 +1218,7 @@
               className: 'btn btn-success btn-sm mr-1',
               title: 'Situation des reinscrits de l\'annee scolaire en cours',
               exportOptions: {
-                      columns: function (idx, data, node) {
-                          return true;   // inclut TOUTES les colonnes, même celles repliées par Responsive
-                      }
+                      columns: ':not(.no-export)',
                   }
             },
             {
@@ -1232,10 +1230,19 @@
               orientation: 'landscape',
               pageSize: 'A4',
               exportOptions: {
-                    columns: function (idx, data, node) {
-                        return true;   // inclut TOUTES les colonnes, même celles repliées par Responsive
-                    }
-                }
+                    columns: ':not(.no-export)',
+                },
+                customize: function (doc) {
+                    // Force toutes les colonnes à se partager équitablement la largeur de la page
+                    doc.content[1].table.widths = Array(doc.content[1].table.body[0].length).fill('*');
+
+                    // Réduit la taille de police pour que le contenu tienne mieux
+                    doc.defaultStyle.fontSize = 2;
+                    doc.styles.tableHeader.fontSize = 3;
+
+                    // Réduit les marges de page pour gagner de la place
+                    doc.pageMargins = [10, 20, 10, 20];
+                      }
             }
           ],
       "language": {
@@ -1275,9 +1282,7 @@
               className: 'btn btn-success btn-sm mr-1',
               title: 'Situation des reinscrits mensuels par classe',
               exportOptions: {
-                      columns: function (idx, data, node) {
-                          return true;   // inclut TOUTES les colonnes, même celles repliées par Responsive
-                      }
+                      columns: ':not(.no-export)',
                   }
             },
             {
@@ -1289,10 +1294,20 @@
               orientation: 'landscape',
               pageSize: 'A4',
               exportOptions: {
-                    columns: function (idx, data, node) {
-                        return true;   // inclut TOUTES les colonnes, même celles repliées par Responsive
-                    }
-                }
+                    columns: ':not(.no-export)',
+                },
+
+                customize: function (doc) {
+                    // Force toutes les colonnes à se partager équitablement la largeur de la page
+                    doc.content[1].table.widths = Array(doc.content[1].table.body[0].length).fill('*');
+
+                    // Réduit la taille de police pour que le contenu tienne mieux
+                    doc.defaultStyle.fontSize = 2;
+                    doc.styles.tableHeader.fontSize = 3;
+
+                    // Réduit les marges de page pour gagner de la place
+                    doc.pageMargins = [10, 20, 10, 20];
+                      }
             }
           ],
       "language": {

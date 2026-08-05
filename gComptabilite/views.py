@@ -84,7 +84,7 @@ def listerecette(request):
     
     cais = Caisse.objects.filter(Q(type_operation=TYPE_OPERATION_CAISSE_CHOICES[1][1]),
                                  Q(date_operation__month=mois_courant)).order_by(
-        '-date_operation')  # Affiche la situation de la caisse des recettes par ordre décroissant de la date
+        '-date_operation','id')  # Affiche la situation de la caisse des recettes par ordre décroissant de la date et ordre croissant de l'id
     # d'opération
     t_entree = Caisse.objects.filter(Q(type_operation=TYPE_OPERATION_CAISSE_CHOICES[1][1]),
                                      Q(date_operation__month=mois_courant)).aggregate(
@@ -180,7 +180,7 @@ def recherchersituationrecette(request):
         
         recette = Caisse.objects.filter(Q(anscolaire__exact=ans),
                                     Q(type_operation__exact=TYPE_OPERATION_CAISSE_CHOICES[1][1])).all().order_by(
-        '-date_operation')
+        '-date_operation','id')
         t_entree = Caisse.objects.filter(Q(type_operation=TYPE_OPERATION_CAISSE_CHOICES[1][1]),
                                      Q(anscolaire__exact=ans)).aggregate(
         entree=Sum('montant_encaisse'))
@@ -212,7 +212,7 @@ def recherchersituationrecette(request):
                
         recette = Caisse.objects.filter(Q(anscolaire__exact=ans),
                                     Q(type_operation__exact=TYPE_OPERATION_CAISSE_CHOICES[1][1]),Q(date_operation__range=(debut,fin))).all().order_by(
-        '-date_operation')
+        '-date_operation','id')
         t_entree = Caisse.objects.filter(Q(type_operation=TYPE_OPERATION_CAISSE_CHOICES[1][1]),
                                      Q(anscolaire__exact=ans),Q(date_operation__range=(debut,fin))).aggregate(
         entree=Sum('montant_encaisse'))
@@ -235,12 +235,15 @@ def recherchersituationrecette(request):
         else:
             total_sortie = 0       
 
+    annee = AnneeScolaire.objects.all().order_by(
+            'id')  # Permet de recuperer la liste générale des années scolaires en vue de charger la dropdown liste
+
 
     paginecais = Paginator(recette, 10)
     numpagecais = request.GET.get('page')
     recette = paginecais.get_page(numpagecais)
     return render(request, 'gComptabilite/liste_recettes.html',
-                  dict(recette=recette, total_entree=total_entree, total_sortie=total_sortie, solde_dispo=solde_dispo, ddebut=debut, dfin=fin))
+                  dict(recette=recette, total_entree=total_entree, total_sortie=total_sortie, solde_dispo=solde_dispo, ddebut=debut, dfin=fin, annee=annee))
 
 
 def enregistrerdepense(request):
@@ -297,7 +300,7 @@ def listedepense(request):
     
     cais = Caisse.objects.filter(Q(type_operation=TYPE_OPERATION_CAISSE_CHOICES[2][1]),
                                  Q(date_operation__month=mois_courant)).order_by(
-        '-date_operation')  # Affiche la situation de la caisse des recettes par ordre décroissant de la date
+        '-date_operation','id')  # Affiche la situation de la caisse des recettes par ordre décroissant de la date
     # d'opération
     t_entree = Caisse.objects.filter(Q(type_operation=TYPE_OPERATION_CAISSE_CHOICES[1][1]),
                                      Q(date_operation__month=mois_courant)).aggregate(
@@ -359,7 +362,7 @@ def recherchersituationdepense(request):
         
         depense = Caisse.objects.filter(Q(anscolaire__exact=ans),
                                     Q(type_operation__exact=TYPE_OPERATION_CAISSE_CHOICES[2][1])).all().order_by(
-        '-date_operation')
+        '-date_operation','id')
 
         t_entree = Caisse.objects.filter(Q(type_operation=TYPE_OPERATION_CAISSE_CHOICES[1][1]),
                                      Q(anscolaire__exact=ans)).aggregate(
@@ -390,7 +393,7 @@ def recherchersituationdepense(request):
         
         depense = Caisse.objects.filter(Q(anscolaire__exact=ans),
                                     Q(type_operation__exact=TYPE_OPERATION_CAISSE_CHOICES[2][1]),Q(date_operation__range=(debut,fin))).all().order_by(
-        '-date_operation')
+        '-date_operation','id')
 
         t_entree = Caisse.objects.filter(Q(type_operation=TYPE_OPERATION_CAISSE_CHOICES[1][1]),
                                      Q(anscolaire__exact=ans),Q(date_operation__range=(debut,fin))).aggregate(
@@ -413,6 +416,10 @@ def recherchersituationdepense(request):
         # filtre ci-dessus; 'sortie' est un alias de la colonne Sum('montant_encaisse')
         else:
             total_sortie = 0
+
+
+    annee = AnneeScolaire.objects.all().order_by(
+                'id')  # Permet de recuperer la liste générale des années scolaires en vue de charger la dropdown liste
             
 
     paginecais = Paginator(depense, 10)
@@ -420,7 +427,7 @@ def recherchersituationdepense(request):
     depense = paginecais.get_page(numpagecais)
 
     return render(request, 'gComptabilite/liste_depenses.html',
-                  dict(depense=depense, total_entree=total_entree, total_sortie=total_sortie, solde_dispo=solde_dispo, ddebut=debut, dfin=fin))
+                  dict(depense=depense, total_entree=total_entree, total_sortie=total_sortie, solde_dispo=solde_dispo, ddebut=debut, dfin=fin, annee=annee))
 
 
 def detailsdepense(request, id):
