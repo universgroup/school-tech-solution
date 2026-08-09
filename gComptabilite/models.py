@@ -29,10 +29,13 @@ CATEGORIE_RECETTE_CHOICES = (
     ('Selectionnez', 'Sélectionnez'),  # 0
     ('Scolarité', 'Scolarité'),  # 1
     ('Cantine', 'Cantine'),  # 2
-    ('Extra scolaire', 'Extra scolaire'),  # 3
-    ('Arriere Scolaire', 'Arriere scolaire'),  # 4
-    ('Remboursement Prêt', 'Remboursement prêt'),  # 5
-    ('Autres Recettes', 'Autres recettes')  # 6
+    ('Sport', 'Sport'),  # 3
+    ('Karaté','Karaté'), # 4
+    ('Natation','Natation'), # 5
+    ('Autres Extra Scolaires','Autres Extra Scolaires'), # 6
+    ('Arriere Scolaire', 'Arriere scolaire'),  # 7
+    ('Remboursement Prêt', 'Remboursement prêt'),  # 8
+    ('Autres Recettes', 'Autres recettes')  # 9
 )
 
 TYPE_PAIEMENT_MENSUALITE_CHOICES = (

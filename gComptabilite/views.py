@@ -15,9 +15,18 @@ from datetime import datetime, date
 import re # Librairie contenant les fonctions de gestion des regex
 import socket
 from smtplib import SMTPException
+
 from reportlab.pdfgen import canvas
 from reportlab.lib import colors  # Contient les méthodes/fonctions de gestion des couleurs
 from reportlab.lib.utils import ImageReader
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.units import cm
+from reportlab.platypus import (BaseDocTemplate, PageTemplate, Frame, NextPageTemplate,
+    Table, TableStyle, Paragraph, Spacer)
+from reportlab.platypus import Table as RLTable  # évite le conflit de nom avec votre "Table" du tableau principal
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.enums import TA_RIGHT # TA_CENTER, 
+
 from PIL import Image
 
 from django.urls import reverse
@@ -1114,18 +1123,357 @@ def supprimerpaiementscolaire(request, idpaie):
     etatpaie.delete()
     return redirect('../listepaiemensuel/')
 
+# Vue permettant de generer à partir de la fonction utilitaire le rapport des etats de paiement
+def rapportpaiementtranche(request):
+
+    anne = request.GET.get('annee')  
+    cycl = request.GET.get('cycle')   
+    clas = request.GET.get('classe')
+    nom_tranche = request.GET.get('tranche')
+
+    ec = Ecole.objects.count()
+    if ec == 0:
+        messages.error(request, 'Veuillez saisir les informations de l\'école')
+    else:
+        ecole = Ecole.objects.get(id=1)
+        if ecole.logo_ecole:
+            data_ecole = [ecole.nom_ecole, ecole.ville_ecole, ecole.prefect_commune,
+                          ecole.telephone1, ecole.telephone2, ecole.logo_ecole.path,
+                          ecole.devise_ecole, ecole.dsee, ecole.comptable]
+        else:
+            data_ecole = [ecole.nom_ecole, ecole.ville_ecole, ecole.prefect_commune,
+                          ecole.telephone1, ecole.telephone2, 'Logo',
+                          ecole.devise_ecole, ecole.dsee, ecole.comptable]
+
+    # Titre du rapport
+    titre = f"SUIVI DES PAIEMENTS DE LA {nom_tranche.upper()}"
+
+    # Appel de la fonction utilitaire
+
+    pdf_buffer = generer_rapport_paiement_scolarite(request,data_ecole=data_ecole,annee=anne, cycle=cycl, classe=clas, nom_tranche=nom_tranche, titre_rapport=titre)
+
+    # 1. Vérification de l'erreur avant toute chose
+    if pdf_buffer is None:
+        return redirect('../listepaiemensuel/') # Redirection vers la liste des paiements
+
+    # 2. TRÈS IMPORTANT : Remettre le curseur au début du buffer
+    # Sinon, FileResponse lit à partir de la fin et votre PDF sera vide.
+    pdf_buffer.seek(0)
     
+    return FileResponse(pdf_buffer, as_attachment=False,
+        filename=f'Situation_Paiement_{str(nom_tranche)}.pdf',
+        content_type='application/pdf')
 
 
 
+# Fonction utilitaire permettant de generer mon rapport des états de paiement
+def generer_rapport_paiement_scolarite(request, data_ecole, annee, cycle, classe, nom_tranche, titre_rapport):
+    """
+    Génère un PDF de suivi des paiements pour une tranche donnée.
+    Entête seulement sur la première page.
+    Numéro de page à droite au format 'n°page """
+
+    etatpaie = {}
+    etatpaie = EtatPaiementTranche.objects.none()
+    t_paye_t1 = {} # Permet de faire le cumul des montants de la première tranche
+    t_paye_t2 = {} # Permet de faire le cumul des montants de la deuxième tranche
+    total_paye_t1 = 0 # Contient le montant total des paiements de la première tranche
+    total_paye_t2 = 0 # Contient le montant total des paiements de la deuxième tranche
+    total_tranche = 0 
+    total_reste = 0
+
+    an = AnneeScolaire.objects.get(id=annee)
+    cy = CycleScolaire.objects.get(id=cycle)
+    cl = Classe.objects.get(id=classe)
+
+    # --- 1. Récupération des données (commune aux deux passes) ---
+    etatpaie = EtatPaiementTranche.objects.select_related(
+        'anneescolaire', 'mateleve', 'idcycle', 'idclasse' 
+    ).filter(Q(anneescolaire__exact=an), Q(idcycle__exact=cy),Q(idclasse__exact=cl)).order_by('mateleve__nom')
+
+    t_paye_t1 = EtatPaiementTranche.objects.select_related('anneescolaire', 'mateleve', 'idcycle', 'idclasse').filter(Q(anneescolaire__exact=an), Q(idcycle__exact=cy),Q(idclasse__exact=cl)).aggregate(totalpaye=Sum('premiere_tranche'))
+
+    t_paye_t2 = EtatPaiementTranche.objects.select_related('anneescolaire', 'mateleve', 'idcycle', 'idclasse').filter(Q(anneescolaire__exact=an), Q(idcycle__exact=cy),Q(idclasse__exact=cl)).aggregate(totalpaye=Sum('deuxieme_tranche'))
+
+    if t_paye_t1 is not None:
+        total_paye_t1 = t_paye_t1['totalpaye']
+    else:
+        total_paye_t1 = 0
+
+    if t_paye_t2 is not None:
+        total_paye_t2 = t_paye_t2['totalpaye']
+    else:
+        total_paye_t2 = 0
+
+    effectif = etatpaie.count() # Permet de compter le nombre d'élèves de la classe sélectionnée
+
+    if effectif == 0:
+        messages.error(request,"Aucun élève trouvé pour les critères donnés.")
+    else:
+         
+        # --- 2. Construction du tableau (identique) ---
+        entetes = ['N°', 'Matricule', 'Prénoms', 'Nom', nom_tranche, 'Montant payé', 'Reste à payer', 'Date paiement']
+        table_data = [entetes]
+
+        for i, etat in enumerate(etatpaie, start=1):
+
+            # Détermination de la tranche
+            if nom_tranche == DEUX_TRANCHES_CHOICES[0][0]: # Si c'est la première tranche qui a été sélectionnée dans la pop-up
+                montant_tranche = cl.tranche1 
+                paye = etat.premiere_tranche or 0
+                total_tranche = cl.tranche1*effectif
+
+            elif nom_tranche == DEUX_TRANCHES_CHOICES[1][0]: # Si c'est la seconde tranche qui a été sélectionnée dans la pop-up
+                montant_tranche = cl.tranche2
+                paye = etat.deuxieme_tranche or 0
+                total_tranche = cl.tranche2*effectif
+            
+            reste = montant_tranche - paye
+            dpaie = etat.date_paie
+            date_str = dpaie.strftime('%d-%m-%Y') if dpaie else ''
+
+            table_data.append([
+                str(i),
+                etat.mateleve.matricule,
+                etat.mateleve.prenom,
+                etat.mateleve.nom,
+                '{:,}'.format(montant_tranche),
+                '{:,}'.format(paye),
+                '{:,}'.format(reste),
+                date_str,
+            ])
+
+        if nom_tranche == DEUX_TRANCHES_CHOICES[0][0]: # Si c'est la première tranche qui a été sélectionnée dans la pop-up
+
+            total_reste = total_tranche - total_paye_t1    
+
+            # Ligne des totaux
+            table_data.append([
+                'Totaux', '', '', '',
+                '{:,}'.format(total_tranche),
+                '{:,}'.format(total_paye_t1),
+                '{:,}'.format(total_reste),
+                ''
+            ])
+                    
+        elif nom_tranche == DEUX_TRANCHES_CHOICES[1][0]: # Si c'est la seconde tranche qui a été sélectionnée
+
+            total_reste = total_tranche - total_paye_t2
+
+            # Ligne des totaux
+            table_data.append([
+                'Totaux', '', '', '',
+                '{:,}'.format(total_tranche),
+                '{:,}'.format(total_paye_t2),
+                '{:,}'.format(total_reste),
+                ''
+            ])
+        
+        
+        col_widths = [1.2*cm, 2.2*cm, 3.0*cm, 3.0*cm, 2.8*cm, 2.8*cm, 2.8*cm, 2.5*cm]
+        table = Table(table_data, repeatRows=1, colWidths=col_widths)
+
+        style = TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#2980b9')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+            ('FONTSIZE', (0, 0), (-1, 0), 8),
+            ('ALIGN', (0, 0), (-1, 0), 'LEFT'),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('FONTSIZE', (0, 1), (-1, -2), 8),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -2), [colors.white, colors.HexColor('#f5f5f5')]),
+            ('BACKGROUND', (0, -1), (-1, -1), colors.HexColor('#27ae60')),
+            ('TEXTCOLOR', (0, -1), (-1, -1), colors.white),
+            ('FONTSIZE', (0, -1), (-1, -1), 9),
+            ('ALIGN', (0, -1), (-1, -1), 'CENTER'),
+            ('SPAN', (0, -1), (3, -1)),   # ← fusionne les colonnes 0 à 3 (N°, Matricule, Prénoms, Nom) sur la ligne Totaux
+        ])
+        table.setStyle(style)
 
 
+        # --- 3. Éléments du flux ---
+        # NextPageTemplate bascule vers le template 'Suivantes' dès que la page 2 commence
+        elements = [NextPageTemplate('Suivantes'), Spacer(1, 0.3*cm)]
+        elements.append(table)
+        elements.append(Spacer(1, 1.0*cm))
 
+        style_signature = ParagraphStyle(
+        'Signature', parent=getSampleStyleSheet()['Normal'],
+        alignment=TA_RIGHT, fontName='Helvetica-Bold') # gras appliqué à tout le style
 
+        date_str = datetime.now().strftime('%d-%m-%Y')   
 
-    
+        bloc_signature = [
+            [Paragraph(f"Conakry, le {date_str}", style_signature)],
+            [Spacer(1, 0.8*cm)], # ← espace ajouté entre la date et "Le Service Scolarité"
+            [Paragraph("Le Service Scolarité", style_signature)],
+            [Spacer(1, 1.5*cm)], # ← espace agrandi : laisse la place à la signature manuscrite avant le nom
+            [Paragraph(str(data_ecole[8]) if len(data_ecole) > 8 and data_ecole[8] else '', style_signature)],
+                    ]
 
+        table_signature = RLTable(bloc_signature, colWidths=[A4[0] - 2*cm])  # même largeur que le cadre du contenu
+        table_signature.setStyle(TableStyle([
+            ('ALIGN', (0, 0), (-1, -1), 'RIGHT'),
+            ('LEFTPADDING', (0, 0), (-1, -1), 0),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 0),
+            ('TOPPADDING', (0, 0), (-1, -1), 0),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 0),
+                ]))
 
-
+        elements.append(table_signature)
 
         
+        def draw_entete(canvas_obj, doc):
+            width, height = A4
+            nom_ecole = data_ecole[0] if len(data_ecole) > 0 else ''
+            ville = data_ecole[1] if len(data_ecole) > 1 else ''
+            commune = data_ecole[2] if len(data_ecole) > 2 else ''
+            tel1 = data_ecole[3] if len(data_ecole) > 3 else ''
+            tel2 = data_ecole[4] if len(data_ecole) > 4 else ''
+            logo_chemin = data_ecole[5] if len(data_ecole) > 5 else ''
+            devise = data_ecole[6] if len(data_ecole) > 6 else ''
+            dsee = data_ecole[7] if len(data_ecole) > 7 else ''
+
+            canvas_obj.setFillColor(colors.black)
+            canvas_obj.setFont('Helvetica-Bold', 10)
+            canvas_obj.drawString(20, 815, 'MEPU-A')
+            canvas_obj.drawString(20, 800, 'IRE : ')
+            canvas_obj.setFont('Helvetica', 10)
+            canvas_obj.drawString(55, 800, str(ville))
+            canvas_obj.setFont('Helvetica-Bold', 10)
+            canvas_obj.drawString(20, 787, 'DCE : ')
+            canvas_obj.setFont('Helvetica', 10)
+            canvas_obj.drawString(55, 787, str(commune))
+            canvas_obj.setFont('Helvetica-Bold', 10)
+            canvas_obj.drawString(20, 772, 'DSEE : ')
+            canvas_obj.setFont('Helvetica', 10)
+            canvas_obj.drawString(55, 772, str(dsee))
+            canvas_obj.setFont('Helvetica-Bold', 10)
+            canvas_obj.drawString(20, 757, 'TEL : ')
+            canvas_obj.setFont('Helvetica', 10)
+            canvas_obj.drawString(55, 757, f"{tel1} / {tel2}")
+
+            if logo_chemin and logo_chemin != 'Logo':
+                try:
+                    img = Image.open(logo_chemin)
+                    img = img.resize((90, 60), Image.LANCZOS)
+                    if img.mode in ('RGBA', 'P'):
+                        img = img.convert('RGB')
+                    elif img.mode != 'RGB':
+                        img = img.convert('RGB')
+                    logo_buffer = io.BytesIO()
+                    img.save(logo_buffer, format='PNG')
+                    logo_buffer.seek(0)
+                    canvas_obj.drawImage(ImageReader(logo_buffer), 245, 770, 90, 60)
+                except Exception:
+                    pass
+
+            canvas_obj.setFillColor('Red')
+            canvas_obj.rect(449, 815, 30, 10, stroke=False, fill=True)
+            canvas_obj.setFillColor('yellow')
+            canvas_obj.rect(479, 815, 30, 10, stroke=False, fill=True)
+            canvas_obj.setFillColor('green')
+            canvas_obj.rect(509, 815, 30, 10, stroke=False, fill=True)
+            canvas_obj.setFillColor(colors.black)
+
+            canvas_obj.setFont('Helvetica-Bold', 10)
+            canvas_obj.drawString(450, 800, 'République de Guinée')
+            canvas_obj.setFont('Helvetica-Oblique', 9)
+            canvas_obj.drawString(450, 785, 'Travail-Justice-Solidarité')
+
+            canvas_obj.setFont('Helvetica-Bold', 12)
+            nom_x = (width - canvas_obj.stringWidth(str(nom_ecole), 'Helvetica-Bold', 12)) / 2
+            canvas_obj.drawString(nom_x, 740, str(nom_ecole))
+            if devise:
+                canvas_obj.setFont('Helvetica-Oblique', 9)
+                devise_x = (width - canvas_obj.stringWidth(str(devise), 'Helvetica-Oblique', 9)) / 2
+                canvas_obj.drawString(devise_x, 725, str(devise))
+
+            canvas_obj.line(20, 715, 575, 715)
+
+            titre = titre_rapport.upper()
+            canvas_obj.setFont('Helvetica-Bold', 12)
+            titre_x = (width - canvas_obj.stringWidth(titre, 'Helvetica-Bold', 12)) / 2
+            canvas_obj.drawString(titre_x, 700, titre)
+            canvas_obj.line(80, 694, 515, 694)
+
+            annee_str = an.descript_annee if an else ''
+            session = annee_str.split('-')[-1] if '-' in annee_str else annee_str
+            canvas_obj.setFont('Helvetica-Bold', 11)
+            canvas_obj.drawString(180, 680, 'Année Scolaire : ')
+            canvas_obj.setFont('Helvetica', 11)
+            canvas_obj.drawString(300, 680, annee_str)
+            canvas_obj.setFont('Helvetica-Bold', 11)
+            canvas_obj.drawString(400, 680, 'Session : ')
+            canvas_obj.setFont('Helvetica', 11)
+            canvas_obj.drawString(460, 680, session)
+
+            Y_CYCLE_CLASSE = 650   # décalé de 664 à 650 (14pt plus bas ; ajustez selon le rendu voulu)
+
+            canvas_obj.setFont('Helvetica-Bold', 11)
+            canvas_obj.drawString(20, Y_CYCLE_CLASSE, 'Cycle : ')
+            canvas_obj.setFont('Helvetica', 11)
+            canvas_obj.drawString(60, Y_CYCLE_CLASSE, str(cy.cycle) if cy else '')
+            canvas_obj.setFont('Helvetica-Bold', 11)
+            canvas_obj.drawString(150, Y_CYCLE_CLASSE, 'Classe : ')
+            canvas_obj.setFont('Helvetica', 11)
+            canvas_obj.drawString(200, Y_CYCLE_CLASSE, str(cl.nom_classe) if cl else '')
+            canvas_obj.setFont('Helvetica-Bold', 11)
+            canvas_obj.drawString(310, Y_CYCLE_CLASSE, 'Effectif de la classe : ')
+            canvas_obj.setFillColor(colors.red)
+            canvas_obj.setFont('Helvetica-Bold', 11)
+            canvas_obj.drawString(450, Y_CYCLE_CLASSE, str(effectif))
+            canvas_obj.setFillColor(colors.black)
+
+        # --- 5. Numéro de page (sur toutes les pages) ---
+        def draw_page_number(canvas_obj, doc):
+            canvas_obj.saveState()
+            canvas_obj.setFont('Helvetica', 8)
+            x = A4[0] - 1.5*cm
+            y = 1.0*cm
+            canvas_obj.drawRightString(x, y, f"Page {doc.page}")
+            canvas_obj.restoreState()
+
+        def on_first_page(canvas_obj, doc):
+            draw_entete(canvas_obj, doc)
+            draw_page_number(canvas_obj, doc)
+
+        def on_later_pages(canvas_obj, doc):
+            draw_page_number(canvas_obj, doc)
+
+        # --- 6. Construction avec deux PageTemplate ---
+        buffer = io.BytesIO()
+
+        marge_gauche_droite = 1.0*cm
+        marge_bas = 1.0*cm
+        largeur_frame = A4[0] - 2*marge_gauche_droite
+
+        # Page 1 : cadre qui commence sous l'entête (y=650pt depuis le bas, avec marge de sécurité)
+
+        y_fin_entete = 636   # 650 - 14, pour garder la même marge de sécurité qu'avant
+        hauteur_frame_page1 = y_fin_entete - marge_bas
+        frame_page1 = Frame(
+            marge_gauche_droite, marge_bas,
+            largeur_frame, hauteur_frame_page1,
+            id='page1', showBoundary=0
+        )
+
+        # Pages suivantes : cadre classique, marge haute réduite
+        frame_suivantes = Frame(
+            marge_gauche_droite, marge_bas,
+            largeur_frame, A4[1] - marge_bas - 1.5*cm,
+            id='suivantes', showBoundary=0
+        )
+
+        doc = BaseDocTemplate(buffer, 
+                            pagesize=A4,
+                            title='Situation des Paiements par tranche')
+        doc.addPageTemplates([
+            PageTemplate(id='Premiere', frames=frame_page1, onPage=on_first_page),
+            PageTemplate(id='Suivantes', frames=frame_suivantes, onPage=on_later_pages),
+        ])
+
+        doc.build(elements)
+        buffer.seek(0)
+        return buffer
+

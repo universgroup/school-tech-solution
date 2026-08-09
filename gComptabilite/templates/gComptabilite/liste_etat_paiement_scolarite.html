@@ -706,8 +706,13 @@
                                     <button type="submit" id="btn_rechercher" class="btn btn-secondary btn-md mr-2" title="Filtrer la liste des paiements par année scolaire et classe">Rechercher &nbsp;<i class="fas fa-search"></i></button>
                                     <a href="{% url  'listepaiemensuel' %}" target="_self" class="btn btn-warning btn-md mr-3" title="Actualiser la liste des paiements">Actualiser &nbsp;<i class="fas fa-refresh"></i></a>
                                     
-                                    
-                                </div>
+                                    <button type="button" class="btn btn-danger btn-md mr-2"
+                                          title="Imprimer le rapport des états de paiement de la scolarité"
+                                          data-toggle="modal"
+                                          data-target="#modalRapportPaiement">
+                                      Rapport paiement &nbsp;<i class="fas fa-print"></i>
+                                  </button>
+                             </div>
 
                             </form>
                         </div>
@@ -723,6 +728,8 @@
 
         <div class="card-body">
 
+          {% include 'messages.html' %}
+
         {% if listepaiementmensuel %}
 
              <table id="listepaiemensuel" class="table table-bordered table-striped">
@@ -734,9 +741,9 @@
                                 <th>Prénom(s)</th>
                                 <th>Sexe</th>
                                 <th>Prénom(s) Père</th>
-                                <th>Prénom(s) & Nom Mère</th>
+                                <th class="no-export">Prénom(s) & Nom Mère</th>
                                 <th>Contact père</th>
-                                <th>Contact mère</th>
+                                <th class="no-export">Contact mère</th>
                                 <th>Ins/Reins</th>
                                 <th>1ère tranche</th>
                                 <th>2ème tranche</th>
@@ -760,9 +767,9 @@
                                               <td>{{lp.mateleve.prenom}}</td>
                                               <td>{{lp.mateleve.sexe_eleve}}</td>
                                               <td>{{lp.mateleve.pere}}</td>
-                                              <td>{{lp.mateleve.mere}}</td>
+                                              <td class="no-export">{{lp.mateleve.mere}}</td>
                                               <td>{{lp.mateleve.contact_pere}}</td>
-                                              <td>{{lp.mateleve.contact_mere}}</td>
+                                              <td class="no-export">{{lp.mateleve.contact_mere}}</td>
                                               <td>{{lp.inscription|floatformat:'2g'}}</td>
                                               <td>{{lp.premiere_tranche|floatformat:'2g'}}</td>
                                               <td>{{lp.deuxieme_tranche|floatformat:'2g'}}</td>
@@ -796,7 +803,7 @@
                           
                           <div class="modal-content">
 
-                              <div class="modal-header">
+                              <div class="modal-header bg-primary">
                                 <h5 class="modal-title">Assistant impression du reçu de paiement</h5>
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
                                   <span aria-hidden="true">&times;</span>
@@ -823,7 +830,7 @@
                               <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
                                 <button type="button" class="btn btn-primary" id="btnGenererRecu">
-                                    Imprimer <i class="fa fa-print"></i>
+                                    Aperçu <i class="fa fa-print"></i>
                                 </button>
                               </div>
                           </div>
@@ -839,9 +846,9 @@
                             <th>Prénom(s)</th>
                             <th>Sexe</th>
                             <th>Prénom(s) Père</th>
-                            <th>Prénom(s) & Nom Mère</th>
+                            <th class="no-export">Prénom(s) & Nom Mère</th>
                             <th>Contact père</th>
-                            <th>Contact mère</th>
+                            <th class="no-export">Contact mère</th>
                             <th>Ins/Reins</th>
                             <th>1ère tranche</th>
                             <th>2ème tranche</th>
@@ -954,9 +961,9 @@
                                 <th>Prénom(s)</th>
                                 <th>Sexe</th>
                                 <th>Prénom(s) Père</th>
-                                <th>Prénom(s) & Nom Mère</th>
+                                <th class="no-export">Prénom(s) & Nom Mère</th>
                                 <th>Contact père</th>
-                                <th>Contact mère</th>
+                                <th class="no-export">Contact mère</th>
                                 <th>Ins/Reins</th>
                                 <th>1ère tranche</th>
                                 <th>2ème tranche</th>
@@ -981,9 +988,9 @@
                                               <td>{{lp.mateleve.prenom}}</td>
                                               <td>{{lp.mateleve.sexe_eleve}}</td>
                                               <td>{{lp.mateleve.pere}}</td>
-                                              <td>{{lp.mateleve.mere}}</td>
+                                              <td class="no-export">{{lp.mateleve.mere}}</td>
                                               <td>{{lp.mateleve.contact_pere}}</td>
-                                              <td>{{lp.mateleve.contact_mere}}</td>
+                                              <td class="no-export">{{lp.mateleve.contact_mere}}</td>
                                               <td>{{lp.inscription|floatformat:'2g'}}</td>
                                               <td>{{lp.premiere_tranche|floatformat:'2g'}}</td>
                                               <td>{{lp.deuxieme_tranche|floatformat:'2g'}}</td>
@@ -1019,7 +1026,7 @@
                           
                           <div class="modal-content">
 
-                              <div class="modal-header">
+                              <div class="modal-header bg-primary">
                                 <h5 class="modal-title">Assistant impression du reçu de paiement</h5>
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
                                   <span aria-hidden="true">&times;</span>
@@ -1063,9 +1070,9 @@
                             <th>Prénom(s)</th>
                             <th>Sexe</th>
                             <th>Prénom(s) Père</th>
-                            <th>Prénom(s) & Nom Mère</th>
+                            <th class="no-export">Prénom(s) & Nom Mère</th>
                             <th>Contact père</th>
-                            <th>Contact mère</th>
+                            <th class="no-export">Contact mère</th>
                             <th>Ins/Reins</th>
                             <th>1ère tranche</th>
                             <th>2ème tranche</th>
@@ -1185,6 +1192,75 @@
         <!-- /.row -->
     </section>
     <!-- /.content -->
+
+      <!--Popup permettant d'imprimer le rapport de paiement de la scolarité-->
+
+        <div class="modal fade" id="modalRapportPaiement" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+
+                <div class="modal-content">
+
+                  <div class="modal-header bg-danger">
+                        <h5 class="modal-title text-white">Assistant impression du rapport de paiement</h5>
+                        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Fermer">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                  </div>
+
+                  <div class="modal-body">
+
+                        <div class="form-group">
+                          <label for="modal_annee_rapport">Année scolaire<strong style="color:red; font-weight: bold;">*</strong></label>
+                          <select id="modal_annee_rapport" class="form-control">
+                            <option value="" selected>Sélectionnez</option>
+                            {% for ane in ans %}
+                            <option value="{{ane.id}}">{{ane.descript_annee}}</option>
+                            {% endfor %}
+                          </select>
+                        </div>
+
+                        <div class="form-group">
+                          <label for="modal_cycle_rapport">Cycle<strong style="color:red; font-weight: bold;">*</strong></label>
+                          <select id="modal_cycle_rapport" class="form-control">
+                            <option value="" selected>Sélectionnez</option>
+                            {% for cy in cycles %}
+                            <option value="{{cy.id}}">{{cy.cycle}}</option>
+                            {% endfor %}
+                          </select>
+                        </div>
+
+                        <div class="form-group">
+                          <label for="modal_classe_rapport">Classe<strong style="color:red; font-weight: bold;">*</strong></label>
+                          <select id="modal_classe_rapport" class="form-control">
+                            <option value="" selected>Sélectionnez</option>
+                            <!-- rempli dynamiquement en JS selon le cycle choisi, voir plus bas -->
+                          </select>
+                        </div>
+
+                        <div class="form-group">
+                          <label for="modal_tranche_rapport">Tranche payée<strong style="color:red; font-weight: bold;">*</strong></label>
+                          <select id="modal_tranche_rapport" class="form-control">
+                            <option value="" selected>Sélectionnez</option>
+                            {% for tranche in tranche_paye %}
+                            <option value="{{tranche.0}}">{{tranche.1}}</option>
+                            {% endfor %}
+                          </select>
+                        </div>
+
+                        <div id="modal_rapport_erreur" class="text-danger" style="display:none;"></div>
+                  </div>
+
+                  <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                      <button type="button" class="btn btn-primary" id="btnGenererRapportPaiement">
+                          Aperçu <i class="fas fa-print"></i>
+                      </button>
+                  </div>
+                </div>
+
+            </div>
+        </div>
+
   </div>
   <!-- /.content-wrapper -->
   <footer class="main-footer">
@@ -1434,6 +1510,63 @@
       window.open(url, "_blank");   // ouvre le reçu dans un nouvel onglet, comme le target="_blank" d'origine
       $("#modalRecuPaiement").modal("hide");
   });
+
+  // Pour la gestion de la pop-up Impression du rapport de paiement de la scolarité
+  $("#modal_cycle_rapport").change(function(){
+        var url = $("#fetatpaiement").attr("data-classe-url");
+        var idcycle_modal = $(this).val();
+
+        $.ajax({
+            url:url,
+            data:{
+                'idcycle':idcycle_modal
+            },
+            success:function(data){
+                $("#modal_classe_rapport").html(data);
+            }
+
+        });
+    });
+
+    // Génération du rapport de paiement de la scolarité
+    $("#btnGenererRapportPaiement").click(function(){
+
+        var annee = $("#modal_annee_rapport").val();
+        var cycle = $("#modal_cycle_rapport").val();
+        var classe = $("#modal_classe_rapport").val();
+        var tranche = $("#modal_tranche_rapport").val();
+
+        if (!annee) {
+            $("#modal_rapport_erreur").text("Veuillez sélectionner l'année scolaire concerné.").show();
+            return;
+        }
+
+        if (!cycle) {
+            $("#modal_rapport_erreur").text("Veuillez sélectionner le cycle concerné par le rapport.").show();
+            return;
+        }
+
+        if (!classe) {
+            $("#modal_rapport_erreur").text("Veuillez sélectionner la classe à imprimer.").show();
+            return;
+        }
+
+        if (!tranche) {
+            $("#modal_rapport_erreur").text("Veuillez sélectionner la tranche concernée par le rapport.").show();
+            return;
+        }
+
+        $("#modal_rapport_erreur").hide();
+
+        var url = "{% url 'rapportpaiementscolarite' %}" +
+            "?annee=" + encodeURIComponent(annee) +
+            "&cycle=" + encodeURIComponent(cycle) +
+            "&classe=" + encodeURIComponent(classe) +
+            "&tranche=" + encodeURIComponent(tranche);
+
+        window.open(url, "_blank"); // ouvre le reçu dans un nouvel onglet, comme le target="_blank" d'origine
+        $("#modalRapportPaiement").modal("hide");
+    });
 
 </script> 
 

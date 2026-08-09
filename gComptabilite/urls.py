@@ -31,6 +31,7 @@ urlpatterns = [
     path('editionpaiement/<int:idpaie>',editerpaiementscolaire,name='editionpaiement'),
     path('modifierpaiement/<int:idpaie>',modifieretatpaiement, name='modifierpaiement'),
     path('supprimerpaiement/<int:idpaie>',supprimerpaiementscolaire, name='supprimerpaiement'),
+    path('rapportpaiementscolarite/',rapportpaiementtranche, name='rapportpaiementscolarite'),
 
 
 ]
