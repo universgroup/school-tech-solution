@@ -65,6 +65,10 @@ class Ecole(models.Model):
     comptable = models.CharField(max_length=50, null=True)
     signa_dg = models.FileField(upload_to='media/', null=True, blank=True)
     signa_de = models.FileField(upload_to='media/', null=True, blank=True)
+    delai_tranche1 = models.DateField(null=True) # Date limite fixée par la fondation pour le paiement de la première tranche de la scolarité
+    delai_tranche2 = models.DateField(null=True) # Date limite fixée par la fondation pour le paiement de la seconde tranche de la scolarité
+    delai_reinscription = models.DateField(null=True) # Date de début des reinscriptions fixée par la fondation
+
 
     def __str__(self):
         return '{} | {} | {} '.format(self.nom_ecole, self.ville_ecole, self.telephone1)

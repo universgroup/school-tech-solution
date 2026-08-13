@@ -133,20 +133,32 @@
 
                     <div class="row g-3">
 
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <div class="form-group">
                                 <label for="id_date_paie">Date paiement<strong style="color:red; font-weight: bold;">*</strong></label>
                                 <input type="date" class="form-control" id="id_date_paie" name="date_paiement" required title="Sélectionnez la date de paiement">
                             </div>
                         </div>
 
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <div class="form-group">
                                 <label for="id_tranche_paye">Tranche payée<strong style="color:red; font-weight: bold;">*</strong></label>
                                 <select id="id_tranche_paye" name="cbo_tranche_paye" class="form-control" required title="Sélectionnez la tranche à payer">
                                     <option value="" selected>Sélectionnez</option>
                                     {% for tranche in tranche_paye %}
                                     <option value="{{tranche.0}}">{{tranche.1}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label for="id_mode_paie">Mode paiement</label>
+                                <select id="id_mode_paie" name="mode_paiement" class="form-control" title="Sélectionnez le mode de paiement">
+                                    <option value="" selected>Sélectionnez</option>
+                                    {% for modep in modepaie %}
+                                    <option value="{{modep.0}}">{{modep.1}}</option>
                                     {% endfor %}
                                 </select>
                             </div>

@@ -7,6 +7,7 @@
   <title>{% block titre_page %} {% endblock titre_page %}</title>
   <!-- Tell the browser to be responsive to screen width -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="{% static 'assets/dist/img/LogoEC.png' %}">
 
   <!-- Font Awesome -->
   <link rel="stylesheet" href="{% static 'assets/plugins/fontawesome-free/css/all.min.css' %}">
@@ -73,8 +74,7 @@
               <li><a href="{% url 'chargeranneecourante' %}" class="dropdown-item">Inscription</a></li>
               <li><a href="{% url 'listereinscritsanneecourante' %}" class="dropdown-item">Reinscription</a></li>
               <li><a href="{% url 'listepaiemensuel' %}" class="dropdown-item">Etat des paiements</a></li>
-              <li><a href="#" class="dropdown-item">Etat des inscriptions/reinscriptions</a></li>
-              <li><a href="#" class="dropdown-item">Liste des élèves par classe</a></li>
+              <li><a href="#" class="dropdown-item">Etat des inscriptions/reinscriptions</a></li>              
               <li><a href="{% url 'registrematricule' %}" class="dropdown-item">Registre de matriculation</a></li>
             </ul>
       </li>
@@ -726,8 +726,7 @@
 <script src="{% static 'assets/dist/js/demo.js' %}"></script>
 
 <!-- Affichage de la photo dans les differents templates qui utilisent les photos -->
- <script src="{% static 'assets/js/zonephoto.js' %}"></script>
-
+<script src="{% static 'assets/js/zonephoto.js' %}"></script>
 
 {% block javascript %}
 <script>

@@ -87,13 +87,24 @@ INFORMATIONS SUR LE PAIEMENT
                 </div>
 
                 <div class="row g-3">
-                    <div class="col-md-12">
+                    <div class="col-md-6">
                         <div class="form-group">
                             <label for="id_nom_tranche">Tranche payée</label>
-                            <select id="id_nom_tranche" name="nom_tranche" class="form-control">
+                            <select id="id_nom_tranche" name="nom_tranche" class="form-control" title="Sélectionnez la tranche à payer">
                                 <option value="" selected>Sélectionnez</option>
                                 {% for tranche in tranche_paye %}
                                 <option value="{{tranche.0}}">{{tranche.1}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_mode_paie">Mode paiement</label>
+                            <select id="id_mode_paie" name="mode_paiement" class="form-control" title="Sélectionnez le mode de paiement">
+                                <option value="{{paie.mode_paie}}" selected>{{paie.mode_paie}}</option>
+                                {% for modep in modepaie %}
+                                <option value="{{modep.0}}">{{modep.1}}</option>
                                 {% endfor %}
                             </select>
                         </div>

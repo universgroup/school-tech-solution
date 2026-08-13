@@ -153,6 +153,30 @@ DONNEES DE L'ECOLE
                 <div class="row g-3">
                     <div class="col-md-6">
                         <div class="form-group">
+                            <label for="id_delai_t1">Date limite première tranche</label>
+                            <input type="text" id="id_delai_t1" name="delai_tranche1" value="{{ecole.delai_tranche1}}" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="id_delai_t2">Date limite deuxième tranche</label>
+                            <input type="text" id="id_delai_t2" name="delai_tranche2" value="{{ecole.delai_tranche2}}" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="id_delai_reinscription">Date début reinscription</label>
+                            <input type="text" id="id_delai_reinscription" name="delai_reinscription" value="{{ecole.delai_reinscription}}" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
                             <div class="text-center">
                                 {% if ecole.logo_ecole %}
                                     <img src="{{ecole.logo_ecole.url}}" width="90px" title="Logo ecole">

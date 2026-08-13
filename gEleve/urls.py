@@ -24,4 +24,7 @@ urlpatterns = [
     path('chargerinfoeleveclasse/', chargerinfoeleveclasse, name='chargerinfoeleveclasse'), # url permettant de charger les prénoms, nom et photo de l'élève lors de la reinscription
     path('listereinscritsanneecourante/',listereinscritsanneescolairecourante,name='listereinscritsanneecourante'),
     path('filtrerlistereinscrits/',filtrelistereinscrits,name='filtrerlistereinscrits'),
+    path('rapportlisteinscrits/', rapportlisteinscrits, name='rapportlisteinscrits'),
+    path('rapportlistereinscrits/', rapportlistereinscrits, name='rapportlistereinscrits'),
+    path('rapportmatriculation/',rapportlistegenerale, name='rapportmatriculation'),
 ]

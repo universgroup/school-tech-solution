@@ -9,6 +9,9 @@
     <!-- Tell the browser to be responsive to screen width -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
+    <!--Favicon-->
+    <link rel="icon" type="image/png" href="{% static 'assets/dist/img/LogoEC.png' %}">
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="{% static 'assets/plugins/fontawesome-free/css/all.min.css' %}">
     <!-- Ionicons -->
@@ -707,6 +710,13 @@
                                     <button type="submit" id="btn_rechercher" class="btn btn-secondary btn-md mr-2" title="Filtrer la liste des élèves par année scolaire et cycle">Rechercher &nbsp;<i class="fas fa-search"></i></button>
                                     <a href="{% url  'registrematricule' %}" target="_self" class="btn btn-warning btn-md mr-3" title="Actualiser la liste générale des élèves">Actualiser &nbsp;<i class="fas fa-refresh"></i></a>
                                     
+                                    <button type="button" class="btn btn-danger btn-md mr-2"
+                                          title="Imprimer la liste des inscrits/reinscrits par classe et année scolaire"
+                                          data-toggle="modal"
+                                          data-target="#modalRapportInscrits">
+                                      Rapport inscription &nbsp;<i class="fas fa-print"></i>
+                                  </button>
+
                                 </div>
 
                             </form>
@@ -722,6 +732,7 @@
               <!-- /.card-header -->
 
         <div class="card-body">
+            {% include 'messages.html' %}
 
         {% if listegenerale %}
              <table id="listegenerale" class="table table-bordered table-striped">
@@ -1138,7 +1149,75 @@
         <!-- /.row -->
     </section>
     <!-- /.content -->
-  </div>
+
+    
+    <!-- Pop up permettant d'imprimer la liste des élèves inscrits par classe-->
+    <div class="modal fade" id="modalRapportInscrits" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+          <div class="modal-header bg-primary">
+            <h5 class="modal-title text-white">Assistant impression des élèves inscrits/reinscrits</h5>
+            <button type="button" class="close text-white" data-dismiss="modal" aria-label="Fermer">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+
+          <div class="modal-body">
+
+            <div class="form-group">
+              <label for="modal_type_liste">Type de liste<strong style="color:red">*</strong></label>
+              <select id="modal_type_liste" class="form-control">
+                <option value="" selected>Sélectionnez</option>
+                <option value="1">Inscription</option>
+                <option value="2">Reinscription</option>
+                <option value="3">Générale</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="modal_annee_inscrits">Année scolaire<strong style="color:red">*</strong></label>
+              <select id="modal_annee_inscrits" class="form-control">
+                <option value="" selected>Sélectionnez</option>
+                {% for annee in ansc %}
+                <option value="{{annee.id}}">{{annee.descript_annee}}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="modal_cycle_inscrits">Cycle<strong style="color:red">*</strong></label>
+              <select id="modal_cycle_inscrits" class="form-control">
+                <option value="" selected>Sélectionnez</option>
+                {% for cycle in cycles %}
+                <option value="{{cycle.id}}">{{cycle.cycle}}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="modal_classe_inscrits">Classe<strong style="color:red">*</strong></label>
+              <select id="modal_classe_inscrits" class="form-control">
+                <option value="" selected>Sélectionnez</option>
+                <!-- rempli dynamiquement en JS selon le cycle choisi -->
+              </select>
+            </div>
+
+            <div id="modal_inscrits_erreur" class="text-danger" style="display:none;"></div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+            <button type="button" class="btn btn-primary" id="btnGenererRapportInscrits">
+                Aperçu <i class="fas fa-print"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+</div>
   <!-- /.content-wrapper -->
   <footer class="main-footer">
     <div class="float-right d-none d-sm-block">
@@ -1348,6 +1427,58 @@
 
         });
     });
+
+
+    $(function() {
+        $("#modal_cycle_inscrits").change(function(){
+            var urlClasses = $("#frecherche").attr("data-classe-url");
+            var idcycle = $(this).val();
+
+            if (!idcycle) {
+                $("#modal_classe_inscrits").html('<option value="" selected>Sélectionnez</option>');
+                return;
+            }
+
+            $.ajax({
+                url: urlClasses,
+                data: { 'idcycle': idcycle },
+                success: function(data){
+                    $("#modal_classe_inscrits").html(data);
+                }
+            });
+        });
+
+        $("#btnGenererRapportInscrits").click(function(){
+            var typeListe = $("#modal_type_liste").val();
+            var annee = $("#modal_annee_inscrits").val();
+            var cycle = $("#modal_cycle_inscrits").val();
+            var classe = $("#modal_classe_inscrits").val();
+
+            if (!typeListe || !annee || !cycle || !classe) {
+                $("#modal_inscrits_erreur").text("Veuillez sélectionner tous les critères.").show();
+                return;
+            }
+            $("#modal_inscrits_erreur").hide();
+
+            // Le type de liste détermine uniquement quelle URL appeler, jamais transmis au backend
+            var nomUrl;
+            if (typeListe === "2") {
+                nomUrl = "{% url 'rapportlistereinscrits' %}";
+            } else if (typeListe === "3") {
+                nomUrl = "{% url 'rapportmatriculation' %}";
+            } else {
+                nomUrl = "{% url 'rapportlisteinscrits' %}";
+            }
+
+            var url = nomUrl +
+                "?annee=" + encodeURIComponent(annee) +
+                "&cycle=" + encodeURIComponent(cycle) +
+                "&classe=" + encodeURIComponent(classe);
+
+            window.open(url, "_blank");
+            $("#modalRapportInscrits").modal("hide");
+        });
+      })
 
 
  </script>

@@ -74,7 +74,7 @@ class FormEcole(ModelForm):
         fields = (
             'nom_ecole', 'ville_ecole', 'prefect_commune', 'dsee', 'telephone1', 'telephone2', 'agrement_ecole',
             'bp_ecole',
-            'email_ecole', 'site_internet', 'devise_ecole', 'dg', 'dga', 'coordo_maternelle', 'coordo_primaire', 'coordo_secondaire', 'comptable',
+            'email_ecole', 'site_internet', 'devise_ecole', 'dg', 'dga', 'coordo_maternelle', 'coordo_primaire', 'coordo_secondaire', 'comptable','delai_tranche1','delai_tranche2','delai_reinscription',
             'logo_ecole', 'signa_dg', 'signa_de')  # '__all__'
         labels = {
             'nom_ecole': 'Nom école/Raison sociale',
@@ -94,6 +94,9 @@ class FormEcole(ModelForm):
             'coordo_primaire': 'Coordinateur Primaire',
             'coordo_secondaire': 'Coordinateur Secondaire',
             'comptable': 'Comptable',
+            'delai_tranche1': 'Date limite première tranche',
+            'delai_tranche2': 'Date limite deuxième tranche',
+            'delai_reinscription': 'Date ouverture reinscription',
             'logo_ecole': 'Logo école',
             'signa_dg': 'Signature du DG',
             'signa_de': 'Signature du DE'
@@ -144,8 +147,14 @@ class FormEcole(ModelForm):
                 attrs={'class': 'form-control', 'placeholder': 'Prénoms et Nom du Coordinateur Secondaire',
                        'title': 'Saisissez le prénoms et nom du coordinateur du secondaire'}),
                        
-            'comptable': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Prénoms et Nom Comptable',
-                                                'title': 'Saisissez le prénoms et nom du/de la comptable'}),
+            'comptable': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Prénoms et Nom Comptable', 'title': 'Saisissez le prénoms et nom du/de la comptable'}),
+
+            'delai_tranche1': forms.DateInput(attrs={'type':'date', 'class':'form-control', 'title':'Date limite de paiement pour la première tranche'}),
+
+            'delai_tranche2': forms.DateInput(attrs={'type':'date', 'class':'form-control', 'title':'Date limite de paiement pour la deuxième tranche'}),
+
+            'delai_reinscription' : forms.DateInput(attrs={'type':'date','class':'form-control', 'title':'Date d\'ouverture des reinscriptions'}),
+
             'logo_ecole': forms.FileInput(
                 attrs={'class': 'd-none', 'title': 'Importez le logo de l\'école',
                        'accept': 'image/*', 'id':'id_logo_ecole', 'onchange': 'previewLogoEcole(this)'}),

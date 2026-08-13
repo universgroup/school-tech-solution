@@ -126,9 +126,24 @@
                     </div>
 
                     <div class="row g-3">
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <div class="form-group">
                                 {{form.comptable|as_crispy_field}}
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                {{form.delai_tranche1|as_crispy_field}}
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                {{form.delai_tranche2|as_crispy_field}}
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                {{form.delai_reinscription|as_crispy_field}}
                             </div>
                         </div>
                     </div>

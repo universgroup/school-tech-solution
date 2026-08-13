@@ -565,6 +565,7 @@ def validerpaiementscolarite(request):
         clas = request.POST.get('classe')
         mat = request.POST.get('matricule')
         cycl = request.POST.get('cycle')
+        modepaie = request.POST.get('mode_paiement')
 
         nom_tranche = request.POST.get('cbo_tranche_paye')
         mont_paye = reformater_montant(request.POST.get('montant_paye')) 
@@ -590,6 +591,7 @@ def validerpaiementscolarite(request):
         etatpaie.mateleve = matel
         etatpaie.idcycle = cy
         etatpaie.date_paie = request.POST['date_paiement'] 
+        etatpaie.mode_paie = modepaie
 
         erreur = False     
 
@@ -618,8 +620,8 @@ def validerpaiementscolarite(request):
                     erreur = True
 
         if not erreur: # Si aucun message d'erreur ne s'affiche, alors on enregistre le paiement
-            annee = AnneeScolaire.objects.all().order_by('id')
-            cycle = CycleScolaire.objects.all().order_by('id')
+            annee = AnneeScolaire.objects.all().order_by('id') # On recharge la liste des annees a nouveau
+            cycle = CycleScolaire.objects.all().order_by('id') # on recharge la liste des cycles a nouveau
             
             fscol = (etatpaie.premiere_tranche + etatpaie.deuxieme_tranche) # Permet de calculer le paiement total effectué par l'élève
             etatpaie.fscolarite = fscol
@@ -669,7 +671,7 @@ def validerpaiementscolarite(request):
     
 
 
-    return render(request,'gComptabilite/paiement_scolarite.html',dict(ans=annee,cycles=cycle, tranche_paye=DEUX_TRANCHES_CHOICES))
+    return render(request,'gComptabilite/paiement_scolarite.html',dict(ans=annee,cycles=cycle, tranche_paye=DEUX_TRANCHES_CHOICES, modepaie=MODE_PAIEMENT_CHOICES))
 
 
 def recupaiementscolarite(request, idetat, nom_tranche, mont_paye):
@@ -1054,7 +1056,7 @@ def editerpaiementscolaire(request, idpaie):
     etatpaie = EtatPaiementTranche.objects.select_related('anneescolaire','mateleve','idclasse','idcycle').get(id=idpaie)
     ans = AnneeScolaire.objects.all().order_by('id')
     cy = CycleScolaire.objects.all().order_by('id')
-    return render(request,'gComptabilite/modifier_paiement_scolaire.html',dict(paie=etatpaie, tranche_paye=DEUX_TRANCHES_CHOICES, annee=ans, cycles=cy))
+    return render(request,'gComptabilite/modifier_paiement_scolaire.html',dict(paie=etatpaie, tranche_paye=DEUX_TRANCHES_CHOICES, annee=ans, cycles=cy, modepaie=MODE_PAIEMENT_CHOICES))
 
 
 def modifieretatpaiement(request, idpaie):
@@ -1073,6 +1075,7 @@ def modifieretatpaiement(request, idpaie):
         nom_tranche = request.POST.get('nom_tranche')
         datepaie = request.POST.get('date_paiement')
         mremise = reformater_montant(request.POST.get('montant_remise'))
+        modepaie = request.POST.get('mode_paiement')
         
 
         ane = AnneeScolaire.objects.get(id=ans)
@@ -1085,6 +1088,7 @@ def modifieretatpaiement(request, idpaie):
         etatpaie.idclasse = cl
         etatpaie.mateleve = matel
         etatpaie.date_paie = datetime.strptime(datepaie,'%Y-%m-%d')
+        etatpaie.mode_paie = modepaie
 
         # Je vais recuperer les frais de la première tranche et deuxième tranche ainsi que le frais de la scolarité dans la table Classe
         fannuel = cl.frais_scolarite

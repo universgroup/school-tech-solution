@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'gUsers',
     'crispy_forms',
     'fontawesomefree',
+    'core', # C'est l'application partagee contenant les fonctions d'envoi des emails groupes et d'autres fonctions partagees
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
@@ -88,6 +89,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'core.context_processors.donnees_menu_rapports',
             ],
         },
     },
@@ -166,7 +168,7 @@ LOGOUT_URL = '/'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'school.tech.solution.26@gmail.com'
-DEFAULT_FROM_EMAIL = 'school.tech.solution.26@gmail.com'
+DEFAULT_FROM_EMAIL = 'GS Ecole les Champions <school.tech.solution.26@gmail.com>'
 EMAIL_HOST_PASSWORD = 'uepr ggqq mpud piuv'  # Ce mot de passe est généré depuis le compte gmail de l'expediteur dans "App Password"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True

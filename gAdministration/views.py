@@ -242,6 +242,9 @@ def enregistrerinfosecole(request):
                 ecole.coordo_primaire = request.POST['coordo_primaire']
                 ecole.coordo_secondaire = request.POST['coordo_secondaire']
                 ecole.comptable = request.POST['comptable']
+                ecole.delai_tranche1 = request.POST['delai_tranche1']
+                ecole.delai_tranche2 = request.POST['delai_tranche2']
+                ecole.delai_reinscription = request.POST['delai_reinscription']
                 ecole.save()
 
                 messages.success(request, 'Informations de l\'école validées avec succès')
@@ -298,6 +301,9 @@ def modifierinfosecole(request, idec):
         infos.coordo_primaire = request.POST['coordop']
         infos.coordo_secondaire = request.POST['coordos']
         infos.comptable = request.POST['comptable']
+        infos.delai_tranche1 = request.POST['delai_tranche1']
+        infos.delai_tranche2 = request.POST['delai_tranche2']
+        infos.delai_reinscription = request.POST['delai_reinscription']
         
         if request.FILES.get('logo_new'):
             infos.logo_ecole = request.FILES.get('logo_new')

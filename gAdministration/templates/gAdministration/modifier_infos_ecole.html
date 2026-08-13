@@ -148,6 +148,30 @@ EDITION DES INFORMATIONS DE L'ECOLE
                 <div class="row g-3">
                     <div class="col-md-6">
                         <div class="form-group">
+                            <label for="id_delai_t1">Date limite première tranche</label>
+                            <input type="text" id="id_delai_t1" name="delai_tranche1" value="{{ecole.delai_tranche1}}" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="id_delai_t2">Date limite deuxième tranche</label>
+                            <input type="text" id="id_delai_t2" name="delai_tranche2" value="{{ecole.delai_tranche2}}" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="id_delai_reinscription">Date début reinscription</label>
+                            <input type="text" id="id_delai_reinscription" name="delai_reinscription" value="{{ecole.delai_reinscription}}" class="form-control">
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
                             <div class="text-center">
                                 {% if ecole.logo_ecole %}
                                 <img src="{{ecole.logo_ecole.url}}" width="90px" title="Logo ecole" name="logo_old">
@@ -188,5 +212,67 @@ EDITION DES INFORMATIONS DE L'ECOLE
                 <a href="{% url 'listeinfos' %}" target="_self" class="btn btn-primary btn-md">&nbsp; Retour <i class="fa fa-arrow-circle-left"></i></a>
             </div>
   </form>
+
+{% endblock %}
+
+{% block javascript %}
+
+  <script>
+
+    $(document).ready(function () {
+            // Au clic sur le champ date, changer le type en "date" pour permettre la modification
+            $('#id_delai_t1').on('click', function () {
+                $(this).attr('type', 'date');
+                $(this).focus();
+            });
+
+            // Quand on quitte le champ, reformater en texte lisible
+            $('#id_delai_t1').on('blur', function () {
+                if ($(this).val() !== '') {
+                    //let date = new Date($(this).val());
+                    //let formatted = date.toLocaleDateString('fr-FR');
+                    $(this).attr('type', 'text');
+                    $(this).val(formatted);
+                }
+            });
+        });
+
+    $(document).ready(function () {
+            // Au clic sur le champ date, changer le type en "date" pour permettre la modification
+            $('#id_delai_t2').on('click', function () {
+                $(this).attr('type', 'date');
+                $(this).focus();
+            });
+
+            // Quand on quitte le champ, reformater en texte lisible
+            $('#id_delai_t2').on('blur', function () {
+                if ($(this).val() !== '') {
+                    //let date = new Date($(this).val());
+                    //let formatted = date.toLocaleDateString('fr-FR');
+                    $(this).attr('type', 'text');
+                    $(this).val(formatted);
+                }
+            });
+        });    
+    
+    $(document).ready(function () {
+            // Au clic sur le champ date, changer le type en "date" pour permettre la modification
+            $('#id_delai_reinscription').on('click', function () {
+                $(this).attr('type', 'date');
+                $(this).focus();
+            });
+
+            // Quand on quitte le champ, reformater en texte lisible
+            $('#id_delai_reinscription').on('blur', function () {
+                if ($(this).val() !== '') {
+                    //let date = new Date($(this).val());
+                    //let formatted = date.toLocaleDateString('fr-FR');
+                    $(this).attr('type', 'text');
+                    $(this).val(formatted);
+                }
+            });
+        });
+
+  </script>
 
 {% endblock %}

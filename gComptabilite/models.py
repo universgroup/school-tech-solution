@@ -22,7 +22,7 @@ CATEGORIE_DEPENSE_CHOICES = (
     ('Dettes Fournisseurs', 'Dettes Fournisseurs'),  # 10
     ('Autres Charges', 'Autres charges'),  # 11
     ('Matériels Informatiques','Matériels Informatiques'), # 12
-    ('Matériels Didactiques','Matériels Didactiques'),
+    ('Matériels Didactiques','Matériels Didactiques'), # 13
 )
 
 CATEGORIE_RECETTE_CHOICES = (
@@ -55,6 +55,14 @@ TROIS_TRANCHES_CHOICES = (
     ('Premiere tranche', 'Première tranche'), # 0
     ('Deuxieme tranche', 'Deuxième tranche'), # 1
     ('Troisieme tranche','Troisième tranche') # 2
+)
+
+MODE_PAIEMENT_CHOICES = (
+    ('Espèce','Espèce'), # 0
+    ('Chèque','Chèque'), # 1
+    ('Virement bancaire','Virement bancaire'), # 2
+    ('Orange Money','Orange Money'), # 3
+    ('MTN Mobile Money','MTN Mobile Money'), # 4
 )
 
 
@@ -93,6 +101,7 @@ class EtatPaiementTranche(models.Model):
     fscolarite = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
     reste_a_payer = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
     date_paie = models.DateField()
+    mode_paie = models.CharField(max_length=50, choices=MODE_PAIEMENT_CHOICES, default=MODE_PAIEMENT_CHOICES[0][0], null=True)
     mateleve = models.ForeignKey(Eleve, on_delete=models.CASCADE)
     idclasse = models.ForeignKey(Classe, on_delete=models.CASCADE)
     idcycle = models.ForeignKey(CycleScolaire, on_delete=models.CASCADE)

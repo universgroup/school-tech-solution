@@ -11,9 +11,16 @@ import io  # Librairie contenant les methodes utilisant les péripheriques d'ent
 from django.http import FileResponse, HttpResponseRedirect, JsonResponse
 
 from reportlab.pdfgen import canvas
-#from reportlab.platypus.tables import Table, TableStyle  # Permet de generer des tableaux (matrices) de données
 from reportlab.lib import colors  # Contient les méthodes/fonctions de gestion des couleurs
+from reportlab.lib.pagesizes import A4, landscape
+from reportlab.lib.units import cm
+from reportlab.platypus import (BaseDocTemplate, PageTemplate, Frame, NextPageTemplate,
+    Table, TableStyle, Paragraph, Spacer)
+from reportlab.platypus import Table as RLTable  # évite le conflit de nom avec votre "Table" du tableau principal
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.enums import TA_RIGHT # TA_CENTER, 
 from reportlab.lib.utils import ImageReader
+
 from PIL import Image
 
 from django.urls import reverse
@@ -27,6 +34,14 @@ from .forms import *
 from gComptabilite.models import *
 from gComptabilite.views import affichersoldecaisse
 from gAdministration.models import AnneeScolaire, CycleScolaire, Classe, Ecole
+
+
+# --- Styles réutilisables pour les rapports PDF ---
+
+style_cellule = ParagraphStyle('Cellule', fontName='Helvetica', fontSize=6, leading=7)
+style_entete_col = ParagraphStyle('EnteteColonne', fontName='Helvetica-Bold', fontSize=7, leading=8, textColor=colors.white)
+style_totaux = ParagraphStyle('Totaux', fontName='Helvetica-Bold', fontSize=8, textColor=colors.white, alignment=1)
+
 
 
 # Create your views here.
@@ -204,7 +219,7 @@ def enregistrereleve(request):
 
 
 # La fonction chargerlisteclasse m'a permis de gerer l'affichage des classes selon le cycle selectionné lors de
-# l'inscription associé au JQuery en Front-end
+# l'instruction associé au JQuery en Front-end
 def chargerlisteclasse(request):
     cy = request.GET.get('idcycle')
     clas = Classe.objects.filter(idcycle=cy).all()
@@ -221,8 +236,8 @@ def registrematricule(request):
     cycles = CycleScolaire.objects.all().order_by('id')
     # Ici je calcule les effectifs totaux des eleves inscrits
     effectif_total = liste.count()
-    effectif_total_garcons = liste.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[1][1]).count()
-    effectif_total_filles = liste.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[2][1]).count()
+    effectif_total_garcons = liste.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[1][0]).count()
+    effectif_total_filles = liste.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[2][0]).count()
 
     pagineinscrit = Paginator(liste, 10)
     numpageinscrit = request.GET.get('page')
@@ -334,8 +349,8 @@ def filtrelistegenerale(request):
 
         # Ici je calcule les effectifs totaux des eleves inscrits
         effectif_total = listeins.count()
-        effectif_total_garcons = listeins.filter(mateleve__sexe_eleve='Masculin').count()
-        effectif_total_filles = listeins.filter(mateleve__sexe_eleve='Feminin').count()
+        effectif_total_garcons = listeins.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[1][0]).count()
+        effectif_total_filles = listeins.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[2][0]).count()
 
         pagineinscrit = Paginator(listeins, 10)
         numpageinscrit = request.GET.get('page')
@@ -348,8 +363,8 @@ def filtrelistegenerale(request):
             Q(idclasse__exact=idclass), Q(idcycle__exact=idcy), Q(annee_scolaire__exact=idansc))
 
         effectif_total = listeinsclasse.count()
-        effectif_total_garcons = listeinsclasse.filter(mateleve__sexe_eleve='Masculin').count()
-        effectif_total_filles = listeinsclasse.filter(mateleve__sexe_eleve='Feminin').count()
+        effectif_total_garcons = listeinsclasse.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[1][0]).count()
+        effectif_total_filles = listeinsclasse.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[2][0]).count()
 
         pagineinscrit = Paginator(listeinsclasse, 10)
         numpageinscrit = request.GET.get('page')
@@ -360,8 +375,8 @@ def filtrelistegenerale(request):
             Q(mateleve__nom__icontains=np) | Q(mateleve__prenom__icontains=np))
 
         effectif_total = listeinsnp.count()
-        effectif_total_garcons = listeinsnp.filter(mateleve__sexe_eleve='Masculin').count()
-        effectif_total_filles = listeinsnp.filter(mateleve__sexe_eleve='Feminin').count()
+        effectif_total_garcons = listeinsnp.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[1][0]).count()
+        effectif_total_filles = listeinsnp.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[2][0]).count()
 
         pagineinscrit = Paginator(listeinsnp, 10)
         numpageinscrit = request.GET.get('page')
@@ -941,8 +956,8 @@ def listeinscritsanneescolairecourante(request):
             Q(etat_inscription__exact=ETAT_INSCRIPTION[0][1]),Q(date_inscription__month=mois_actuel)).order_by('-date_inscription')
     
     effectif_total = listeeleves.count()
-    effectif_total_garcons = listeeleves.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[1][1]).count() # SEXE_ELEVE_CHOICES[1][1] correspond à Masculin
-    effectif_total_filles = listeeleves.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[2][1]).count() # SEXE_ELEVE_CHOICES[2][1] correspond à Feminin
+    effectif_total_garcons = listeeleves.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[1][0]).count() # SEXE_ELEVE_CHOICES[1][0] correspond à M
+    effectif_total_filles = listeeleves.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[2][0]).count() # SEXE_ELEVE_CHOICES[2][0] correspond à F
     
     pagineins = Paginator(listeeleves, 10)
     numpageins = request.GET.get('page')
@@ -970,8 +985,8 @@ def listereinscritsanneescolairecourante(request):
             Q(etat_inscription__exact=ETAT_INSCRIPTION[1][1]),Q(date_inscription__month=mois_actuel)).order_by('-date_inscription')
     
     effectif_total = listeeleves.count()
-    effectif_total_garcons = listeeleves.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[1][1]).count() # SEXE_ELEVE_CHOICES[1][1] correspond à Masculin
-    effectif_total_filles = listeeleves.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[2][1]).count() # SEXE_ELEVE_CHOICES[2][1] correspond à Feminin
+    effectif_total_garcons = listeeleves.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[1][0]).count() # SEXE_ELEVE_CHOICES[1][0] correspond à M
+    effectif_total_filles = listeeleves.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[2][0]).count() # SEXE_ELEVE_CHOICES[2][0] correspond à F
     
     pagineins = Paginator(listeeleves, 10)
     numpageins = request.GET.get('page')
@@ -1005,8 +1020,8 @@ def filtrelisteinscrits(request):
 
         # Ici je calcule les effectifs totaux des eleves inscrits
         effectif_total = listeinsclasse.count()
-        effectif_total_garcons = listeinsclasse.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[1][1]).count() # SEXE_ELEVE_CHOICES[1][1] correspond à Masculin
-        effectif_total_filles = listeinsclasse.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[2][1]).count() # SEXE_ELEVE_CHOICES[2][1] correspond à Feminin
+        effectif_total_garcons = listeinsclasse.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[1][0]).count() # SEXE_ELEVE_CHOICES[1][0] correspond à M
+        effectif_total_filles = listeinsclasse.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[2][0]).count() # SEXE_ELEVE_CHOICES[2][0] correspond à F
 
         pagineinscrit = Paginator(listeinsclasse, 10)
         numpageinscrit = request.GET.get('page')
@@ -1041,8 +1056,8 @@ def filtrelistereinscrits(request):
 
         # Ici je calcule les effectifs totaux des eleves inscrits
         effectif_total = listeinsclasse.count()
-        effectif_total_garcons = listeinsclasse.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[1][1]).count() # SEXE_ELEVE_CHOICES[1][1] correspond à Masculin
-        effectif_total_filles = listeinsclasse.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[2][1]).count() # SEXE_ELEVE_CHOICES[2][1] correspond à Feminin
+        effectif_total_garcons = listeinsclasse.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[1][0]).count() # SEXE_ELEVE_CHOICES[1][0] correspond à M
+        effectif_total_filles = listeinsclasse.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[2][0]).count() # SEXE_ELEVE_CHOICES[2][0] correspond à F
 
         pagineinscrit = Paginator(listeinsclasse, 10)
         numpageinscrit = request.GET.get('page')
@@ -1051,3 +1066,597 @@ def filtrelistereinscrits(request):
     return render(request, 'gEleve/liste_eleves_reinscrits.html',
                   dict(listereinscrits=listeinsclasse, effectif_total=effectif_total,
                        effectif_total_garcons=effectif_total_garcons, effectif_total_filles=effectif_total_filles, ans=ans, cycles=cy))
+
+# Permet de generer le rapport contenant la liste des inscrits par classe
+def rapportlisteinscrits(request):
+    """Génère le rapport pour les élèves au statut 'Inscrit'"""
+    return _generer_rapport_liste_inscription(request, etat_recherche=ETAT_INSCRIPTION[0][0], nom_fichier='Liste_des_inscrits', titre="LISTE DES INSCRITS PAR CLASSE")
+
+# Permet de generer le rapport contenant la liste des reinscrits par classe
+def rapportlistereinscrits(request):
+    """Génère le rapport pour les élèves au statut 'Réinscrit'"""
+    return _generer_rapport_liste_inscription(request, etat_recherche=ETAT_INSCRIPTION[1][0], nom_fichier='Liste_des_reinscrits', titre="LISTE DES REINSCRITS PAR CLASSE")
+
+# Permet de generer le rapport contenant la liste générale/registre de matriculation de l'école
+def rapportlistegenerale(request):
+       """Génère le registre de matriculation de l'école """
+       return _generer_rapport_matriculation(request, nom_fichier='Registre_matriculation_scolaire', titre="REGISTRE DE MATRICULATION")
+
+
+# Fonction ou vue django appelée lors de l'impression des rapports des inscriptions/reinscriptions
+def _generer_rapport_liste_inscription(request, etat_recherche, nom_fichier, titre):
+
+    """Fonction commune aux deux vues ci-dessus, pour éviter la duplication de code"""
+    anne = request.GET.get('annee')
+    cycl = request.GET.get('cycle')
+    clas = request.GET.get('classe')
+
+    ec = Ecole.objects.count()
+    if ec == 0:
+        messages.error(request, 'Veuillez saisir les informations de l\'école')
+        return redirect('registrematricule')
+
+    ecole = Ecole.objects.get(id=1)
+    if ecole.logo_ecole:
+        data_ecole = [ecole.nom_ecole, ecole.ville_ecole, ecole.prefect_commune,
+                      ecole.telephone1, ecole.telephone2, ecole.logo_ecole.path,
+                      ecole.devise_ecole, ecole.dsee, ecole.comptable]
+    else:
+        data_ecole = [ecole.nom_ecole, ecole.ville_ecole, ecole.prefect_commune,
+                      ecole.telephone1, ecole.telephone2, 'Logo',
+                      ecole.devise_ecole, ecole.dsee, ecole.comptable]
+
+    pdf_buffer = generer_rapport_inscrits(
+        request, data_ecole=data_ecole, annee=anne, cycle=cycl, classe=clas,
+        titre_rapport=titre, etat_recherche=etat_recherche
+    )
+
+    # S'il n'existe aucune information correspondant aux critères de sélection du pop up, alors on recharge la page courante
+    if pdf_buffer is None:
+        return redirect('registrematricule')
+
+    pdf_buffer.seek(0)
+    return FileResponse(pdf_buffer, as_attachment=False,
+        filename=f'{nom_fichier}_{str(clas)}.pdf',
+        content_type='application/pdf')
+
+# Fonction ou vue django appelée lors de l'impression du registre de matriculation
+def _generer_rapport_matriculation(request, nom_fichier, titre):
+
+    """Fonction commune aux deux vues ci-dessus, pour éviter la duplication de code"""
+    anne = request.GET.get('annee')
+    
+    ec = Ecole.objects.count()
+    if ec == 0:
+        messages.error(request, 'Veuillez saisir les informations de l\'école')
+        return redirect('registrematricule')
+
+    ecole = Ecole.objects.get(id=1)
+    if ecole.logo_ecole:
+        data_ecole = [ecole.nom_ecole, ecole.ville_ecole, ecole.prefect_commune,
+                      ecole.telephone1, ecole.telephone2, ecole.logo_ecole.path,
+                      ecole.devise_ecole, ecole.dsee, ecole.comptable]
+    else:
+        data_ecole = [ecole.nom_ecole, ecole.ville_ecole, ecole.prefect_commune,
+                      ecole.telephone1, ecole.telephone2, 'Logo',
+                      ecole.devise_ecole, ecole.dsee, ecole.comptable]
+
+    pdf_buffer = generer_rapport_matriculation(
+        request, data_ecole=data_ecole, annee=anne, titre_rapport=titre)
+
+    # S'il n'existe aucune information correspondant aux critères de sélection du pop up, alors on recharge la page courante
+    if pdf_buffer is None:
+        return redirect('registrematricule')
+
+    pdf_buffer.seek(0)
+    return FileResponse(pdf_buffer, as_attachment=False,
+        filename=f'{nom_fichier}.pdf',
+        content_type='application/pdf')
+
+# Fonction utilitaire permettant de generer le rapport contenant la liste des inscrits par classe
+def generer_rapport_inscrits(request, data_ecole, annee, cycle, classe, titre_rapport, etat_recherche):
+
+    # --- Marges et largeurs calculées UNE SEULE FOIS, réutilisées partout ---
+    marge_gauche_droite = 1.5*cm
+    marge_bas = 1.5*cm
+    largeur_frame = landscape(A4)[0] - 2*marge_gauche_droite
+
+    an = AnneeScolaire.objects.get(id=annee)
+    cy = CycleScolaire.objects.get(id=cycle)
+    cl = Classe.objects.get(id=classe)
+
+    # --- 1. Récupération des données ---
+    listinscrits = Inscription.objects.select_related(
+        'annee_scolaire', 'mateleve', 'idcycle', 'idclasse'
+    ).filter(
+        Q(annee_scolaire__exact=an), Q(idcycle__exact=cy), Q(idclasse__exact=cl),
+        Q(etat_inscription__exact=etat_recherche)
+    ).order_by('mateleve__nom')
+
+    effectif_total = listinscrits.count()
+    effectif_total_garcons = listinscrits.filter(mateleve__sexe_eleve__exact=SEXE_ELEVE_CHOICES[1][0]).count()
+    effectif_total_filles = listinscrits.filter(mateleve__sexe_eleve__exact=SEXE_ELEVE_CHOICES[2][0]).count()
+
+    if effectif_total == 0:
+        messages.error(request, "Aucun élève trouvé pour les critères donnés.")
+        return None
+
+    # --- 2. Construction du tableau (14 colonnes, Contacts fusionné) ---
+    entetes = ['N°', 'Matricule', 'Prénoms', 'Nom', 'Sexe', 'Date naiss', 'Lieu naiss',
+               'Père', 'Mère', 'Tuteur', 'Contacts', 'Email père', 'Email mère', 'Résidence']
+    table_data = [[Paragraph(e, style_entete_col) for e in entetes]]
+
+    for i, insc in enumerate(listinscrits, start=1):
+        eleve = insc.mateleve
+        contacts = f"{eleve.contact_pere or ''}<br/>{eleve.contact_mere or ''}"
+
+        ligne_brute = [
+            str(i), eleve.matricule, eleve.prenom, eleve.nom, eleve.sexe_eleve,
+            eleve.datenaissance.strftime('%d/%m/%Y') if eleve.datenaissance else '',
+            eleve.lieu_naissance, eleve.pere, eleve.mere, eleve.tuteur,
+        ]
+        ligne = [Paragraph(str(v) if v else '', style_cellule) for v in ligne_brute]
+        ligne.append(Paragraph(contacts, style_cellule))
+        ligne.append(Paragraph(eleve.email_pere or '', style_cellule))
+        ligne.append(Paragraph(eleve.email_mere or '', style_cellule))
+        ligne.append(Paragraph(eleve.adresse or '', style_cellule))
+        table_data.append(ligne)
+
+    # Ligne des totaux — libellé "Effectif de la classe" fusionné (colonnes 0-6),
+    # puis un second bloc fusionné (colonnes 7-13) avec les 3 chiffres explicitement étiquetés
+    texte_totaux = f"Total : {effectif_total}    —    Garçons : {effectif_total_garcons}    —    Filles : {effectif_total_filles}"
+
+    table_data.append([
+        Paragraph('Effectif de la classe', style_totaux), '', '', '', '', '', '',
+        Paragraph(texte_totaux, style_totaux), '', '', '', '', '', '',
+    ])
+
+    # --- Largeurs proportionnelles, garanties de tenir dans largeur_frame ---
+    poids = [0.4, 1.1, 1.3, 1.3, 0.8, 1.1, 1.3, 1.3, 1.3, 1.3, 1.4, 1.8, 1.8, 1.6]
+    somme_poids = sum(poids)
+    col_widths = [(p / somme_poids) * largeur_frame for p in poids]
+
+    table = Table(table_data, repeatRows=1, colWidths=col_widths)
+    style = TableStyle([
+    ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#2980b9')),
+    ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+    ('ALIGN', (0, 0), (-1, 0), 'LEFT'),
+    ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+    ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+    ('ROWBACKGROUNDS', (0, 1), (-1, -2), [colors.white, colors.HexColor('#f5f5f5')]),
+    ('BACKGROUND', (0, -1), (-1, -1), colors.HexColor('#27ae60')),
+    ('ALIGN', (0, -1), (-1, -1), 'CENTER'),
+    ('SPAN', (0, -1), (6, -1)),    # "Effectif de la classe" — colonnes 0 à 6
+    ('SPAN', (7, -1), (13, -1)),   # "Total : ... — Garçons : ... — Filles : ..." — colonnes 7 à 13
+    ('TOPPADDING', (0, 0), (-1, -1), 3),
+    ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
+                ])
+        
+    table.setStyle(style)
+
+    # --- 3. Éléments du flux ---
+    elements = [NextPageTemplate('Suivantes'), Spacer(1, 0.3*cm)]
+    elements.append(table)
+    elements.append(Spacer(1, 1.0*cm))
+
+    style_signature = ParagraphStyle('Signature', parent=getSampleStyleSheet()['Normal'], alignment=TA_RIGHT, fontName='Helvetica-Bold')
+    date_str = datetime.now().strftime('%d/%m/%Y')
+
+    bloc_signature = [
+        [Paragraph(f"Conakry, le {date_str}", style_signature)],
+        [Spacer(1, 0.8*cm)],
+        [Paragraph("Le Service Scolarité", style_signature)],
+        [Spacer(1, 1.5*cm)],
+        [Paragraph(str(data_ecole[8]) if len(data_ecole) > 8 and data_ecole[8] else '', style_signature)],
+    ]
+    table_signature = RLTable(bloc_signature, colWidths=[largeur_frame])
+    table_signature.setStyle(TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'RIGHT'),
+        ('LEFTPADDING', (0, 0), (-1, -1), 0),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 0),
+        ('TOPPADDING', (0, 0), (-1, -1), 0),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 0),
+    ]))
+    elements.append(table_signature)
+
+    # --- 4. En-tête (page 1 uniquement) ---
+    def draw_entete(canvas_obj, doc):
+        width, height = landscape(A4)   # height ≈ 595 points, PAS 842
+        marge = marge_gauche_droite
+        largeur_utile = largeur_frame
+
+        nom_ecole = data_ecole[0] if len(data_ecole) > 0 else ''
+        ville = data_ecole[1] if len(data_ecole) > 1 else ''
+        commune = data_ecole[2] if len(data_ecole) > 2 else ''
+        tel1 = data_ecole[3] if len(data_ecole) > 3 else ''
+        tel2 = data_ecole[4] if len(data_ecole) > 4 else ''
+        logo_chemin = data_ecole[5] if len(data_ecole) > 5 else ''
+        devise = data_ecole[6] if len(data_ecole) > 6 else ''
+        dsee = data_ecole[7] if len(data_ecole) > 7 else ''
+
+        # --- Positions calculées depuis le HAUT de la page, compactées pour tenir en paysage ---
+        y = height - 20   # départ, juste sous le bord supérieur
+
+        canvas_obj.setFillColor(colors.black)
+        canvas_obj.setFont('Helvetica-Bold', 9)
+        canvas_obj.drawString(marge, y, 'MEPU-A')
+        y -= 12
+        canvas_obj.drawString(marge, y, 'IRE : ')
+        canvas_obj.setFont('Helvetica', 9)
+        canvas_obj.drawString(marge + 30, y, str(ville))
+        y -= 12
+        canvas_obj.setFont('Helvetica-Bold', 9)
+        canvas_obj.drawString(marge, y, 'DCE : ')
+        canvas_obj.setFont('Helvetica', 9)
+        canvas_obj.drawString(marge + 30, y, str(commune))
+        y -= 12
+        canvas_obj.setFont('Helvetica-Bold', 9)
+        canvas_obj.drawString(marge, y, 'DSEE : ')
+        canvas_obj.setFont('Helvetica', 9)
+        canvas_obj.drawString(marge + 30, y, str(dsee))
+        y -= 12
+        canvas_obj.setFont('Helvetica-Bold', 9)
+        canvas_obj.drawString(marge, y, 'TEL : ')
+        canvas_obj.setFont('Helvetica', 9)
+        canvas_obj.drawString(marge + 30, y, f"{tel1} / {tel2}")
+
+        # --- Logo (aligné en haut à droite du bloc gauche) ---
+        if logo_chemin and logo_chemin != 'Logo':
+            try:
+                img = Image.open(logo_chemin)
+                img = img.resize((60, 40), Image.LANCZOS)
+                if img.mode in ('RGBA', 'P'):
+                    img = img.convert('RGB')
+                elif img.mode != 'RGB':
+                    img = img.convert('RGB')
+                logo_buffer = io.BytesIO()
+                img.save(logo_buffer, format='PNG')
+                logo_buffer.seek(0)
+                canvas_obj.drawImage(ImageReader(logo_buffer), width/2 - 30, height - 55, 60, 40)
+            except Exception:
+                pass
+
+        # --- Drapeau + République (bloc droit, aligné en haut) ---
+        y_drapeau = height - 20
+        canvas_obj.setFillColor('Red')
+        canvas_obj.rect(width - marge - 90, y_drapeau, 30, 8, stroke=False, fill=True)
+        canvas_obj.setFillColor('yellow')
+        canvas_obj.rect(width - marge - 60, y_drapeau, 30, 8, stroke=False, fill=True)
+        canvas_obj.setFillColor('green')
+        canvas_obj.rect(width - marge - 30, y_drapeau, 30, 8, stroke=False, fill=True)
+        canvas_obj.setFillColor(colors.black)
+
+        canvas_obj.setFont('Helvetica-Bold', 9)
+        canvas_obj.drawRightString(width - marge, y_drapeau - 12, 'République de Guinée')
+        canvas_obj.setFont('Helvetica-Oblique', 8)
+        canvas_obj.drawRightString(width - marge, y_drapeau - 24, 'Travail-Justice-Solidarité')
+
+        # --- Nom de l'école (centré, sous le bloc logo/IRE/République) ---
+        y = height - 70
+        canvas_obj.setFont('Helvetica-Bold', 12)
+        nom_x = (width - canvas_obj.stringWidth(str(nom_ecole), 'Helvetica-Bold', 12)) / 2
+        canvas_obj.drawString(nom_x, y, str(nom_ecole))
+
+        if devise:
+            y -= 13
+            canvas_obj.setFont('Helvetica-Oblique', 8)
+            devise_x = (width - canvas_obj.stringWidth(str(devise), 'Helvetica-Oblique', 8)) / 2
+            canvas_obj.drawString(devise_x, y, str(devise))
+
+        y -= 10
+        canvas_obj.line(marge, y, marge + largeur_utile, y)
+
+        # --- Titre du rapport ---
+        y -= 15
+        titre = titre_rapport.upper()
+        canvas_obj.setFont('Helvetica-Bold', 11)
+        titre_x = (width - canvas_obj.stringWidth(titre, 'Helvetica-Bold', 11)) / 2
+        canvas_obj.drawString(titre_x, y, titre)
+
+        y -= 6
+        canvas_obj.line(marge + 60, y, marge + largeur_utile - 60, y)
+
+        # --- Année scolaire et session ---
+        y -= 16
+        annee_str = an.descript_annee if an else ''
+        session = annee_str.split('-')[-1] if '-' in annee_str else annee_str
+        canvas_obj.setFont('Helvetica-Bold', 10)
+        canvas_obj.drawString(marge + 160, y, 'Année Scolaire : ')
+        canvas_obj.setFont('Helvetica', 10)
+        canvas_obj.drawString(marge + 270, y, annee_str)
+        canvas_obj.setFont('Helvetica-Bold', 10)
+        canvas_obj.drawString(marge + 370, y, 'Session : ')
+        canvas_obj.setFont('Helvetica', 10)
+        canvas_obj.drawString(marge + 420, y, session)
+
+        # --- Cycle et Classe ---
+        y -= 16
+        canvas_obj.setFont('Helvetica-Bold', 10)
+        canvas_obj.drawString(marge, y, 'Cycle : ')
+        canvas_obj.setFont('Helvetica', 10)
+        canvas_obj.drawString(marge + 38, y, str(cy.cycle) if cy else '')
+        canvas_obj.setFont('Helvetica-Bold', 10)
+        canvas_obj.drawString(marge + 130, y, 'Classe : ')
+        canvas_obj.setFont('Helvetica', 10)
+        canvas_obj.drawString(marge + 175, y, str(cl.nom_classe) if cl else '')
+        canvas_obj.setFillColor(colors.black)
+
+        return y   # position finale, utile pour ajuster dynamiquement y_fin_entete si besoin
+
+    def draw_page_number(canvas_obj, doc):
+        canvas_obj.saveState()
+        canvas_obj.setFont('Helvetica', 8)
+        canvas_obj.drawRightString(landscape(A4)[0] - 1.5*cm, 1.0*cm, f"Page {doc.page}")
+        canvas_obj.restoreState()
+
+    def on_first_page(canvas_obj, doc):
+        draw_entete(canvas_obj, doc)
+        draw_page_number(canvas_obj, doc)
+
+    def on_later_pages(canvas_obj, doc):
+        draw_page_number(canvas_obj, doc)
+
+    # --- 5. Construction avec deux PageTemplate ---
+    buffer = io.BytesIO()
+
+    y_fin_entete = 450   # nouvelle valeur compatible avec une hauteur de page paysage de ~595 points
+    hauteur_frame_page1 = y_fin_entete - marge_bas
+
+    frame_page1 = Frame(marge_gauche_droite, marge_bas, largeur_frame, hauteur_frame_page1, id='page1', showBoundary=0)
+    frame_suivantes = Frame(marge_gauche_droite, marge_bas, largeur_frame, landscape(A4)[1] - marge_bas - 1.5*cm, id='suivantes', showBoundary=0)
+
+    doc = BaseDocTemplate(buffer, pagesize=landscape(A4), title=titre_rapport)
+    doc.addPageTemplates([
+        PageTemplate(id='Premiere', frames=frame_page1, onPage=on_first_page),
+        PageTemplate(id='Suivantes', frames=frame_suivantes, onPage=on_later_pages),
+    ])
+
+    doc.build(elements)
+    buffer.seek(0)
+    return buffer
+
+
+def generer_rapport_matriculation(request, data_ecole, annee, titre_rapport):
+
+    # --- Marges et largeurs calculées UNE SEULE FOIS, réutilisées partout ---
+    marge_gauche_droite = 1.5*cm
+    marge_bas = 1.5*cm
+    largeur_frame = landscape(A4)[0] - 2*marge_gauche_droite
+
+    an = AnneeScolaire.objects.get(id=annee)
+    
+
+    # --- 1. Récupération des données ---
+    listgenerale = Inscription.objects.select_related(
+        'annee_scolaire', 'mateleve', 'idcycle', 'idclasse'
+    ).filter(annee_scolaire__exact=an).order_by('idclasse')
+
+    effectif_total = listgenerale.count()
+    effectif_total_garcons = listgenerale.filter(mateleve__sexe_eleve__exact=SEXE_ELEVE_CHOICES[1][0]).count()
+    effectif_total_filles = listgenerale.filter(mateleve__sexe_eleve__exact=SEXE_ELEVE_CHOICES[2][0]).count()
+
+    if effectif_total == 0:
+        messages.error(request, "Aucun élève trouvé pour les critères donnés.")
+        return None
+
+    # --- 2. Construction du tableau (14 colonnes, Contacts fusionné) ---
+    entetes = ['N°', 'Matricule', 'Prénoms', 'Nom', 'Sexe', 'Date naiss', 'Lieu naiss',
+               'Père', 'Mère', 'Tuteur', 'Contacts', 'Email père', 'Email mère', 'Résidence']
+    table_data = [[Paragraph(e, style_entete_col) for e in entetes]]
+
+    for i, insc in enumerate(listgenerale, start=1):
+        eleve = insc.mateleve
+        contacts = f"{eleve.contact_pere or ''}<br/>{eleve.contact_mere or ''}"
+
+        ligne_brute = [
+            str(i), eleve.matricule, eleve.prenom, eleve.nom, eleve.sexe_eleve,
+            eleve.datenaissance.strftime('%d/%m/%Y') if eleve.datenaissance else '',
+            eleve.lieu_naissance, eleve.pere, eleve.mere, eleve.tuteur,
+        ]
+        ligne = [Paragraph(str(v) if v else '', style_cellule) for v in ligne_brute]
+        ligne.append(Paragraph(contacts, style_cellule))
+        ligne.append(Paragraph(eleve.email_pere or '', style_cellule))
+        ligne.append(Paragraph(eleve.email_mere or '', style_cellule))
+        ligne.append(Paragraph(eleve.adresse or '', style_cellule))
+        table_data.append(ligne)
+
+    # Ligne des totaux — libellé "Effectif de la classe" fusionné (colonnes 0-6),
+    # puis un second bloc fusionné (colonnes 7-13) avec les 3 chiffres explicitement étiquetés
+    texte_totaux = f"Total : {effectif_total}    —    Garçons : {effectif_total_garcons}    —    Filles : {effectif_total_filles}"
+
+    table_data.append([
+        Paragraph('Effectif de la classe', style_totaux), '', '', '', '', '', '',
+        Paragraph(texte_totaux, style_totaux), '', '', '', '', '', '',
+    ])
+
+    # --- Largeurs proportionnelles, garanties de tenir dans largeur_frame ---
+    poids = [0.4, 1.1, 1.3, 1.3, 0.8, 1.1, 1.3, 1.3, 1.3, 1.3, 1.4, 1.8, 1.8, 1.6]
+    somme_poids = sum(poids)
+    col_widths = [(p / somme_poids) * largeur_frame for p in poids]
+
+    table = Table(table_data, repeatRows=1, colWidths=col_widths)
+    style = TableStyle([
+    ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#2980b9')),
+    ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+    ('ALIGN', (0, 0), (-1, 0), 'LEFT'),
+    ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+    ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+    ('ROWBACKGROUNDS', (0, 1), (-1, -2), [colors.white, colors.HexColor('#f5f5f5')]),
+    ('BACKGROUND', (0, -1), (-1, -1), colors.HexColor('#27ae60')),
+    ('ALIGN', (0, -1), (-1, -1), 'CENTER'),
+    ('SPAN', (0, -1), (6, -1)),    # "Effectif de la classe" — colonnes 0 à 6
+    ('SPAN', (7, -1), (13, -1)),   # "Total : ... — Garçons : ... — Filles : ..." — colonnes 7 à 13
+    ('TOPPADDING', (0, 0), (-1, -1), 3),
+    ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
+                ])
+        
+    table.setStyle(style)
+
+    # --- 3. Éléments du flux ---
+    elements = [NextPageTemplate('Suivantes'), Spacer(1, 0.3*cm)]
+    elements.append(table)
+    elements.append(Spacer(1, 1.0*cm))
+
+    style_signature = ParagraphStyle('Signature', parent=getSampleStyleSheet()['Normal'], alignment=TA_RIGHT, fontName='Helvetica-Bold')
+    date_str = datetime.now().strftime('%d/%m/%Y')
+
+    bloc_signature = [
+        [Paragraph(f"Conakry, le {date_str}", style_signature)],
+        [Spacer(1, 0.8*cm)],
+        [Paragraph("Le Service Scolarité", style_signature)],
+        [Spacer(1, 1.5*cm)],
+        [Paragraph(str(data_ecole[8]) if len(data_ecole) > 8 and data_ecole[8] else '', style_signature)],
+    ]
+    table_signature = RLTable(bloc_signature, colWidths=[largeur_frame])
+    table_signature.setStyle(TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'RIGHT'),
+        ('LEFTPADDING', (0, 0), (-1, -1), 0),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 0),
+        ('TOPPADDING', (0, 0), (-1, -1), 0),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 0),
+    ]))
+    elements.append(table_signature)
+
+    # --- 4. En-tête (page 1 uniquement) ---
+    def draw_entete(canvas_obj, doc):
+        width, height = landscape(A4)   # height ≈ 595 points, PAS 842
+        marge = marge_gauche_droite
+        largeur_utile = largeur_frame
+
+        nom_ecole = data_ecole[0] if len(data_ecole) > 0 else ''
+        ville = data_ecole[1] if len(data_ecole) > 1 else ''
+        commune = data_ecole[2] if len(data_ecole) > 2 else ''
+        tel1 = data_ecole[3] if len(data_ecole) > 3 else ''
+        tel2 = data_ecole[4] if len(data_ecole) > 4 else ''
+        logo_chemin = data_ecole[5] if len(data_ecole) > 5 else ''
+        devise = data_ecole[6] if len(data_ecole) > 6 else ''
+        dsee = data_ecole[7] if len(data_ecole) > 7 else ''
+
+        # --- Positions calculées depuis le HAUT de la page, compactées pour tenir en paysage ---
+        y = height - 20   # départ, juste sous le bord supérieur
+
+        canvas_obj.setFillColor(colors.black)
+        canvas_obj.setFont('Helvetica-Bold', 9)
+        canvas_obj.drawString(marge, y, 'MEPU-A')
+        y -= 12
+        canvas_obj.drawString(marge, y, 'IRE : ')
+        canvas_obj.setFont('Helvetica', 9)
+        canvas_obj.drawString(marge + 30, y, str(ville))
+        y -= 12
+        canvas_obj.setFont('Helvetica-Bold', 9)
+        canvas_obj.drawString(marge, y, 'DCE : ')
+        canvas_obj.setFont('Helvetica', 9)
+        canvas_obj.drawString(marge + 30, y, str(commune))
+        y -= 12
+        canvas_obj.setFont('Helvetica-Bold', 9)
+        canvas_obj.drawString(marge, y, 'DSEE : ')
+        canvas_obj.setFont('Helvetica', 9)
+        canvas_obj.drawString(marge + 30, y, str(dsee))
+        y -= 12
+        canvas_obj.setFont('Helvetica-Bold', 9)
+        canvas_obj.drawString(marge, y, 'TEL : ')
+        canvas_obj.setFont('Helvetica', 9)
+        canvas_obj.drawString(marge + 30, y, f"{tel1} / {tel2}")
+
+        # --- Logo (aligné en haut à droite du bloc gauche) ---
+        if logo_chemin and logo_chemin != 'Logo':
+            try:
+                img = Image.open(logo_chemin)
+                img = img.resize((60, 40), Image.LANCZOS)
+                if img.mode in ('RGBA', 'P'):
+                    img = img.convert('RGB')
+                elif img.mode != 'RGB':
+                    img = img.convert('RGB')
+                logo_buffer = io.BytesIO()
+                img.save(logo_buffer, format='PNG')
+                logo_buffer.seek(0)
+                canvas_obj.drawImage(ImageReader(logo_buffer), width/2 - 30, height - 55, 60, 40)
+            except Exception:
+                pass
+
+        # --- Drapeau + République (bloc droit, aligné en haut) ---
+        y_drapeau = height - 20
+        canvas_obj.setFillColor('Red')
+        canvas_obj.rect(width - marge - 90, y_drapeau, 30, 8, stroke=False, fill=True)
+        canvas_obj.setFillColor('yellow')
+        canvas_obj.rect(width - marge - 60, y_drapeau, 30, 8, stroke=False, fill=True)
+        canvas_obj.setFillColor('green')
+        canvas_obj.rect(width - marge - 30, y_drapeau, 30, 8, stroke=False, fill=True)
+        canvas_obj.setFillColor(colors.black)
+
+        canvas_obj.setFont('Helvetica-Bold', 9)
+        canvas_obj.drawRightString(width - marge, y_drapeau - 12, 'République de Guinée')
+        canvas_obj.setFont('Helvetica-Oblique', 8)
+        canvas_obj.drawRightString(width - marge, y_drapeau - 24, 'Travail-Justice-Solidarité')
+
+        # --- Nom de l'école (centré, sous le bloc logo/IRE/République) ---
+        y = height - 70
+        canvas_obj.setFont('Helvetica-Bold', 12)
+        nom_x = (width - canvas_obj.stringWidth(str(nom_ecole), 'Helvetica-Bold', 12)) / 2
+        canvas_obj.drawString(nom_x, y, str(nom_ecole))
+
+        if devise:
+            y -= 13
+            canvas_obj.setFont('Helvetica-Oblique', 8)
+            devise_x = (width - canvas_obj.stringWidth(str(devise), 'Helvetica-Oblique', 8)) / 2
+            canvas_obj.drawString(devise_x, y, str(devise))
+
+        y -= 10
+        canvas_obj.line(marge, y, marge + largeur_utile, y)
+
+        # --- Titre du rapport ---
+        y -= 15
+        titre = titre_rapport.upper()
+        canvas_obj.setFont('Helvetica-Bold', 11)
+        titre_x = (width - canvas_obj.stringWidth(titre, 'Helvetica-Bold', 11)) / 2
+        canvas_obj.drawString(titre_x, y, titre)
+
+        y -= 6
+        canvas_obj.line(marge + 60, y, marge + largeur_utile - 60, y)
+
+        # --- Année scolaire et session ---
+        y -= 16
+        annee_str = an.descript_annee if an else ''
+        session = annee_str.split('-')[-1] if '-' in annee_str else annee_str
+        canvas_obj.setFont('Helvetica-Bold', 10)
+        canvas_obj.drawString(marge + 160, y, 'Année Scolaire : ')
+        canvas_obj.setFont('Helvetica', 10)
+        canvas_obj.drawString(marge + 270, y, annee_str)
+        canvas_obj.setFont('Helvetica-Bold', 10)
+        canvas_obj.drawString(marge + 370, y, 'Session : ')
+        canvas_obj.setFont('Helvetica', 10)
+        canvas_obj.drawString(marge + 420, y, session)
+
+        return y   # position finale, utile pour ajuster dynamiquement y_fin_entete si besoin
+
+    def draw_page_number(canvas_obj, doc):
+        canvas_obj.saveState()
+        canvas_obj.setFont('Helvetica', 8)
+        canvas_obj.drawRightString(landscape(A4)[0] - 1.5*cm, 1.0*cm, f"Page {doc.page}")
+        canvas_obj.restoreState()
+
+    def on_first_page(canvas_obj, doc):
+        draw_entete(canvas_obj, doc)
+        draw_page_number(canvas_obj, doc)
+
+    def on_later_pages(canvas_obj, doc):
+        draw_page_number(canvas_obj, doc)
+
+    # --- 5. Construction avec deux PageTemplate ---
+    buffer = io.BytesIO()
+
+    y_fin_entete = 450   # nouvelle valeur compatible avec une hauteur de page paysage de ~595 points
+    hauteur_frame_page1 = y_fin_entete - marge_bas
+
+    frame_page1 = Frame(marge_gauche_droite, marge_bas, largeur_frame, hauteur_frame_page1, id='page1', showBoundary=0)
+    frame_suivantes = Frame(marge_gauche_droite, marge_bas, largeur_frame, landscape(A4)[1] - marge_bas - 1.5*cm, id='suivantes', showBoundary=0)
+
+    doc = BaseDocTemplate(buffer, pagesize=landscape(A4), title=titre_rapport)
+    doc.addPageTemplates([
+        PageTemplate(id='Premiere', frames=frame_page1, onPage=on_first_page),
+        PageTemplate(id='Suivantes', frames=frame_suivantes, onPage=on_later_pages),
+    ])
+
+    doc.build(elements)
+    buffer.seek(0)
+    return buffer

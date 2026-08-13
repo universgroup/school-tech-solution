@@ -4,8 +4,8 @@ import uuid
 
 SEXE_ELEVE_CHOICES = (
     ('Selectionnez', 'Sélectionnez'),  # 0
-    ('Masculin', 'Masculin'),  # 1
-    ('Feminin', 'Feminin')  # 2
+    ('M', 'Masculin'),  # 1
+    ('F', 'Feminin')  # 2
 )
 ETAT_INSCRIPTION = (
     ('Inscrit','Inscrit'), # 0
@@ -19,7 +19,7 @@ class Eleve(models.Model):
     matricule = models.CharField(max_length=50, primary_key=True, unique=True, default=uuid.uuid4)
     nom = models.CharField(max_length=50)
     prenom = models.CharField(max_length=100)
-    sexe_eleve = models.CharField(max_length=15, default=SEXE_ELEVE_CHOICES[1][1], choices=SEXE_ELEVE_CHOICES)
+    sexe_eleve = models.CharField(max_length=15, default=SEXE_ELEVE_CHOICES[1][0], choices=SEXE_ELEVE_CHOICES)
     pere = models.CharField(max_length=100)
     mere = models.CharField(max_length=100, default='')
     tuteur = models.CharField(max_length=100)
