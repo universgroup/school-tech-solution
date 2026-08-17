@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="container mt-4">
+    <h1>Mon profil</h1>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="form-group text-center mb-4">
+            {% if request.user.photo_profil %}
+            <img src="{{ request.user.photo_profil.url }}" alt="Photo de profil" class="img-circle" width="120" height="120" style="object-fit:cover;">
+            {% else %}
+            <img src="{% static 'assets/dist/img/user1-128x128.jpg' %}" alt="Photo de profil" class="img-circle" width="120" height="120" style="object-fit:cover;">
+            {% endif %}
+        </div>
+
+        {% for champ in form %}
+        <div class="form-group">
+            <label for="{{ champ.id_for_label }}">{{ champ.label }}</label>
+            {{ champ }}
+            {% if champ.errors %}<div class="text-danger">{{ champ.errors }}</div>{% endif %}
+        </div>
+        {% endfor %}
+
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+    </form>
+
+    <hr>
+    <p><a href="{% url 'password_reset' %}">Changer mon mot de passe</a></p>
+</div>
+{% endblock %}

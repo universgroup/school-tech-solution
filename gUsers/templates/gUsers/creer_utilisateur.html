@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block titre_page %} GESTION DES UTILISATEURS {% endblock %}
+{% block titre_formulaire %} AJOUT D'UN COMPTE UTILISATEUR {% endblock %}
+{% load crispy_forms_tags %}
+{% block titre_cadre %}
+CREER UN UTILISATEUR
+{% endblock %}
+
+{% block formulaire %}
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        
+        <button type="submit" class="btn btn-primary btn-md"> Créer &nbsp;<i class="fas fa-add-plus"></i></button>
+        <button type="reset" class="btn btn-warning btn-md">Actualiser &nbsp; <i class="fas fa-refresh"></i></button>
+    </form>
+
+{% endblock %}

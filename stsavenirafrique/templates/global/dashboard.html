@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  {% load static %}
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Ecole les Champions-Tableau de bord</title>
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="{% static 'assets/dist/img/LogoEC.png' %}">
+
+   <!-- Style du template dashboard à applique sur tous les autres templates-->
+  <link rel="stylesheet" href="{% static 'assets/css/dashboard.css' %}">
+
+   <!-- Google Font: Source Sans Pro -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="{% static 'assets/plugins/fontawesome-free/css/all.min.css' %}">
+  <!-- Ionicons -->
+  <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+
+  <link rel="stylesheet" href="{% static 'assets/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css' %}">
+  <link rel="stylesheet" href="{% static 'assets/plugins/icheck-bootstrap/icheck-bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'assets/plugins/jqvmap/jqvmap.min.css' %}">
+
+  <!-- Theme style -->
+  <link rel="stylesheet" href="{% static 'assets/dist/css/adminlte.min.css' %}">
+
+  <!--begin::Third Party Plugin(OverlayScrollbars)-->
+  <link rel="stylesheet" href="{% static 'assets/plugins/overlayScrollbars/css/OverlayScrollbars.min.css' %}"/>
+  <link href="{% static 'fontawesomefree/css/all.min.css' %}" rel="stylesheet" type="text/css">
+
+  <!--begin::Third Party Plugin(Bootstrap Icons)-->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"/> 
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+
+  <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+    <!-- Left navbar links -->
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+      </li>
+      <li class="nav-item d-none d-sm-inline-block">
+        <a href="{% url 'accueil' %}" class="nav-link" title="Acceder au tableau de bord">Accueil</a>
+      </li>
+      
+      <li class="nav-item dropdown">
+            <a id="dropdownSubMenu1" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle">Administration</a>
+            <ul aria-labelledby="dropdownSubMenu1" class="dropdown-menu border-0 shadow">
+              <li><a href="{% url 'listeinfos' %}" class="dropdown-item">Paramètres de l'école </a></li>
+              <li><a href="#" class="dropdown-item">Certificat de scolarité</a></li>
+              <li><a href="#" class="dropdown-item">Contrat de travail</a></li>
+
+              <li class="dropdown-divider"></li>
+
+              <!-- Level two dropdown-->
+              <li class="dropdown-submenu dropdown-hover">
+                <a id="dropdownSubMenu2" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-item dropdown-toggle">Gestion des cours</a>
+                <ul aria-labelledby="dropdownSubMenu2" class="dropdown-menu border-0 shadow">
+                  <li><a tabindex="-1" href="{% url 'listeanneescolaire' %}" class="dropdown-item">Ajouter une année scolaire</a></li>
+                  <li><a href="{% url 'listecycle' %}" class="dropdown-item">Ajouter un cycle scolaire</a></li>
+                  <li><a href="{% url 'listeclasse' %}" class="dropdown-item">Ajouter une classe</a></li>
+                  <li><a href="#" class="dropdown-item">Ajouter une matière</a></li>
+                </ul>
+              </li>
+              <!-- End Level two -->
+            </ul>
+      </li>
+
+      <li class="nav-item dropdown">
+            <a id="dropdownSubMenu3" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle">Elèves</a>
+            <ul aria-labelledby="dropdownSubMenu3" class="dropdown-menu border-0 shadow">
+              <li><a href="{% url 'chargeranneecourante' %}" class="dropdown-item">Inscription</a></li>
+              <li><a href="{% url 'listereinscritsanneecourante' %}" class="dropdown-item">Reinscription</a></li>
+              <li><a href="{% url 'listepaiemensuel' %}" class="dropdown-item">Etat des paiements</a></li>
+              <li><a href="#" class="dropdown-item">Etat des inscriptions/reinscriptions</a></li>              
+              <li><a href="{% url 'registrematricule' %}" class="dropdown-item">Registre de matriculation</a></li>
+            </ul>
+      </li>
+
+      <li class="nav-item dropdown">
+            <a id="dropdownSubMenu4" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle">Comptabilité</a>
+            <ul aria-labelledby="dropdownSubMenu4" class="dropdown-menu border-0 shadow">
+              <li><a href="{% url 'listepaiemensuel' %}" class="dropdown-item">Paiement de la scolarité</a></li>
+              <li><a href="{% url 'listerecette' %}" class="dropdown-item">Situation de la scolarité</a></li>
+              <li><a href="#" class="dropdown-item">Situation de la cantine scolaire</a></li>
+              <li><a href="#" class="dropdown-item">Situation des activités extra scolaires</a></li>
+              <li><a href="{% url 'listedepense' %}" class="dropdown-item">Situation des dépenses</a></li>
+              
+              <li class="dropdown-divider"></li>
+              
+              <li class="dropdown-submenu dropdown-hover">
+                <a id="dropdownSubMenu5" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-item dropdown-toggle">Rapports</a>
+                <ul aria-labelledby="dropdownSubMenu5" class="dropdown-menu border-0 shadow">
+                  <li><a tabindex="-1" href="#" class="dropdown-item">Rapport périodique des recettes</a></li>
+                  <li><a href="#" class="dropdown-item">Rapport périodique des dépenses</a></li>
+                  <li><a href="#" class="dropdown-item">Rapport global par période</a></li>
+                  <li><a href="#" class="dropdown-item">Rapport global par année scolaire</a></li>
+                </ul>
+              </li>
+
+            </ul>
+      </li>
+
+      <li class="nav-item dropdown">
+            <a id="dropdownSubMenu6" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle">Personnel</a>
+            <ul aria-labelledby="dropdownSubMenu6" class="dropdown-menu border-0 shadow">
+              <li><a href="#" class="dropdown-item">Enregistrer un employé</a></li>
+              <li><a href="#" class="dropdown-item">Enregistrer une avance sur salaire</a></li>
+              <li><a href="#" class="dropdown-item">Paiement des salaires</a></li>
+              <li><a href="#" class="dropdown-item">Suivi des absences</a></li>
+              <li><a href="#" class="dropdown-item">Liste des employés</a></li>
+            </ul>
+      </li>
+
+      <li class="nav-item dropdown">
+            <a id="dropdownSubMenu7" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle">Evaluation</a>
+            <ul aria-labelledby="dropdownSubMenu7" class="dropdown-menu border-0 shadow">
+              
+              <li class="dropdown-submenu dropdown-hover">
+                <a id="dropdownSubMenu8" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-item dropdown-toggle">Saisie des notes</a>
+                <ul aria-labelledby="dropdownSubMenu8" class="dropdown-menu border-0 shadow">
+                  <li><a tabindex="-1" href="#" class="dropdown-item">Par classe</a></li>
+                  <li><a href="#" class="dropdown-item">Par élève</a></li>
+                </ul>
+              </li>
+
+              <li class="dropdown-submenu dropdown-hover">
+                <a id="dropdownSubMenu9" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-item dropdown-toggle">Resultats</a>
+                <ul aria-labelledby="dropdownSubMenu9" class="dropdown-menu border-0 shadow">
+                  <li><a tabindex="-1" href="#" class="dropdown-item">Par période</a></li>
+                  <li><a href="#" class="dropdown-item">Par trimestre/semestre</a></li>
+                  <li><a href="#" class="dropdown-item">Par année scolaire</a></li>
+                </ul>
+              </li>
+
+              <li class="dropdown-submenu dropdown-hover">
+                <a id="dropdownSubMenu10" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-item dropdown-toggle">Bulletin de notes</a>
+                <ul aria-labelledby="dropdownSubMenu10" class="dropdown-menu border-0 shadow">
+                  <li><a tabindex="-1" href="#" class="dropdown-item">Par période</a></li>
+                  <li><a href="#" class="dropdown-item">Par trimestre/semestre</a></li>
+                  <li><a href="#" class="dropdown-item">Par année scolaire</a></li>
+                </ul>
+              </li>
+                            
+            </ul>
+      </li>
+
+      <li class="nav-item dropdown">
+            <a id="dropdownSubMenu11" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle">Services</a>
+            <ul aria-labelledby="dropdownSubMenu11" class="dropdown-menu border-0 shadow">
+              <li><a href="#" class="dropdown-item">Cantine</a></li>
+              <li><a href="#" class="dropdown-item">Activités extra scolaires</a></li>              
+            </ul>
+      </li>
+
+    </ul>
+
+    <!-- SEARCH FORM -->
+    <form class="form-inline ml-3">
+      <div class="input-group input-group-sm">
+        <input class="form-control form-control-navbar" type="search" placeholder="Rechercher..." aria-label="Search">
+        <div class="input-group-append">
+          <button class="btn btn-navbar" type="submit">
+            <i class="fas fa-search"></i>
+          </button>
+        </div>
+      </div>
+    </form>
+
+    <!-- Right navbar links -->
+    <ul class="navbar-nav ml-auto">
+      <!-- Messages Dropdown Menu -->
+      <li class="nav-item dropdown">
+        <a class="nav-link" data-toggle="dropdown" href="#">
+          <i class="far fa-comments"></i>
+          <span class="badge badge-danger navbar-badge">3</span>
+        </a>
+        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+          <a href="#" class="dropdown-item">
+            <!-- Message Start -->
+            <div class="media">
+              <img src="{% static 'assets/dist/img/user1-128x128.jpg' %}" alt="User Avatar" class="img-size-50 mr-3 img-circle">
+              <div class="media-body">
+                <h3 class="dropdown-item-title">
+                  Brad Diesel
+                  <span class="float-right text-sm text-danger"><i class="fas fa-star"></i></span>
+                </h3>
+                <p class="text-sm">Call me whenever you can...</p>
+                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
+              </div>
+            </div>
+            <!-- Message End -->
+          </a>
+          <div class="dropdown-divider"></div>
+          <a href="#" class="dropdown-item">
+            <!-- Message Start -->
+            <div class="media">
+              <img src="{% static 'assets/dist/img/user8-128x128.jpg' %}" alt="Avatar utilisateur" class="img-size-50 img-circle mr-3">
+              <div class="media-body">
+                <h3 class="dropdown-item-title">
+                  John Pierce
+                  <span class="float-right text-sm text-muted"><i class="fas fa-star"></i></span>
+                </h3>
+                <p class="text-sm">I got your message bro</p>
+                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
+              </div>
+            </div>
+            <!-- Message End -->
+          </a>
+          <div class="dropdown-divider"></div>
+          <a href="#" class="dropdown-item">
+            <!-- Message Start -->
+            <div class="media">
+              <img src="{% static 'assets/dist/img/user3-128x128.jpg' %}" alt="Avatar utilisateur" class="img-size-50 img-circle mr-3">
+              <div class="media-body">
+                <h3 class="dropdown-item-title">
+                  Nora Silvester
+                  <span class="float-right text-sm text-warning"><i class="fas fa-star"></i></span>
+                </h3>
+                <p class="text-sm">The subject goes here</p>
+                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
+              </div>
+            </div>
+            <!-- Message End -->
+          </a>
+          <div class="dropdown-divider"></div>
+          <a href="#" class="dropdown-item dropdown-footer">See All Messages</a>
+        </div>
+      </li>
+      <!-- Notifications Dropdown Menu -->
+      <li class="nav-item dropdown">
+        <a class="nav-link" data-toggle="dropdown" href="#">
+          <i class="far fa-bell"></i>
+          <span class="badge badge-warning navbar-badge">15</span>
+        </a>
+        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+          <span class="dropdown-item dropdown-header">15 Notifications</span>
+          <div class="dropdown-divider"></div>
+          <a href="#" class="dropdown-item">
+            <i class="fas fa-envelope mr-2"></i> 4 new messages
+            <span class="float-right text-muted text-sm">3 mins</span>
+          </a>
+          <div class="dropdown-divider"></div>
+          <a href="#" class="dropdown-item">
+            <i class="fas fa-users mr-2"></i> 8 friend requests
+            <span class="float-right text-muted text-sm">12 hours</span>
+          </a>
+          <div class="dropdown-divider"></div>
+          <a href="#" class="dropdown-item">
+            <i class="fas fa-file mr-2"></i> 3 new reports
+            <span class="float-right text-muted text-sm">2 days</span>
+          </a>
+          <div class="dropdown-divider"></div>
+          <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
+        </div>
+      </li>
+
+     
+      <li class="nav-item dropdown">
+          <a class="nav-link" data-toggle="dropdown" href="{% url 'mon_profil' %}" title="Acceder à vos informations personnelles">
+              {% if request.user.photo_profil %}
+              <img src="{{ request.user.photo_profil.url }}" alt="Avatar" class="img-size-24 img-circle">
+              {% else %}
+              <img src="{% static 'assets/dist/img/user1-128x128.jpg' %}" alt="Avatar" class="img-size-24 img-circle">
+              {% endif %}
+          </a>
+      </li>
+   
+
+      <li class="nav-item">
+        <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button">
+          <i class="fas fa-th-large"></i>
+        </a>
+      </li>
+    </ul>
+  </nav>
+  <!-- /.navbar -->
+
+  <aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <!-- Brand Logo -->
+    <a href="{% url 'accueil' %}" class="brand-link" title="Acceder au tableau de bord">
+      <img src="{% static 'assets/dist/img/LogoEC.png' %}"
+           alt="Logo Ecole les Champions"
+           class="img-size-24 img-circle"
+           style="opacity: .8">
+      <span class="brand-text font-weight-light">Ecole les Champions</span>
+    </a>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <!-- Sidebar user (optional) -->
+      <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+        <div class="image">
+          {% if request.user.photo_profil %}
+          <img src="{{ request.user.photo_profil.url }}" alt="Avatar" class="img-size-24 mr-2 img-circle">
+          {% else %}
+          <img src="{% static 'assets/dist/img/user1-128x128.jpg' %}" alt="Avatar" class="img-size-24 mr-2 img-circle">
+          {% endif %}
+        </div>
+        <div class="info">
+          <a href="{% url 'mon_profil' %}" class="d-block" title="Acceder à vos informations personnelles">{{ request.user.get_full_name|default:request.user.username }}</a>
+        </div>
+      </div>
+
+      <!-- Sidebar Menu -->
+      <nav class="mt-2">
+        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+          <!-- Add icons to the links using the .nav-icon class
+               with font-awesome or any other icon font library -->
+
+               <!--Debut du menu Administration -->
+          <li class="nav-item has-treeview">
+            <a href="#" class="nav-link active" title="Permet de parametrer les données de base de l'application">
+              <i class="nav-icon fas fa-wrench"></i>
+              <p>
+                Administration
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="{% url 'listeinfos' %}" class="nav-link" title="Permet de saisir les renseignements de l'école">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Paramères de l'école &nbsp;</p>
+                  <i class="fas fa-gears"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet d'éditer le certificat de scolarité d'un élève">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Certificat de scolarité &nbsp;</p>
+                  <i class="fas fa-award"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet d'éditer le contrat de travail d'un employé de l'école">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Contrat de travail &nbsp;</p>
+                  <i class="fas fa-file-signature"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{% url 'listeanneescolaire' %}" class="nav-link" title="Permet d'ajouter de nouvelles années scolaires">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Créer une année scolaire &nbsp;</p>
+                  <i class="fas fa-calendar-plus"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{% url 'listecycle' %}" class="nav-link" title="Permet d'ajouter un nouveau cycle scolaire">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Créer un cycle scolaire &nbsp;</p>
+                  <i class="fa-brands fa-google-scholar"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{% url 'listeclasse' %}" class="nav-link" title="Permet d'ajouter de nouvelles classes dans le système">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Créer une classe &nbsp;</p>
+                  <i class="fas fa-school"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet d'ajouter de nouvelles matières et leurs coefficients respectifs">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Créer une matière &nbsp;</p>
+                  <i class="fas fa-book-skull"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{% url 'creer_utilisateur' %}" class="nav-link" title="Permet de créer un compte utilisateur pour le personnel ou les parents d'élèves">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Créer un utilisateur &nbsp;</p>
+                  <i class="fas fa-user-plus"></i>
+                </a>
+              </li>
+
+            </ul>
+          </li>
+          
+          <li class="nav-item has-treeview">
+            <a href="#" class="nav-link" title="Permet de gérer les élèves de l'école">
+              <i class="nav-icon fas fa-children"></i>
+              <p>
+                Elèves
+                <i class="fas fa-angle-left right"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="{% url 'chargeranneecourante' %}" class="nav-link" title="Permet d'effectuer les inscriptions des nouvels élèves">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Inscription &nbsp;</p>
+                  <i class="fas fa-info"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{% url 'listereinscritsanneecourante' %}" class="nav-link" title="Permet d'effectuer la reinscription des anciens élèves">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Reinscription &nbsp;</p>
+                  <i class="fas fa-registered"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{% url 'listepaiemensuel' %}" class="nav-link" title="Permet de consulter l'état des paiements de la scolarité">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Etat des paiements &nbsp;</p>
+                  <i class="fas fa-file-invoice-dollar"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet de consulter l'état des paiements des inscriptions/reinscriptions">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Etat inscriptions &nbsp;</p>
+                  <i class="fas fa-file-invoice"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet de consulter la liste des élèves par classe et par cycle scolaire">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Liste par classe &nbsp;</p>
+                  <i class="fas fa-list"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{% url 'registrematricule' %}" class="nav-link" title="Permet de consulter le registre de matriculation de l'école">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Registre de matricule &nbsp;</p>
+                  <i class="fas fa-list-ol"></i>
+                </a>
+              </li>
+              
+            </ul>
+          </li>
+
+          <li class="nav-item has-treeview">
+            <a href="#" class="nav-link" title="Permet d'acceder à toutes les opérations de la comptabilité ou de la caisse">
+              <i class="nav-icon fas fa-calculator"></i>
+              <p>
+                Comptabilité
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="{% url 'listepaiemensuel' %}" class="nav-link" title="Permet de procéder au paiement des frais de scolarité">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Paiement scolarité &nbsp;</p>
+                  <i class="fa-brands fa-cc-visa"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{% url 'listerecette' %}" class="nav-link" title="Permet de gérer la situation des recettes générées par le paiement des frais à la scolarité">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Recettes scolarité &nbsp;</p>
+                  <i class="fa-brands fa-cc-mastercard"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet de gérer la situation des recettes générées par le paiement des frais de cantine">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Recettes cantine &nbsp;</p>
+                  <i class="fas fa-cash-register"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet de gérer la situation des recettes générées par le paiement des activités extra scolaires">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Recettes extra scolaires &nbsp;</p>
+                  <i class="fas fa-person-swimming"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{% url 'listedepense' %}" class="nav-link" title="Permet de gérer la situation des dépenses quotidiennes">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Gestion dépenses &nbsp;</p>
+                  <i class="fas fa-credit-card"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet d'imprimer le rapport des recettes générées durant une période donnée">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Rapport recettes &nbsp;</p>
+                  <i class="fas fa-chart-pie"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet d'imprimer le rapport des dépenses réalisées durant une période donnée">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Rapport dépenses &nbsp;</p>
+                  <i class="fas fa-chart-area"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet d'imprimer le rapport global des recettes et dépenses durant une période donnée">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Rapport global période &nbsp;</p>
+                  <i class="fas fa-table"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet d'imprimer le rapport global des recettes et dépenses durant l'année scolaire">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Rapport global annuel &nbsp;</p>
+                  <i class="fas fa-file-pdf"></i>
+                </a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-item has-treeview">
+            <a href="#" class="nav-link" title="Permet de gérer le personnel de l'école">
+              <i class="nav-icon fas fa-user-tie"></i>
+              <p>
+                Personnel
+                <i class="fas fa-angle-left right"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet d'enregistrer les informations de chaque employé de l'école">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Ajouter un employé &nbsp;</p>
+                  <i class="fas fa-user-check"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet de saisir les avances sur salaire accordées aux employés">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Ajouter bon paiement &nbsp;</p>
+                  <i class="fas fa-sack-dollar"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet de saisir les salaires mensuels versés aux employés">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Paiement salaires &nbsp;</p>
+                  <i class="fas fa-hand-holding-dollar"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet d'enregistrer les absences du personnel enseignant">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Suivi absences &nbsp;</p>
+                  <i class="fas fa-person-chalkboard"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet d'imprimer la liste générale du personnel">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Liste employés &nbsp;</p>
+                  <i class="fa-solid fa-users"></i>
+                </a>
+              </li>
+            </ul>
+          </li>    
+          <li class="nav-item has-treeview">
+            <a href="#" class="nav-link" title="Permet de gerer les évaluations des élèves par cycle et classe">
+              <i class="nav-icon fas fa-book"></i>
+              <p>
+                Evaluation
+                <i class="fas fa-angle-left right"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet de faire la saisie des notes par classe">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Saisie par classe &nbsp;</p>
+                  <i class="fas fa-chalkboard-user"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet de faire la saisie des notes par élève">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Saisie par élève &nbsp;</p>
+                  <i class="fas fa-child"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet de consulter et imprimer les résultats d'une classe aucours d'une période donnée">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Résultat périodique &nbsp;</p>
+                  <i class="fas fa-file-pdf"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet de consulter et imprimer les résultats d'une classe aucours d'un trimestre ou semestre">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Résultat trimestriel &nbsp;</p>
+                  <i class="fas fa-file-lines"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet de consulter et imprimer les résultats d'une classe aucours d'une année scolaire">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Résultat annuel &nbsp;</p>
+                  <i class="fas fa-newspaper"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet de consulter et imprimer les bulletins d'une classe aucours d'une période donnée">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Bulletin périodique &nbsp;</p>
+                  <i class="fas fa-address-card"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet de consulter et imprimer les bulletins d'une classe aucours d'un trimestre ou semestre">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Bulletin trimestriel &nbsp;</p>
+                  <i class="fas fa-id-badge"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet de consulter et imprimer les bulletins d'une classe aucours d'une année scolaire">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Bulletin annuel &nbsp;</p>
+                  <i class="fas fa-layer-group"></i>
+                </a>
+              </li>
+            </ul>
+          </li>
+
+          <li class="nav-item has-treeview">
+            <a href="#" class="nav-link" title="Permet de gérer les services extra scolaires : Natation, Football, Karaté, Cantine, etc.">
+              <i class="nav-icon fas fa-table"></i>
+              <p>
+                Services
+                <i class="fas fa-angle-left right"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet de gérer les opérations de paiement des frais de cantine">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Gestion cantine &nbsp;</p>
+                  <i class="fas fa-utensils"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link" title="Permet de gérer les activités extra scolaires comme le Karaté, la Natation, le Football, etc.">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Activités extra scolaires &nbsp;</p>
+                  <i class="fas fa-futbol"></i>
+                </a>
+              </li>
+            </ul>
+          </li>
+
+          <!-- Bouton Déconnexion dans le Sidebar -->
+          <li class="nav-item mt-4">
+              <form action="{% url 'deconnexion' %}" method="post" class="d-inline w-100">
+                  {% csrf_token %}
+                  <button type="submit" class="btn-logout-sidebar" title="Retour à la page de connexion">
+                      <i class="fas fa-sign-out-alt me-2"></i> <span>Déconnexion</span>
+                  </button>
+              </form>
+          </li>
+     
+        </ul>
+      </nav>
+      <!-- /.sidebar-menu -->
+    </div>
+    <!-- /.sidebar -->
+  </aside>
+  
+
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="m-0">TABLEAU DE BORD DES ACTIVITES</h1>
+          </div><!-- /.col -->
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="#">Accueil</a></li>
+              <li class="breadcrumb-item active" aria-current="page">Tableau de bord</li>
+            </ol>
+          </div><!-- /.col -->
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content-header -->
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <!-- Small boxes (Stat box) -->
+        <div class="row mb-4">
+          <div class="col-lg-3 col-6">
+              <div class="stat-card">
+                  <div class="stat-icon blue"><i class="fas fa-user-graduate"></i></div>
+                  <div class="stat-label">Total élèves</div>
+                  <div class="stat-value">{{ total_eleves }}</div>
+                  <div class="stat-footer">
+                      <span>Effectif actuel</span>
+                  </div>
+              </div>
+          </div>
+          <div class="col-lg-3 col-6">
+              <div class="stat-card">
+                  <div class="stat-icon green"><i class="fas fa-chalkboard-teacher"></i></div>
+                  <div class="stat-label">Enseignants</div>
+                  <div class="stat-value">{{ total_enseignants }}</div>
+                  <div class="stat-footer">
+                      <span>Personnel enseignant</span>
+                  </div>
+              </div>
+          </div>
+          <div class="col-lg-3 col-6">
+              <div class="stat-card">
+                  <div class="stat-icon yellow"><i class="fas fa-book-open"></i></div>
+                  <div class="stat-label">Classes</div>
+                  <div class="stat-value">{{ total_classes }}</div>
+                  <div class="stat-footer">
+                      <span>Toutes classes confondues</span>
+                  </div>
+              </div>
+          </div>
+          <div class="col-lg-3 col-6">
+              <div class="stat-card">
+                  <div class="stat-icon purple"><i class="fas fa-circle-check"></i></div>
+                  <div class="stat-label">Taux de réussite</div>
+                  <div class="stat-value">{{ taux_reussite}}</div>
+                  <div class="stat-footer">
+                      <span>Année en cours</span>
+                  </div>
+              </div>
+          </div>
+      </div>
+            
+   </div>
+
+   <div class="row g-3">
+      <div class="col-md-8">
+          <div class="card-dash">
+              <div class="card-header-dash">
+                  <h5><i class="fas fa-chart-line text-primary-custom mr-2"></i>Évolution des inscriptions</h5>
+              </div>
+              <div class="chart-container">
+                  <canvas id="chartLine"></canvas>
+              </div>
+          </div>
+      </div>
+      <div class="col-md-4">
+          <div class="card-dash">
+              <div class="card-header-dash">
+                  <h5><i class="fas fa-chart-bar text-primary-custom mr-2"></i>Répartition par classe</h5>
+              </div>
+              <div class="chart-container">
+                  <canvas id="chartBar"></canvas>
+              </div>
+          </div>
+      </div>
+  </div>
+
+    <!-- Ligne du tableau de progression des paiements -->
+  <div class="row mt-4">
+      <div class="col-12">
+          <div class="card-dash">
+              <div class="card-header-dash">
+                  <h5>
+                      <i class="fas fa-coins text-primary-custom mr-2"></i>
+                      Progression des paiements de scolarité
+                  </h5>
+              </div>
+              <div class="table-responsive">
+                  <table class="table table-dash">
+                      <thead>
+                          <tr>
+                              <th>Classe</th>
+                              <th>Montant attendu</th>
+                              <th>Première tranche</th>
+                              <th>Deuxième tranche</th>
+                              <th>Montant restant</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          {% for paiement in paiements %}
+                          <tr>
+                              <td><strong>{{ paiement.classe }}</strong></td>
+                              <td>{{ paiement.montant_attendu|floatformat:0 }} FCFA</td>
+                              <td>{{ paiement.premiere_tranche|floatformat:0 }} FCFA</td>
+                              <td>{{ paiement.deuxieme_tranche|floatformat:0 }} FCFA</td>
+                              <td>
+                                  {% if paiement.montant_restant == 0 %}
+                                      <span class="badge-status success">✓ Payé</span>
+                                  {% else %}
+                                      <span class="badge-status warning">
+                                          {{ paiement.montant_restant|floatformat:0 }} FCFA
+                                      </span>
+                                  {% endif %}
+                              </td>
+                          </tr>
+                          {% empty %}
+                          <tr>
+                              <td colspan="5" class="text-center py-3">
+                                  Aucune donnée de paiement disponible.
+                              </td>
+                          </tr>
+                          {% endfor %}
+                      </tbody>
+                  </table>
+              </div>
+          </div>
+      </div>
+  </div>
+      
+
+            <!-- /.card -->
+</section>
+          <!-- right col -->
+        </div>
+        <!-- /.row (main row) -->
+      </div><!-- /.container-fluid -->
+    </section>
+    <!-- /.content -->
+  </div>
+  
+  <!-- /.content-wrapper -->
+  <footer class="main-footer">
+    <div class="float-right d-none d-sm-block">
+      <b>Version</b> 1.0.0.1
+    </div>
+    <strong>Copyright &copy; 2023-2026 <a href="https://www.universtechgroup.com">Univers Tech Group</a>.</strong> Tous droits reservés
+  </footer>
+
+  <!-- Control Sidebar -->
+  <aside class="control-sidebar control-sidebar-dark">
+    <!-- Control sidebar content goes here -->
+  </aside>
+  <!-- /.control-sidebar -->
+</div>
+<!-- ./wrapper -->
+
+<script src="{% static 'assets/plugins/jquery/jquery.min.js' %}"></script>
+<script src="{% static 'assets/plugins/jquery-ui/jquery-ui.min.js' %}"></script>
+<script>$.widget.bridge('uibutton', $.ui.button)</script>
+<script src="{% static 'assets/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'assets/plugins/jqvmap/jquery.vmap.min.js' %}"></script>
+<script src="{% static 'assets/plugins/jqvmap/maps/jquery.vmap.usa.js' %}"></script>
+<script src="{% static 'assets/plugins/jquery-knob/jquery.knob.min.js' %}"></script>
+<script src="{% static 'assets/plugins/moment/moment.min.js' %}"></script>
+<script src="{% static 'assets/plugins/daterangepicker/daterangepicker.js' %}"></script>
+<script src="{% static 'assets/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js' %}"></script>
+<script src="{% static 'assets/plugins/summernote/summernote-bs4.min.js' %}"></script>
+<script src="{% static 'assets/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js' %}"></script>
+<script src="{% static 'assets/dist/js/adminlte.js' %}"></script>
+<script src="{% static 'assets/dist/js/demo.js' %}"></script>
+
+<!-- Chart.js (graphiques du tableau de bord) -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+
+<script>
+
+    $(function () {
+        new Chart(document.getElementById('chartLine').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août'],
+                datasets: [{
+                    label: 'Nouvelles inscriptions',
+                    data: [28, 32, 41, 38, 55, 62, 70, 85],
+                    borderColor: '#4f46e5',
+                    backgroundColor: 'rgba(79,70,229,0.08)',
+                    borderWidth: 3,
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+        });
+
+        new Chart(document.getElementById('chartBar').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: ['6e', '5e', '4e', '3e', '2de', '1re', 'Term'],
+                datasets: [{
+                    label: 'Effectifs',
+                    data: [95, 88, 92, 78, 65, 58, 52],
+                    backgroundColor: '#4f46e5',
+                    borderRadius: 6
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+        });
+    });
+
+</script>
+
+
+</body>
+</html>

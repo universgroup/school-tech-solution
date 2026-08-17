@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    {% load static %}
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Connexion-École Les Champions</title>
+    <link rel="icon" type="image/png" href="{% static 'assets/dist/img/LogoEC.png' %}">
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+    <!-- Feuille de style associee au template login.html-->
+    <link rel="stylesheet" href="{% static 'assets/css/loginstyle.css' %}">
+
+</head>
+<body>
+    <div class="login-card">
+        <!-- Côté gauche : logo / photo de l'école -->
+        <div class="login-brand">
+            <div class="brand-content">
+                <div class="school-logo">
+                    <img src="{% static 'assets/dist/img/LogoEC.png' %}" alt="Logo de l'école les Champions" />
+                </div>
+                <h1>École Les Champions</h1>
+                <p>L'excellence au service de l'éducation</p>
+                <div class="brand-divider"></div>
+                <div class="school-feature">
+                    <span><i class="fas fa-check-circle"></i> 15 ans d'excellence</span>
+                    <span><i class="fas fa-users"></i> 1000+ élèves</span>
+                    <span><i class="fas fa-award"></i> Label qualité</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Côté droit : formulaire -->
+        <div class="login-form">
+            <div class="form-header">
+                <h2>Bienvenue</h2>
+                <p>Connectez-vous à votre espace personnel</p>
+            </div>
+
+
+            <form method="post" novalidate>
+                
+                {% csrf_token %}
+
+
+                {% if form.errors %}
+                <div class="alert alert-danger">Adresse e-mail ou mot de passe incorrect.</div>
+                {% endif %}
+
+                <div class="form-floating">
+                     {{ form.username }}
+                    <label for="{{ form.username.id_for_label }}"><i class="far fa-envelope me-2"></i>Adresse email</label>
+                </div>
+                <div class="form-floating">
+                    {{ form.password }}
+                    <label for="{{ form.password.id_for_label }}"><i class="fas fa-lock me-2"></i>Mot de passe</label>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="remember" checked>
+                        <label class="form-check-label" for="remember">Se souvenir de moi</label>
+                    </div>
+                    <br>
+                    <a href="{% url 'password_reset' %}" class="text-primary fw-bold" style="font-size:0.85rem;">Mot de passe oublié ?</a>
+                </div>
+
+
+                <button type="submit" class="btn-login">
+                    <i class="fas fa-arrow-right-to-bracket"></i> Se connecter
+                </button>
+
+                
+                <div class="social-login">
+                    <button type="button" class="btn-social"><i class="fab fa-google"></i> Gmail</button>
+                    <button type="button" class="btn-social"><i class="fab fa-facebook"></i> Facebook</button>
+                    <button type="button" class="btn-social"><i class="fab fa-whatsapp"></i>WhatsApp</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+
+        $(function() {
+            // Écoute le déclenchement de l'animation-piège = signal fiable qu'un autofill vient d'avoir lieu
+            document.querySelectorAll('.form-floating .form-control').forEach(function(champ) {
+                champ.addEventListener('animationstart', function(e) {
+                    if (e.animationName === 'onAutoFillStart') {
+                        champ.classList.add('is-filled');
+                    }
+                });
+            });
+
+            // Filet de sécurité : vérifie aussi au chargement si un champ est déjà rempli
+            document.querySelectorAll('.form-floating .form-control').forEach(function(champ) {
+                if (champ.value) {
+                    champ.classList.add('is-filled');
+                }
+            });
+        });
+
+    </script>
+</body>
+</html>

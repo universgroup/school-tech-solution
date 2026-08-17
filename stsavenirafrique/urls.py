@@ -16,19 +16,26 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.views.generic import RedirectView
+
 # from . import views # c est une autre methode/facon d'importer les views
 
 from django.conf import settings
 from django.conf.urls.static import static
+from gUsers.views import home
 
-urlpatterns = [
+urlpatterns = [   # Racine du site "/" redirige vers la page de connexion
+                  path('', RedirectView.as_view(pattern_name='connexion', permanent=False), name='connexion'),
+                  path('accueil/',home,name='accueil'),  
                   path('admin/', admin.site.urls),
                   path('administration/', include('gAdministration.urls'), name='administration'),
                   path('comptabilite/', include('gComptabilite.urls'), name='comptabilite'),
-                  path('cours/', include('gCours.urls'), name='cours'),
+                  #path('cours/', include('gCours.urls'), name='cours'),
                   path('eleves/', include('gEleve.urls'), name='eleves'),
                   # path('notes/', include('gNotes.urls'), name='notes'),
-                  path('personnel/', include('gPersonnel.urls'), name='personnel'),
-                  # path('utilisateurs/', include('gUsers.urls'), name='utilisateurs')
+                  # path('personnel/', include('gPersonnel.urls'), name='personnel'),
+                  
+                  path('utilisateurs/', include('gUsers.urls'), name='utilisateurs'),  # l'attribut name devant chaque url contenant le include n'a pas d'effet, donc facultatif              
+                  
 
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -4,7 +4,7 @@
   {% load static %}
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>{% block titre_page %} {% endblock titre_page %}</title>
+  <title>{% block titre_page %}Ecole les Champions- {% endblock titre_page %}</title>
   <!-- Tell the browser to be responsive to screen width -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/png" href="{% static 'assets/dist/img/LogoEC.png' %}">
@@ -31,6 +31,9 @@
   <!-- Style des astérisques des champs requis (crispy-forms) dans tous les templates -->
   <link rel="stylesheet" href="{% static 'assets/css/myforms.css' %}">
 
+  <!-- Style du template dashboard à applique sur tous les autres templates-->
+  <link rel="stylesheet" href="{% static 'assets/css/dashboard.css' %}">
+
 </head>
 <body class="hold-transition sidebar-mini">
 <div class="wrapper">
@@ -42,7 +45,7 @@
         <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
       </li>
       <li class="nav-item d-none d-sm-inline-block">
-        <a href="#" class="nav-link">Accueil</a>
+        <a href="{% url 'accueil' %}" class="nav-link" title="Acceder au tableau de bord">Accueil</a>
       </li>
       
       <li class="nav-item dropdown">
@@ -256,6 +259,17 @@
           <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
         </div>
       </li>
+
+      <li class="nav-item dropdown">
+          <a class="nav-link" data-toggle="dropdown" href="{% url 'mon_profil' %}" title="Acceder à vos informations personnelles">
+              {% if request.user.photo_profil %}
+              <img src="{{ request.user.photo_profil.url }}" alt="Avatar" class="img-size-24 img-circle">
+              {% else %}
+              <img src="{% static 'assets/dist/img/user1-128x128.jpg' %}" alt="Avatar" class="img-size-24 img-circle">
+              {% endif %}
+          </a>
+      </li>
+
       <li class="nav-item">
         <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button">
           <i class="fas fa-th-large"></i>
@@ -268,10 +282,10 @@
   <!-- Main Sidebar Container -->
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
-    <a href="#" class="brand-link">
+    <a href="{% url 'accueil' %}" class="brand-link" title="Acceder au tableau de bord">
       <img src="{% static 'assets/dist/img/LogoEC.png' %}"
            alt="Logo Ecole les Champions"
-           class="brand-image img-circle elevation-3"
+           class="img-size-24 img-circle"
            style="opacity: .8">
       <span class="brand-text font-weight-light">Ecole les Champions</span>
     </a>
@@ -281,10 +295,14 @@
       <!-- Sidebar user (optional) -->
       <div class="user-panel mt-3 pb-3 mb-3 d-flex">
         <div class="image">
-          <img src="{% static 'assets/dist/img/user7-128x128.jpg' %}" class="img-circle elevation-2" alt="User Image">
+          {% if request.user.photo_profil %}
+          <img src="{{ request.user.photo_profil.url }}" alt="Avatar" class="img-size-24 mr-2 img-circle">
+          {% else %}
+          <img src="{% static 'assets/dist/img/user1-128x128.jpg' %}" alt="Avatar" class="img-size-24 mr-2 img-circle">
+          {% endif %}
         </div>
         <div class="info">
-          <a href="#" class="d-block">Mme Djénabou DIALLO</a>
+          <a href="{% url 'mon_profil' %}" class="d-block" title="Acceder à vos informations personnelles">{{ request.user.get_full_name|default:request.user.username }}</a>
         </div>
       </div>
 
@@ -309,7 +327,7 @@
                 <a href="{% url 'listeinfos' %}" class="nav-link" title="Permet de saisir les renseignements de l'école">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Paramères de l'école &nbsp;</p>
-                  <i class=" fas fa-gears"></i>
+                  <i class="fas fa-gears"></i>
                 </a>
               </li>
               <li class="nav-item">
@@ -355,7 +373,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="#" class="nav-link" title="Permet de créer un compte utilisateur pour le personnel ou les parents d'élèves">
+                <a href="{% url 'creer_utilisateur' %}" class="nav-link" title="Permet de créer un compte utilisateur pour le personnel ou les parents d'élèves"></a>   
                   <i class="far fa-circle nav-icon"></i>
                   <p>Créer un utilisateur &nbsp;</p>
                   <i class="fas fa-user-plus"></i>
@@ -633,6 +651,16 @@
               </li>
             </ul>
           </li>
+
+          <!-- Bouton Déconnexion dans le Sidebar -->
+          <li class="nav-item mt-4">
+              <form action="{% url 'deconnexion' %}" method="post" class="d-inline w-100">
+                  {% csrf_token %}
+                  <button type="submit" class="btn-logout-sidebar" title="Revenir à la page de connexion">
+                      <i class="fas fa-sign-out-alt me-2"></i> <span>Déconnexion</span>
+                  </button>
+              </form>
+          </li>
      
         </ul>
       </nav>
@@ -652,8 +680,8 @@
           </div>
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="#">Accueil</a></li>
-              <li class="breadcrumb-item active">Classe</li>
+              <li class="breadcrumb-item"><a href="{% url 'accueil' %}" title="Tableau de bord">Accueil</a></li>
+              <li class="breadcrumb-item active">{% block fil_ariane %}{% endblock fil_ariane %}</li>
             </ol>
           </div>
         </div>

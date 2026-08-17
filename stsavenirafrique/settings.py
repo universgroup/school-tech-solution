@@ -160,10 +160,16 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 DATE_INPUT_FORMATS = ['%d-%m-%Y', '%Y-%m-%d', '%m-%d-%Y']
 DATE_FORMAT = 'j N, Y'
 
-LOGIN_REDIRECT_URL = '//'
+# Déclare le nouveau modèle utilisateur au projet
+AUTH_USER_MODEL = 'gUsers.Utilisateur'
+
+LOGIN_REDIRECT_URL = 'accueil'
 LOGIN_URL = '/'  # C'est l'URL de la page de connexion
 LOGOUT_REDIRECT_URL = '/'
 LOGOUT_URL = '/'
+
+# Durée de validité du lien de réinitialisation de mot de passe (1h)
+PASSWORD_RESET_TIMEOUT = 3600
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'

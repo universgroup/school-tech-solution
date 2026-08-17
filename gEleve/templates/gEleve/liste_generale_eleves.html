@@ -36,6 +36,9 @@
     <!-- Ce style est mis pour les boutons d'exportation en excel et PDF de la datatable-->
     <link rel="stylesheet" href="{% static 'assets/css/datatablesbuttons.css' %}">
 
+    <!-- Style du template dashboard à applique sur tous les autres templates-->
+    <link rel="stylesheet" href="{% static 'assets/css/dashboard.css' %}">
+
 </head>
 <body class="hold-transition sidebar-mini">
 
@@ -48,7 +51,7 @@
         <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
       </li>
       <li class="nav-item d-none d-sm-inline-block">
-        <a href="#" class="nav-link">Accueil</a>
+        <a href="{% url 'accueil' %}" class="nav-link" title="Acceder au tableau de bord">Accueil</a>
       </li>
       
       <li class="nav-item dropdown">
@@ -263,6 +266,17 @@
           <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
         </div>
       </li>
+
+      <li class="nav-item dropdown">
+          <a class="nav-link" data-toggle="dropdown" href="{% url 'mon_profil' %}" title="Acceder à vos informations personnelles">
+              {% if request.user.photo_profil %}
+              <img src="{{ request.user.photo_profil.url }}" alt="Avatar" class="img-size-24 img-circle">
+              {% else %}
+              <img src="{% static 'assets/dist/img/user1-128x128.jpg' %}" alt="Avatar" class="img-size-24 img-circle">
+              {% endif %}
+          </a>
+      </li>   
+
       <li class="nav-item">
         <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button">
           <i class="fas fa-th-large"></i>
@@ -275,10 +289,10 @@
   <!-- Main Sidebar Container -->
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
-    <a href="#" class="brand-link">
+    <a href="{% url 'accueil' %}" class="brand-link" title="Acceder au tableau de bord">
       <img src="{% static 'assets/dist/img/LogoEC.png' %}"
            alt="Logo Ecole les Champions"
-           class="brand-image img-circle elevation-3"
+           class="img-size-24 img-circle"
            style="opacity: .8">
       <span class="brand-text font-weight-light">Ecole les Champions</span>
     </a>
@@ -288,10 +302,14 @@
       <!-- Sidebar user (optional) -->
       <div class="user-panel mt-3 pb-3 mb-3 d-flex">
         <div class="image">
-          <img src="{% static 'assets/dist/img/user7-128x128.jpg' %}" class="img-circle elevation-2" alt="User Image">
+          {% if request.user.photo_profil %}
+          <img src="{{ request.user.photo_profil.url }}" alt="Avatar" class="img-size-24 mr-2 img-circle">
+          {% else %}
+          <img src="{% static 'assets/dist/img/user1-128x128.jpg' %}" alt="Avatar" class="img-size-24 mr-2 img-circle">
+          {% endif %}
         </div>
         <div class="info">
-          <a href="#" class="d-block">Mme Djénabou DIALLO</a>
+          <a href="{% url 'mon_profil' %}" class="d-block" title="Acceder à vos informations personnelles">{{ request.user.get_full_name|default:request.user.username }}</a>
         </div>
       </div>
 
@@ -640,7 +658,17 @@
               </li>
             </ul>
           </li>
-     
+
+          <!-- Bouton Déconnexion dans le Sidebar -->
+          <li class="nav-item mt-4">
+              <form action="{% url 'deconnexion' %}" method="post" class="d-inline w-100">
+                  {% csrf_token %}
+                  <button type="submit" class="btn-logout-sidebar">
+                      <i class="fas fa-sign-out-alt me-2"></i> <span>Déconnexion</span>
+                  </button>
+              </form>
+          </li>
+        
         </ul>
       </nav>
       <!-- /.sidebar-menu -->
@@ -659,7 +687,7 @@
           </div>
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="#">Accueil</a></li>
+              <li class="breadcrumb-item"><a href="{% url 'accueil' %}" title="Tableau de bord">Accueil</a></li>
               <li class="breadcrumb-item active">Registre de matricule</li>
             </ol>
           </div>
