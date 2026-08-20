@@ -89,7 +89,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'core.context_processors.donnees_menu_rapports',
+                #'core.context_processors.donnees_menu_rapports',
             ],
         },
     },
@@ -103,7 +103,7 @@ WSGI_APPLICATION = 'stsavenirafrique.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'school',
+        'NAME': 'school_champions',
         'HOST': 'localhost',
         'USER': 'utg',
         'PASSWORD': 'UTech@@2026',

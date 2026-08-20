@@ -4,36 +4,54 @@
             --secondary: #0f172a;
         }
 
-        
-        /* CORRECTION : Évite que le texte de l'input soit masqué par le label flottant*/
-        .form-floating > .form-control {
-            padding-top: 2rem !important;   /* Augmente l'espace en haut pour l'input */
-            padding-bottom: 0.5rem !important;
+        .floating-label-group {
+            position: relative;
+            margin-bottom: 1.5rem;
         }
 
-        /* Ajustement final pour l'espacement */
-        .form-floating > label {
-            padding-top: 1.7rem !important; /* On passe de 1rem à 1.2rem pour dégager le texte */
-            padding-bottom: 0 !important;
-            z-index: 3 !important;
-        } 
-
-        /* Anime silencieusement le champ dès que le navigateur déclenche l'autofill */
-        @keyframes onAutoFillStart {
-            from {}
-            to {}
+        .floating-input {
+            height: 58px;
+            padding: 1.625rem 0.75rem 0.625rem 0.75rem;
+            font-size: 1rem;
         }
 
-        .form-floating > .form-control:-webkit-autofill,
-        .form-floating > .form-control:autofill {
-            animation-name: onAutoFillStart;
-            animation-duration: 0.001s;
+        .floating-label {
+            position: absolute;
+            top: 50%;
+            left: 0.75rem;
+            transform: translateY(-50%);
+            font-size: 1rem;
+            color: #6c757d;
+            background-color: transparent;
+            pointer-events: none;
+            transition: all 0.15s ease-in-out;
+            margin-bottom: 0;
         }
 
-        .form-floating > .form-control.is-filled ~ label {
-            opacity: 0.65;
-            transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem);
+        /* Le label flotte quand le champ est focus OU déjà rempli */
+        .floating-input:focus ~ .floating-label,
+        .floating-input:not(:placeholder-shown) ~ .floating-label {
+            top: 0;
+            transform: translateY(-50%);
+            font-size: 0.75rem;
+            padding: 0 0.25rem;
+            background-color: #fff; /* pour "découper" la bordure comme sur Gmail */
+            color: #6f42c1; /* couleur d'accent au focus, adapte à ta charte */
         }
+
+        .floating-input:focus {
+            border-color: #6f42c1;
+            box-shadow: 0 0 0 0.2rem rgba(111, 66, 193, 0.15);
+        }
+
+
+        .floating-input.has-value ~ .floating-label {
+            top: 0;
+            transform: translateY(-50%);
+            font-size: 0.75rem;
+            background-color: #fff;
+        }
+                
 
         * { box-sizing: border-box; }
         
@@ -153,7 +171,51 @@
             flex-direction: column;
             justify-content: center;
             background: #fff;
+            position: relative;      /* ajouté pour le logo en filigrane */
+            overflow: hidden;        /* ajouté pour le logo en filigrane */
         }
+
+        /* Filigrane logo - côté formulaire (droite) */
+        .login-form::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 320px;
+            height: 320px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.06; /*; 0.12*/
+            filter: grayscale(30%);   /* optionnel, adoucit les couleurs vives sur fond blanc */
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .login-form .form-header,
+        .login-form form {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Filigrane logo - côté brand (gauche, violet) */
+        .login-brand::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 380px;
+            height: 380px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.08;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
         .login-form .form-header {
             margin-bottom: 2rem;
         }

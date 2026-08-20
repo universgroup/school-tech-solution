@@ -315,3 +315,68 @@
         $("#PJPreview").attr("src", "").hide();  // masque et vide l'aperçu
         $("#PJPlaceholder").show();               // réaffiche l'icône + le texte par défaut
     }
+
+
+
+    // Fonction commune : affiche l'aperçu de la photo de profil
+    function afficherApercuPhotoUser(file) {
+        if (!file || !file.type.startsWith("image/")) return;
+        var reader = new FileReader();
+        reader.onload = function(e) {
+        $("#photoUserPreview").attr("src", e.target.result).show();
+        $("#photoUserPlaceholder").hide();
+        };
+        reader.readAsDataURL(file);
+    }
+
+    
+    // Cas de la Photo de profil de l'utilisateur
+    function previewPhotoProfil(input) {
+        if (input.files && input.files[0]) {
+        afficherApercuPhotoUser(input.files[0]);
+        }
+    }
+
+    // Cas du template enregsitrer les utilisateurs
+    var PhotoUserZone = document.getElementById("photoUserZone");
+    var PhotoUserinputFile = document.getElementById("id_photo_user");
+
+    if(PhotoUserZone){
+            // Empêcher le navigateur d'ouvrir l'image dans un nouvel onglet
+            ["dragenter", "dragover", "dragleave", "drop"].forEach(function(evt){
+                        PhotoUserZone.addEventListener(evt, function(e){
+                        e.preventDefault();
+                        e.stopPropagation();
+                        });
+            });
+
+            // Effet visuel pendant le survol avec un fichier
+            ["dragenter", "dragover"].forEach(function(evt){
+                        PhotoUserZone.addEventListener(evt, function(){
+                        PhotoUserZone.classList.add("drag-over");
+                        });
+            });
+            
+            ["dragleave", "drop"].forEach(function(evt){
+                        PhotoUserZone.addEventListener(evt, function(){
+                        PhotoUserZone.classList.remove("drag-over");
+                        });
+            });
+        
+            // Cas 2 : dépôt du fichier (drag & drop)
+            PhotoUserZone.addEventListener("drop", function(e){
+                    var files = e.dataTransfer.files;
+                    if (files.length > 0) {
+                    deinputFile.files = files;
+                    // injecte le fichier dans l'input Django
+                    afficherApercuPhotoUser(files[0]);
+                    }
+            });
+    } // fin de if(PhotoUserZone)
+
+    // Reinitialisation de la zone PhotoUserZone
+    function resetPhotoUserZone() {
+        $("#id_photo_user").val("");            // vide le contenu du input file
+        $("#photoUserPreview").attr("src", "").hide();  // masque et vide l'aperçu
+        $("#photoUserPlaceholder").show();               // réaffiche l'icône + le texte par défaut
+    }

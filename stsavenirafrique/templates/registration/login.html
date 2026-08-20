@@ -15,6 +15,13 @@
     <!-- Feuille de style associee au template login.html-->
     <link rel="stylesheet" href="{% static 'assets/css/loginstyle.css' %}">
 
+    <style>
+    .login-form::before,
+    .login-brand::after {
+        background-image: url("{% static 'assets/dist/img/LogoEC.png' %}");
+    }
+    </style>
+
 </head>
 <body>
     <div class="login-card">
@@ -52,13 +59,13 @@
                 <div class="alert alert-danger">Adresse e-mail ou mot de passe incorrect.</div>
                 {% endif %}
 
-                <div class="form-floating">
+                <div class="floating-label-group">
                      {{ form.username }}
-                    <label for="{{ form.username.id_for_label }}"><i class="far fa-envelope me-2"></i>Adresse email</label>
+                    <label for="idemail" class="floating-label"><i class="far fa-envelope me-2"></i>Adresse email</label>
                 </div>
-                <div class="form-floating">
+                <div class="floating-label-group">
                     {{ form.password }}
-                    <label for="{{ form.password.id_for_label }}"><i class="fas fa-lock me-2"></i>Mot de passe</label>
+                    <label for="idpassword" class="floating-label"><i class="fas fa-lock me-2"></i>Mot de passe</label>
                 </div>
 
                 <div class="d-flex justify-content-between align-items-center">
@@ -87,23 +94,14 @@
 
     <script>
 
-        $(function() {
-            // Écoute le déclenchement de l'animation-piège = signal fiable qu'un autofill vient d'avoir lieu
-            document.querySelectorAll('.form-floating .form-control').forEach(function(champ) {
-                champ.addEventListener('animationstart', function(e) {
-                    if (e.animationName === 'onAutoFillStart') {
-                        champ.classList.add('is-filled');
-                    }
-                });
-            });
-
-            // Filet de sécurité : vérifie aussi au chargement si un champ est déjà rempli
-            document.querySelectorAll('.form-floating .form-control').forEach(function(champ) {
-                if (champ.value) {
-                    champ.classList.add('is-filled');
+        $(document).ready(function() {
+            $('.floating-input').each(function() {
+                if ($(this).val() !== '') {
+                    $(this).addClass('has-value');
                 }
             });
         });
+
 
     </script>
 </body>

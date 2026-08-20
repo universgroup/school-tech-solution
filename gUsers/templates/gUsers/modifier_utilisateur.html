@@ -1,32 +1,105 @@
 {% extends 'base.html' %}
-{% load static %}
-{% block content %}
-<div class="container mt-4">
-    <h1>Modifier l'utilisateur</h1>
-    <p class="text-muted">{{ utilisateur.get_full_name|default:utilisateur.username }}</p>
+{% block titre_page %} MIS A JOUR {% endblock %}
+{% block titre_formulaire %} EDITION D'UN COMPTE UTILISATEUR {% endblock %}
+{% block fil_ariane %}Administration / Utilisateurs /  Mis à jour {% endblock %}
+{% block titre_cadre %}
+EDITER LES INFOS D'UN UTILISATEUR
+{% endblock %}
 
-    <form method="post" enctype="multipart/form-data">
+{% block formulaire %}
+
+    <form action="{% url 'modifier_utilisateur' user.id %}" method="post" enctype="multipart/form-data">
+
         {% csrf_token %}
 
-        <div class="form-group text-center mb-4">
-            {% if utilisateur.photo_profil %}
-            <img src="{{ utilisateur.photo_profil.url }}" alt="Photo de profil" class="img-circle" width="100" height="100" style="object-fit:cover;">
-            {% else %}
-            <img src="{% static 'assets/dist/img/user1-128x128.jpg' %}" alt="Photo de profil" class="img-circle" width="100" height="100" style="object-fit:cover;">
-            {% endif %}
-        </div>
+        <div class="card-body">   
+                <div class="row g-3">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="IDuser">ID</label>
+                            <input type="text" id="IDuser" value="{{user.id}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>
 
-        {% for champ in form %}
-        <div class="form-group">
-            <label for="{{ champ.id_for_label }}">{{ champ.label }}</label>
-            {{ champ }}
-            {% if champ.errors %}<div class="text-danger">{{ champ.errors }}</div>{% endif %}
-            {% if champ.help_text %}<small class="form-text text-muted">{{ champ.help_text }}</small>{% endif %}
-        </div>
-        {% endfor %}
+                <div class="row g-3">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="id_username">Nom utilisateur</label>
+                            <input type="text" name="username" id="id_username" value="{{user.username}}" class="form-control">
+                        </div>
+                    </div>
+                </div>
 
-        <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
-        <a href="{% url 'liste_utilisateurs' %}" class="btn btn-secondary">Annuler</a>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_firstname">Prénom(s)</label>
+                            <input type="text" name="first_name" id="id_firstname" value="{{user.first_name}}" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_lastname">Nom famille</label>
+                            <input type="text" name="last_name" id="id_lastname" value="{{user.last_name}}" class="form-control">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="id_email">Adresse email</label>
+                            <input type="email" name="email_user" id="id_email" value="{{user.email}}" class="form-control" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\'.[a-zA-Z]{2,}">
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="id_password">Mot de passe</label>
+                            <input type="password" name="passwrd" id="id_password" value="{{user.password}}" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_niv_acces">Niveau d'accès</label>
+                            <select name="niveau_acces" id="id_niv_acces" class="form-control">
+                                <option value="{{user.niveau_acces}}" selected>{{user.niveau_acces}}</option>
+                                {% for niv in niveau_acces %}
+                                <option value="{{niv.0}}">{{niv.1}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>                    
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-12">
+                        <div class="form-group text-center">
+                            {% if user.photo_profil %}
+                                <a href="{{user.photo_profil.url}}" title="Photo du profil">
+                                    <img src="{{user.photo_profil.url}}" width="150px">
+                                </a>
+                            {% else %}
+                                <label>Photo indisponible <br> mais cliquez ci-dessous pour modifier</label>
+                            {% endif %}
+                                <br>
+                                <input type="file" class="form-control" name="new_photo_profil" accept="image/*">
+                        </div>
+                    </div>
+
+                </div>
+        </div> 
+
+        <div class="card-footer text-center">
+
+            <button type="submit" class="btn btn-success btn-md">Modifier &nbsp;<i class="fa fa-edit"></i></button>            
+
+            <a href="{% url 'liste_utilisateurs' %}" target="_self" class="btn btn-primary btn-md" title="Retour à la liste des utilisateurs">Retour &nbsp;<i class="fa fa-arrow-circle-left"></i></a>
+        </div>
+        
     </form>
 </div>
 {% endblock %}

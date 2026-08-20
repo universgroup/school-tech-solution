@@ -1,14 +1,16 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
-from . import views
+from .views import *
 
 urlpatterns = [
-    path('connexion/', views.ConnexionView.as_view(), name='connexion'),
-    path('deconnexion/', views.DeconnexionView.as_view(), name='deconnexion'),
-    path('utilisateurs/', views.liste_utilisateurs, name='liste_utilisateurs'),
-    path('utilisateurs/creer/', views.creer_utilisateur, name='creer_utilisateur'),
-    path('utilisateurs/<int:pk>/modifier/', views.modifier_utilisateur, name='modifier_utilisateur'),
-    path('mon-profil/', views.mon_profil, name='mon_profil'),
+    path('connexion/', ConnexionView.as_view(), name='connexion'),
+    path('deconnexion/', DeconnexionView.as_view(), name='deconnexion'),
+    path('liste_utilisateurs/', listeutilisateurs, name='liste_utilisateurs'),
+    path('creer_utilisateur/', creerutilisateur, name='creer_utilisateur'),
+    path('editionutilisateur/<int:iduser>',editerutilisateur, name='editionutilisateur'),
+    path('modifier_utilisateur/<int:pk>', modifierutilisateur, name='modifier_utilisateur'),
+    path('mon-profil/<int:iduser>', affichermonprofil, name='mon_profil'),
+    path('suppressionutilisateur/<int:iduser>',supprimerutilisateur, name='suppressionutilisateur'),
 
     # Réinitialisation du mot de passe (flux natif Django, rien à recoder)
     path('mot-de-passe-oublie/', auth_views.PasswordResetView.as_view(
