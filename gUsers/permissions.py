@@ -21,21 +21,20 @@ PERMISSIONS = {
     # Menus
     "menu_administration": [DG],
     "menu_eleves": [DG, SCOL, COMPTA],
-    "menu_comptabilite": [DG, COMPTA],
+    "menu_comptabilite": [DG, SCOL ,COMPTA],
     "menu_personnel": [DG, COMPTA],
     "menu_evaluation": [DG, SCOL, ENS],
-    "menu_services": [DG, COMPTA],
+    "menu_services": [DG, SCOL ,COMPTA],
 
     # Élèves
-    "eleve_ajouter": [DG, SCOL],
-    "eleve_modifier": [DG, SCOL],
+    "eleve_inscrire": [DG, SCOL, COMPTA],
+    "eleve_modifier": [DG, SCOL, COMPTA],
     "eleve_supprimer": [DG],
-    "eleve_inscrire": [DG, COMPTA],
     "voir_montants_paiement": [DG, COMPTA],
 
     # Comptabilité
-    "compta_ajouter": [DG, COMPTA],
-    "compta_modifier": [DG, COMPTA],
+    "compta_ajouter": [DG, SCOL, COMPTA],
+    "compta_modifier": [DG, SCOL, COMPTA],
     "compta_annuler": [DG, COMPTA],
     "compta_supprimer": [],           # personne — aucune vue ne doit exister
     "compta_cloturer_mois": [DG, COMPTA],
@@ -50,7 +49,7 @@ PERMISSIONS = {
     "note_modifier": [DG, SCOL],      # ENS : voir peut_modifier_note() ci-dessous
 
     # Services
-    "services_gerer": [DG],
+    "services_gerer": [DG, SCOL, COMPTA],
 }
 
 

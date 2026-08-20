@@ -2,6 +2,7 @@
 <html lang="fr">
 <head>
     {% load static %}
+    {% load permissions_tags %}
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>DETAILS DES INFORMATIONS DE L'ECOLE</title>
@@ -53,6 +54,11 @@
         <a href="{% url 'accueil' %}" class="nav-link" title="Acceder au tableau de bord">Accueil</a>
       </li>
       
+        
+    {% peut request.user 'menu_administration' as ok_admin %}
+
+    {% if ok_admin %}
+
       <li class="nav-item dropdown">
             <a id="dropdownSubMenu1" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle">Administration</a>
             <ul aria-labelledby="dropdownSubMenu1" class="dropdown-menu border-0 shadow">
@@ -76,6 +82,12 @@
             </ul>
       </li>
 
+    {% endif %}
+
+    {% peut request.user 'menu_eleves' as ok_eleves %}
+
+    {% if ok_eleves %}
+
       <li class="nav-item dropdown">
             <a id="dropdownSubMenu3" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle">Elèves</a>
             <ul aria-labelledby="dropdownSubMenu3" class="dropdown-menu border-0 shadow">
@@ -87,6 +99,12 @@
               <li><a href="{% url 'registrematricule' %}" class="dropdown-item">Registre de matriculation</a></li>
             </ul>
       </li>
+
+      {% endif %}
+
+    {% peut request.user 'menu_comptabilite' as ok_compta %}
+    
+    {% if ok_compta %}
 
       <li class="nav-item dropdown">
             <a id="dropdownSubMenu4" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle">Comptabilité</a>
@@ -112,6 +130,12 @@
             </ul>
       </li>
 
+    {% endif %}
+
+    {% peut request.user 'menu_personnel' as ok_personnel %}
+    
+    {% if ok_personnel %}
+
       <li class="nav-item dropdown">
             <a id="dropdownSubMenu6" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle">Personnel</a>
             <ul aria-labelledby="dropdownSubMenu6" class="dropdown-menu border-0 shadow">
@@ -122,11 +146,21 @@
               <li><a href="#" class="dropdown-item">Liste des employés</a></li>
             </ul>
       </li>
+    
+    {% endif %}  
+
+    {% peut request.user 'menu_evaluation' as ok_eval %}
+    
+    {% if ok_eval %}
 
       <li class="nav-item dropdown">
             <a id="dropdownSubMenu7" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle">Evaluation</a>
             <ul aria-labelledby="dropdownSubMenu7" class="dropdown-menu border-0 shadow">
               
+              {% peut request.user 'periode_gerer' as ok_periodes %}
+              
+              {% if ok_periodes %}
+
               <li class="dropdown-submenu dropdown-hover">
                 <a id="dropdownSubMenu8" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-item dropdown-toggle">Saisie des notes</a>
                 <ul aria-labelledby="dropdownSubMenu8" class="dropdown-menu border-0 shadow">
@@ -134,6 +168,8 @@
                   <li><a href="#" class="dropdown-item">Par élève</a></li>
                 </ul>
               </li>
+
+              {% endif %}
 
               <li class="dropdown-submenu dropdown-hover">
                 <a id="dropdownSubMenu9" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-item dropdown-toggle">Resultats</a>
@@ -156,6 +192,12 @@
             </ul>
       </li>
 
+    {% endif %}  
+
+    {% peut request.user 'menu_services' as ok_services %}
+    
+    {% if ok_services %}
+
       <li class="nav-item dropdown">
             <a id="dropdownSubMenu11" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle">Services</a>
             <ul aria-labelledby="dropdownSubMenu11" class="dropdown-menu border-0 shadow">
@@ -163,6 +205,8 @@
               <li><a href="#" class="dropdown-item">Activités extra scolaires</a></li>              
             </ul>
       </li>
+
+    {% endif %}
 
     </ul>
 
@@ -276,7 +320,6 @@
           </a>
       </li>
 
-
       <li class="nav-item">
         <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button">
           <i class="fas fa-th-large"></i>
@@ -320,6 +363,9 @@
           <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
 
+        {% peut request.user 'menu_administration' as ok_admin %}
+        
+        {% if ok_admin %}
                <!--Debut du menu Administration -->
           <li class="nav-item has-treeview">
             <a href="#" class="nav-link active" title="Permet de parametrer les données de base de l'application">
@@ -390,7 +436,13 @@
 
             </ul>
           </li>
-          
+
+        {% endif %}  
+
+        {% peut request.user 'menu_eleves' as ok_eleves %}
+        
+        {% if ok_eleves %}
+        
           <li class="nav-item has-treeview">
             <a href="#" class="nav-link" title="Permet de gérer les élèves de l'école">
               <i class="nav-icon fas fa-children"></i>
@@ -445,6 +497,12 @@
               
             </ul>
           </li>
+
+        {% endif %}
+
+        {% peut request.user 'menu_comptabilite' as ok_compta %}
+        
+        {% if ok_compta %}
 
           <li class="nav-item has-treeview">
             <a href="#" class="nav-link" title="Permet d'acceder à toutes les opérations de la comptabilité ou de la caisse">
@@ -520,6 +578,13 @@
               </li>
             </ul>
           </li>
+
+        {% endif %}
+
+        {% peut request.user 'menu_personnel' as ok_personnel %}
+        
+        {% if ok_personnel %}
+
           <li class="nav-item has-treeview">
             <a href="#" class="nav-link" title="Permet de gérer le personnel de l'école">
               <i class="nav-icon fas fa-user-tie"></i>
@@ -566,6 +631,13 @@
               </li>
             </ul>
           </li>    
+
+        {% endif %}
+
+        {% peut request.user 'menu_evaluation' as ok_eval %}
+        
+        {% if ok_eval %}
+        
           <li class="nav-item has-treeview">
             <a href="#" class="nav-link" title="Permet de gerer les évaluations des élèves par cycle et classe">
               <i class="nav-icon fas fa-book"></i>
@@ -575,20 +647,27 @@
               </p>
             </a>
             <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="#" class="nav-link" title="Permet de faire la saisie des notes par classe">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Saisie par classe &nbsp;</p>
-                  <i class="fas fa-chalkboard-user"></i>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="#" class="nav-link" title="Permet de faire la saisie des notes par élève">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Saisie par élève &nbsp;</p>
-                  <i class="fas fa-child"></i>
-                </a>
-              </li>
+
+              {% peut request.user 'periode_gerer' as ok_periodes %}
+              {% if ok_periodes %}
+
+                  <li class="nav-item">
+                    <a href="#" class="nav-link" title="Permet de faire la saisie des notes par classe">
+                      <i class="far fa-circle nav-icon"></i>
+                      <p>Saisie par classe &nbsp;</p>
+                      <i class="fas fa-chalkboard-user"></i>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="#" class="nav-link" title="Permet de faire la saisie des notes par élève">
+                      <i class="far fa-circle nav-icon"></i>
+                      <p>Saisie par élève &nbsp;</p>
+                      <i class="fas fa-child"></i>
+                    </a>
+                  </li>
+
+              {% endif %}
+
               <li class="nav-item">
                 <a href="#" class="nav-link" title="Permet de consulter et imprimer les résultats d'une classe aucours d'une période donnée">
                   <i class="far fa-circle nav-icon"></i>
@@ -634,6 +713,12 @@
             </ul>
           </li>
 
+        {% endif %}
+
+        {% peut request.user 'menu_services' as ok_services %}
+        
+        {% if ok_services %}
+
           <li class="nav-item has-treeview">
             <a href="#" class="nav-link" title="Permet de gérer les services extra scolaires : Natation, Football, Karaté, Cantine, etc.">
               <i class="nav-icon fas fa-table"></i>
@@ -659,6 +744,8 @@
               </li>
             </ul>
           </li>
+
+        {% endif %}
 
           <!-- Bouton Déconnexion dans le Sidebar -->
           <li class="nav-item mt-4">

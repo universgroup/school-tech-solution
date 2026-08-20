@@ -641,27 +641,28 @@
               </p>
             </a>
 
-        {% peut request.user 'periode_gerer' as ok_periodes %}
+              <ul class="nav nav-treeview">
 
-        {% if ok_periodes %}
+                {% peut request.user 'periode_gerer' as ok_periodes %}
 
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="#" class="nav-link" title="Permet de faire la saisie des notes par classe">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Saisie par classe &nbsp;</p>
-                  <i class="fas fa-chalkboard-user"></i>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="#" class="nav-link" title="Permet de faire la saisie des notes par élève">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Saisie par élève &nbsp;</p>
-                  <i class="fas fa-child"></i>
-                </a>
-              </li>
+                {% if ok_periodes %}
 
-        {% endif %} <!--Fin de ok_periodes -->
+                  <li class="nav-item">
+                    <a href="#" class="nav-link" title="Permet de faire la saisie des notes par classe">
+                      <i class="far fa-circle nav-icon"></i>
+                      <p>Saisie par classe &nbsp;</p>
+                      <i class="fas fa-chalkboard-user"></i>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="#" class="nav-link" title="Permet de faire la saisie des notes par élève">
+                      <i class="far fa-circle nav-icon"></i>
+                      <p>Saisie par élève &nbsp;</p>
+                      <i class="fas fa-child"></i>
+                    </a>
+                  </li>
+
+                {% endif %} <!--Fin de ok_periodes -->
 
               <li class="nav-item">
                 <a href="#" class="nav-link" title="Permet de consulter et imprimer les résultats d'une classe aucours d'une période donnée">

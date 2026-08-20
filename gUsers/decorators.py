@@ -39,8 +39,8 @@ def note_modifiable_requis(view_func):
     @wraps(view_func)
     @login_required
     def _wrapped_view(request, pk, *args, **kwargs):
-        from gEvaluation.models import Note
-        note = get_object_or_404(Note, pk=pk)
+        from gNotes.models import Evaluation
+        note = get_object_or_404(Evaluation, pk=pk)
         if not peut_modifier_note(request.user, note):
             raise PermissionDenied
         return view_func(request, pk, *args, **kwargs)
@@ -55,8 +55,8 @@ def operation_annulable_requis(view_func):
     @wraps(view_func)
     @login_required
     def _wrapped_view(request, pk, *args, **kwargs):
-        from gComptabilite.models import OperationCaisse
-        operation = get_object_or_404(OperationCaisse, pk=pk)
+        from gComptabilite.models import Caisse
+        operation = get_object_or_404(Caisse, pk=pk)
         if not peut_annuler_operation(request.user, operation):
             raise PermissionDenied
         return view_func(request, pk, *args, **kwargs)
@@ -72,8 +72,8 @@ def operation_modifiable_requis(view_func):
     @wraps(view_func)
     @login_required
     def _wrapped_view(request, pk, *args, **kwargs):
-        from gComptabilite.models import OperationCaisse
-        operation = get_object_or_404(OperationCaisse, pk=pk)
+        from gComptabilite.models import Caisse
+        operation = get_object_or_404(Caisse, pk=pk)
         if not peut_modifier_operation(request.user, operation):
             raise PermissionDenied
         return view_func(request, pk, *args, **kwargs)

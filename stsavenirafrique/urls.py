@@ -39,3 +39,8 @@ urlpatterns = [   # Racine du site "/" redirige vers la page de connexion
                   
 
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+
+# Handler 403 personnalisé (page affichée quand PermissionDenied est levée)
+# À ajouter également dans ce fichier :
+handler403 = "core.views.erreur_403"
