@@ -1,13 +1,53 @@
-{% extends 'base.html' %}
-{% block content %}
-<h1>Nouveau mot de passe</h1>
+{% extends "base.html" %}
+{% block titre_page %}REINITIALISATION{% endblock %}
+{% block titre_formulaire %}REINITIALISATION DU MOT DE PASSE{% endblock %}
+{% block fil_ariane %}Administration / Utilisateur / Nouveau mot de passe{% endblock %}
+{% block titre_cadre %}
+CHOISIR UN NOUVEAU MOT DE PASSE
+{% endblock %}
+
+{% block formulaire %}
+
 {% if validlink %}
-<form method="post">
+  <p class="text-muted mb-4">Saisissez votre nouveau mot de passe.</p>
+
+  <form method="post">
     {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">Réinitialiser</button>
-</form>
+
+    {% for field in form %}
+
+    <div class="form-group">
+      <label>{{ field.label }}</label>
+
+      {{ field }}
+
+      {% if field.help_text %}
+        <small class="form-text text-muted">{{ field.help_text|safe }}</small>
+      {% endif %}
+
+      {% if field.errors %}
+        <div class="text-danger small">{{ field.errors }}</div>
+      {% endif %}
+    </div>
+    {% endfor %}
+
+    <button type="submit" class="btn btn-primary btn-md">
+      <i class="fas fa-check"></i> Réinitialiser le mot de passe
+    </button>
+  </form>
+
 {% else %}
-<p class="text-danger">Ce lien de réinitialisation n'est plus valide.</p>
+  <div class="text-center">
+    <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+    <h5>Lien invalide ou expiré</h5>
+    <p class="text-muted">
+      Ce lien de réinitialisation n'est plus valable — il a peut-être déjà été utilisé
+      ou a expiré. Vous pouvez en demander un nouveau.
+    </p>
+    <a href="{% url 'password_reset' %}" class="btn btn-info btn-md">
+      <i class="fas fa-redo"></i> Demander un nouveau lien
+    </a>
+  </div>
 {% endif %}
+
 {% endblock %}

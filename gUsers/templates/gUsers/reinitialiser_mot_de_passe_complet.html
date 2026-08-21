@@ -1,5 +1,20 @@
-{% extends 'base.html' %}
-{% block content %}
-<h1>Mot de passe réinitialisé</h1>
-<p>Votre mot de passe a bien été changé. <a href="{% url 'connexion' %}">Se connecter</a></p>
+{% extends "base.html" %}
+{% block titre_page %}REINITIALISATION{% endblock %}
+{% block titre_formulaire %}REINITIALISATION DU MOT DE PASSE{% endblock %}
+{% block fil_ariane %}Administration / Utilisateur / Terminé{% endblock %}
+{% block titre_cadre %}
+MOT DE PASSE RÉINITIALISÉ
+{% endblock %}
+
+{% block formulaire %}
+<div class="text-center">
+  <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+  <h5>Votre mot de passe a été mis à jour</h5>
+  <p class="text-muted">
+    Vous pouvez maintenant vous connecter avec votre nouveau mot de passe.
+  </p>
+  <a href="{% url 'connexion' %}" class="btn btn-primary btn-md">
+    <i class="fas fa-sign-in-alt"></i> Se connecter
+  </a>
+</div>
 {% endblock %}

@@ -1,5 +1,5 @@
 from django import forms
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, UserChangeForm
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, PasswordResetForm, SetPasswordForm
 from .models import Utilisateur, NIVEAU_ACCES_CHOICES
 from django.core.exceptions import ValidationError
 
@@ -30,7 +30,7 @@ class CreationUtilisateurForm(UserCreationForm):
             'username': forms.TextInput(attrs={'class':'form-control','placeholder':'Nom utilisateur','title':'Tapez votre nom d\'utilisateur'}),
             'first_name': forms.TextInput(attrs={'class':'form-control','placeholder':'Prénom(s)', 'title':'Tapez votre prénom(s)'}),
             'last_name': forms.TextInput(attrs={'class':'form-control','placeholder':'Nom famille', 'title':'Tapez votre nom de famille'}),
-            'email': forms.EmailInput(attrs={'class':'form-control','placeholder': 'Ex: contact@universtechgroup.com','pattern': "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\'.[a-zA-Z]{2,}", 'title': 'Saisissez un email correct!'}),
+            'email': forms.EmailInput(attrs={'class':'form-control','placeholder': 'Ex: contact@universtechgroup.com','pattern': "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}", 'title': 'Saisissez un email correct!'}),
             'password1': forms.PasswordInput(attrs={'class':'form-control','title':'Tapez un mot de passe d\'au moins 8 caractères composé de lettres, chiffres, majuscules, minuscule et de caractères spéciaux'}),
             'password2': forms.PasswordInput(attrs={'class':'form-control','title':'Retapez le même mot de passe'}),
             'photo_profil' : forms.FileInput(attrs={'class': 'd-none', 'accept': 'image/*','title': 'Importez une photo de profil','id':'id_photo_user', 'onchange': 'previewPhotoProfil(this)'}),
@@ -53,3 +53,34 @@ class CreationUtilisateurForm(UserCreationForm):
 
         self.fields['password1'].widget.attrs.update({'placeholder': 'Mot de passe'}) # Permet de définir un placeholder pour la zone de saisie password1
         self.fields['password2'].widget.attrs.update({'placeholder': 'Confirmation du mot de passe'}) # Permet de définir un placeholder pour la zone de saisie password2
+
+
+class MotDePasseOublieForm(PasswordResetForm):
+    """Sous-classe de PasswordResetForm, uniquement pour styler le champ email en AdminLTE."""
+    email = forms.EmailField(
+        label="Adresse email",
+        widget=forms.EmailInput(attrs={
+            "class": "form-control",
+            "placeholder": "votre adresse email",'pattern':"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}",
+        }),
+    )
+
+
+class ReinitialiserMotDePasseForm(SetPasswordForm):
+    """Sous-classe de SetPasswordForm, uniquement pour styler les champs en AdminLTE."""
+    new_password1 = forms.CharField(
+        label="Nouveau mot de passe",
+        strip=False,
+        widget=forms.PasswordInput(attrs={
+            "class": "form-control",
+            "autocomplete": "new-password",
+        }),
+    )
+    new_password2 = forms.CharField(
+        label="Confirmer le nouveau mot de passe",
+        strip=False,
+        widget=forms.PasswordInput(attrs={
+            "class": "form-control",
+            "autocomplete": "new-password",
+        }),
+    )

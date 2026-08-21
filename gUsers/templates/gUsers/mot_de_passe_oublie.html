@@ -1,10 +1,34 @@
-{% extends 'base.html' %}
-{% block content %}
-<h1>Mot de passe oublié</h1>
-<p>Saisissez votre adresse e-mail, un lien de réinitialisation vous sera envoyé.</p>
+{% extends "base.html" %}
+{% block titre_page %}REINITIALISATION{% endblock %}
+{% block titre_formulaire %}REINITIALISATION DU MOT DE PASSE{% endblock %}
+{% block fil_ariane %}Administration / Utilisateur / Mot de passe oublié{% endblock %}
+{% block titre_cadre %}
+MOT DE PASSE OUBLIÉ
+{% endblock %}
+
+{% block formulaire %}
+<p class="text-muted mb-4">
+  Saisissez votre adresse e-mail. Si un compte existe, un lien de réinitialisation
+  vous sera envoyé.
+</p>
 <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">Envoyer le lien</button>
+  {% csrf_token %}
+
+  {% for field in form %}
+  <div class="form-group">
+    <label>{{ field.label }}</label>
+
+        {{ field }}
+
+    {% if field.errors %}
+      <div class="text-danger small">{{ field.errors }}</div>
+    {% endif %}
+  </div>
+  {% endfor %}
+
+  <button type="submit" class="btn btn-primary btn-md">
+    <i class="fas fa-paper-plane"></i> Envoyer le lien
+  </button>
+  <a href="{% url 'connexion' %}" class="btn btn-link btn-md">Se connecter</a>
 </form>
 {% endblock %}

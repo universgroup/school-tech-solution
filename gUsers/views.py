@@ -4,9 +4,13 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.views import LoginView, LogoutView
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .forms import ConnexionForm, CreationUtilisateurForm
+from .forms import ConnexionForm, CreationUtilisateurForm, MotDePasseOublieForm
 from django.core.paginator import Paginator
 from .models import NIVEAU_ACCES_CHOICES
+
+from django.contrib.auth import views as auth_views
+
+from gAdministration.models import Ecole
 
 Utilisateur = get_user_model()
 
@@ -95,7 +99,22 @@ def supprimerutilisateur(request, iduser):
     use = Utilisateur.objects.get(id=iduser)
     use.delete()
     return redirect('../liste_utilisateurs/')
-    
+
+# Permet de personnaliser le mail envoyé à l'utilisateur pour la reinitialisation de son mot de passe en y ajoutant le nom de l'école comme signature
+class MotDePasseOublieView(auth_views.PasswordResetView):
+    template_name = "gUsers/mot_de_passe_oublie.html"
+    email_template_name = "emails/reset_mot_de_passe.html"
+    subject_template_name = "emails/reset_mot_de_passe_sujet.txt"
+    success_url = "/gestion-utilisateurs/mot-de-passe-oublie/envoye/"
+    form_class = MotDePasseOublieForm
+
+    def form_valid(self, form):
+        # Recalculé à chaque requête, jamais au démarrage du serveur.
+        ecole = Ecole.objects.first()
+        self.extra_email_context = {
+            "nom_ecole": ecole.nom_ecole if ecole else "Ecole les Champions-Service Scolarité"
+        }
+        return super().form_valid(form)
 
 
 @login_required
