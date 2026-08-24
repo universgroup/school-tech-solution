@@ -10,9 +10,26 @@
 
 from decouple import config
 from pathlib import Path
+
+import django.db.backends.postgresql.base as postgres_base
+
+# On force Django à ignorer la version obsolète du serveur o2switch
+class ForcedDatabaseFeatures(postgres_base.DatabaseFeatures):
+    @property
+    def is_postgresql_12(self): return True
+    @property
+    def is_postgresql_13(self): return True
+    @property
+    def is_postgresql_14(self): return True
+
+postgres_base.DatabaseFeatures = ForcedDatabaseFeatures
+
+
+
+
 import os
 from django.contrib.messages import constants as messages
-from django.db.backends.postgresql.base import DatabaseFeatures
+
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -108,13 +125,6 @@ DATABASES = {
         'PORT': config('DB_PORT', default='5432'),
     }
 }
-
-
-# Force Django à accepter la version 9.6 de PostgreSQL
-DatabaseFeatures.is_postgresql_12 = property(lambda self: True)
-DatabaseFeatures.is_postgresql_13 = property(lambda self: True)
-DatabaseFeatures.is_postgresql_14 = property(lambda self: True)
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
