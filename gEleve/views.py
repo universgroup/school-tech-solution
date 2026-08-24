@@ -34,7 +34,8 @@ from .forms import *
 from gComptabilite.models import *
 from gComptabilite.views import affichersoldecaisse
 from gAdministration.models import AnneeScolaire, CycleScolaire, Classe, Ecole
-
+from gUsers.decorators import action_requise
+from django.contrib.auth.decorators import login_required
 
 # --- Styles réutilisables pour les rapports PDF ---
 
@@ -46,7 +47,7 @@ style_totaux = ParagraphStyle('Totaux', fontName='Helvetica-Bold', fontSize=8, t
 
 # Create your views here.
 # GESTION DES INSCRIPTIONS DES ELEVES
-
+@action_requise('eleve_inscrire')
 def enregistrereleve(request):
     mateleve = ''
     nom_eleve = ''
@@ -220,6 +221,7 @@ def enregistrereleve(request):
 
 # La fonction chargerlisteclasse m'a permis de gerer l'affichage des classes selon le cycle selectionné lors de
 # l'instruction associé au JQuery en Front-end
+@login_required
 def chargerlisteclasse(request):
     cy = request.GET.get('idcycle')
     clas = Classe.objects.filter(idcycle=cy).all()
@@ -228,6 +230,7 @@ def chargerlisteclasse(request):
 
 
 # Permet d'afficher la liste générale des élèves (registre de matriculation)
+@login_required
 def registrematricule(request):
     
     liste = Inscription.objects.select_related('annee_scolaire', 'mateleve', 'idcycle', 'idclasse').all().order_by(
@@ -246,12 +249,12 @@ def registrematricule(request):
                   dict(listegenerale=liste, ansc=ansc, cycles=cycles, effectif_total=effectif_total,
                        effectif_total_garcons=effectif_total_garcons, effectif_total_filles=effectif_total_filles))
 
-
+@action_requise('eleve_modifier')
 def detailsinscription(request, pkins):
     ins = Inscription.objects.select_related('annee_scolaire', 'mateleve', 'idcycle', 'idclasse').get(id=pkins)
     return render(request, 'gEleve/afficher_details_inscription.html', dict(ins=ins))
 
-
+@action_requise('eleve_modifier')
 def editerinscription(request, pk):
     ins = Inscription.objects.select_related('annee_scolaire', 'mateleve', 'idcycle', 'idclasse').get(id=pk)
     ans = AnneeScolaire.objects.all().order_by('id')
@@ -260,7 +263,7 @@ def editerinscription(request, pk):
 
     return render(request, 'gEleve/modifier_inscription.html', dict(ins=ins, annee=ans, cycle=cy, clas=cl))
 
-
+@action_requise('eleve_modifier')
 def modifierinscription(request, idins, mat):
     if request.method == 'POST':
         inscri = Inscription.objects.get(id=idins)
@@ -315,7 +318,7 @@ def modifierinscription(request, idins, mat):
     else:
         return redirect('chargeranneecourante')
 
-
+@action_requise('eleve_supprimer')
 def supprimerinscription(request, pkins):
     insc = Inscription.objects.get(id=pkins)
     insc.delete()
@@ -324,6 +327,7 @@ def supprimerinscription(request, pkins):
 
 
 # Fonctions me permettant de filtrer la liste des inscrits par matricule, par classe, par nom de famille
+@login_required
 def filtrelistegenerale(request):
     listeins = {}
     listeinsclasse = {}
@@ -389,6 +393,7 @@ def filtrelistegenerale(request):
 
 
 # Gestion de l'impression des recus d'inscription à la scolarité
+@login_required
 def recuinscription(request, idinsc):
     # Et là je tente de recuperer les données d'identification de l'école
     ec = Ecole.objects.count()
@@ -609,6 +614,7 @@ def recuinscription(request, idinsc):
 
 
 # Cette fonction permet d'imprimer les recus d'inscription de manière permanente
+@login_required
 def imprimerecuinscription(request, idins):
     return HttpResponseRedirect(reverse('recuinscription',
                                         args=(
@@ -616,6 +622,7 @@ def imprimerecuinscription(request, idins):
 
 
 # Gestion des reinscription des élèves
+@login_required
 def chargeranneecycle(request):
     ans = Inscription.objects.all().distinct('annee_scolaire')
     cy = CycleScolaire.objects.all()
@@ -626,6 +633,7 @@ def chargeranneecycle(request):
 
 # Cette fonction me permet de charger la liste des élèves inscrits dans une classe donnée aucours d'une année
 # scolaire donnée
+@login_required
 def chargerlisteeleveclasse(request):
     ane = request.GET.get('anneesco') # anneesco est la valeur renvoyée depuis la fonction JQuery dans le template reinscription_eleve.html
     clas = request.GET.get('id_classe') # id_classe est recupérée depuis la fonction JQuery
@@ -635,6 +643,7 @@ def chargerlisteeleveclasse(request):
 
 
 # Cette fonction me permet de charger les infos de l'élève sélectionné lors de la reinscription à savoir le prénom, le nom et la photo
+@login_required
 def chargerinfoeleveclasse(request):
     matricule = request.GET.get('matricule')
     try:
@@ -649,7 +658,7 @@ def chargerinfoeleveclasse(request):
     
     return JsonResponse(data)
 
-
+@action_requise('eleve_inscrire')
 def validerreinscription(request):
 
     if request.method == 'POST':
@@ -708,7 +717,7 @@ def validerreinscription(request):
     else:
         return redirect('../listereinscritsanneecourante/')
 
-
+@login_required
 def recureinscription(request, idinsc):
     
     # Et là je tente de recuperer les données d'identification de l'école    
@@ -927,7 +936,7 @@ def recureinscription(request, idinsc):
         buffer.seek(0)
         return FileResponse(buffer, as_attachment=False, filename=f'Recu_reinscription_{str(data[2])}.pdf', content_type='application/pdf')
 
-
+@login_required
 def imprimerecureinscription(request, idins):
     return HttpResponseRedirect(reverse('recureinscription',
                                         args=(
@@ -937,6 +946,7 @@ effectif_total = 0
 effectif_total_garcons = 0
 effectif_total_filles = 0
 
+@login_required
 def listeinscritsanneescolairecourante(request):
 
     ans = Inscription.objects.all().distinct('annee_scolaire')
@@ -965,7 +975,7 @@ def listeinscritsanneescolairecourante(request):
     
     return render(request, 'gEleve/liste_eleves_inscrits.html', dict(ans=ans, cycles=cy, listeeleves=listeeleves, effectif_total=effectif_total, effectif_total_garcons=effectif_total_garcons, effectif_total_filles=effectif_total_filles))
 
-
+@login_required
 def listereinscritsanneescolairecourante(request):
 
     ans = Inscription.objects.all().distinct('annee_scolaire')
@@ -994,7 +1004,7 @@ def listereinscritsanneescolairecourante(request):
     
     return render(request, 'gEleve/liste_eleves_reinscrits.html', dict(ans=ans, cycles=cy, listeeleves=listeeleves, effectif_total=effectif_total, effectif_total_garcons=effectif_total_garcons, effectif_total_filles=effectif_total_filles))
 
-
+@login_required
 def filtrelisteinscrits(request):
     
     idclass = request.GET.get('id_classe')
@@ -1031,7 +1041,7 @@ def filtrelisteinscrits(request):
                   dict(listeinscrits=listeinsclasse, effectif_total=effectif_total,
                        effectif_total_garcons=effectif_total_garcons, effectif_total_filles=effectif_total_filles, ans=ans, cycles=cy))
 
-
+@login_required
 def filtrelistereinscrits(request):
     
     idclass = request.GET.get('id_classe')
@@ -1068,16 +1078,19 @@ def filtrelistereinscrits(request):
                        effectif_total_garcons=effectif_total_garcons, effectif_total_filles=effectif_total_filles, ans=ans, cycles=cy))
 
 # Permet de generer le rapport contenant la liste des inscrits par classe
+@login_required
 def rapportlisteinscrits(request):
     """Génère le rapport pour les élèves au statut 'Inscrit'"""
     return _generer_rapport_liste_inscription(request, etat_recherche=ETAT_INSCRIPTION[0][0], nom_fichier='Liste_des_inscrits', titre="LISTE DES INSCRITS PAR CLASSE")
 
 # Permet de generer le rapport contenant la liste des reinscrits par classe
+@login_required
 def rapportlistereinscrits(request):
     """Génère le rapport pour les élèves au statut 'Réinscrit'"""
     return _generer_rapport_liste_inscription(request, etat_recherche=ETAT_INSCRIPTION[1][0], nom_fichier='Liste_des_reinscrits', titre="LISTE DES REINSCRITS PAR CLASSE")
 
 # Permet de generer le rapport contenant la liste générale/registre de matriculation de l'école
+@login_required
 def rapportlistegenerale(request):
        """Génère le registre de matriculation de l'école """
        return _generer_rapport_matriculation(request, nom_fichier='Registre_matriculation_scolaire', titre="REGISTRE DE MATRICULATION")

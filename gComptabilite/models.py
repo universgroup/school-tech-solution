@@ -70,7 +70,7 @@ MODE_PAIEMENT_CHOICES = (
 class Caisse(models.Model):
     libelle_operation = models.TextField()
     montant_encaisse = models.DecimalField(max_digits=20, decimal_places=2)
-    type_operation = models.CharField(max_length=15, default=TYPE_OPERATION_CAISSE_CHOICES[0][0], choices=TYPE_OPERATION_CAISSE_CHOICES)
+    type_operation = models.CharField(max_length=15, default=TYPE_OPERATION_CAISSE_CHOICES[1][0], choices=TYPE_OPERATION_CAISSE_CHOICES)
     date_operation = models.DateField(null=True) # Il se peut qu'en pratique l'opération soit effectuée avant la date du jour. Donc, l'utilisateur a besoin de saisir
     solde_actuel = models.DecimalField(max_digits=20, decimal_places=2, default=0)
     heure_operation = models.TimeField(auto_now=True)

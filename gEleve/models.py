@@ -44,32 +44,6 @@ class Eleve(models.Model):
         return f'{self.matricule}|{self.prenom}|{self.nom}|{self.contact_pere}'
 
 
-class Discipline(models.Model):
-    motif_sanction = models.TextField()
-    sanction = models.CharField(max_length=80)
-    observation = models.TextField()
-    annescolaire = models.ForeignKey(AnneeScolaire, on_delete=models.CASCADE)
-    date_sanction = models.DateField()
-    delit = models.TextField()
-    mateleve = models.ForeignKey(Eleve, on_delete=models.CASCADE)
-    idclasse = models.ForeignKey(Classe, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return '{} | {} | {} | {}'.format(self.mateleve, self.motif_sanction, self.sanction, self.delit)
-
-    @property
-    def eleve(self):
-        return self.mateleve
-
-    @property
-    def classe(self):
-        return self.idclasse
-
-    @property
-    def annee(self):
-        return self.annescolaire
-
-
 class Inscription(models.Model):
     date_inscription = models.DateField(auto_now=True)
     annee_scolaire = models.ForeignKey(AnneeScolaire, on_delete=models.CASCADE)
@@ -96,3 +70,29 @@ class Inscription(models.Model):
     @property
     def cycle(self):
         return self.idcycle.cycle
+
+
+class Discipline(models.Model):
+    motif_sanction = models.TextField()
+    sanction = models.CharField(max_length=80)
+    observation = models.TextField()
+    annescolaire = models.ForeignKey(AnneeScolaire, on_delete=models.CASCADE)
+    date_sanction = models.DateField()
+    delit = models.TextField()
+    mateleve = models.ForeignKey(Eleve, on_delete=models.CASCADE)
+    idclasse = models.ForeignKey(Classe, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return '{} | {} | {} | {}'.format(self.mateleve, self.motif_sanction, self.sanction, self.delit)
+
+    @property
+    def eleve(self):
+        return self.mateleve
+
+    @property
+    def classe(self):
+        return self.idclasse
+
+    @property
+    def annee(self):
+        return self.annescolaire

@@ -930,7 +930,12 @@
                                               <td class="no-export">
                                                   <a class="btn btn-primary" href="{% url 'afficherdetailsinscription' le.id %}" title="Voir/Afficher"><i class="fa fa-eye fa-sm"></i></a>
                                                   <a class="btn btn-info" href="{% url 'editioninscription' le.id %}" title="Modifier/Editer"><i class="fa fa-edit fa-sm"></i></a>
+
+                                                  {% peut request.user 'menu_administration' as ok_admin %}
+
+                                                  {% if ok_admin %}
                                                   <a class="btn btn-danger" href=" {% url 'suppinscription' le.id %}" title="Supprimer"><i class="fa fa-remove fa-sm"></i></a>
+                                                  {% endif %}
                                                   <a class="btn btn-secondary" target="_blank" href="{% url 'imprimerecuinscription' le.id %}" title="Imprimer le recu d'inscription"><i class="fa fa-print fa-sm"></i></a>
                                               </td>
 
@@ -1129,7 +1134,12 @@
                                               <td class="no-export">
                                                   <a class="btn btn-primary" href="{% url 'afficherdetailsinscription' le.id %}" title="Voir/Afficher"><i class="fa fa-eye fa-sm"></i></a>
                                                   <a class="btn btn-info" href="{% url 'editioninscription' le.id %}" title="Modifier/Editer"><i class="fa fa-edit fa-sm"></i></a>
+
+                                                  {% peut request.user 'menu_administration' as ok_admin %}
+
+                                                  {% if ok_admin %}
                                                   <a class="btn btn-danger" href=" {% url 'suppinscription' le.id %}" title="Supprimer"><i class="fa fa-remove fa-sm"></i></a>
+                                                  {% endif %}
                                                   <a class="btn btn-secondary" target="_blank" href="{% url 'imprimerecuinscription' le.id %}" title="Imprimer le recu d'inscription"><i class="fa fa-print fa-sm"></i></a>
                                               </td>
 

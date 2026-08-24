@@ -33,10 +33,13 @@ from django.urls import reverse
 from django.core.mail import EmailMessage
 from django.conf import settings
 import io  # Librairie contenant les methodes utilisant les péripheriques d'entrées/sorties
+from gUsers.decorators import action_requise
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 
 # Cette fonction me permet de recuperer le dernier solde caisse
+
 def affichersoldecaisse():
     try:
         cais = Caisse.objects.latest('id')  # Ici je tente de recuperer le dernier solde caisse
@@ -50,6 +53,7 @@ def affichersoldecaisse():
 
 
 # Gestion de la Caisse Scolarité
+@action_requise('compta_ajouter')
 def enregistrer_recette(request):
     if request.method == 'POST':
         formrecette = FormCaisseScolarite(request.POST)
@@ -85,7 +89,7 @@ def enregistrer_recette(request):
 
     return render(request, 'gComptabilite/enregistrer_caisse_scolarite.html', dict(form=formrecette))
 
-
+@login_required 
 def listerecette(request):
       
     mois_courant = datetime.strftime(datetime.now(),'%m') # Je recupere le numero du mois en cours en vue de filtrer les operations conformement a cela
@@ -131,17 +135,17 @@ def listerecette(request):
                   dict(cais=cais, total_entree=total_entree, total_sortie=total_sortie,
                        solde_dispo=solde_dispo, annee=annee,mois_actuel=mactu))
 
-
+@action_requise('compta_modifier')
 def detailscaisserecette(request, idcais):
     cais = Caisse.objects.get(id=idcais)
     return render(request, 'gComptabilite/afficher_details_caisse_scolarite.html', dict(cais=cais))
 
-
+@action_requise('compta_modifier')
 def editercaisserecette(request, idcais):
     cais = Caisse.objects.get(id=idcais)
     return render(request, 'gComptabilite/modifier_caisse_scolarite.html', dict(cais=cais))
 
-
+@action_requise('compta_modifier')
 def modifiercaisserecette(request, idcais):
     if request.method == 'POST':
         cais = Caisse.objects.get(id=idcais)
@@ -153,7 +157,7 @@ def modifiercaisserecette(request, idcais):
     else:
         return redirect('../listerecette/')
 
-
+@action_requise('compta_supprimer')
 def supprimercaisserecette(request, pk):
     cais = Caisse.objects.get(id=pk)
     cais.delete()
@@ -168,6 +172,7 @@ solde_dispo = 0
 debut = None
 fin = None
 
+@login_required
 def recherchersituationrecette(request):
     
     ans = request.GET.get('nom_annee')
@@ -254,7 +259,7 @@ def recherchersituationrecette(request):
     return render(request, 'gComptabilite/liste_recettes.html',
                   dict(recette=recette, total_entree=total_entree, total_sortie=total_sortie, solde_dispo=solde_dispo, ddebut=debut, dfin=fin, annee=annee))
 
-
+@action_requise('compta_ajouter')
 def enregistrerdepense(request):
     if request.method == 'POST':
         fdepense = FormDepense(request.POST)
@@ -301,7 +306,7 @@ def enregistrerdepense(request):
         fdepense = FormDepense()
     return render(request, 'gComptabilite/enregistrer_depense.html', dict(form=fdepense))
 
-
+@login_required
 def listedepense(request):
   
     mois_courant = datetime.strftime(datetime.now(),'%m') # Je recupere le numero du mois en cours en vue de filtrer les operations conformement a cela
@@ -352,6 +357,7 @@ debut = None
 fin = None
 solde_dispo = 0
 
+@login_required
 def recherchersituationdepense(request):
     
     ans = request.GET.get('nom_annee')
@@ -438,17 +444,17 @@ def recherchersituationdepense(request):
     return render(request, 'gComptabilite/liste_depenses.html',
                   dict(depense=depense, total_entree=total_entree, total_sortie=total_sortie, solde_dispo=solde_dispo, ddebut=debut, dfin=fin, annee=annee))
 
-
+@action_requise('compta_modifier')
 def detailsdepense(request, id):
     depense = Caisse.objects.get(id=id)
     return render(request, 'gComptabilite/afficher_details_depense.html', dict(depense=depense))
 
-
+@action_requise('compta_modifier')
 def editerdepense(request, id):
     depense = Caisse.objects.get(id=id)
     return render(request, 'gComptabilite/modifier_depense.html', {'depense': depense})
 
-
+@action_requise('compta_modifier')
 def modifierdepense(request, pk):
     if request.method == 'POST':
         depense = Caisse.objects.get(id=pk)
@@ -465,7 +471,7 @@ def modifierdepense(request, pk):
     else:
         return redirect('../listedepense/')
 
-
+@action_requise('compta_supprimer')
 def supprimerdepense(request, pk):
     depense = Caisse.objects.get(id=pk)
     depense.delete()
@@ -475,6 +481,7 @@ def supprimerdepense(request, pk):
 
 # Cette fonction me permet de charger la liste des élèves inscrits dans une classe donnée aucours d'une année
 # scolaire donnée
+@login_required
 def chargerlisteelevepaiement(request):
     ane = request.GET.get('anneesco') # anneesco est la valeur renvoyée depuis la fonction JQuery dans le template paiement_scolarite.html
     clas = request.GET.get('id_classe') # id_classe est recupérée depuis la fonction JQuery
@@ -485,6 +492,7 @@ def chargerlisteelevepaiement(request):
 
 # La fonction chargerlisteclasse m'a permis de gerer l'affichage des classes selon le cycle selectionné lors de
 # l'inscription associé au JQuery en Front-end
+@login_required
 def chargerlisteclassepaiement(request):
     cy = request.GET.get('idcycle')
     clas = Classe.objects.filter(idcycle=cy).all()
@@ -492,6 +500,7 @@ def chargerlisteclassepaiement(request):
     return render(request, 'gComptabilite/liste_classe_cycle_paiement.html', context)
 
 # Cette fonction me permet de charger les infos de l'élève sélectionné lors de la reinscription à savoir le prénom, le nom et la photo
+@login_required
 def chargerinfoeleveclasse(request):
 
     matricule = request.GET.get('matricule')
@@ -541,7 +550,9 @@ def reformater_montant(valeur):
     return Decimal(montant_a_reformater)
 
 erreur = None
+
 # Fonction permettant de valider le paiement de la scolarite
+@action_requise('compta_ajouter')
 def validerpaiementscolarite(request):
 
     t1 = 0
@@ -673,7 +684,7 @@ def validerpaiementscolarite(request):
 
     return render(request,'gComptabilite/paiement_scolarite.html',dict(ans=annee,cycles=cycle, tranche_paye=DEUX_TRANCHES_CHOICES, modepaie=MODE_PAIEMENT_CHOICES))
 
-
+@login_required
 def recupaiementscolarite(request, idetat, nom_tranche, mont_paye):
     # Et là je tente de recuperer les données d'identification de l'école
     ec = Ecole.objects.count()
@@ -756,7 +767,7 @@ def recupaiementscolarite(request, idetat, nom_tranche, mont_paye):
             p.drawString(55, 772 + y_offset, str(data_ecole[7]))
             p.setFont('Helvetica-Bold', 10)
             p.drawString(20, 757 + y_offset, 'TEL : ')
-            p.setFont('Helvetica', 10)
+            p.setFont('Helvetmodifierica', 10)
             p.drawString(55, 757 + y_offset, str(data_ecole[3]) + ' / ' + str(data_ecole[4]))
 
             # ── LOGO ──
@@ -922,11 +933,11 @@ def recupaiementscolarite(request, idetat, nom_tranche, mont_paye):
         buffer.seek(0)
         return FileResponse(buffer, as_attachment=False, filename=f'Recu_paiement_{str(data[2])}.pdf', content_type='application/pdf')
 
-
+@login_required
 def imprimerecuscolarite(request, idetat, nom_tranche, mont_paye):
     return HttpResponseRedirect(reverse('recupaiementscolarite',args=(idetat,nom_tranche,str(mont_paye),)))
 
-
+@login_required
 def listepaiementmensuel(request):
     
     anne = {}
@@ -985,7 +996,7 @@ def listepaiementmensuel(request):
 
     return render(request,'gComptabilite/liste_etat_paiement_scolarite.html',dict(ans=anne, cycles=cy, listepaiementmensuel=listepaiemensuel, total_tranche1=total_tranche1, total_tranche2=total_tranche2, total_reste_a_payer=total_reste_a_payer, tranche_paye=DEUX_TRANCHES_CHOICES, total_paiement_annuel=total_paiement_annuel))
 
-
+@login_required
 def filtrelistepaiementclasse(request):
 
     anne = request.GET.get('annee_scolaire')
@@ -1048,17 +1059,19 @@ def filtrelistepaiementclasse(request):
 
     return render(request,'gComptabilite/liste_etat_paiement_scolarite.html',{'listepaiementclasse':listepaieclasse, 'ans': an, 'cycles': cy, 'total_tranche1': total_tranche1, 'total_tranche2': total_tranche2, 'total_reste_a_payer': total_reste_a_payer, 'tranche_paye': DEUX_TRANCHES_CHOICES, 'total_paiement_annuel': total_paiement_annuel})
 
+@action_requise('compta_modifier')
 def detailpaiementscolaire(request, idpaie):
     etatpaie = EtatPaiementTranche.objects.select_related('anneescolaire','mateleve','idclasse','idcycle').get(id=idpaie)
     return render(request,'gComptabilite/afficher_details_paiement_scolaire.html', dict(paie=etatpaie))
 
+@action_requise('compta_modifier')
 def editerpaiementscolaire(request, idpaie):
     etatpaie = EtatPaiementTranche.objects.select_related('anneescolaire','mateleve','idclasse','idcycle').get(id=idpaie)
     ans = AnneeScolaire.objects.all().order_by('id')
     cy = CycleScolaire.objects.all().order_by('id')
     return render(request,'gComptabilite/modifier_paiement_scolaire.html',dict(paie=etatpaie, tranche_paye=DEUX_TRANCHES_CHOICES, annee=ans, cycles=cy, modepaie=MODE_PAIEMENT_CHOICES))
 
-
+@action_requise('compta_modifier')
 def modifieretatpaiement(request, idpaie):
 
     p_tranche = 0
@@ -1121,13 +1134,14 @@ def modifieretatpaiement(request, idpaie):
     else:
         return redirect('../listepaiemensuel/')
     
-
+@action_requise('compta_supprimer')
 def supprimerpaiementscolaire(request, idpaie):
     etatpaie = EtatPaiementTranche.objects.get(id=idpaie)
     etatpaie.delete()
     return redirect('../listepaiemensuel/')
 
 # Vue permettant de generer à partir de la fonction utilitaire le rapport des etats de paiement
+@login_required
 def rapportpaiementtranche(request):
 
     anne = request.GET.get('annee')  
@@ -1199,12 +1213,12 @@ def generer_rapport_paiement_scolarite(request, data_ecole, annee, cycle, classe
 
     t_paye_t2 = EtatPaiementTranche.objects.select_related('anneescolaire', 'mateleve', 'idcycle', 'idclasse').filter(Q(anneescolaire__exact=an), Q(idcycle__exact=cy),Q(idclasse__exact=cl)).aggregate(totalpaye=Sum('deuxieme_tranche'))
 
-    if t_paye_t1 is not None:
+    if t_paye_t1['totalpaye'] is not None:
         total_paye_t1 = t_paye_t1['totalpaye']
     else:
         total_paye_t1 = 0
 
-    if t_paye_t2 is not None:
+    if t_paye_t2['totalpaye'] is not None:
         total_paye_t2 = t_paye_t2['totalpaye']
     else:
         total_paye_t2 = 0

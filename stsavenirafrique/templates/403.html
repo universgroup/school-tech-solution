@@ -1,22 +1,63 @@
-{% extends 'base.html' %}
-{% block titre_page %} ERREUR D'ACCES {% endblock %}
-{% block titre_formulaire %} ERREUR D'ACCES A UN MODULE {% endblock %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    {% load static %}
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Accès refusé (403) - École Les Champions</title>
+    <link rel="icon" type="image/png" href="{% static 'assets/dist/img/LogoEC.png' %}">
 
-{% block fil_ariane %}Administration / Global /  Page Erreur {% endblock %}
-{% block titre_cadre %}
-ACCES REFUSE : ERREUR 403
-{% endblock %}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="{% static 'assets/css/loginstyle.css' %}">
 
-{% block formulaire %}
+    <style>
+    .login-form::before,
+    .login-brand::after {
+        background-image: url("{% static 'assets/dist/img/LogoEC.png' %}");
+    }
+    .error-code {
+        font-size: 4rem;
+        font-weight: 800;
+        line-height: 1;
+        color: #dc3545;
+    }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <div class="login-brand">
+            <div class="brand-content">
+                <div class="school-logo">
+                    <img src="{% static 'assets/dist/img/LogoEC.png' %}" alt="Logo de l'école les Champions" />
+                </div>
+                <h1>École Les Champions</h1>
+                <p>L'excellence au service de l'éducation</p>
+                <div class="brand-divider"></div>
+                <div class="school-feature">
+                    <span><i class="fas fa-check-circle"></i> 15 ans d'excellence</span>
+                    <span><i class="fas fa-users"></i> 1000+ élèves</span>
+                    <span><i class="fas fa-award"></i> Label qualité</span>
+                </div>
+            </div>
+        </div>
 
-<div class="error-page">
-  <h2 class="headline text-warning">403</h2>
-  <div class="error-content">
-    <h3><i class="fas fa-exclamation-triangle text-warning"></i> Accès refusé</h3>
-    <p>
-      Vous n'avez pas les droits nécessaires pour effectuer cette action.
-      Contactez l'Administration si vous pensez qu'il s'agit d'une erreur.
-    </p>
-  </div>
-</div>
-{% endblock %}
+        <div class="login-form">
+            <div class="form-header text-center">
+                <div class="error-code">403</div>
+                <i class="fas fa-lock fa-2x text-danger mb-3"></i>
+                <h2>Accès refusé</h2>
+                <p>
+                    Vous n'avez pas les droits nécessaires pour accéder à cette page ou
+                    effectuer cette action. Contactez votre administrateur si vous pensez
+                    qu'il s'agit d'une erreur.
+                </p>
+            </div>
+
+            <a href="{% url 'connexion' %}" class="btn-login d-block text-center text-decoration-none">
+                 Se connecter &nbsp; <i class="fas fa-arrow-right-to-bracket"></i>
+            </a>
+        </div>
+    </div>
+</body>
+</html>

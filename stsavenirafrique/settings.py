@@ -8,6 +8,7 @@
 # For the full list of settings and their values, see
 # https://docs.djangoproject.com/en/4.2/ref/settings/
 
+from decouple import config
 from pathlib import Path
 import os
 from django.contrib.messages import constants as messages
@@ -20,10 +21,10 @@ BASE_DIR = Path(__file__).resolve().parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-e%+*dw)^))b8ixg$a9&nn01w@61bugp^6@)h1+07ylu1eo$lz8'
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = [
     'localhost',
@@ -89,7 +90,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                #'core.context_processors.donnees_menu_rapports',
+                'core.context_processor.annee_scolaire_actuelle', # Peut être affiché dans tous les templates du projet
             ],
         },
     },
@@ -103,11 +104,11 @@ WSGI_APPLICATION = 'stsavenirafrique.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'school_champions',
-        'HOST': 'localhost',
-        'USER': 'utg',
-        'PASSWORD': 'UTech@@2026',
-        'PORT': 5432
+        'NAME': config('DB_NAME'),
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_PASSWORD'),
+        'HOST': config('DB_HOST', default='localhost'),
+        'PORT': config('DB_PORT', default='5432'),
     }
 }
 
@@ -172,9 +173,9 @@ LOGOUT_URL = '/'
 PASSWORD_RESET_TIMEOUT = 3600
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'school.tech.solution.26@gmail.com'
-DEFAULT_FROM_EMAIL = 'GS Ecole les Champions <school.tech.solution.26@gmail.com>'
-EMAIL_HOST_PASSWORD = 'uepr ggqq mpud piuv'  # Ce mot de passe est généré depuis le compte gmail de l'expediteur dans "App Password"
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
+EMAIL_HOST = config('EMAIL_HOST')
+EMAIL_PORT = config('EMAIL_PORT', cast=int)
+EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool)
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = f"GS Ecole les Champions <{config('EMAIL_HOST_USER')}>"

@@ -36,7 +36,7 @@ PERMISSIONS = {
     "compta_ajouter": [DG, SCOL, COMPTA],
     "compta_modifier": [DG, SCOL, COMPTA],
     "compta_annuler": [DG, COMPTA],
-    "compta_supprimer": [],           # personne — aucune vue ne doit exister
+    "compta_supprimer": [DG],           
     "compta_cloturer_mois": [DG, COMPTA],
 
     # Personnel

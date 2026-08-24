@@ -905,8 +905,13 @@
                                               <td class="no-export">
                                                   <a class="btn btn-primary" href="{% url 'detailspaiement' lp.id %}" title="Voir/Afficher"><i class="fa fa-eye fa-sm"></i></a>
                                                   <a class="btn btn-info" href="{% url 'editionpaiement' lp.id %}" title="Modifier/Editer"><i class="fa fa-edit fa-sm"></i></a>
-                                                  <a class="btn btn-danger" href=" {% url 'supprimerpaiement' lp.id %}" title="Supprimer"><i class="fa fa-remove fa-sm"></i></a>
                                                   
+                                                  {% peut request.user 'menu_administration' as ok_admin %}
+
+                                                  {% if ok_admin %}                                                  
+                                                  <a class="btn btn-danger" href=" {% url 'supprimerpaiement' lp.id %}" title="Supprimer"><i class="fa fa-remove fa-sm"></i></a>
+                                                  {% endif %}
+
                                                   <button type="button" class="btn btn-secondary btn-recu"
                                                           data-idetat="{{lp.id}}" title="Imprimer le recu de paiement de scolarité"
                                                           data-toggle="modal"
@@ -1130,7 +1135,12 @@
                                               <td class="no-export">
                                                   <a class="btn btn-primary" href="{% url 'detailspaiement' lp.id %}" title="Voir/Afficher"><i class="fa fa-eye fa-sm"></i></a>
                                                   <a class="btn btn-info" href="{% url 'editionpaiement' lp.id %}" title="Modifier/Editer"><i class="fa fa-edit fa-sm"></i></a>
+                                                  
+                                                  {% peut request.user 'menu_administration' as ok_admin %}
+
+                                                  {% if ok_admin %}
                                                   <a class="btn btn-danger" href=" {% url 'supprimerpaiement' lp.id %}" title="Supprimer"><i class="fa fa-remove fa-sm"></i></a>
+                                                  {% endif %}
 
                                                   <button type="button" class="btn btn-secondary btn-recu"
                                                           data-idetat="{{lp.id}}" title="Imprimer le recu de paiement de scolarité"

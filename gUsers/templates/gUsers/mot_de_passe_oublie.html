@@ -1,34 +1,75 @@
-{% extends "base.html" %}
-{% block titre_page %}REINITIALISATION{% endblock %}
-{% block titre_formulaire %}REINITIALISATION DU MOT DE PASSE{% endblock %}
-{% block fil_ariane %}Administration / Utilisateur / Mot de passe oublié{% endblock %}
-{% block titre_cadre %}
-MOT DE PASSE OUBLIÉ
-{% endblock %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    {% load static %}
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mot de passe oublié - École Les Champions</title>
+    <link rel="icon" type="image/png" href="{% static 'assets/dist/img/LogoEC.png' %}">
 
-{% block formulaire %}
-<p class="text-muted mb-4">
-  Saisissez votre adresse e-mail. Si un compte existe, un lien de réinitialisation
-  vous sera envoyé.
-</p>
-<form method="post">
-  {% csrf_token %}
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
-  {% for field in form %}
-  <div class="form-group">
-    <label>{{ field.label }}</label>
+    <link rel="stylesheet" href="{% static 'assets/css/loginstyle.css' %}">
 
-        {{ field }}
+    <style>
+    .login-form::before,
+    .login-brand::after {
+        background-image: url("{% static 'assets/dist/img/LogoEC.png' %}");
+    }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <!-- Côté gauche : logo / photo de l'école -->
+        <div class="login-brand">
+            <div class="brand-content">
+                <div class="school-logo">
+                    <img src="{% static 'assets/dist/img/LogoEC.png' %}" alt="Logo de l'école les Champions" />
+                </div>
+                <h1>École Les Champions</h1>
+                <p>L'excellence au service de l'éducation</p>
+                <div class="brand-divider"></div>
+                <div class="school-feature">
+                    <span><i class="fas fa-check-circle"></i> 15 ans d'excellence</span>
+                    <span><i class="fas fa-users"></i> 1000+ élèves</span>
+                    <span><i class="fas fa-award"></i> Label qualité</span>
+                </div>
+            </div>
+        </div>
 
-    {% if field.errors %}
-      <div class="text-danger small">{{ field.errors }}</div>
-    {% endif %}
-  </div>
-  {% endfor %}
+        <!-- Côté droit : formulaire -->
+        <div class="login-form">
+            <div class="form-header">
+                <h2>Mot de passe oublié</h2>
+                <p>Saisissez votre adresse e-mail, un lien de réinitialisation vous sera envoyé</p>
+            </div>
 
-  <button type="submit" class="btn btn-primary btn-md">
-    <i class="fas fa-paper-plane"></i> Envoyer le lien
-  </button>
-  <a href="{% url 'connexion' %}" class="btn btn-link btn-md">Se connecter</a>
-</form>
-{% endblock %}
+            <form method="post" novalidate>
+                {% csrf_token %}
+
+                {% if form.errors %}
+                <div class="alert alert-danger">{{ form.errors }}</div>
+                {% endif %}
+
+                <div class="floating-label-group">
+                    {{ form.email }}
+                    <label for="idemail" class="floating-label"><i class="far fa-envelope me-2"></i>Adresse email</label>
+                </div>
+
+                <button type="submit" class="btn-login">
+                    Envoyer le lien <i class="fas fa-paper-plane"></i>
+                </button>
+
+                <div class="text-center mt-3">
+                    <a href="{% url 'connexion' %}" class="btn btn-primary btn-sm" style="font-size:0.85rem;">
+                         Se connecter &nbsp;<i class="fas fa-arrow-right-to-bracket me-1"></i>
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

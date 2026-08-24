@@ -124,10 +124,10 @@ class FormEcole(ModelForm):
                                                'title': 'Saisissez une boite postale'}),
             'email_ecole': forms.EmailInput(
                 attrs={'class': 'form-control', 'placeholder': 'Ex: contact@universtechgroup.com',
-                       'pattern': "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\'.[a-zA-Z]{2,}", 'title': 'Saisissez un email correct!'}),
+                       'pattern': "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}", 'title': 'Saisissez un email correct!'}),
             'site_internet': forms.URLInput(
                 attrs={'class': 'form-control', 'placeholder': 'Ex: https://www.universtechgroup.com',
-                       'pattern': "https?://[a-zA-Z0-9.-]+\\'.[a-zA-Z]{2,}.*",
+                       'pattern': "https?://[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}.*",
                        'title': 'Saisissez un site web correct!'}),
             'devise_ecole': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Devise de l\'école',
                                                    'title': 'Saisissez la devise/slogan de l\'école'}),

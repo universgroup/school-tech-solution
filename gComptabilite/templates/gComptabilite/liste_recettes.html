@@ -882,8 +882,13 @@
                                 <td class="no-export">
                                     <a class="btn btn-primary" href="{% url 'afficherdetailscaisserecette' c.id %}" title="Voir/Afficher" target="_self"><i class="fa-solid fa-eye fa-sm"></i></a>
                                     <a class="btn btn-info" href="{% url 'editioncaisserecette' c.id %}" title="Modifier/Editer" target="_self"><i class="fa-solid fa-edit fa-sm"></i></a>
+
+                                    {% peut request.user 'menu_administration' as ok_admin %}
+
+                                    {% if ok_admin %}
                                     <a class="btn btn-danger" href="{% url 'supprimecaisserecette' c.id %}" title="Supprimer" target="_self"><i class="fa-solid fa-remove fa-sm"></i></a>
-                                </td>
+                                    {% endif %}
+                                  </td>
                             </tr>
                         {% endfor %}
 
@@ -1029,8 +1034,13 @@
                                 <td class="no-export">
                                     <a class="btn btn-primary" href="{% url 'afficherdetailscaisserecette' r.id %}" title="Voir/Afficher" target="_self"><i class="fa-solid fa-eye fa-sm"></i></a>
                                     <a class="btn btn-info" href="{% url 'editioncaisserecette' r.id %}" title="Modifier/Editer" target="_self"><i class="fa-solid fa-edit fa-sm"></i></a>
+                                    
+                                    {% peut request.user 'menu_administration' as ok_admin %}
+
+                                    {% if ok_admin %}                                    
                                     <a class="btn btn-danger" href="{% url 'supprimecaisserecette' r.id %}" title="Supprimer" target="_self"><i class="fa-solid fa-remove fa-sm"></i></a>
-                                </td>
+                                    {% endif %}
+                                  </td>
                             </tr>
                         {% endfor %}
                     </tbody>

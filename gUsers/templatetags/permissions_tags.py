@@ -1,4 +1,4 @@
-# gUsers/templatetags/permissions_tags.py
+
 from django import template
 
 from gUsers.permissions import (

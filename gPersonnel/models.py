@@ -3,9 +3,9 @@ from gAdministration.models import AnneeScolaire
 
 CIVILITE_CHOICES = [
     ('Selectionnez', 'Sélectionnez'),  # 0
-    ('Monsieur', 'Monsieur'),  # 1
-    ('Madame', 'Madame'),  # 2
-    ('Madémoiselle', 'Madémoisselle')  # 3
+    ('M', 'Monsieur'),  # 1
+    ('Mme', 'Madame'),  # 2
+    ('Mlle', 'Madémoisselle')  # 3
 ]
 
 TYPE_PERSONNEL = (
@@ -16,8 +16,8 @@ TYPE_PERSONNEL = (
 
 SEXE_PERSONNEL = (
     ('Selectionnez', 'Sélectionnez'),  # 0
-    ('Homme', 'Homme'),  # 1
-    ('Femme', 'Femme')  # 2
+    ('H', 'Homme'),  # 1
+    ('F', 'Femme')  # 2
 )
 
 CONTRAT_CHOICES = (
@@ -46,18 +46,18 @@ MOIS_CHOICES = (
 class Personnel(models.Model):
     nom_personnel = models.CharField(max_length=30)
     prenom_personnel = models.CharField(max_length=50)
-    civilite = models.CharField(max_length=15, default='Selectionnez', choices=CIVILITE_CHOICES)
+    civilite = models.CharField(max_length=15, default=CIVILITE_CHOICES[1][0], choices=CIVILITE_CHOICES)
     date_naissance = models.DateField()
     niveau_etude = models.CharField(max_length=50)
-    type_personnel = models.CharField(max_length=15, default='Selectionnez', choices=TYPE_PERSONNEL)
+    type_personnel = models.CharField(max_length=15, default=TYPE_PERSONNEL[1][0], choices=TYPE_PERSONNEL)
     adresse_personnel = models.CharField(max_length=50)
     contact_personnel = models.CharField(max_length=25)
     fonction_personnel = models.CharField(max_length=35)
     email_personnel = models.EmailField()
-    sexe_personnel = models.CharField(max_length=15, default='Selectionnez', choices=SEXE_PERSONNEL)
+    sexe_personnel = models.CharField(max_length=15, default=SEXE_PERSONNEL[1][0], choices=SEXE_PERSONNEL)
     salbase = models.DecimalField(max_digits=10, decimal_places=2)
     annee_experience = models.CharField(max_length=10)
-    contrat_type = models.CharField(max_length=15, default='Selectionnez', choices=CONTRAT_CHOICES)
+    contrat_type = models.CharField(max_length=15, default=CONTRAT_CHOICES[1][0], choices=CONTRAT_CHOICES)
     diplome = models.CharField(max_length=25)
     date_embauche = models.DateField()
 
@@ -70,7 +70,7 @@ class AvanceSalaire(models.Model):
     montant_avance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     intitule = models.TextField()
     date_avance = models.DateField(auto_now=True)
-    mois_avance = models.CharField(max_length=15, default='Selectionnez', choices=MOIS_CHOICES)
+    mois_avance = models.CharField(max_length=15, default=MOIS_CHOICES[1][0], choices=MOIS_CHOICES)
     anscolaire = models.ForeignKey(AnneeScolaire, on_delete=models.CASCADE)
     idpersonnel = models.ForeignKey(Personnel, on_delete=models.CASCADE)
 
@@ -109,7 +109,7 @@ class Salaire(models.Model):
     date_paiement = models.DateField(auto_now=True)
     nbre_heure = models.IntegerField(default=0)
     anneescolaire = models.ForeignKey(AnneeScolaire, on_delete=models.CASCADE)
-    mois_paie = models.CharField(max_length=15, default='Selectionnez', choices=MOIS_CHOICES)
+    mois_paie = models.CharField(max_length=15, default=MOIS_CHOICES[1][0], choices=MOIS_CHOICES)
     detail_paiement = models.TextField()
     taux_horaire = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     avance_paie = models.DecimalField(max_digits=10, decimal_places=2, default=0)

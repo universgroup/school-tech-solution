@@ -56,31 +56,36 @@ class CreationUtilisateurForm(UserCreationForm):
 
 
 class MotDePasseOublieForm(PasswordResetForm):
-    """Sous-classe de PasswordResetForm, uniquement pour styler le champ email en AdminLTE."""
+    """
+    Sous-classe de PasswordResetForm — pas de classe CSS ajoutée, le style
+    vient de loginstyle.css (floating-label-group), comme le champ 'username'
+    de votre AuthenticationForm sur la page de connexion.
+    """
     email = forms.EmailField(
-        label="Adresse email",
-        widget=forms.EmailInput(attrs={
-            "class": "form-control",
-            "placeholder": "votre adresse email",'pattern':"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}",
-        }),
+        label="Adresse e-mail",
+        widget=forms.EmailInput(attrs={'id':'idemail',"placeholder": " ",'pattern':"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}",'class': 'form-control floating-input'}),
+        # placeholder=" " (espace) est nécessaire pour que le CSS floating-label
+        # détecte un champ "rempli" via :not(:placeholder-shown), comme sur login.html
     )
 
 
 class ReinitialiserMotDePasseForm(SetPasswordForm):
-    """Sous-classe de SetPasswordForm, uniquement pour styler les champs en AdminLTE."""
+    """Sous-classe de SetPasswordForm, même logique de style que ci-dessus."""
     new_password1 = forms.CharField(
         label="Nouveau mot de passe",
         strip=False,
         widget=forms.PasswordInput(attrs={
-            "class": "form-control",
+            "placeholder": " ",
             "autocomplete": "new-password",
+            'class': 'form-control floating-input',
         }),
     )
     new_password2 = forms.CharField(
         label="Confirmer le nouveau mot de passe",
         strip=False,
         widget=forms.PasswordInput(attrs={
-            "class": "form-control",
+            "placeholder": " ",
             "autocomplete": "new-password",
+            'class': 'form-control floating-input'
         }),
     )

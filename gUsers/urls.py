@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, reverse_lazy
 from django.contrib.auth import views as auth_views
 from .views import *
 from .forms import ReinitialiserMotDePasseForm
@@ -22,7 +22,7 @@ urlpatterns = [
 
     path('reinitialiser/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(
         template_name='gUsers/reinitialiser_mot_de_passe.html',
-        success_url='/gestion-utilisateurs/reinitialiser/complet/',
+        success_url=reverse_lazy('password_reset_complete'),
         form_class=ReinitialiserMotDePasseForm,
     ), name='password_reset_confirm'),
 

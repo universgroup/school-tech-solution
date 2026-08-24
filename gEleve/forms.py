@@ -48,15 +48,15 @@ class FormEleve(ModelForm):
                                              'title': 'Saisissez le prénoms et nom du tuteur'}),
             'contact_pere': forms.TextInput(
                 attrs={'class': 'form-control', 'placeholder': 'Contact du père', 'type': 'tel',
-                       'pattern': '^(\\+?[0-9]{1,3}[\\s\\-]?)?[0-9\\s\\-\\(\\)]{7,15}$','title': 'Saisissez un numéro de téléphone valide avec ou sans code du pays'}),
+                       'pattern': "^(\+?[0-9]{1,3}[\s\-]?)?[0-9\s\-\(\)]{7,15}$",'title': 'Saisissez un numéro de téléphone valide avec ou sans code du pays'}),
 
             'contact_mere': forms.TextInput(attrs={'class': 'form-control', 'placeholder' : 'Contact de la mère', 'type': 'tel', 'pattern': '^(\\+?[0-9]{1,3}[\\s\\-]?)?[0-9\\s\\-\\(\\)]{7,15}$', 'title': 'Saisissez un numéro de téléphone valide avec ou sans code du pays'}),
 
             'email_pere': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Ex: contact@universtechgroup.com',
-                       'pattern': "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\'.[a-zA-Z]{2,}", 'title': 'Saisissez un email correct!'}),
+                       'pattern': "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}", 'title': 'Saisissez un email correct!'}),
 
             'email_mere': forms.EmailInput(attrs={'class': 'form-control','placeholder': 'Ex: contact@universtechgroup.com',
-                       'pattern': "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\'.[a-zA-Z]{2,}", 'title': 'Saisissez un email correct!'}),
+                       'pattern': "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}", 'title': 'Saisissez un email correct!'}),
 
             'profes_pere': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Profession du père', 'title': 'Saisissez la profession du père'}),
 

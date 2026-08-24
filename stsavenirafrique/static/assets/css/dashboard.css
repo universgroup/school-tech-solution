@@ -2,7 +2,8 @@
     --primary: #4f46e5;
     --primary-dark: #4338ca;
     --secondary: #0f172a;
-    --bg-light: #f1f5f9;
+    /* --bg-light: #f1f5f9; */
+    --bg-light:#8dabd3;
     --card-shadow: 0 10px 40px rgba(0,0,0,0.08);
 }
 
@@ -22,7 +23,8 @@
     font-size: 0.8rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: #94a3b8;
+    /* color: #94a3b8; */
+    color: #1c2129;
     font-weight: 600;
 }
 .stat-card .stat-value {
@@ -36,7 +38,8 @@
     align-items: center;
     gap: 0.5rem;
     font-size: 0.8rem;
-    color: #64748b;
+    /* color: #64748b; */
+    color: #3b567a;
 }
 .stat-card .stat-footer .trend-up { color: #22c55e; font-weight: 600; }
 .stat-card .stat-footer .trend-down { color: #ef4444; font-weight: 600; }
@@ -55,6 +58,11 @@
 .stat-card .stat-icon.green { background: linear-gradient(135deg, #22c55e, #16a34a); }
 .stat-card .stat-icon.yellow { background: linear-gradient(135deg, #f59e0b, #d97706); }
 .stat-card .stat-icon.purple { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+
+/* Cartes à valeurs monétaires (montants longs) */
+.stat-value.stat-value-money {
+    font-size: 1.5rem;
+}
 
 /* Cartes graphiques et tableaux */
 .card-dash {
@@ -93,7 +101,8 @@
 .table-dash { width: 100%; font-size: 0.9rem; }
 .table-dash th {
     font-weight: 600;
-    color: #64748b;
+    /* color: #64748b; */
+    color: #222e3f;
     border-bottom: 1.5px solid #e2e8f0;
     padding: 0.6rem 0.5rem 0.6rem 0;
     font-size: 0.75rem;
@@ -103,7 +112,8 @@
 .table-dash td {
     padding: 0.7rem 0.5rem 0.7rem 0;
     border-bottom: 1px solid #f1f5f9;
-    color: var(--secondary);
+    /* color: var(--secondary); */
+    color: #222e3f;
 }
 .table-dash tr:last-child td { border-bottom: none; }
 
