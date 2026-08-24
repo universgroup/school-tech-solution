@@ -10,8 +10,27 @@
 
 from decouple import config
 from pathlib import Path
+
+import django.db.backends.postgresql.base as postgres_base
+
+# On force Django à ignorer la version obsolète du serveur o2switch
+class ForcedDatabaseFeatures(postgres_base.DatabaseFeatures):
+    @property
+    def is_postgresql_12(self): return True
+    @property
+    def is_postgresql_13(self): return True
+    @property
+    def is_postgresql_14(self): return True
+
+postgres_base.DatabaseFeatures = ForcedDatabaseFeatures
+
+
+
+
 import os
 from django.contrib.messages import constants as messages
+
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 # BASE_DIR = Path(__file__).resolve().parent.parent
