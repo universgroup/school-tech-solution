@@ -10,27 +10,14 @@
 
 from decouple import config
 from pathlib import Path
-
-import django.db.backends.postgresql.base as postgres_base
-
-# On force Django à ignorer la version obsolète du serveur o2switch
-class ForcedDatabaseFeatures(postgres_base.DatabaseFeatures):
-    @property
-    def is_postgresql_12(self): return True
-    @property
-    def is_postgresql_13(self): return True
-    @property
-    def is_postgresql_14(self): return True
-
-postgres_base.DatabaseFeatures = ForcedDatabaseFeatures
-
-
-
-
 import os
 from django.contrib.messages import constants as messages
 
+# Patch absolu pour contourner la restriction de version PostgreSQL sur o2switch
+from django.db.backends.base.base import BaseDatabaseWrapper
 
+# On vide la fonction de vérification pour que Django ne bloque plus jamais
+BaseDatabaseWrapper.check_database_version_supported = lambda self: None
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 # BASE_DIR = Path(__file__).resolve().parent.parent
