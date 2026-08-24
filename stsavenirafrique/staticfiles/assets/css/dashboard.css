@@ -1,0 +1,206 @@
+:root {
+    --primary: #4f46e5;
+    --primary-dark: #4338ca;
+    --secondary: #0f172a;
+    /* --bg-light: #f1f5f9; */
+    --bg-light:#8dabd3;
+    --card-shadow: 0 10px 40px rgba(0,0,0,0.08);
+}
+
+
+/* Cartes statistiques (small-box AdminLTE stylées) */
+.stat-card {
+    background: #fff;
+    border-radius: 1.25rem;
+    padding: 1.5rem 1.5rem 1.2rem;
+    box-shadow: var(--card-shadow);
+    border: 1px solid rgba(0,0,0,0.02);
+    transition: 0.3s;
+    margin-bottom: 20px;
+}
+.stat-card:hover { transform: translateY(-4px); }
+.stat-card .stat-label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    /* color: #94a3b8; */
+    color: #1c2129;
+    font-weight: 600;
+}
+.stat-card .stat-value {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--secondary);
+    margin: 0.3rem 0 0.2rem;
+}
+.stat-card .stat-footer {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    /* color: #64748b; */
+    color: #3b567a;
+}
+.stat-card .stat-footer .trend-up { color: #22c55e; font-weight: 600; }
+.stat-card .stat-footer .trend-down { color: #ef4444; font-weight: 600; }
+.stat-card .stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    color: #fff;
+    margin-bottom: 0.5rem;
+}
+.stat-card .stat-icon.blue { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+.stat-card .stat-icon.green { background: linear-gradient(135deg, #22c55e, #16a34a); }
+.stat-card .stat-icon.yellow { background: linear-gradient(135deg, #f59e0b, #d97706); }
+.stat-card .stat-icon.purple { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+
+/* Cartes à valeurs monétaires (montants longs) */
+.stat-value.stat-value-money {
+    font-size: 1.5rem;
+}
+
+/* Cartes graphiques et tableaux */
+.card-dash {
+    background: #fff;
+    border-radius: 1.25rem;
+    padding: 1.5rem;
+    box-shadow: var(--card-shadow);
+    border: 1px solid rgba(0,0,0,0.02);
+    margin-top: 20px;
+}
+.card-dash .card-header-dash {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.2rem;
+}
+.card-dash .card-header-dash h5 {
+    font-weight: 700;
+    font-size: 1.05rem;
+    margin: 0;
+    color: var(--secondary);
+}
+.card-dash .card-header-dash a {
+    color: var(--primary);
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-decoration: none;
+}
+.card-dash .card-header-dash a:hover { text-decoration: underline; }
+.card-dash .chart-container {
+    position: relative;
+    height: 220px;
+}
+
+/* Tableau des activités */
+.table-dash { width: 100%; font-size: 0.9rem; }
+.table-dash th {
+    font-weight: 600;
+    /* color: #64748b; */
+    color: #222e3f;
+    border-bottom: 1.5px solid #e2e8f0;
+    padding: 0.6rem 0.5rem 0.6rem 0;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+.table-dash td {
+    padding: 0.7rem 0.5rem 0.7rem 0;
+    border-bottom: 1px solid #f1f5f9;
+    /* color: var(--secondary); */
+    color: #222e3f;
+}
+.table-dash tr:last-child td { border-bottom: none; }
+
+/* Badges de statut */
+.badge-status {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.65rem;
+    border-radius: 50px;
+    font-weight: 600;
+}
+.badge-status.success { background: #dcfce7; color: #16a34a; }
+.badge-status.warning { background: #fef3c7; color: #d97706; }
+.badge-status.danger { background: #fee2e2; color: #dc2626; }
+.badge-status.info { background: #dbeafe; color: #2563eb; }
+
+/* Utilitaires */
+.text-primary-custom { color: var(--primary); }
+.fw-600 { font-weight: 600; }
+
+/* Responsive : uniquement les règles concernant .stat-card / .card-dash / .table-dash */
+@media (max-width: 576px) {
+    .stat-card { padding: 1rem; }
+    .stat-card .stat-value { font-size: 1.5rem; }
+    .stat-card .stat-icon { width: 36px; height: 36px; font-size: 1rem; }
+    .card-dash { padding: 1rem; }
+    .card-dash .chart-container { height: 160px; }
+    .table-dash { font-size: 0.75rem; }
+    .table-dash th, .table-dash td { padding: 0.4rem 0.3rem 0.4rem 0; }
+}
+
+/* Style du bouton de déconnexion de la sidebar */
+.btn-logout-sidebar {
+    background-color: #dc3545; /* Rouge de base */
+    color: #ffffff !important; /* FORCE le blanc en permanence */
+    border: none;
+    transition: all 0.3s ease; /* Animation fluide */
+    width: 100%;
+    text-align: left;
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+}
+
+/* Effet au survol (Zoom et couleur bleue) */
+.btn-logout-sidebar:hover {
+    background-color: #0d6efd !important; /* Bleu Bootstrap (ou votre couleur de thème) */
+    color: #ffffff !important; /* Reste bien blanc, sans bleuissement du texte */
+    transform: scale(1.05); /* Effet de zoom */
+    box-shadow: 0 4px 6px rgba(13, 110, 253, 0.3); /* Petite ombre portée */
+}
+
+/* Comportement responsive du bouton de déconnexion en mode sidebar réduit */
+.sidebar-collapse .btn-logout-sidebar {
+    width: auto;
+    padding: 0.5rem;
+    text-align: center;
+    border-radius: 0.25rem;
+}
+
+.sidebar-collapse .btn-logout-sidebar span {
+    display: none;   /* masque le texte "Déconnexion", comme AdminLTE masque les <p> des autres nav-link */
+}
+
+.sidebar-collapse .btn-logout-sidebar i {
+    margin-right: 0 !important;   /* retire l'espacement prévu pour un texte qui n'est plus affiché (me-2) */
+}
+
+/* Réaffiche le texte du bouton Déconnexion quand la sidebar réduite est survolée (comportement natif AdminLTE) */
+.sidebar-mini.sidebar-collapse .main-sidebar:hover .btn-logout-sidebar {
+    width: auto;
+    text-align: left;
+    padding: 0.5rem 1rem;
+}
+
+.sidebar-mini.sidebar-collapse .main-sidebar:hover .btn-logout-sidebar span {
+    display: inline;
+}
+
+.sidebar-mini.sidebar-collapse .main-sidebar:hover .btn-logout-sidebar i {
+    margin-right: 0.5rem !important;
+}
+
+/* Correction pour l'avatar de la navbar */
+.img-size-24.img-circle {
+    width: 32px !important;
+    height: 32px !important;
+    object-fit: cover; /* Maintient l'image dans son cadre sans la déformer */
+    border-radius: 50%; /* Assure le cercle parfait */
+    border: 2px solid #fff; /* Ajoute un petit contour blanc sympa */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Une légère ombre */
+}

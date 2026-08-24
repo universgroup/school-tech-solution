@@ -26,11 +26,6 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1'
-]
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -179,3 +174,23 @@ EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool)
 EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = f"GS Ecole les Champions <{config('EMAIL_HOST_USER')}>"
+
+# À la fin de votre fichier settings.py
+
+if not DEBUG:
+    # Configuration de sécurité pour la production
+    ALLOWED_HOSTS = [
+    '://school-tech-solution.universtechgroup.com',
+    '://www.school-tech-solution.universtechgroup.com',
+]    
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+else:
+    # Configuration pour le développement local
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+
