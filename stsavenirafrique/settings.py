@@ -13,11 +13,7 @@ from pathlib import Path
 import os
 from django.contrib.messages import constants as messages
 
-# # Patch absolu pour contourner la restriction de version PostgreSQL sur o2switch
-# from django.db.backends.base.base import BaseDatabaseWrapper
 
-# # On vide la fonction de vérification pour que Django ne bloque plus jamais
-# BaseDatabaseWrapper.check_database_version_supported = lambda self: None
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 # BASE_DIR = Path(__file__).resolve().parent.parent
@@ -68,6 +64,7 @@ MESSAGE_TAGS = {
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -148,7 +145,7 @@ STATIC_ROOT = os.path.normpath(os.path.join(BASE_DIR, 'staticfiles'))
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
-# STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # MEDIA_DIR = BASE_DIR/'media'
 
