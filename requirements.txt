@@ -1,6 +1,6 @@
 asgiref==3.11.1
 charset-normalizer==3.4.4
-Django==3.2.25
+Django==6.0.2
 django-adminlte3==0.1.6
 django-crispy-forms==1.12.0
 et_xmlfile==2.0.0
@@ -13,4 +13,3 @@ psycopg2-pool==1.2
 python-decouple==3.8
 reportlab==4.4.10
 sqlparse==0.5.5
-whitenoise==6.4.0
