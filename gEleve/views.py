@@ -4,40 +4,59 @@ from django.contrib import messages
 from django.core.paginator import Paginator  # Utilisé dans la gestion des paginations des différentes listes de données
 from django.utils.datastructures import MultiValueDictKeyError
 
-from datetime import datetime  # Utilisé pour recuperer l'année courante dans la generation des matricules des élèves
+from datetime import datetime, date  # Utilisé pour recuperer l'année courante dans la generation des matricules des élèves
 from django.db.models import Q, Max, \
     Sum  # Permet de faire des requêtes avec les opérateurs And (,) et les opérateurs OR (|)
 import io  # Librairie contenant les methodes utilisant les péripheriques d'entrées/sorties
-from django.http import FileResponse, HttpResponseRedirect
+from django.http import FileResponse, HttpResponseRedirect, JsonResponse
 
 from reportlab.pdfgen import canvas
-from reportlab.platypus.tables import Table, TableStyle  # Permet de generer des tableaux (matrices) de données
 from reportlab.lib import colors  # Contient les méthodes/fonctions de gestion des couleurs
+from reportlab.lib.pagesizes import A4, landscape
+from reportlab.lib.units import cm
+from reportlab.platypus import (BaseDocTemplate, PageTemplate, Frame, NextPageTemplate,
+    Table, TableStyle, Paragraph, Spacer)
+from reportlab.platypus import Table as RLTable  # évite le conflit de nom avec votre "Table" du tableau principal
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.enums import TA_RIGHT # TA_CENTER, 
 from reportlab.lib.utils import ImageReader
+
 from PIL import Image
 
 from django.urls import reverse
 from django.core.mail import EmailMessage
 from django.conf import settings
+import socket
+from smtplib import SMTPException
 
 from .models import *
 from .forms import *
 from gComptabilite.models import *
 from gComptabilite.views import affichersoldecaisse
 from gAdministration.models import AnneeScolaire, CycleScolaire, Classe, Ecole
+from gUsers.decorators import action_requise
+from django.contrib.auth.decorators import login_required
+
+# --- Styles réutilisables pour les rapports PDF ---
+
+style_cellule = ParagraphStyle('Cellule', fontName='Helvetica', fontSize=6, leading=7)
+style_entete_col = ParagraphStyle('EnteteColonne', fontName='Helvetica-Bold', fontSize=7, leading=8, textColor=colors.white)
+style_totaux = ParagraphStyle('Totaux', fontName='Helvetica-Bold', fontSize=8, textColor=colors.white, alignment=1)
+
 
 
 # Create your views here.
 # GESTION DES INSCRIPTIONS DES ELEVES
-
+@action_requise('eleve_inscrire')
 def enregistrereleve(request):
     mateleve = ''
     nom_eleve = ''
     pren_eleve = ''
     
     if request.method == 'POST':
-        formeleve = FormEleve(request.POST)
 
+        # 1ère Partie du formulaire (Tabpage 1) : Validation des données personnelles de l'élève
+        formeleve = FormEleve(request.POST)
         if formeleve.is_valid():
             # Ici j'enregistre les informations personnelles de l'élève à inscrire
             ansco = datetime.now().strftime('%Y')  # Je recupère uniquement l'année de la date courante
@@ -97,33 +116,112 @@ def enregistrereleve(request):
             eleve.pere = request.POST['pere']
             eleve.mere = request.POST['mere']
             eleve.tuteur = request.POST['tuteur']
-            eleve.contact_parent = request.POST['contact_parent']
+            eleve.contact_pere = request.POST['contact_pere']
+            eleve.contact_mere = request.POST['contact_mere']
+            eleve.email_pere = request.POST['email_pere']
+            eleve.email_mere = request.POST['email_mere']
+            eleve.profes_pere = request.POST['profes_pere']
+            eleve.profes_mere = request.POST['profes_mere']
+            eleve.personne_contact = request.POST['personne_contact']
             eleve.adresse = request.POST['adresse']
             eleve.ecole_origine = request.POST['ecole_origine']
             
-            try:
-                eleve.photo_eleve = request.FILES.get('photo_eleve')
-            except MultiValueDictKeyError:
-                pass
+            #try:
+            if request.FILES.get('photo_eleve'):
+                    eleve.photo_eleve = request.FILES.get('photo_eleve')
+            #except MultiValueDictKeyError:
+            #    pass
 
             eleve.datenaissance = request.POST['datenaissance']
             eleve.lieu_naissance = request.POST['lieu_naissance']
             eleve.date_arrivee = request.POST['date_arrivee']
-            eleve.pays_naissance = request.POST['pays_naissance']
-            eleve.email_parent = request.POST['email_parent']
-            
+            eleve.pays_naissance = request.POST['pays_naissance']  
             eleve.save()  # Permet de valider l'enregistrement des informations de l'élève
 
-            messages.success(request, 'Informations élève validées avec succès')
-            return redirect('inscriptioneleve', mat=mateleve)
+            # messages.success(request, 'Informations élève validées avec succès')
+            #return redirect('inscriptioneleve', mat=mateleve)
+
+        # 2ème Partie (Tabpage 2) : Validation de l'inscription de l'élève
+        forminscrip = FormInscription(request.POST)
+        if forminscrip.is_valid():
+                ansco = request.POST.get('annee_scolaire')  # Je recupère ici l'ID de l'année scolaire selectionnée
+                idclas = request.POST.get('idclasse')  # Ici l'ID de la Classe selectionnée
+                idcy = request.POST.get('idcycle')  # Ici l'ID du cycle selectionné
+                
+
+                # Je fais ensuite des requêtes sur les quatre tables en vue de recuperer les identifiants à inserer dans
+                # la table inscription
+                an = AnneeScolaire.objects.get(id=ansco)
+                cl = Classe.objects.get(id=idclas)
+                cy = CycleScolaire.objects.get(id=idcy)
+                el = Eleve.objects.get(matricule=mateleve)
+
+                # Je valide enfin l'inscription de l'elève enregistré
+                inscrip = Inscription(annee_scolaire=an, mateleve=el, idclasse=cl, idcycle=cy)
+                inscrip.save()
+
+                # Ici je vais recuperer les frais d'inscription de la classe selectionnée
+                frais = cl.frais_inscription
+                # Et la je vais actualiser le dernier solde caisse en appellant la fonction affichersoldecaisse
+                soldecaisse = affichersoldecaisse()
+                # Je vais enregistrer ensuite l'opération dans la table caisse
+                cais = Caisse()
+                cais.type_operation = TYPE_OPERATION_CAISSE_CHOICES[1][1]
+                cais.libelle_operation = 'Paiement des frais inscription de l\'élève:  {},  {} , {} '.format(
+                    el.matricule, el.nom, el.prenom)
+                cais.montant_encaisse = Decimal(frais)
+                cais.anscolaire = an
+                cais.categ_depense = CATEGORIE_RECETTE_CHOICES[1][1]
+                cais.solde_actuel = Decimal(soldecaisse) + Decimal(frais)
+                cais.date_operation = date.today() # Recupère la date du système en YYYY-MM-dd
+                cais.save()
+
+                # Ici je vais enregistrer les frais d'inscription de l'élève dans son etat de paiement de la scolarité
+                etatscol = EtatPaiementTranche()
+                etatscol.anneescolaire = an
+                etatscol.idcycle = cy
+                etatscol.idclasse = cl
+                etatscol.mateleve = el
+                etatscol.inscription = Decimal(frais)
+                etatscol.date_paie = date.today()
+                etatscol.save()
+
+                # Ici je vais enregistrer l'evenement dans la table Historique
+                his = Historique()
+                his.nature_operation = 'Inscription'
+                his.detail_operation = 'Inscription de l\'élève de matricule : {}, {}, {}'.format(
+                    el.matricule, el.nom, el.prenom)
+                his.user_login = 'contact@universtechgroup.com'
+                his.poste_travail = ''
+                his.save()
+
+                messages.success(request, 'Inscription validée avec succès')
+
+                # Je vide les champs après validation
+
+                formeleve = FormEleve()
+                forminscrit = FormInscription()
+
+                # Ici je vais recuperer le dernier ID validé de l'Inscription
+                idi = Inscription.objects.latest(
+                'id')  # Cette instruction permet de recuperer le dernier record suivant l'id
+                lastid = idi.id  # Permet de recuperer l'ID de ce dernier record
+                return HttpResponseRedirect(reverse('recuinscription',
+                                                args=(
+                                                    lastid,)))  # Je redirige l'utilisateur vers l'impression du recu d'inscription (PDF)
+           
 
     else:
+        # Ici je renvoie dans le template les deux formulaires de saisie qui étaient jusque là separés au demarrage de celui-ci.
+        # La raison est simple: Utiliser un tabpage pour gérer la saisie des données personnelles de l'élève et la validation de l'inscription
         formeleve = FormEleve()
-    return render(request, 'gEleve/inscription_eleve.html', dict(form=formeleve))
+        forminscrit = FormInscription()
+    return render(request, 'gEleve/inscription_eleve.html', dict(form=formeleve,form_inscrit=forminscrit))
 
 
 # La fonction chargerlisteclasse m'a permis de gerer l'affichage des classes selon le cycle selectionné lors de
-# l'inscription associé au JQuery en Front-end
+# l'instruction associé au JQuery en Front-end
+@login_required
 def chargerlisteclasse(request):
     cy = request.GET.get('idcycle')
     clas = Classe.objects.filter(idcycle=cy).all()
@@ -131,93 +229,32 @@ def chargerlisteclasse(request):
     return render(request, 'gEleve/charger_liste_classe_cycle.html', context)
 
 
-def validerinscription(request, mat):
-    if request.method == 'POST':
-        forminscrip = FormInscription(request.POST)
-        if forminscrip.is_valid():
-            ansco = request.POST.get('annee_scolaire')  # Je recupère ici l'ID de l'année scolaire selectionnée
-            idclas = request.POST.get('idclasse')  # Ici l'ID de la Classe selectionnée
-            idcy = request.POST.get('idcycle')  # Ici l'ID du cycle selectionné
-            
-
-            # Je fais ensuite des requêtes sur les quatre tables en vue de recuperer les identifiants à inserer dans
-            # la table inscription
-            an = AnneeScolaire.objects.get(id=ansco)
-            cl = Classe.objects.get(id=idclas)
-            cy = CycleScolaire.objects.get(id=idcy)
-            el = Eleve.objects.get(matricule=mat)
-
-            # Je valide enfin l'inscription de l'elève enregistré
-            inscrip = Inscription(annee_scolaire=an, mateleve=el, idclasse=cl, idcycle=cy)
-            inscrip.save()
-
-            # Ici je vais recuperer les frais d'inscription de la classe selectionnée
-            frais = cl.frais_inscription
-            # Et la je vais actualiser le dernier solde caisse en appellant la fonction affichersoldecaisse
-            soldecaisse = affichersoldecaisse()
-            # Je vais enregistrer ensuite l'opération dans la table caisse
-            cais = Caisse()
-            cais.type_operation = TYPE_OPERATION_CAISSE_CHOICES[1][1]
-            cais.libelle_operation = 'Paiement des frais inscription de l\'élève:  {},  {} , {} '.format(
-                el.matricule, el.nom, el.prenom)
-            cais.montant_encaisse = Decimal(frais)
-            cais.anscolaire = an
-            cais.categ_depense = CATEGORIE_RECETTE_CHOICES[1][1]
-            cais.solde_actuel = Decimal(soldecaisse) + Decimal(frais)
-            cais.save()
-            # Ici je vais enregistrer les frais d'inscription de l'élève dans son etat de paiement de la scolarité
-            etatscol = EtatPaiementScolarite()
-            etatscol.anneescolaire = an
-            etatscol.idclasse = cl
-            etatscol.mateleve = el
-            etatscol.inscription = Decimal(frais)
-            etatscol.save()
-            # Ici je vais enregistrer l'evenement dans la table Historique
-            his = Historique()
-            his.nature_operation = 'Inscription'
-            his.detail_operation = 'Inscription de l\'élève de matricule : {}, {}, {}'.format(
-                el.matricule, el.nom, el.prenom)
-            his.user_login = 'contact@universtechg'
-            his.save()
-
-            messages.success(request, 'Inscription validée avec succès')
-
-            # Ici je vais recuperer le dernier ID validé de l'Inscription
-            idi = Inscription.objects.latest(
-                'id')  # Cette instruction permet de recuperer le dernier record suivant l'id
-            lastid = idi.id  # Permet de recuperer l'ID de ce dernier record
-            return HttpResponseRedirect(reverse('recuinscription',
-                                                args=(
-                                                    lastid,)))  # Je redirige l'utilisateur vers l'impression du recu d'inscription (PDF)
-    else:
-        forminscrip = FormInscription()
-    return render(request, 'gEleve/terminer_inscription.html', dict(form=forminscrip, mateleve=mat))
-
-
 # Permet d'afficher la liste générale des élèves (registre de matriculation)
+@login_required
 def registrematricule(request):
+    
     liste = Inscription.objects.select_related('annee_scolaire', 'mateleve', 'idcycle', 'idclasse').all().order_by(
         'idcycle')
     ansc = AnneeScolaire.objects.all().order_by('descript_annee')
     cycles = CycleScolaire.objects.all().order_by('id')
     # Ici je calcule les effectifs totaux des eleves inscrits
     effectif_total = liste.count()
-    effectif_total_garcons = liste.filter(mateleve__sexe_eleve='Masculin').count()
-    effectif_total_filles = liste.filter(mateleve__sexe_eleve='Feminin').count()
+    effectif_total_garcons = liste.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[1][0]).count()
+    effectif_total_filles = liste.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[2][0]).count()
 
     pagineinscrit = Paginator(liste, 10)
     numpageinscrit = request.GET.get('page')
     liste = pagineinscrit.get_page(numpageinscrit)
     return render(request, 'gEleve/liste_generale_eleves.html',
-                  dict(listeinscrits=liste, ansc=ansc, cycles=cycles, effectif_total=effectif_total,
+                  dict(listegenerale=liste, ansc=ansc, cycles=cycles, effectif_total=effectif_total,
                        effectif_total_garcons=effectif_total_garcons, effectif_total_filles=effectif_total_filles))
 
-
+@action_requise('eleve_modifier')
 def detailsinscription(request, pkins):
     ins = Inscription.objects.select_related('annee_scolaire', 'mateleve', 'idcycle', 'idclasse').get(id=pkins)
     return render(request, 'gEleve/afficher_details_inscription.html', dict(ins=ins))
 
-
+@action_requise('eleve_modifier')
 def editerinscription(request, pk):
     ins = Inscription.objects.select_related('annee_scolaire', 'mateleve', 'idcycle', 'idclasse').get(id=pk)
     ans = AnneeScolaire.objects.all().order_by('id')
@@ -226,12 +263,31 @@ def editerinscription(request, pk):
 
     return render(request, 'gEleve/modifier_inscription.html', dict(ins=ins, annee=ans, cycle=cy, clas=cl))
 
-
+@action_requise('eleve_modifier')
 def modifierinscription(request, idins, mat):
     if request.method == 'POST':
         inscri = Inscription.objects.get(id=idins)
         inscri.date_inscription = request.POST.get('date_inscription')
+
+        
+        ansco = request.POST.get('ansco')  # Je recupère ici l'ID de l'année scolaire selectionnée
+        idclas = request.POST.get('classe')  # Ici l'ID de la Classe selectionnée
+        idcy = request.POST.get('cycle')  # Ici l'ID du cycle selectionné
+                
+        # Je fais ensuite des requêtes sur les quatre tables en vue de recuperer les identifiants à inserer dans
+        # la table inscription
+        an = AnneeScolaire.objects.get(id=ansco)
+        cl = Classe.objects.get(id=idclas)
+        cy = CycleScolaire.objects.get(id=idcy)
+
+        # J'enregistre maintenant ces ID dans la table Inscription
+        inscri.annee_scolaire = an
+        inscri.idclasse = cl
+        inscri.idcycle = cy
         inscri.save()
+
+        dnais = request.POST.get('datenaiss')
+        dentree = request.POST.get('date_entree')
 
         el = Eleve.objects.get(matricule=mat)
         el.nom = request.POST.get('nom')
@@ -240,45 +296,55 @@ def modifierinscription(request, idins, mat):
         el.pere = request.POST.get('pere')
         el.mere = request.POST.get('mere')
         el.tuteur = request.POST.get('tuteur')
-        el.contact_parent = request.POST.get('contact')
-        el.email_parent = request.POST.get('email_tuteur')
+        el.contact_pere = request.POST.get('contact_pere')
+        el.contact_mere = request.POST.get('contact_mere')
+        el.email_pere = request.POST.get('email_pere')
+        el.email_mere = request.POST.get('email_mere')
+        el.profes_pere = request.POST.get('profes_pere')
+        el.profes_mere = request.POST.get('profes_mere')
+        el.personne_contact = request.POST.get('personne_contact')
         el.adresse = request.POST.get('adresse')
         el.ecole_origine = request.POST.get('ecole_origine')
-        el.datenaissance = request.POST.get('datenaiss')
+        el.datenaissance = datetime.strptime(dnais,'%Y-%m-%d')
         el.lieu_naissance = request.POST.get('lieunais')
-        el.date_arrivee = request.POST.get('date_entree')
+        el.date_arrivee = datetime.strptime(dentree,'%Y-%m-%d')
         el.pays_naissance = request.POST.get('pays_naiss')
-        if request.FILES.get('photoel') != '':
+
+        if request.FILES.get('photoel'):
             el.photo_eleve = request.FILES.get('photoel')
-        else:
-            el.photo_eleve = request.FILES.get('photo_eleve')
+ 
         el.save()
-        return redirect('../registrematricule/')
+        return redirect('chargeranneecourante')
     else:
-        return redirect('../registrematricule/')
+        return redirect('chargeranneecourante')
 
-
+@action_requise('eleve_supprimer')
 def supprimerinscription(request, pkins):
     insc = Inscription.objects.get(id=pkins)
     insc.delete()
     messages.success(request, 'Inscription supprimée avec succès')
-    return redirect('../registrematricule/')
+    return redirect('../chargeranneecourante/')
 
 
 # Fonctions me permettant de filtrer la liste des inscrits par matricule, par classe, par nom de famille
+@login_required
 def filtrelistegenerale(request):
-    listeins = []
-    listeinsclasse = []
-    listeinsnp = []
-    effectif_total = []
-    effectif_total_garcons = []
-    effectif_total_filles = []
+    listeins = {}
+    listeinsclasse = {}
+    listeinsnp = {}
+    effectif_total = 0
+    effectif_total_garcons = 0
+    effectif_total_filles = 0
 
     mat = request.GET.get('matricule')
     idclass = request.GET.get('classe')
     idcy = request.GET.get('cycle')
     idansc = request.GET.get('annee_scolaire')
     np = request.GET.get('nomeleve')
+
+    listeins = Inscription.objects.none()
+    listeinsclasse = Inscription.objects.none()
+    listeinsnp = Inscription.objects.none()
 
     if mat != '' and mat is not None:
 
@@ -287,8 +353,8 @@ def filtrelistegenerale(request):
 
         # Ici je calcule les effectifs totaux des eleves inscrits
         effectif_total = listeins.count()
-        effectif_total_garcons = listeins.filter(mateleve__sexe_eleve='Masculin').count()
-        effectif_total_filles = listeins.filter(mateleve__sexe_eleve='Feminin').count()
+        effectif_total_garcons = listeins.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[1][0]).count()
+        effectif_total_filles = listeins.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[2][0]).count()
 
         pagineinscrit = Paginator(listeins, 10)
         numpageinscrit = request.GET.get('page')
@@ -301,8 +367,8 @@ def filtrelistegenerale(request):
             Q(idclasse__exact=idclass), Q(idcycle__exact=idcy), Q(annee_scolaire__exact=idansc))
 
         effectif_total = listeinsclasse.count()
-        effectif_total_garcons = listeinsclasse.filter(mateleve__sexe_eleve='Masculin').count()
-        effectif_total_filles = listeinsclasse.filter(mateleve__sexe_eleve='Feminin').count()
+        effectif_total_garcons = listeinsclasse.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[1][0]).count()
+        effectif_total_filles = listeinsclasse.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[2][0]).count()
 
         pagineinscrit = Paginator(listeinsclasse, 10)
         numpageinscrit = request.GET.get('page')
@@ -313,8 +379,8 @@ def filtrelistegenerale(request):
             Q(mateleve__nom__icontains=np) | Q(mateleve__prenom__icontains=np))
 
         effectif_total = listeinsnp.count()
-        effectif_total_garcons = listeinsnp.filter(mateleve__sexe_eleve='Masculin').count()
-        effectif_total_filles = listeinsnp.filter(mateleve__sexe_eleve='Feminin').count()
+        effectif_total_garcons = listeinsnp.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[1][0]).count()
+        effectif_total_filles = listeinsnp.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[2][0]).count()
 
         pagineinscrit = Paginator(listeinsnp, 10)
         numpageinscrit = request.GET.get('page')
@@ -327,267 +393,228 @@ def filtrelistegenerale(request):
 
 
 # Gestion de l'impression des recus d'inscription à la scolarité
+@login_required
 def recuinscription(request, idinsc):
     # Et là je tente de recuperer les données d'identification de l'école
     ec = Ecole.objects.count()
-    if ec==0:
-        messages.error(request,'Veuillez saisir les informations de l\'école')
+    if ec == 0:
+        messages.error(request, 'Veuillez saisir les informations de l\'école')
     else:
         ecole = Ecole.objects.get(id=1)
         if ecole.logo_ecole:
-            data_ecole = [ecole.nom_ecole, ecole.ville_ecole, ecole.prefect_commune, ecole.telephone1, ecole.telephone2,
-                          ecole.logo_ecole.path, ecole.devise_ecole, ecole.dsee, ecole.comptable]
+            data_ecole = [ecole.nom_ecole, ecole.ville_ecole, ecole.prefect_commune,
+                          ecole.telephone1, ecole.telephone2, ecole.logo_ecole.path,
+                          ecole.devise_ecole, ecole.dsee, ecole.comptable]
         else:
-            data_ecole = [ecole.nom_ecole, ecole.ville_ecole, ecole.prefect_commune, ecole.telephone1, ecole.telephone2,
-                          'Logo', ecole.devise_ecole, ecole.dsee, ecole.comptable]
+            data_ecole = [ecole.nom_ecole, ecole.ville_ecole, ecole.prefect_commune,
+                          ecole.telephone1, ecole.telephone2, 'Logo',
+                          ecole.devise_ecole, ecole.dsee, ecole.comptable]
 
-        # Ici je tente de recuperer les données sur l'inscription depuis la BD
+        ins  = Inscription.objects.select_related('annee_scolaire', 'mateleve', 'idcycle', 'idclasse').get(id=idinsc)
 
-        ins = Inscription.objects.select_related('annee_scolaire', 'mateleve', 'idcycle', 'idclasse').get(id=idinsc)
-        data = [ins.id, ins.annee_scolaire.descript_annee, ins.mateleve.matricule, ins.idclasse, ins.mateleve.nom,
-                ins.mateleve.prenom,
-                ins.mateleve.tuteur, ins.mateleve.contact_parent,ins.mateleve.email_parent, ins.date_inscription, ins.idclasse.frais_inscription
-                ]
+        data = [ins.id, ins.annee_scolaire.descript_annee,
+                ins.mateleve.matricule, ins.idclasse,
+                ins.mateleve.nom, ins.mateleve.prenom,
+                ins.mateleve.tuteur, ins.mateleve.contact_pere,
+                ins.mateleve.email_pere, ins.date_inscription,
+                ins.idclasse.frais_inscription]
 
-        ch = str(data[1])  # Je recupère le nom de l'année scolaire i.e 2023-2024 par exemple
-        ch = ch.split('-')  # Je découpe la chaine obtenue en deux sous chaines tenant compte du séparateur (-)
-        ane = ch[1]  # Je recupère la deuxième sous chaine i.e 2024 par exemple
+        ch  = str(data[1]).split('-')
+        ane = ch[1]
 
-        # Create a file-like buffer to receive PDF data.
-        buffer = io.BytesIO()
-
-        # Create the PDF object, using the buffer as its "file."
-        p = canvas.Canvas(buffer)
-        p.setTitle('Reçu Inscription Scolarité')  # Permet de définir le Titre du Document
-
-        # Draw things on the PDF. Here's where the PDF generation happens.
-        # See the ReportLab documentation for the full list of functionality.
-        # Ecriture des textes de l'entête superieur gauche
-        p.setFont('Helvetica-Bold',10)
-        p.drawString(20, 815, 'MEPU-A')
-        p.drawString(20, 798, 'IRE : ')
-        p.setFont('Helvetica',10)
-        p.drawString(55, 798, str(data_ecole[1]))
-        p.setFont('Helvetica-Bold',10)
-        p.drawString(20, 785, 'DCE : ')
-        p.setFont('Helvetica',10)
-        p.drawString(55, 785, str(data_ecole[2]))
-        p.setFont('Helvetica-Bold',10)
-        p.drawString(20, 770, 'DSEE : ')
-        p.setFont('Helvetica',10)
-        p.drawString(55, 770, str(data_ecole[7]))
-        p.setFont('Helvetica-Bold',10)
-        p.drawString(20, 755, 'TEL : ')
-        p.setFont('Helvetica',10)
-        p.drawString(55, 755, str(data_ecole[3]) + ' / ' + str(data_ecole[4]))
-
-        
-        # Affichage du logo de l'ecole
-        try:
-            logo = Image.open(data_ecole[5]) # Ici je tente d'ouvrir l'image stockee dans la BD en utilisant son path (voir dans la liste data_ecole[])
-            logo.thumbnail((60,60)) # Redimensionne l'image en format miniature avec comme taille (width=100,height=100), permet de gerer les ratios de l'image
-            if logo.mode in ('RGBA','P'): # Permet de verifier le type de couleur utilise dans l'image (RGBA == Red Green Blue + Alpha (transparent) pour PNG)
-                logo = logo.convert('RGB') # Transforme la couleur en format RGB standard
-            
-            # Je cree ici un buffer (fichier temporaire) pour stocker l'image recuperee
-            logo_buffer = io.BytesIO()
-            logo.save(logo_buffer,format='JPEG') # Sauvegarde l'image au format JPEG
-            logo_buffer.seek(0)
-            
-            # Ici je dessine l'image stockee dans le fichier temporaire a l'interieur du PDF
-            p.drawImage(ImageReader(logo_buffer), 245, 770, 60, 60)
-            
-        except FileNotFoundError:
-            p.drawString(data_ecole[5],245, 770)
-        except OSError:
-            p.drawString(data_ecole[5],245, 770)
-
-        # Affichage du drapeau de la République
-        p.setFillColor("Red")  # Définit la couleur de remplissage du 1er rectangle à Rouge
-        p.rect(449, 815, 30, 10, stroke=False,
-               fill=True)  # fill = True permet de définir la couleur de remplissage du 1er rectangle
-        p.setFillColor("yellow")
-        p.rect(479, 815, 30, 10, stroke=False, fill=True)
-        p.setFillColor("green")
-        p.rect(509, 815, 30, 10, stroke=False, fill=True)
-
-        p.setFillColor("black")  # Définit la couleur de police (black) pour le reste du document
-        # Ecriture des textes de l'entête supérieur droit
-        p.setFont('Helvetica-Bold',10)
-        p.drawString(450, 798, 'République de Guinée')
-
-        # p.setFontSize(9)
-        p.setFont('Helvetica-Oblique', 9)
-        p.drawString(450, 780, 'Travail-Justice-Solidarité')
-
-        p.setFont('Helvetica-Bold', 11)
-        p.drawString(225, 740, str(data_ecole[0]))  # Nom de l'école
-
-        p.setFont('Helvetica-Oblique', 9)
-        p.drawString(225, 720, str(data_ecole[6]))  # Devise de l'école
-
-        # Tracé de ligne séparatrice entre l'entête et le reste du document
-        p.line(140, 710, 440, 710)
-
-        p.setFont('Helvetica-Bold', 11)
-        # Ecriture de la deuxième partie de l'entête
-        p.drawString(150, 695, 'Année Scolaire :')
-        p.setFont('Helvetica',11)
-        p.drawString(245, 695, str(data[1]))
-        p.setFont('Helvetica-Bold',11)
-        p.drawString(330, 695, 'Session : ')
-        p.setFont('Helvetica',11)
-        p.drawString(385, 695, str(ane))
-        p.setFont('Helvetica-Bold',11)
-        p.drawString(180, 673, 'RECU INSCRIPTION N° : ')
-        p.setFont('Helvetica',11)
-
-        numrecu = data[0]  # Ici je recupère le numéro de l'inscription
-        ansco = datetime.now().strftime('%y')  # Je recupère uniquement l'année de la date courante
-        numero_recu = ''
-
+        # Numéro de reçu formaté
+        numrecu = data[0]
+        ansco   = datetime.now().strftime('%y')
         if numrecu < 10:
-            numero_recu = ansco + '00' + str(numrecu)
+            numero_recu = ansco + '000' + str(numrecu)
         elif numrecu < 100:
-            numero_recu = ansco + '0' + str(numrecu)
+            numero_recu = ansco + '00' + str(numrecu)
         elif numrecu < 1000:
             numero_recu = ansco + '0' + str(numrecu)
-        elif numrecu < 10000:
-            numero_recu = ansco + '0' + str(numrecu)
+        else:
+            numero_recu = ansco + str(numrecu)
 
-        p.drawString(330, 673, str(numero_recu))
+        buffer = io.BytesIO()
+        p = canvas.Canvas(buffer)
+        p.setTitle('Reçu Inscription Scolarité')
 
-        # Ecriture des informations de l'élève
-        p.setFont('Helvetica-Bold',11)
-        p.drawString(120, 645, 'Matricule : ')
-        p.setFont('Helvetica',11)
-        p.drawString(185, 645, str(data[2]))
-        p.setFont('Helvetica-Bold',11)
-        p.drawString(120, 629, 'Nom : ')
-        p.setFont('Helvetica',11)
-        p.drawString(185, 629, str(data[4]))
-        p.setFont('Helvetica-Bold',11)
-        p.drawString(120, 610, 'Prénoms : ')
-        p.setFont('Helvetica',11)
-        p.drawString(185, 610, str(data[5]))
-        p.setFont('Helvetica-Bold',11)
-        p.drawString(120, 590, 'Date inscription : ')
-        p.setFont('Helvetica',11)
-        p.drawString(216, 590, str(data[9]))
-        p.setFont('Helvetica-Bold',11)
-        p.drawString(120, 570, 'Frais inscription : ')
-        p.setFont('Helvetica',11)
-        p.drawString(216, 570, str(data[10]))
-        p.setFont('Helvetica-Bold',11)
-        p.drawString(120, 550, 'Classe : ')
-        p.setFont('Helvetica',11)
-        p.drawString(216, 550, str(data[3]))
-        # Informations placées à droite dans la rubrique des informations de l'élève
-        p.setFont('Helvetica-Bold',11)
-        p.drawString(315, 629, 'Tuteur : ')
-        p.setFont('Helvetica',11)
-        p.drawString(365, 629, str(data[6]))
-        p.setFont('Helvetica-Bold',11)
-        p.drawString(315, 610, 'Contact : ')
-        p.setFont('Helvetica',11)
-        p.drawString(365, 610, str(data[7]))
-        
-        # Ecriture des informations du bas de la page, Date d'impression, signature du DG et de la partie reservée au
-        # parent d'élève
-        p.setFont('Helvetica-Bold',11)
-        p.drawString(375, 500, 'Conakry, le ')
-        p.drawString(440, 500, datetime.now().strftime('%d/%m/%Y'))
-        p.drawString(120, 460, 'Le Parent')
-        p.drawString(375, 460, 'La Comptabilité')
-        p.drawString(375, 395, str(data_ecole[8]))
+        def draw_entete(y_offset):
+            """Dessine l entete complete avec logo et drapeau"""
 
-        # J'insere ici une ligne séparatrice pour diviser le reçu en deux (2) copies
-        p.line(20, 370, 580, 370)
+            # ── ENTETE GAUCHE ──
+            p.setFillColor(colors.black)
+            p.setFont('Helvetica-Bold', 10)
+            p.drawString(20, 815 + y_offset, 'MEPU-A')
+            p.drawString(20, 800 + y_offset, 'IRE : ')
+            p.setFont('Helvetica', 10)
+            p.drawString(55, 800 + y_offset, str(data_ecole[1]))
+            p.setFont('Helvetica-Bold', 10)
+            p.drawString(20, 787 + y_offset, 'DCE : ')
+            p.setFont('Helvetica', 10)
+            p.drawString(55, 787 + y_offset, str(data_ecole[2]))
+            p.setFont('Helvetica-Bold', 10)
+            p.drawString(20, 772 + y_offset, 'DSEE : ')
+            p.setFont('Helvetica', 10)
+            p.drawString(55, 772 + y_offset, str(data_ecole[7]))
+            p.setFont('Helvetica-Bold', 10)
+            p.drawString(20, 757 + y_offset, 'TEL : ')
+            p.setFont('Helvetica', 10)
+            p.drawString(55, 757 + y_offset, str(data_ecole[3]) + ' / ' + str(data_ecole[4]))
 
-        # Ici commence la deuxième partie du reçu d'inscription
+            # ── LOGO ──
+            try:
+                logo = Image.open(data_ecole[5])
+                logo = logo.resize((90, 60), Image.LANCZOS)
+                if logo.mode in ('RGBA', 'P'):
+                    logo = logo.convert('RGB')
+                elif logo.mode != 'RGB':
+                    logo = logo.convert('RGB')
+                logo_buffer = io.BytesIO()
+                logo.save(logo_buffer, format='PNG')
+                logo_buffer.seek(0)
+                p.drawImage(ImageReader(logo_buffer), 245, 770 + y_offset, 90, 60)
+            except (FileNotFoundError, OSError):
+                p.drawString(data_ecole[5],245, 770 + y_offset)
 
-        p.setFont('Helvetica-Bold', 11)
-        # Ecriture de la deuxième partie de l'entête
-        p.drawString(150, 345, 'Année Scolaire :')
-        p.setFont('Helvetica',11)
-        p.drawString(245, 345, str(data[1]))
-        p.setFont('Helvetica-Bold',11)
-        p.drawString(330, 345, 'Session : ')
-        p.setFont('Helvetica',11)
-        p.drawString(385, 345, str(ane))
-        p.setFont('Helvetica-Bold',11)
-        p.drawString(180, 323, 'RECU INSCRIPTION N° : ')
-        p.setFont('Helvetica',11)
-        p.drawString(330, 323, str(numero_recu))
+            # ── DRAPEAU ──
+            p.setFillColor('Red')
+            p.rect(449, 815 + y_offset, 30, 10, stroke=False, fill=True)
+            p.setFillColor('yellow')
+            p.rect(479, 815 + y_offset, 30, 10, stroke=False, fill=True)
+            p.setFillColor('green')
+            p.rect(509, 815 + y_offset, 30, 10, stroke=False, fill=True)
+            p.setFillColor(colors.black)
 
-        # Ecriture des informations de l'élève
-        p.setFont('Helvetica-Bold',11)
-        p.drawString(120, 295, 'Matricule : ')
-        p.setFont('Helvetica',11)
-        p.drawString(185, 295, str(data[2]))
-        p.setFont('Helvetica-Bold',11)
-        p.drawString(120, 279, 'Nom : ')
-        p.setFont('Helvetica',11)
-        p.drawString(185, 279, str(data[4]))
-        p.setFont('Helvetica-Bold',11)
-        p.drawString(120, 260, 'Prénoms : ')
-        p.setFont('Helvetica',11)
-        p.drawString(185, 260, str(data[5]))
-        p.setFont('Helvetica-Bold',11)
-        p.drawString(120, 240, 'Date inscription : ')
-        p.setFont('Helvetica',11)
-        p.drawString(216, 240, str(data[9]))
-        p.setFont('Helvetica-Bold',11)
-        p.drawString(120, 220, 'Frais inscription : ')
-        p.setFont('Helvetica',11)
-        p.drawString(216, 220, str(data[10]))
-        p.setFont('Helvetica-Bold',11)
-        p.drawString(120, 200, 'Classe : ')
-        p.setFont('Helvetica',11)
-        p.drawString(216, 200, str(data[3]))
-        # Informations placées à droite dans la rubrique des informations de l'élève
-        p.setFont('Helvetica-Bold',11)
-        p.drawString(315, 279, 'Tuteur : ')
-        p.setFont('Helvetica',11)
-        p.drawString(365, 279, str(data[6]))
-        p.setFont('Helvetica-Bold',11)
-        p.drawString(315, 260, 'Contact : ')
-        p.setFont('Helvetica',11)
-        p.drawString(365, 260, str(data[7]))
-        
-        # Ecriture des informations du bas de la page, Date d'impression, signature du DG et de la partie reservée au
-        # parent d'élève
-        p.setFont('Helvetica-Bold',11)
-        p.drawString(375, 150, 'Conakry, le ')
-        p.drawString(440, 150, datetime.now().strftime('%d/%m/%Y'))
-        p.drawString(120, 110, 'Le Parent')
-        p.drawString(375, 110, 'La Comptabilité')
-        p.drawString(375, 45, str(data_ecole[8]))
+            # ── ENTETE DROITE ──
+            p.setFont('Helvetica-Bold', 10)
+            p.drawString(450, 800 + y_offset, 'République de Guinée')
+            p.setFont('Helvetica-Oblique', 9)
+            p.drawString(450, 785 + y_offset, 'Travail-Justice-Solidarité')
 
-        # Close the PDF object cleanly, and we're done.
+            # ── NOM ET DEVISE ECOLE ──
+            p.setFont('Helvetica-Bold', 11)
+            p.drawString(200, 740 + y_offset, str(data_ecole[0]))
+            p.setFont('Helvetica-Oblique', 9)
+            p.drawString(220, 725 + y_offset, str(data_ecole[6]))
+
+            # ── LIGNE SEPARATRICE ──
+            p.line(140, 715 + y_offset, 440, 715 + y_offset)
+
+        def draw_recu(y_offset):
+            """Dessine un exemplaire complet du reçu"""
+
+            draw_entete(y_offset)
+
+            # ── ANNEE SCOLAIRE ET SESSION ──
+            p.setFont('Helvetica-Bold', 11)
+            p.drawString(150, 700 + y_offset, 'Année Scolaire :')
+            p.setFont('Helvetica', 11)
+            p.drawString(255, 700 + y_offset, str(data[1]))
+            p.setFont('Helvetica-Bold', 11)
+            p.drawString(350, 700 + y_offset, 'Session :')
+            p.setFont('Helvetica', 11)
+            p.drawString(400, 700 + y_offset, str(ane))
+
+            # ── TITRE RECU ──
+            p.setFont('Helvetica-Bold', 12)
+            p.rect(150, 675 + y_offset, 280, 18, stroke=True, fill=False)
+            p.drawString(165, 679 + y_offset, f'RECU INSCRIPTION N° : {numero_recu}')
+
+            # ── INFOS ELEVE GAUCHE ──
+            p.setFont('Helvetica-Bold', 11)
+            p.drawString(120, 650 + y_offset, 'Matricule :')
+            p.setFont('Helvetica', 11)
+            p.drawString(195, 650 + y_offset, str(data[2]))
+
+            p.setFont('Helvetica-Bold', 11)
+            p.drawString(120, 634 + y_offset, 'Nom :')
+            p.setFont('Helvetica', 11)
+            p.drawString(195, 634 + y_offset, str(data[4]))
+
+            p.setFont('Helvetica-Bold', 11)
+            p.drawString(120, 618 + y_offset, 'Prénoms :')
+            p.setFont('Helvetica', 11)
+            p.drawString(195, 618 + y_offset, str(data[5]))
+
+            p.setFont('Helvetica-Bold', 11)
+            p.drawString(120, 600 + y_offset, 'Date inscription :')
+            p.setFont('Helvetica', 11)
+            p.drawString(220, 600 + y_offset, str(data[9]))
+
+            p.setFont('Helvetica-Bold', 11)
+            p.drawString(120, 582 + y_offset, 'Frais inscription :')
+            p.setFont('Helvetica', 11)
+            p.drawString(220, 582 + y_offset, '{:,} GNF'.format(data[10]))
+
+            p.setFont('Helvetica-Bold', 11)
+            p.drawString(120, 564 + y_offset, 'Classe :')
+            p.setFont('Helvetica', 11)
+            p.drawString(195, 564 + y_offset, str(data[3]))
+
+            # ── INFOS ELEVE DROITE ──
+            p.setFont('Helvetica-Bold', 11)
+            p.drawString(340, 634 + y_offset, 'Tuteur :')
+            p.setFont('Helvetica', 11)
+            p.drawString(390, 634 + y_offset, str(data[6]))
+
+            p.setFont('Helvetica-Bold', 11)
+            p.drawString(340, 618 + y_offset, 'Contact :')
+            p.setFont('Helvetica', 11)
+            p.drawString(395, 618 + y_offset, str(data[7]))
+            p.setFont('Helvetica-Bold', 11)
+            p.drawString(340, 600 + y_offset, 'Email :')
+            p.setFont('Helvetica', 11)
+            p.drawString(395, 600 + y_offset, str(data[8]))
+
+            # ── DATE ET SIGNATURE ──
+            p.setFont('Helvetica-Bold', 11)
+            p.drawString(375, 510 + y_offset, 'Conakry, le ')
+            p.drawString(450, 510 + y_offset,
+                datetime.now().strftime('%d/%m/%Y'))
+            p.drawString(120, 475 + y_offset, 'Le Parent')
+            p.drawString(375, 475 + y_offset, 'Le Service Scolarité')
+            p.drawString(375, 435 + y_offset, str(data_ecole[8]))
+
+        # ── PREMIER EXEMPLAIRE ──
+        draw_recu(0)
+
+        # ── LIGNE SEPARATRICE ──
+        p.line(20, 420, 580, 420)
+
+        # ── DEUXIEME EXEMPLAIRE ──
+        draw_recu(-420)
+
         p.showPage()
         p.save()
-        
         buffer.seek(0)
-        
-        
-        email = EmailMessage(
-        subject='Reçu d\'inscription',
-        body=f'Veuillez trouver votre reçu d\'inscription en pièce jointe.\n Cordialement. \n La Comptabilité : \n {data_ecole[8]}',
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        to=[data[8]], # data[8] correspond ici a l'email du parent/tuteur
-        )
-        email.attach(f'Recu_inscription {str(data[2])}.pdf', buffer.getvalue(), 'application/pdf')
-        email.send()
-        messages.success(request,'Email envoyé avec succès!')
 
-        # FileResponse sets the Content-Disposition header so that browsers
-        # present the option to save the file.
-        
-        return FileResponse(buffer, as_attachment=False, filename='Reçu_inscription ' + str(data[2]) + '.pdf',content_type='application/pdf')
+        # ── ENVOI EMAIL ──
+        try:
+            email = EmailMessage(
+                subject='Reçu d\'inscription',
+                body=f'Veuillez trouver votre reçu d\'inscription en pièce jointe.\n'
+                     f'Cordialement.\nLa Comptabilité : {data_ecole[8]}',
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[data[8]],
+            )
+            email.attach(f'Recu_inscription_{str(data[2])}.pdf', buffer.getvalue(), 'application/pdf')
+            email.send()
+            messages.success(request, 'Email envoyé avec succès!')
+        except SMTPException:
+            messages.warning(request, 'Erreur SMTP : impossible d\'envoyer l\'email.')
+        except socket.gaierror:
+            messages.warning(request, 'Pas de connexion internet. Email non envoyé.')
+        except TimeoutError:
+            messages.warning(request, 'Délai de connexion dépassé. Email non envoyé.')
+        except Exception as e:
+            messages.warning(request, f'Erreur inattendue : {str(e)}')
+
+        buffer.seek(0)
+        return FileResponse(buffer, as_attachment=False, filename=f'Recu_inscription_{str(data[2])}.pdf', content_type='application/pdf')
 
 
 # Cette fonction permet d'imprimer les recus d'inscription de manière permanente
+@login_required
 def imprimerecuinscription(request, idins):
     return HttpResponseRedirect(reverse('recuinscription',
                                         args=(
@@ -595,8 +622,9 @@ def imprimerecuinscription(request, idins):
 
 
 # Gestion des reinscription des élèves
+@login_required
 def chargeranneecycle(request):
-    ans = Inscription.objects.all().distinct()
+    ans = Inscription.objects.all().distinct('annee_scolaire')
     cy = CycleScolaire.objects.all()
     an = AnneeScolaire.objects.all()
     clas = Classe.objects.all()
@@ -605,15 +633,34 @@ def chargeranneecycle(request):
 
 # Cette fonction me permet de charger la liste des élèves inscrits dans une classe donnée aucours d'une année
 # scolaire donnée
+@login_required
 def chargerlisteeleveclasse(request):
-    ane = request.GET.get('anneesco')
-    clas = request.GET.get('id_classe')
+    ane = request.GET.get('anneesco') # anneesco est la valeur renvoyée depuis la fonction JQuery dans le template reinscription_eleve.html
+    clas = request.GET.get('id_classe') # id_classe est recupérée depuis la fonction JQuery
     el = Inscription.objects.select_related('annee_scolaire', 'mateleve', 'idcycle', 'idclasse').filter(
         Q(annee_scolaire=ane), Q(idclasse=clas))
     return render(request, 'gEleve/charger_liste_eleve_classe_cycle.html', dict(eleve=el))
 
 
+# Cette fonction me permet de charger les infos de l'élève sélectionné lors de la reinscription à savoir le prénom, le nom et la photo
+@login_required
+def chargerinfoeleveclasse(request):
+    matricule = request.GET.get('matricule')
+    try:
+        el = Eleve.objects.get(matricule=matricule)
+        data = {
+            'nom': el.nom,
+            'prenom': el.prenom,
+            'photo': str(el.photo_eleve) if el.photo_eleve else '',
+        }
+    except Eleve.DoesNotExist:
+        data = {'nom': '', 'prenom': '', 'photo': ''}
+    
+    return JsonResponse(data)
+
+@action_requise('eleve_inscrire')
 def validerreinscription(request):
+
     if request.method == 'POST':
         cy = request.POST['cycle']
         ans = request.POST['annee_scolaire_new']
@@ -625,13 +672,13 @@ def validerreinscription(request):
         idcy = CycleScolaire.objects.get(id=cy)
         el = Eleve.objects.get(matricule=mat)
 
-        insc = Inscription(annee_scolaire=an, mateleve=el, idcycle=idcy, idclasse=cl, etat_inscription='Reinscrit')
+        insc = Inscription(annee_scolaire=an, mateleve=el, idcycle=idcy, idclasse=cl, etat_inscription=ETAT_INSCRIPTION[1][1])
         insc.save()
 
         frais = Decimal(cl.frais_reinscription)
 
         # Ici je vais ensuite enregistrer l'état de paiement de la scolarité de l'élève
-        eps = EtatPaiementScolarite()
+        eps = EtatPaiementTranche()
         eps.anneescolaire = an
         eps.mateleve = el
         eps.inscription = frais
@@ -642,7 +689,7 @@ def validerreinscription(request):
         soldecaisse = affichersoldecaisse()
         cais = Caisse()
         cais.type_operation = TYPE_OPERATION_CAISSE_CHOICES[1][1]
-        cais.libelle_operation = 'Paiement des frais reinscription de l\'élève:  {},  {} , {} '.format(
+        cais.libelle_operation = 'Paiement des frais de reinscription de l\'élève:  {},  {} , {} '.format(
             el.matricule, el.nom, el.prenom)
         cais.montant_encaisse = Decimal(frais)
         cais.anscolaire = an
@@ -668,303 +715,323 @@ def validerreinscription(request):
                                             args=(
                                                 lastid,)))  # Je redirige l'utilisateur vers l'impression du recu d'inscription (PDF)
     else:
-        return redirect('../reinscriptioneleve/')
+        return redirect('../listereinscritsanneecourante/')
 
-
+@login_required
 def recureinscription(request, idinsc):
     
     # Et là je tente de recuperer les données d'identification de l'école    
     ec = Ecole.objects.count()
-    if ec==0:
-        messages.error(request,'Veuillez saisir les informations de l\'école')
+    if ec == 0:
+        messages.error(request, 'Veuillez saisir les informations de l\'école')
     else:
         ecole = Ecole.objects.get(id=1)
         if ecole.logo_ecole:
-            data_ecole = [ecole.nom_ecole, ecole.ville_ecole, ecole.prefect_commune, ecole.telephone1, ecole.telephone2,
-                          ecole.logo_ecole.path, ecole.devise_ecole, ecole.dsee, ecole.comptable]
+            data_ecole = [ecole.nom_ecole, ecole.ville_ecole, ecole.prefect_commune,
+                          ecole.telephone1, ecole.telephone2, ecole.logo_ecole.path,
+                          ecole.devise_ecole, ecole.dsee, ecole.comptable]
         else:
-            data_ecole = [ecole.nom_ecole, ecole.ville_ecole, ecole.prefect_commune, ecole.telephone1, ecole.telephone2,
-                          'Logo', ecole.devise_ecole, ecole.dsee, ecole.comptable]
+            data_ecole = [ecole.nom_ecole, ecole.ville_ecole, ecole.prefect_commune,
+                          ecole.telephone1, ecole.telephone2, 'Logo',
+                          ecole.devise_ecole, ecole.dsee, ecole.comptable]
 
-        # Ici je tente de recuperer les données sur l'inscription depuis la BD
+        ins  = Inscription.objects.select_related('annee_scolaire', 'mateleve', 'idcycle', 'idclasse').get(id=idinsc)
+        data = [ins.id, ins.annee_scolaire.descript_annee,
+                ins.mateleve.matricule, ins.idclasse,
+                ins.mateleve.nom, ins.mateleve.prenom,
+                ins.mateleve.tuteur, ins.mateleve.contact_pere,
+                ins.mateleve.email_pere, ins.date_inscription,
+                ins.idclasse.frais_reinscription]
 
-        ins = Inscription.objects.select_related('annee_scolaire', 'mateleve', 'idcycle', 'idclasse').get(id=idinsc)
-        data = [ins.id, ins.annee_scolaire.descript_annee, ins.mateleve.matricule, ins.idclasse, ins.mateleve.nom,
-                ins.mateleve.prenom,
-                ins.mateleve.tuteur, ins.mateleve.contact_parent,ins.mateleve.email_parent, ins.date_inscription, ins.idclasse.frais_inscription
-                ]
+        ch  = str(data[1]).split('-')
+        ane = ch[1]
 
-        ch = str(data[1])  # Je recupère le nom de l'année scolaire i.e 2023-2024 par exemple
-        ch = ch.split('-')  # Je découpe la chaine obtenue en deux sous chaines tenant compte du séparateur (-)
-        ane = ch[1]  # Je recupère la deuxième sous chaine i.e 2024 par exemple
-
-        # Create a file-like buffer to receive PDF data.
-        buffer = io.BytesIO()
-
-        # Create the PDF object, using the buffer as its "file."
-        p = canvas.Canvas(buffer)
-        p.setTitle('Reçu Reinscription Scolarité')  # Permet de définir le Titre du Document
-
-        # Draw things on the PDF. Here's where the PDF generation happens.
-        # See the ReportLab documentation for the full list of functionality.
-        # Ecriture des textes de l'entête superieur gauche
-        p.setFont('Helvetica-Bold',10)
-        p.drawString(20, 815, 'MEPU-A')
-        p.drawString(20, 798, 'IRE : ')
-        p.setFont('Helvetica',10)
-        p.drawString(55, 798, str(data_ecole[1]))
-        p.setFont('Helvetica-Bold',10)
-        p.drawString(20, 785, 'DCE : ')
-        p.setFont('Helvetica',10)
-        p.drawString(55, 785, str(data_ecole[2]))
-        p.setFont('Helvetica-Bold',10)
-        p.drawString(20, 770, 'DSEE : ')
-        p.setFont('Helvetica',10)
-        p.drawString(55, 770, str(data_ecole[7]))
-        p.setFont('Helvetica-Bold',10)
-        p.drawString(20, 755, 'TEL : ')
-        p.setFont('Helvetica',10)
-        p.drawString(55, 755, str(data_ecole[3]) + ' / ' + str(data_ecole[4]))
-
-        
-        # Affichage du logo de l'ecole
-        try:
-            logo = Image.open(data_ecole[5]) # Ici je tente d'ouvrir l'image stockee dans la BD en utilisant son path (voir dans la liste data_ecole[])
-            logo.thumbnail((60,60)) # Redimensionne l'image en format miniature avec comme taille (width=100,height=100), permet de gerer les ratios de l'image
-            if logo.mode in ('RGBA','P'): # Permet de verifier le type de couleur utilise dans l'image (RGBA == Red Green Blue + Alpha (transparent) pour PNG)
-                logo = logo.convert('RGB') # Transforme la couleur en format RGB standard
-            
-            # Je cree ici un buffer (fichier temporaire) pour stocker l'image recuperee
-            logo_buffer = io.BytesIO()
-            logo.save(logo_buffer,format='JPEG') # Sauvegarde l'image au format JPEG
-            logo_buffer.seek(0)
-            
-            # Ici je dessine l'image stockee dans le fichier temporaire a l'interieur du PDF
-            p.drawImage(ImageReader(logo_buffer), 245, 770, 60, 60)
-            
-        except FileNotFoundError:
-            p.drawString(data_ecole[5],245, 770)
-        except OSError:
-            p.drawString(data_ecole[5],245, 770)
-
-        # Affichage du drapeau de la République
-        p.setFillColor("Red")  # Définit la couleur de remplissage du 1er rectangle à Rouge
-        p.rect(449, 815, 30, 10, stroke=False,
-               fill=True)  # fill = True permet de définir la couleur de remplissage du 1er rectangle
-        p.setFillColor("yellow")
-        p.rect(479, 815, 30, 10, stroke=False, fill=True)
-        p.setFillColor("green")
-        p.rect(509, 815, 30, 10, stroke=False, fill=True)
-
-        p.setFillColor("black")  # Définit la couleur de police (black) pour le reste du document
-        # Ecriture des textes de l'entête supérieur droit
-        p.setFont('Helvetica-Bold',10)
-        p.drawString(450, 798, 'République de Guinée')
-
-        # p.setFontSize(9)
-        p.setFont('Helvetica-Oblique', 9)
-        p.drawString(450, 780, 'Travail-Justice-Solidarité')
-
-        p.setFont('Helvetica-Bold', 11)
-        p.drawString(225, 740, str(data_ecole[0]))  # Nom de l'école
-
-        p.setFont('Helvetica-Oblique', 9)
-        p.drawString(225, 720, str(data_ecole[6]))  # Devise de l'école
-
-        # Tracé de ligne séparatrice entre l'entête et le reste du document
-        p.line(140, 710, 440, 710)
-
-        p.setFont('Helvetica-Bold', 11)
-        # Ecriture de la deuxième partie de l'entête
-        p.drawString(150, 695, 'Année Scolaire :')
-        p.setFont('Helvetica',11)
-        p.drawString(245, 695, str(data[1]))
-        p.setFont('Helvetica-Bold',11)
-        p.drawString(330, 695, 'Session : ')
-        p.setFont('Helvetica',11)
-        p.drawString(385, 695, str(ane))
-        p.setFont('Helvetica-Bold',11)
-        p.drawString(180, 673, 'RECU REINSCRIPTION N° : ')
-        p.setFont('Helvetica',11)
-
-        numrecu = data[0]  # Ici je recupère le numéro de l'inscription
-        ansco = datetime.now().strftime('%y')  # Je recupère uniquement l'année de la date courante
-        numero_recu = ''
-
+        # Numéro de reçu formaté
+        numrecu = data[0]
+        ansco   = datetime.now().strftime('%y')
         if numrecu < 10:
-            numero_recu = ansco + '00' + str(numrecu)
+            numero_recu = ansco + '000' + str(numrecu)
         elif numrecu < 100:
-            numero_recu = ansco + '0' + str(numrecu)
+            numero_recu = ansco + '00' + str(numrecu)
         elif numrecu < 1000:
             numero_recu = ansco + '0' + str(numrecu)
-        elif numrecu < 10000:
-            numero_recu = ansco + '0' + str(numrecu)
+        else:
+            numero_recu = ansco + str(numrecu)
 
-        p.drawString(330, 673, str(numero_recu))
+        buffer = io.BytesIO()
+        p = canvas.Canvas(buffer)
+        p.setTitle('Reçu Réinscription Scolarité')
 
-        # Ecriture des informations de l'élève
-        p.setFont('Helvetica-Bold',11)
-        p.drawString(120, 645, 'Matricule : ')
-        p.setFont('Helvetica',11)
-        p.drawString(185, 645, str(data[2]))
-        p.setFont('Helvetica-Bold',11)
-        p.drawString(120, 629, 'Nom : ')
-        p.setFont('Helvetica',11)
-        p.drawString(185, 629, str(data[4]))
-        p.setFont('Helvetica-Bold',11)
-        p.drawString(120, 610, 'Prénoms : ')
-        p.setFont('Helvetica',11)
-        p.drawString(185, 610, str(data[5]))
-        p.setFont('Helvetica-Bold',11)
-        p.drawString(120, 590, 'Date reinscription : ')
-        p.setFont('Helvetica',11)
-        p.drawString(216, 590, str(data[9]))
-        p.setFont('Helvetica-Bold',11)
-        p.drawString(120, 570, 'Frais reinscription : ')
-        p.setFont('Helvetica',11)
-        p.drawString(216, 570, str(data[10]))
-        p.setFont('Helvetica-Bold',11)
-        p.drawString(120, 550, 'Classe : ')
-        p.setFont('Helvetica',11)
-        p.drawString(216, 550, str(data[3]))
-        # Informations placées à droite dans la rubrique des informations de l'élève
-        p.setFont('Helvetica-Bold',11)
-        p.drawString(315, 629, 'Tuteur : ')
-        p.setFont('Helvetica',11)
-        p.drawString(365, 629, str(data[6]))
-        p.setFont('Helvetica-Bold',11)
-        p.drawString(315, 610, 'Contact : ')
-        p.setFont('Helvetica',11)
-        p.drawString(365, 610, str(data[7]))
-        
-        # Ecriture des informations du bas de la page, Date d'impression, signature du DG et de la partie reservée au
-        # parent d'élève
-        p.setFont('Helvetica-Bold',11)
-        p.drawString(375, 500, 'Conakry, le ')
-        p.drawString(440, 500, datetime.now().strftime('%d/%m/%Y'))
-        p.drawString(120, 460, 'Le Parent')
-        p.drawString(375, 460, 'La Comptabilité')
-        p.drawString(375, 395, str(data_ecole[8]))
+        def draw_entete(y_offset):
+            """Dessine l entete complete avec logo et drapeau"""
 
-        # J'insere ici une ligne séparatrice pour diviser le reçu en deux (2) copies
-        p.line(20, 370, 580, 370)
+            # ── ENTETE GAUCHE ──
+            p.setFillColor(colors.black)
+            p.setFont('Helvetica-Bold', 10)
+            p.drawString(20, 815 + y_offset, 'MEPU-A')
+            p.drawString(20, 800 + y_offset, 'IRE : ')
+            p.setFont('Helvetica', 10)
+            p.drawString(55, 800 + y_offset, str(data_ecole[1]))
+            p.setFont('Helvetica-Bold', 10)
+            p.drawString(20, 787 + y_offset, 'DCE : ')
+            p.setFont('Helvetica', 10)
+            p.drawString(55, 787 + y_offset, str(data_ecole[2]))
+            p.setFont('Helvetica-Bold', 10)
+            p.drawString(20, 772 + y_offset, 'DSEE : ')
+            p.setFont('Helvetica', 10)
+            p.drawString(55, 772 + y_offset, str(data_ecole[7]))
+            p.setFont('Helvetica-Bold', 10)
+            p.drawString(20, 757 + y_offset, 'TEL : ')
+            p.setFont('Helvetica', 10)
+            p.drawString(55, 757 + y_offset, str(data_ecole[3]) + ' / ' + str(data_ecole[4]))
 
-        # Ici commence la deuxième partie du reçu d'inscription
+            # ── LOGO ──
+            try:
+                logo = Image.open(data_ecole[5])
+                logo = logo.resize((90, 60), Image.LANCZOS)
+                if logo.mode in ('RGBA', 'P'):
+                    logo = logo.convert('RGB')
+                elif logo.mode != 'RGB':
+                    logo = logo.convert('RGB')
+                logo_buffer = io.BytesIO()
+                logo.save(logo_buffer, format='PNG')
+                logo_buffer.seek(0)
+                p.drawImage(ImageReader(logo_buffer), 245, 770 + y_offset, 90, 60)
+            except (FileNotFoundError, OSError):
+                p.drawString(data_ecole[5],245, 770 + y_offset)
 
-        p.setFont('Helvetica-Bold', 11)
-        # Ecriture de la deuxième partie de l'entête
-        p.drawString(150, 345, 'Année Scolaire :')
-        p.setFont('Helvetica',11)
-        p.drawString(245, 345, str(data[1]))
-        p.setFont('Helvetica-Bold',11)
-        p.drawString(330, 345, 'Session : ')
-        p.setFont('Helvetica',11)
-        p.drawString(385, 345, str(ane))
-        p.setFont('Helvetica-Bold',11)
-        p.drawString(180, 323, 'RECU REINSCRIPTION N° : ')
-        p.setFont('Helvetica',11)
-        p.drawString(330, 323, str(numero_recu))
+            # ── DRAPEAU ──
+            p.setFillColor('Red')
+            p.rect(449, 815 + y_offset, 30, 10, stroke=False, fill=True)
+            p.setFillColor('yellow')
+            p.rect(479, 815 + y_offset, 30, 10, stroke=False, fill=True)
+            p.setFillColor('green')
+            p.rect(509, 815 + y_offset, 30, 10, stroke=False, fill=True)
+            p.setFillColor(colors.black)
 
-        # Ecriture des informations de l'élève
-        p.setFont('Helvetica-Bold',11)
-        p.drawString(120, 295, 'Matricule : ')
-        p.setFont('Helvetica',11)
-        p.drawString(185, 295, str(data[2]))
-        p.setFont('Helvetica-Bold',11)
-        p.drawString(120, 279, 'Nom : ')
-        p.setFont('Helvetica',11)
-        p.drawString(185, 279, str(data[4]))
-        p.setFont('Helvetica-Bold',11)
-        p.drawString(120, 260, 'Prénoms : ')
-        p.setFont('Helvetica',11)
-        p.drawString(185, 260, str(data[5]))
-        p.setFont('Helvetica-Bold',11)
-        p.drawString(120, 240, 'Date reinscription : ')
-        p.setFont('Helvetica',11)
-        p.drawString(216, 240, str(data[9]))
-        p.setFont('Helvetica-Bold',11)
-        p.drawString(120, 220, 'Frais reinscription : ')
-        p.setFont('Helvetica',11)
-        p.drawString(216, 220, str(data[10]))
-        p.setFont('Helvetica-Bold',11)
-        p.drawString(120, 200, 'Classe : ')
-        p.setFont('Helvetica',11)
-        p.drawString(216, 200, str(data[3]))
-        # Informations placées à droite dans la rubrique des informations de l'élève
-        p.setFont('Helvetica-Bold',11)
-        p.drawString(315, 279, 'Tuteur : ')
-        p.setFont('Helvetica',11)
-        p.drawString(365, 279, str(data[6]))
-        p.setFont('Helvetica-Bold',11)
-        p.drawString(315, 260, 'Contact : ')
-        p.setFont('Helvetica',11)
-        p.drawString(365, 260, str(data[7]))
-        
-        # Ecriture des informations du bas de la page, Date d'impression, signature du DG et de la partie reservée au
-        # parent d'élève
-        p.setFont('Helvetica-Bold',11)
-        p.drawString(375, 150, 'Conakry, le ')
-        p.drawString(440, 150, datetime.now().strftime('%d/%m/%Y'))
-        p.drawString(120, 110, 'Le Parent')
-        p.drawString(375, 110, 'La Comptabilité')
-        p.drawString(375, 45, str(data_ecole[8]))
+            # ── ENTETE DROITE ──
+            p.setFont('Helvetica-Bold', 10)
+            p.drawString(450, 800 + y_offset, 'République de Guinée')
+            p.setFont('Helvetica-Oblique', 9)
+            p.drawString(450, 785 + y_offset, 'Travail-Justice-Solidarité')
 
-        # Close the PDF object cleanly, and we're done.
+            # ── NOM ET DEVISE ECOLE ──
+            p.setFont('Helvetica-Bold', 11)
+            p.drawString(200, 740 + y_offset, str(data_ecole[0]))
+            p.setFont('Helvetica-Oblique', 9)
+            p.drawString(220, 725 + y_offset, str(data_ecole[6]))
+
+            # ── LIGNE SEPARATRICE ──
+            p.line(140, 715 + y_offset, 440, 715 + y_offset)
+
+        def draw_recu(y_offset):
+            """Dessine un exemplaire complet du reçu de réinscription"""
+
+            draw_entete(y_offset)
+
+            # ── ANNEE SCOLAIRE ET SESSION ──
+            p.setFont('Helvetica-Bold', 11)
+            p.drawString(150, 700 + y_offset, 'Année Scolaire :')
+            p.setFont('Helvetica', 11)
+            p.drawString(255, 700 + y_offset, str(data[1]))
+            p.setFont('Helvetica-Bold', 11)
+            p.drawString(350, 700 + y_offset, 'Session :')
+            p.setFont('Helvetica', 11)
+            p.drawString(400, 700 + y_offset, str(ane))
+
+            # ── TITRE RECU ──
+            p.setFont('Helvetica-Bold', 12)
+            p.rect(150, 675 + y_offset, 280, 18, stroke=True, fill=False)
+            p.drawString(155, 679 + y_offset, f'RECU REINSCRIPTION N° : {numero_recu}')
+
+            # ── INFOS ELEVE GAUCHE ──
+            p.setFont('Helvetica-Bold', 11)
+            p.drawString(120, 650 + y_offset, 'Matricule :')
+            p.setFont('Helvetica', 11)
+            p.drawString(195, 650 + y_offset, str(data[2]))
+
+            p.setFont('Helvetica-Bold', 11)
+            p.drawString(120, 634 + y_offset, 'Nom :')
+            p.setFont('Helvetica', 11)
+            p.drawString(195, 634 + y_offset, str(data[4]))
+
+            p.setFont('Helvetica-Bold', 11)
+            p.drawString(120, 618 + y_offset, 'Prénoms :')
+            p.setFont('Helvetica', 11)
+            p.drawString(195, 618 + y_offset, str(data[5]))
+
+            p.setFont('Helvetica-Bold', 11)
+            p.drawString(120, 600 + y_offset, 'Date réinscription :')
+            p.setFont('Helvetica', 11)
+            p.drawString(230, 600 + y_offset, str(data[9]))
+
+            p.setFont('Helvetica-Bold', 11)
+            p.drawString(120, 582 + y_offset, 'Frais réinscription :')
+            p.setFont('Helvetica', 11)
+            p.drawString(230, 582 + y_offset, '{:,} GNF'.format(data[10]))
+
+            p.setFont('Helvetica-Bold', 11)
+            p.drawString(120, 564 + y_offset, 'Classe :')
+            p.setFont('Helvetica', 11)
+            p.drawString(195, 564 + y_offset, str(data[3]))
+
+            # ── INFOS ELEVE DROITE ──
+            p.setFont('Helvetica-Bold', 11)
+            p.drawString(340, 634 + y_offset, 'Tuteur :')
+            p.setFont('Helvetica', 11)
+            p.drawString(390, 634 + y_offset, str(data[6]))
+
+            p.setFont('Helvetica-Bold', 11)
+            p.drawString(340, 618 + y_offset, 'Contact :')
+            p.setFont('Helvetica', 11)
+            p.drawString(395, 618 + y_offset, str(data[7]))
+            p.setFont('Helvetica-Bold', 11)
+            p.drawString(340, 600 + y_offset, 'Email :')
+            p.setFont('Helvetica', 11)
+            p.drawString(395, 600 + y_offset, str(data[8]))
+
+            # ── DATE ET SIGNATURE ──
+            p.setFont('Helvetica-Bold', 11)
+            p.drawString(375, 510 + y_offset, 'Conakry, le ')
+            p.drawString(450, 510 + y_offset,
+                datetime.now().strftime('%d/%m/%Y'))
+            p.drawString(120, 475 + y_offset, 'Le Parent')
+            p.drawString(375, 475 + y_offset, 'Le Service Scolarité')
+            p.drawString(375, 435 + y_offset, str(data_ecole[8]))
+
+        # ── PREMIER EXEMPLAIRE ──
+        draw_recu(0)
+
+        # ── LIGNE SEPARATRICE ──
+        p.line(20, 420, 580, 420)
+
+        # ── DEUXIEME EXEMPLAIRE ──
+        draw_recu(-420)
+
         p.showPage()
         p.save()
+        buffer.seek(0)
+
+        # ── ENVOI EMAIL ──
+        try:
+            email = EmailMessage(
+                subject='Reçu de réinscription',
+                body=f'Veuillez trouver votre reçu de réinscription en pièce jointe.\n'
+                     f'Cordialement.\nLa Comptabilité : {data_ecole[8]}',
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[data[8]],
+            )
+            email.attach(f'Recu_reinscription_{str(data[2])}.pdf', buffer.getvalue(), 'application/pdf')
+            email.send()
+            messages.success(request, 'Email envoyé avec succès!')
+        except SMTPException:
+            messages.warning(request, 'Erreur SMTP : impossible d\'envoyer l\'email.')
+        except socket.gaierror:
+            messages.warning(request, 'Pas de connexion internet. Email non envoyé.')
+        except TimeoutError:
+            messages.warning(request, 'Délai de connexion dépassé. Email non envoyé.')
+        except Exception as e:
+            messages.warning(request, f'Erreur inattendue : {str(e)}')
 
         buffer.seek(0)
-    
-        email = EmailMessage(
-            subject='Reçu de reinscription',
-            body=f'Veuillez trouver votre reçu de reinscription en pièce jointe.\n Cordialement. \n La Comptabilité : \n {data_ecole[8]}',
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            to=[data[8]], # data[8] correspond ici a l'email du parent/tuteur
-            )
-        email.attach(f'Recu_reinscription {str(data[2])}.pdf', buffer.getvalue(), 'application/pdf')
-        email.send()
-        messages.success(request,'Email envoyé avec succès!')
-    
-    
-    
-        # FileResponse sets the Content-Disposition header so that browsers
-        # present the option to save the file.
-    
-        return FileResponse(buffer, as_attachment=False, filename='Reçu_reinscription ' + str(data[2]) + '.pdf',
-                        content_type='application/pdf')
+        return FileResponse(buffer, as_attachment=False, filename=f'Recu_reinscription_{str(data[2])}.pdf', content_type='application/pdf')
 
-
+@login_required
 def imprimerecureinscription(request, idins):
     return HttpResponseRedirect(reverse('recureinscription',
                                         args=(
                                             idins,)))
 
+effectif_total = 0
+effectif_total_garcons = 0
+effectif_total_filles = 0
 
-def chargeranneescolairecourante(request):
-    ans = Inscription.objects.all().distinct()
+@login_required
+def listeinscritsanneescolairecourante(request):
+
+    ans = Inscription.objects.all().distinct('annee_scolaire')
     cy = CycleScolaire.objects.all()
-    return render(request, 'gEleve/liste_eleves_inscrits.html', dict(ans=ans, cycles=cy))
 
+    listeeleves = {}
+    listeeleves = Inscription.objects.none()
 
+    global effectif_total
+    global effectif_total_garcons
+    global effectif_total_filles
+
+    mois = date.today()
+    mois_actuel = mois.strftime('%m')
+
+    listeeleves = Inscription.objects.select_related('annee_scolaire', 'mateleve', 'idcycle', 'idclasse').filter(
+            Q(etat_inscription__exact=ETAT_INSCRIPTION[0][1]),Q(date_inscription__month=mois_actuel)).order_by('-date_inscription')
+    
+    effectif_total = listeeleves.count()
+    effectif_total_garcons = listeeleves.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[1][0]).count() # SEXE_ELEVE_CHOICES[1][0] correspond à M
+    effectif_total_filles = listeeleves.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[2][0]).count() # SEXE_ELEVE_CHOICES[2][0] correspond à F
+    
+    pagineins = Paginator(listeeleves, 10)
+    numpageins = request.GET.get('page')
+    listeeleves = pagineins.get_page(numpageins)
+    
+    return render(request, 'gEleve/liste_eleves_inscrits.html', dict(ans=ans, cycles=cy, listeeleves=listeeleves, effectif_total=effectif_total, effectif_total_garcons=effectif_total_garcons, effectif_total_filles=effectif_total_filles))
+
+@login_required
+def listereinscritsanneescolairecourante(request):
+
+    ans = Inscription.objects.all().distinct('annee_scolaire')
+    cy = CycleScolaire.objects.all().order_by('id')
+
+    listeeleves = {}
+    listeeleves = Inscription.objects.none()
+
+    global effectif_total
+    global effectif_total_garcons
+    global effectif_total_filles
+
+    mois = date.today()
+    mois_actuel = mois.strftime('%m')
+
+    listeeleves = Inscription.objects.select_related('annee_scolaire', 'mateleve', 'idcycle', 'idclasse').filter(
+            Q(etat_inscription__exact=ETAT_INSCRIPTION[1][1]),Q(date_inscription__month=mois_actuel)).order_by('-date_inscription')
+    
+    effectif_total = listeeleves.count()
+    effectif_total_garcons = listeeleves.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[1][0]).count() # SEXE_ELEVE_CHOICES[1][0] correspond à M
+    effectif_total_filles = listeeleves.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[2][0]).count() # SEXE_ELEVE_CHOICES[2][0] correspond à F
+    
+    pagineins = Paginator(listeeleves, 10)
+    numpageins = request.GET.get('page')
+    listeeleves = pagineins.get_page(numpageins)
+    
+    return render(request, 'gEleve/liste_eleves_reinscrits.html', dict(ans=ans, cycles=cy, listeeleves=listeeleves, effectif_total=effectif_total, effectif_total_garcons=effectif_total_garcons, effectif_total_filles=effectif_total_filles))
+
+@login_required
 def filtrelisteinscrits(request):
-    listeinsclasse = []
-    effectif_total = []
-    effectif_total_garcons = []
-    effectif_total_filles = []
-
+    
     idclass = request.GET.get('id_classe')
     idcy = request.GET.get('cycle')
     idansc = request.GET.get('annee_scolaire')
 
+    listeinsclasse = {}
+    listeinsclasse = Inscription.objects.none()
+
+    # Pour permettre un rechargement des donnees relatives a l'annee scolaire et le cycle
+    ans = Inscription.objects.all().distinct('annee_scolaire')
+    cy = CycleScolaire.objects.all().order_by('id')
+
+    global effectif_total
+    global effectif_total_garcons
+    global effectif_total_filles
+
     if (idclass != '' and idclass is not None) and (idcy != '' and idcy is not None) and (
             idansc != '' and idansc is not None):
         listeinsclasse = Inscription.objects.select_related('annee_scolaire', 'mateleve', 'idcycle', 'idclasse').filter(
-            Q(idclasse__exact=idclass), Q(idcycle__exact=idcy), Q(annee_scolaire__exact=idansc))
+            Q(idclasse__exact=idclass), Q(idcycle__exact=idcy), Q(annee_scolaire__exact=idansc), Q(etat_inscription__exact=ETAT_INSCRIPTION[0][1])).order_by('-date_inscription')
+
 
         # Ici je calcule les effectifs totaux des eleves inscrits
         effectif_total = listeinsclasse.count()
-        effectif_total_garcons = listeinsclasse.filter(mateleve__sexe_eleve='Masculin').count()
-        effectif_total_filles = listeinsclasse.filter(mateleve__sexe_eleve='Feminin').count()
+        effectif_total_garcons = listeinsclasse.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[1][0]).count() # SEXE_ELEVE_CHOICES[1][0] correspond à M
+        effectif_total_filles = listeinsclasse.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[2][0]).count() # SEXE_ELEVE_CHOICES[2][0] correspond à F
 
         pagineinscrit = Paginator(listeinsclasse, 10)
         numpageinscrit = request.GET.get('page')
@@ -972,4 +1039,637 @@ def filtrelisteinscrits(request):
         
     return render(request, 'gEleve/liste_eleves_inscrits.html',
                   dict(listeinscrits=listeinsclasse, effectif_total=effectif_total,
-                       effectif_total_garcons=effectif_total_garcons, effectif_total_filles=effectif_total_filles))
+                       effectif_total_garcons=effectif_total_garcons, effectif_total_filles=effectif_total_filles, ans=ans, cycles=cy))
+
+@login_required
+def filtrelistereinscrits(request):
+    
+    idclass = request.GET.get('id_classe')
+    idcy = request.GET.get('cycle')
+    idansc = request.GET.get('annee_scolaire')
+
+    ans = Inscription.objects.all().distinct('annee_scolaire')
+    cy = CycleScolaire.objects.all().order_by('id')
+
+    listeinsclasse = {}
+    listeinsclasse = Inscription.objects.none()
+
+    global effectif_total
+    global effectif_total_garcons
+    global effectif_total_filles
+
+    if (idclass != '' and idclass is not None) and (idcy != '' and idcy is not None) and (
+            idansc != '' and idansc is not None):
+        listeinsclasse = Inscription.objects.select_related('annee_scolaire', 'mateleve', 'idcycle', 'idclasse').filter(
+            Q(idclasse__exact=idclass), Q(idcycle__exact=idcy), Q(annee_scolaire__exact=idansc), Q(etat_inscription__exact=ETAT_INSCRIPTION[1][1])).order_by('-date_inscription')
+
+
+        # Ici je calcule les effectifs totaux des eleves inscrits
+        effectif_total = listeinsclasse.count()
+        effectif_total_garcons = listeinsclasse.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[1][0]).count() # SEXE_ELEVE_CHOICES[1][0] correspond à M
+        effectif_total_filles = listeinsclasse.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[2][0]).count() # SEXE_ELEVE_CHOICES[2][0] correspond à F
+
+        pagineinscrit = Paginator(listeinsclasse, 10)
+        numpageinscrit = request.GET.get('page')
+        listeinsclasse = pagineinscrit.get_page(numpageinscrit)
+        
+    return render(request, 'gEleve/liste_eleves_reinscrits.html',
+                  dict(listereinscrits=listeinsclasse, effectif_total=effectif_total,
+                       effectif_total_garcons=effectif_total_garcons, effectif_total_filles=effectif_total_filles, ans=ans, cycles=cy))
+
+# Permet de generer le rapport contenant la liste des inscrits par classe
+@login_required
+def rapportlisteinscrits(request):
+    """Génère le rapport pour les élèves au statut 'Inscrit'"""
+    return _generer_rapport_liste_inscription(request, etat_recherche=ETAT_INSCRIPTION[0][0], nom_fichier='Liste_des_inscrits', titre="LISTE DES INSCRITS PAR CLASSE")
+
+# Permet de generer le rapport contenant la liste des reinscrits par classe
+@login_required
+def rapportlistereinscrits(request):
+    """Génère le rapport pour les élèves au statut 'Réinscrit'"""
+    return _generer_rapport_liste_inscription(request, etat_recherche=ETAT_INSCRIPTION[1][0], nom_fichier='Liste_des_reinscrits', titre="LISTE DES REINSCRITS PAR CLASSE")
+
+# Permet de generer le rapport contenant la liste générale/registre de matriculation de l'école
+@login_required
+def rapportlistegenerale(request):
+       """Génère le registre de matriculation de l'école """
+       return _generer_rapport_matriculation(request, nom_fichier='Registre_matriculation_scolaire', titre="REGISTRE DE MATRICULATION")
+
+
+# Fonction ou vue django appelée lors de l'impression des rapports des inscriptions/reinscriptions
+def _generer_rapport_liste_inscription(request, etat_recherche, nom_fichier, titre):
+
+    """Fonction commune aux deux vues ci-dessus, pour éviter la duplication de code"""
+    anne = request.GET.get('annee')
+    cycl = request.GET.get('cycle')
+    clas = request.GET.get('classe')
+
+    ec = Ecole.objects.count()
+    if ec == 0:
+        messages.error(request, 'Veuillez saisir les informations de l\'école')
+        return redirect('registrematricule')
+
+    ecole = Ecole.objects.get(id=1)
+    if ecole.logo_ecole:
+        data_ecole = [ecole.nom_ecole, ecole.ville_ecole, ecole.prefect_commune,
+                      ecole.telephone1, ecole.telephone2, ecole.logo_ecole.path,
+                      ecole.devise_ecole, ecole.dsee, ecole.comptable]
+    else:
+        data_ecole = [ecole.nom_ecole, ecole.ville_ecole, ecole.prefect_commune,
+                      ecole.telephone1, ecole.telephone2, 'Logo',
+                      ecole.devise_ecole, ecole.dsee, ecole.comptable]
+
+    pdf_buffer = generer_rapport_inscrits(
+        request, data_ecole=data_ecole, annee=anne, cycle=cycl, classe=clas,
+        titre_rapport=titre, etat_recherche=etat_recherche
+    )
+
+    # S'il n'existe aucune information correspondant aux critères de sélection du pop up, alors on recharge la page courante
+    if pdf_buffer is None:
+        return redirect('registrematricule')
+
+    pdf_buffer.seek(0)
+    return FileResponse(pdf_buffer, as_attachment=False,
+        filename=f'{nom_fichier}_{str(clas)}.pdf',
+        content_type='application/pdf')
+
+# Fonction ou vue django appelée lors de l'impression du registre de matriculation
+def _generer_rapport_matriculation(request, nom_fichier, titre):
+
+    """Fonction commune aux deux vues ci-dessus, pour éviter la duplication de code"""
+    anne = request.GET.get('annee')
+    
+    ec = Ecole.objects.count()
+    if ec == 0:
+        messages.error(request, 'Veuillez saisir les informations de l\'école')
+        return redirect('registrematricule')
+
+    ecole = Ecole.objects.get(id=1)
+    if ecole.logo_ecole:
+        data_ecole = [ecole.nom_ecole, ecole.ville_ecole, ecole.prefect_commune,
+                      ecole.telephone1, ecole.telephone2, ecole.logo_ecole.path,
+                      ecole.devise_ecole, ecole.dsee, ecole.comptable]
+    else:
+        data_ecole = [ecole.nom_ecole, ecole.ville_ecole, ecole.prefect_commune,
+                      ecole.telephone1, ecole.telephone2, 'Logo',
+                      ecole.devise_ecole, ecole.dsee, ecole.comptable]
+
+    pdf_buffer = generer_rapport_matriculation(
+        request, data_ecole=data_ecole, annee=anne, titre_rapport=titre)
+
+    # S'il n'existe aucune information correspondant aux critères de sélection du pop up, alors on recharge la page courante
+    if pdf_buffer is None:
+        return redirect('registrematricule')
+
+    pdf_buffer.seek(0)
+    return FileResponse(pdf_buffer, as_attachment=False,
+        filename=f'{nom_fichier}.pdf',
+        content_type='application/pdf')
+
+# Fonction utilitaire permettant de generer le rapport contenant la liste des inscrits par classe
+def generer_rapport_inscrits(request, data_ecole, annee, cycle, classe, titre_rapport, etat_recherche):
+
+    # --- Marges et largeurs calculées UNE SEULE FOIS, réutilisées partout ---
+    marge_gauche_droite = 1.5*cm
+    marge_bas = 1.5*cm
+    largeur_frame = landscape(A4)[0] - 2*marge_gauche_droite
+
+    an = AnneeScolaire.objects.get(id=annee)
+    cy = CycleScolaire.objects.get(id=cycle)
+    cl = Classe.objects.get(id=classe)
+
+    # --- 1. Récupération des données ---
+    listinscrits = Inscription.objects.select_related(
+        'annee_scolaire', 'mateleve', 'idcycle', 'idclasse'
+    ).filter(
+        Q(annee_scolaire__exact=an), Q(idcycle__exact=cy), Q(idclasse__exact=cl),
+        Q(etat_inscription__exact=etat_recherche)
+    ).order_by('mateleve__nom')
+
+    effectif_total = listinscrits.count()
+    effectif_total_garcons = listinscrits.filter(mateleve__sexe_eleve__exact=SEXE_ELEVE_CHOICES[1][0]).count()
+    effectif_total_filles = listinscrits.filter(mateleve__sexe_eleve__exact=SEXE_ELEVE_CHOICES[2][0]).count()
+
+    if effectif_total == 0:
+        messages.error(request, "Aucun élève trouvé pour les critères donnés.")
+        return None
+
+    # --- 2. Construction du tableau (14 colonnes, Contacts fusionné) ---
+    entetes = ['N°', 'Matricule', 'Prénoms', 'Nom', 'Sexe', 'Date naiss', 'Lieu naiss',
+               'Père', 'Mère', 'Tuteur', 'Contacts', 'Email père', 'Email mère', 'Résidence']
+    table_data = [[Paragraph(e, style_entete_col) for e in entetes]]
+
+    for i, insc in enumerate(listinscrits, start=1):
+        eleve = insc.mateleve
+        contacts = f"{eleve.contact_pere or ''}<br/>{eleve.contact_mere or ''}"
+
+        ligne_brute = [
+            str(i), eleve.matricule, eleve.prenom, eleve.nom, eleve.sexe_eleve,
+            eleve.datenaissance.strftime('%d/%m/%Y') if eleve.datenaissance else '',
+            eleve.lieu_naissance, eleve.pere, eleve.mere, eleve.tuteur,
+        ]
+        ligne = [Paragraph(str(v) if v else '', style_cellule) for v in ligne_brute]
+        ligne.append(Paragraph(contacts, style_cellule))
+        ligne.append(Paragraph(eleve.email_pere or '', style_cellule))
+        ligne.append(Paragraph(eleve.email_mere or '', style_cellule))
+        ligne.append(Paragraph(eleve.adresse or '', style_cellule))
+        table_data.append(ligne)
+
+    # Ligne des totaux — libellé "Effectif de la classe" fusionné (colonnes 0-6),
+    # puis un second bloc fusionné (colonnes 7-13) avec les 3 chiffres explicitement étiquetés
+    texte_totaux = f"Total : {effectif_total}    —    Garçons : {effectif_total_garcons}    —    Filles : {effectif_total_filles}"
+
+    table_data.append([
+        Paragraph('Effectif de la classe', style_totaux), '', '', '', '', '', '',
+        Paragraph(texte_totaux, style_totaux), '', '', '', '', '', '',
+    ])
+
+    # --- Largeurs proportionnelles, garanties de tenir dans largeur_frame ---
+    poids = [0.4, 1.1, 1.3, 1.3, 0.8, 1.1, 1.3, 1.3, 1.3, 1.3, 1.4, 1.8, 1.8, 1.6]
+    somme_poids = sum(poids)
+    col_widths = [(p / somme_poids) * largeur_frame for p in poids]
+
+    table = Table(table_data, repeatRows=1, colWidths=col_widths)
+    style = TableStyle([
+    ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#2980b9')),
+    ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+    ('ALIGN', (0, 0), (-1, 0), 'LEFT'),
+    ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+    ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+    ('ROWBACKGROUNDS', (0, 1), (-1, -2), [colors.white, colors.HexColor('#f5f5f5')]),
+    ('BACKGROUND', (0, -1), (-1, -1), colors.HexColor('#27ae60')),
+    ('ALIGN', (0, -1), (-1, -1), 'CENTER'),
+    ('SPAN', (0, -1), (6, -1)),    # "Effectif de la classe" — colonnes 0 à 6
+    ('SPAN', (7, -1), (13, -1)),   # "Total : ... — Garçons : ... — Filles : ..." — colonnes 7 à 13
+    ('TOPPADDING', (0, 0), (-1, -1), 3),
+    ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
+                ])
+        
+    table.setStyle(style)
+
+    # --- 3. Éléments du flux ---
+    elements = [NextPageTemplate('Suivantes'), Spacer(1, 0.3*cm)]
+    elements.append(table)
+    elements.append(Spacer(1, 1.0*cm))
+
+    style_signature = ParagraphStyle('Signature', parent=getSampleStyleSheet()['Normal'], alignment=TA_RIGHT, fontName='Helvetica-Bold')
+    date_str = datetime.now().strftime('%d/%m/%Y')
+
+    bloc_signature = [
+        [Paragraph(f"Conakry, le {date_str}", style_signature)],
+        [Spacer(1, 0.8*cm)],
+        [Paragraph("Le Service Scolarité", style_signature)],
+        [Spacer(1, 1.5*cm)],
+        [Paragraph(str(data_ecole[8]) if len(data_ecole) > 8 and data_ecole[8] else '', style_signature)],
+    ]
+    table_signature = RLTable(bloc_signature, colWidths=[largeur_frame])
+    table_signature.setStyle(TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'RIGHT'),
+        ('LEFTPADDING', (0, 0), (-1, -1), 0),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 0),
+        ('TOPPADDING', (0, 0), (-1, -1), 0),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 0),
+    ]))
+    elements.append(table_signature)
+
+    # --- 4. En-tête (page 1 uniquement) ---
+    def draw_entete(canvas_obj, doc):
+        width, height = landscape(A4)   # height ≈ 595 points, PAS 842
+        marge = marge_gauche_droite
+        largeur_utile = largeur_frame
+
+        nom_ecole = data_ecole[0] if len(data_ecole) > 0 else ''
+        ville = data_ecole[1] if len(data_ecole) > 1 else ''
+        commune = data_ecole[2] if len(data_ecole) > 2 else ''
+        tel1 = data_ecole[3] if len(data_ecole) > 3 else ''
+        tel2 = data_ecole[4] if len(data_ecole) > 4 else ''
+        logo_chemin = data_ecole[5] if len(data_ecole) > 5 else ''
+        devise = data_ecole[6] if len(data_ecole) > 6 else ''
+        dsee = data_ecole[7] if len(data_ecole) > 7 else ''
+
+        # --- Positions calculées depuis le HAUT de la page, compactées pour tenir en paysage ---
+        y = height - 20   # départ, juste sous le bord supérieur
+
+        canvas_obj.setFillColor(colors.black)
+        canvas_obj.setFont('Helvetica-Bold', 9)
+        canvas_obj.drawString(marge, y, 'MEPU-A')
+        y -= 12
+        canvas_obj.drawString(marge, y, 'IRE : ')
+        canvas_obj.setFont('Helvetica', 9)
+        canvas_obj.drawString(marge + 30, y, str(ville))
+        y -= 12
+        canvas_obj.setFont('Helvetica-Bold', 9)
+        canvas_obj.drawString(marge, y, 'DCE : ')
+        canvas_obj.setFont('Helvetica', 9)
+        canvas_obj.drawString(marge + 30, y, str(commune))
+        y -= 12
+        canvas_obj.setFont('Helvetica-Bold', 9)
+        canvas_obj.drawString(marge, y, 'DSEE : ')
+        canvas_obj.setFont('Helvetica', 9)
+        canvas_obj.drawString(marge + 30, y, str(dsee))
+        y -= 12
+        canvas_obj.setFont('Helvetica-Bold', 9)
+        canvas_obj.drawString(marge, y, 'TEL : ')
+        canvas_obj.setFont('Helvetica', 9)
+        canvas_obj.drawString(marge + 30, y, f"{tel1} / {tel2}")
+
+        # --- Logo (aligné en haut à droite du bloc gauche) ---
+        if logo_chemin and logo_chemin != 'Logo':
+            try:
+                img = Image.open(logo_chemin)
+                img = img.resize((60, 40), Image.LANCZOS)
+                if img.mode in ('RGBA', 'P'):
+                    img = img.convert('RGB')
+                elif img.mode != 'RGB':
+                    img = img.convert('RGB')
+                logo_buffer = io.BytesIO()
+                img.save(logo_buffer, format='PNG')
+                logo_buffer.seek(0)
+                canvas_obj.drawImage(ImageReader(logo_buffer), width/2 - 30, height - 55, 60, 40)
+            except Exception:
+                pass
+
+        # --- Drapeau + République (bloc droit, aligné en haut) ---
+        y_drapeau = height - 20
+        canvas_obj.setFillColor('Red')
+        canvas_obj.rect(width - marge - 90, y_drapeau, 30, 8, stroke=False, fill=True)
+        canvas_obj.setFillColor('yellow')
+        canvas_obj.rect(width - marge - 60, y_drapeau, 30, 8, stroke=False, fill=True)
+        canvas_obj.setFillColor('green')
+        canvas_obj.rect(width - marge - 30, y_drapeau, 30, 8, stroke=False, fill=True)
+        canvas_obj.setFillColor(colors.black)
+
+        canvas_obj.setFont('Helvetica-Bold', 9)
+        canvas_obj.drawRightString(width - marge, y_drapeau - 12, 'République de Guinée')
+        canvas_obj.setFont('Helvetica-Oblique', 8)
+        canvas_obj.drawRightString(width - marge, y_drapeau - 24, 'Travail-Justice-Solidarité')
+
+        # --- Nom de l'école (centré, sous le bloc logo/IRE/République) ---
+        y = height - 70
+        canvas_obj.setFont('Helvetica-Bold', 12)
+        nom_x = (width - canvas_obj.stringWidth(str(nom_ecole), 'Helvetica-Bold', 12)) / 2
+        canvas_obj.drawString(nom_x, y, str(nom_ecole))
+
+        if devise:
+            y -= 13
+            canvas_obj.setFont('Helvetica-Oblique', 8)
+            devise_x = (width - canvas_obj.stringWidth(str(devise), 'Helvetica-Oblique', 8)) / 2
+            canvas_obj.drawString(devise_x, y, str(devise))
+
+        y -= 10
+        canvas_obj.line(marge, y, marge + largeur_utile, y)
+
+        # --- Titre du rapport ---
+        y -= 15
+        titre = titre_rapport.upper()
+        canvas_obj.setFont('Helvetica-Bold', 11)
+        titre_x = (width - canvas_obj.stringWidth(titre, 'Helvetica-Bold', 11)) / 2
+        canvas_obj.drawString(titre_x, y, titre)
+
+        y -= 6
+        canvas_obj.line(marge + 60, y, marge + largeur_utile - 60, y)
+
+        # --- Année scolaire et session ---
+        y -= 16
+        annee_str = an.descript_annee if an else ''
+        session = annee_str.split('-')[-1] if '-' in annee_str else annee_str
+        canvas_obj.setFont('Helvetica-Bold', 10)
+        canvas_obj.drawString(marge + 160, y, 'Année Scolaire : ')
+        canvas_obj.setFont('Helvetica', 10)
+        canvas_obj.drawString(marge + 270, y, annee_str)
+        canvas_obj.setFont('Helvetica-Bold', 10)
+        canvas_obj.drawString(marge + 370, y, 'Session : ')
+        canvas_obj.setFont('Helvetica', 10)
+        canvas_obj.drawString(marge + 420, y, session)
+
+        # --- Cycle et Classe ---
+        y -= 16
+        canvas_obj.setFont('Helvetica-Bold', 10)
+        canvas_obj.drawString(marge, y, 'Cycle : ')
+        canvas_obj.setFont('Helvetica', 10)
+        canvas_obj.drawString(marge + 38, y, str(cy.cycle) if cy else '')
+        canvas_obj.setFont('Helvetica-Bold', 10)
+        canvas_obj.drawString(marge + 130, y, 'Classe : ')
+        canvas_obj.setFont('Helvetica', 10)
+        canvas_obj.drawString(marge + 175, y, str(cl.nom_classe) if cl else '')
+        canvas_obj.setFillColor(colors.black)
+
+        return y   # position finale, utile pour ajuster dynamiquement y_fin_entete si besoin
+
+    def draw_page_number(canvas_obj, doc):
+        canvas_obj.saveState()
+        canvas_obj.setFont('Helvetica', 8)
+        canvas_obj.drawRightString(landscape(A4)[0] - 1.5*cm, 1.0*cm, f"Page {doc.page}")
+        canvas_obj.restoreState()
+
+    def on_first_page(canvas_obj, doc):
+        draw_entete(canvas_obj, doc)
+        draw_page_number(canvas_obj, doc)
+
+    def on_later_pages(canvas_obj, doc):
+        draw_page_number(canvas_obj, doc)
+
+    # --- 5. Construction avec deux PageTemplate ---
+    buffer = io.BytesIO()
+
+    y_fin_entete = 450   # nouvelle valeur compatible avec une hauteur de page paysage de ~595 points
+    hauteur_frame_page1 = y_fin_entete - marge_bas
+
+    frame_page1 = Frame(marge_gauche_droite, marge_bas, largeur_frame, hauteur_frame_page1, id='page1', showBoundary=0)
+    frame_suivantes = Frame(marge_gauche_droite, marge_bas, largeur_frame, landscape(A4)[1] - marge_bas - 1.5*cm, id='suivantes', showBoundary=0)
+
+    doc = BaseDocTemplate(buffer, pagesize=landscape(A4), title=titre_rapport)
+    doc.addPageTemplates([
+        PageTemplate(id='Premiere', frames=frame_page1, onPage=on_first_page),
+        PageTemplate(id='Suivantes', frames=frame_suivantes, onPage=on_later_pages),
+    ])
+
+    doc.build(elements)
+    buffer.seek(0)
+    return buffer
+
+
+def generer_rapport_matriculation(request, data_ecole, annee, titre_rapport):
+
+    # --- Marges et largeurs calculées UNE SEULE FOIS, réutilisées partout ---
+    marge_gauche_droite = 1.5*cm
+    marge_bas = 1.5*cm
+    largeur_frame = landscape(A4)[0] - 2*marge_gauche_droite
+
+    an = AnneeScolaire.objects.get(id=annee)
+    
+
+    # --- 1. Récupération des données ---
+    listgenerale = Inscription.objects.select_related(
+        'annee_scolaire', 'mateleve', 'idcycle', 'idclasse'
+    ).filter(annee_scolaire__exact=an).order_by('idclasse')
+
+    effectif_total = listgenerale.count()
+    effectif_total_garcons = listgenerale.filter(mateleve__sexe_eleve__exact=SEXE_ELEVE_CHOICES[1][0]).count()
+    effectif_total_filles = listgenerale.filter(mateleve__sexe_eleve__exact=SEXE_ELEVE_CHOICES[2][0]).count()
+
+    if effectif_total == 0:
+        messages.error(request, "Aucun élève trouvé pour les critères donnés.")
+        return None
+
+    # --- 2. Construction du tableau (14 colonnes, Contacts fusionné) ---
+    entetes = ['N°', 'Matricule', 'Prénoms', 'Nom', 'Sexe', 'Date naiss', 'Lieu naiss',
+               'Père', 'Mère', 'Tuteur', 'Contacts', 'Email père', 'Email mère', 'Résidence']
+    table_data = [[Paragraph(e, style_entete_col) for e in entetes]]
+
+    for i, insc in enumerate(listgenerale, start=1):
+        eleve = insc.mateleve
+        contacts = f"{eleve.contact_pere or ''}<br/>{eleve.contact_mere or ''}"
+
+        ligne_brute = [
+            str(i), eleve.matricule, eleve.prenom, eleve.nom, eleve.sexe_eleve,
+            eleve.datenaissance.strftime('%d/%m/%Y') if eleve.datenaissance else '',
+            eleve.lieu_naissance, eleve.pere, eleve.mere, eleve.tuteur,
+        ]
+        ligne = [Paragraph(str(v) if v else '', style_cellule) for v in ligne_brute]
+        ligne.append(Paragraph(contacts, style_cellule))
+        ligne.append(Paragraph(eleve.email_pere or '', style_cellule))
+        ligne.append(Paragraph(eleve.email_mere or '', style_cellule))
+        ligne.append(Paragraph(eleve.adresse or '', style_cellule))
+        table_data.append(ligne)
+
+    # Ligne des totaux — libellé "Effectif de la classe" fusionné (colonnes 0-6),
+    # puis un second bloc fusionné (colonnes 7-13) avec les 3 chiffres explicitement étiquetés
+    texte_totaux = f"Total : {effectif_total}    —    Garçons : {effectif_total_garcons}    —    Filles : {effectif_total_filles}"
+
+    table_data.append([
+        Paragraph('Effectif de la classe', style_totaux), '', '', '', '', '', '',
+        Paragraph(texte_totaux, style_totaux), '', '', '', '', '', '',
+    ])
+
+    # --- Largeurs proportionnelles, garanties de tenir dans largeur_frame ---
+    poids = [0.4, 1.1, 1.3, 1.3, 0.8, 1.1, 1.3, 1.3, 1.3, 1.3, 1.4, 1.8, 1.8, 1.6]
+    somme_poids = sum(poids)
+    col_widths = [(p / somme_poids) * largeur_frame for p in poids]
+
+    table = Table(table_data, repeatRows=1, colWidths=col_widths)
+    style = TableStyle([
+    ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#2980b9')),
+    ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+    ('ALIGN', (0, 0), (-1, 0), 'LEFT'),
+    ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+    ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+    ('ROWBACKGROUNDS', (0, 1), (-1, -2), [colors.white, colors.HexColor('#f5f5f5')]),
+    ('BACKGROUND', (0, -1), (-1, -1), colors.HexColor('#27ae60')),
+    ('ALIGN', (0, -1), (-1, -1), 'CENTER'),
+    ('SPAN', (0, -1), (6, -1)),    # "Effectif de la classe" — colonnes 0 à 6
+    ('SPAN', (7, -1), (13, -1)),   # "Total : ... — Garçons : ... — Filles : ..." — colonnes 7 à 13
+    ('TOPPADDING', (0, 0), (-1, -1), 3),
+    ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
+                ])
+        
+    table.setStyle(style)
+
+    # --- 3. Éléments du flux ---
+    elements = [NextPageTemplate('Suivantes'), Spacer(1, 0.3*cm)]
+    elements.append(table)
+    elements.append(Spacer(1, 1.0*cm))
+
+    style_signature = ParagraphStyle('Signature', parent=getSampleStyleSheet()['Normal'], alignment=TA_RIGHT, fontName='Helvetica-Bold')
+    date_str = datetime.now().strftime('%d/%m/%Y')
+
+    bloc_signature = [
+        [Paragraph(f"Conakry, le {date_str}", style_signature)],
+        [Spacer(1, 0.8*cm)],
+        [Paragraph("Le Service Scolarité", style_signature)],
+        [Spacer(1, 1.5*cm)],
+        [Paragraph(str(data_ecole[8]) if len(data_ecole) > 8 and data_ecole[8] else '', style_signature)],
+    ]
+    table_signature = RLTable(bloc_signature, colWidths=[largeur_frame])
+    table_signature.setStyle(TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'RIGHT'),
+        ('LEFTPADDING', (0, 0), (-1, -1), 0),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 0),
+        ('TOPPADDING', (0, 0), (-1, -1), 0),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 0),
+    ]))
+    elements.append(table_signature)
+
+    # --- 4. En-tête (page 1 uniquement) ---
+    def draw_entete(canvas_obj, doc):
+        width, height = landscape(A4)   # height ≈ 595 points, PAS 842
+        marge = marge_gauche_droite
+        largeur_utile = largeur_frame
+
+        nom_ecole = data_ecole[0] if len(data_ecole) > 0 else ''
+        ville = data_ecole[1] if len(data_ecole) > 1 else ''
+        commune = data_ecole[2] if len(data_ecole) > 2 else ''
+        tel1 = data_ecole[3] if len(data_ecole) > 3 else ''
+        tel2 = data_ecole[4] if len(data_ecole) > 4 else ''
+        logo_chemin = data_ecole[5] if len(data_ecole) > 5 else ''
+        devise = data_ecole[6] if len(data_ecole) > 6 else ''
+        dsee = data_ecole[7] if len(data_ecole) > 7 else ''
+
+        # --- Positions calculées depuis le HAUT de la page, compactées pour tenir en paysage ---
+        y = height - 20   # départ, juste sous le bord supérieur
+
+        canvas_obj.setFillColor(colors.black)
+        canvas_obj.setFont('Helvetica-Bold', 9)
+        canvas_obj.drawString(marge, y, 'MEPU-A')
+        y -= 12
+        canvas_obj.drawString(marge, y, 'IRE : ')
+        canvas_obj.setFont('Helvetica', 9)
+        canvas_obj.drawString(marge + 30, y, str(ville))
+        y -= 12
+        canvas_obj.setFont('Helvetica-Bold', 9)
+        canvas_obj.drawString(marge, y, 'DCE : ')
+        canvas_obj.setFont('Helvetica', 9)
+        canvas_obj.drawString(marge + 30, y, str(commune))
+        y -= 12
+        canvas_obj.setFont('Helvetica-Bold', 9)
+        canvas_obj.drawString(marge, y, 'DSEE : ')
+        canvas_obj.setFont('Helvetica', 9)
+        canvas_obj.drawString(marge + 30, y, str(dsee))
+        y -= 12
+        canvas_obj.setFont('Helvetica-Bold', 9)
+        canvas_obj.drawString(marge, y, 'TEL : ')
+        canvas_obj.setFont('Helvetica', 9)
+        canvas_obj.drawString(marge + 30, y, f"{tel1} / {tel2}")
+
+        # --- Logo (aligné en haut à droite du bloc gauche) ---
+        if logo_chemin and logo_chemin != 'Logo':
+            try:
+                img = Image.open(logo_chemin)
+                img = img.resize((60, 40), Image.LANCZOS)
+                if img.mode in ('RGBA', 'P'):
+                    img = img.convert('RGB')
+                elif img.mode != 'RGB':
+                    img = img.convert('RGB')
+                logo_buffer = io.BytesIO()
+                img.save(logo_buffer, format='PNG')
+                logo_buffer.seek(0)
+                canvas_obj.drawImage(ImageReader(logo_buffer), width/2 - 30, height - 55, 60, 40)
+            except Exception:
+                pass
+
+        # --- Drapeau + République (bloc droit, aligné en haut) ---
+        y_drapeau = height - 20
+        canvas_obj.setFillColor('Red')
+        canvas_obj.rect(width - marge - 90, y_drapeau, 30, 8, stroke=False, fill=True)
+        canvas_obj.setFillColor('yellow')
+        canvas_obj.rect(width - marge - 60, y_drapeau, 30, 8, stroke=False, fill=True)
+        canvas_obj.setFillColor('green')
+        canvas_obj.rect(width - marge - 30, y_drapeau, 30, 8, stroke=False, fill=True)
+        canvas_obj.setFillColor(colors.black)
+
+        canvas_obj.setFont('Helvetica-Bold', 9)
+        canvas_obj.drawRightString(width - marge, y_drapeau - 12, 'République de Guinée')
+        canvas_obj.setFont('Helvetica-Oblique', 8)
+        canvas_obj.drawRightString(width - marge, y_drapeau - 24, 'Travail-Justice-Solidarité')
+
+        # --- Nom de l'école (centré, sous le bloc logo/IRE/République) ---
+        y = height - 70
+        canvas_obj.setFont('Helvetica-Bold', 12)
+        nom_x = (width - canvas_obj.stringWidth(str(nom_ecole), 'Helvetica-Bold', 12)) / 2
+        canvas_obj.drawString(nom_x, y, str(nom_ecole))
+
+        if devise:
+            y -= 13
+            canvas_obj.setFont('Helvetica-Oblique', 8)
+            devise_x = (width - canvas_obj.stringWidth(str(devise), 'Helvetica-Oblique', 8)) / 2
+            canvas_obj.drawString(devise_x, y, str(devise))
+
+        y -= 10
+        canvas_obj.line(marge, y, marge + largeur_utile, y)
+
+        # --- Titre du rapport ---
+        y -= 15
+        titre = titre_rapport.upper()
+        canvas_obj.setFont('Helvetica-Bold', 11)
+        titre_x = (width - canvas_obj.stringWidth(titre, 'Helvetica-Bold', 11)) / 2
+        canvas_obj.drawString(titre_x, y, titre)
+
+        y -= 6
+        canvas_obj.line(marge + 60, y, marge + largeur_utile - 60, y)
+
+        # --- Année scolaire et session ---
+        y -= 16
+        annee_str = an.descript_annee if an else ''
+        session = annee_str.split('-')[-1] if '-' in annee_str else annee_str
+        canvas_obj.setFont('Helvetica-Bold', 10)
+        canvas_obj.drawString(marge + 160, y, 'Année Scolaire : ')
+        canvas_obj.setFont('Helvetica', 10)
+        canvas_obj.drawString(marge + 270, y, annee_str)
+        canvas_obj.setFont('Helvetica-Bold', 10)
+        canvas_obj.drawString(marge + 370, y, 'Session : ')
+        canvas_obj.setFont('Helvetica', 10)
+        canvas_obj.drawString(marge + 420, y, session)
+
+        return y   # position finale, utile pour ajuster dynamiquement y_fin_entete si besoin
+
+    def draw_page_number(canvas_obj, doc):
+        canvas_obj.saveState()
+        canvas_obj.setFont('Helvetica', 8)
+        canvas_obj.drawRightString(landscape(A4)[0] - 1.5*cm, 1.0*cm, f"Page {doc.page}")
+        canvas_obj.restoreState()
+
+    def on_first_page(canvas_obj, doc):
+        draw_entete(canvas_obj, doc)
+        draw_page_number(canvas_obj, doc)
+
+    def on_later_pages(canvas_obj, doc):
+        draw_page_number(canvas_obj, doc)
+
+    # --- 5. Construction avec deux PageTemplate ---
+    buffer = io.BytesIO()
+
+    y_fin_entete = 450   # nouvelle valeur compatible avec une hauteur de page paysage de ~595 points
+    hauteur_frame_page1 = y_fin_entete - marge_bas
+
+    frame_page1 = Frame(marge_gauche_droite, marge_bas, largeur_frame, hauteur_frame_page1, id='page1', showBoundary=0)
+    frame_suivantes = Frame(marge_gauche_droite, marge_bas, largeur_frame, landscape(A4)[1] - marge_bas - 1.5*cm, id='suivantes', showBoundary=0)
+
+    doc = BaseDocTemplate(buffer, pagesize=landscape(A4), title=titre_rapport)
+    doc.addPageTemplates([
+        PageTemplate(id='Premiere', frames=frame_page1, onPage=on_first_page),
+        PageTemplate(id='Suivantes', frames=frame_suivantes, onPage=on_later_pages),
+    ])
+
+    doc.build(elements)
+    buffer.seek(0)
+    return buffer

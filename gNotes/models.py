@@ -2,7 +2,7 @@ from django.db import models
 from gEleve.models import Eleve
 from gAdministration.models import AnneeScolaire, Classe
 from gCours.models import Matiere
-from gComptabilite.models import MOIS_CHOICES
+from gPersonnel.models import MOIS_CHOICES
 
 TRIMESTRE_CHOICES = (
     ('Selectionnez', 'Sélectionnez'),

@@ -1,16 +1,19 @@
 {% extends "base.html" %}
 {% block titre_page %} CONSULTATION {% endblock %}
+{% block titre_formulaire %} DETAILS DES INFORMATIONS DE L'ECOLE {% endblock %}
+{% block fil_ariane %}Administration /  Ecole / Consultation {% endblock %}
 {% block titre_cadre %}
-DETAILS DES INFORMATIONS DE L'ECOLE
+DONNEES DE L'ECOLE
 {% endblock %}
 
 {% block formulaire %}
 
-  <form class="form-horizontal" action="" method="POST">
+  <form action="" method="get" class="needs-validation">
 
                 {% csrf_token %}
 
-                <div class="row">
+        <div class="card-body"> 
+                <div class="row g-3">
                     <div class="col-md-12">
                        <div class="form-group">
                             <label for="IDecole">ID</label>
@@ -18,7 +21,7 @@ DETAILS DES INFORMATIONS DE L'ECOLE
                        </div>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-12">
                         <div class="form-group">
                             <label for="id_nom_ecole">Nom/Raison sociale</label>
@@ -26,7 +29,7 @@ DETAILS DES INFORMATIONS DE L'ECOLE
                         </div>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-12">
                         <div class="form-group">
                             <label for="id_ville_ecole">IRE</label>
@@ -34,7 +37,7 @@ DETAILS DES INFORMATIONS DE L'ECOLE
                         </div>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="id_dce">DCE/DPE</label>
@@ -49,7 +52,7 @@ DETAILS DES INFORMATIONS DE L'ECOLE
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="id_tel1">Contact 1</label>
@@ -64,7 +67,7 @@ DETAILS DES INFORMATIONS DE L'ECOLE
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="id_agrement">N°agrement</label>
@@ -79,7 +82,7 @@ DETAILS DES INFORMATIONS DE L'ECOLE
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="id_mail">Email</label>
@@ -94,7 +97,7 @@ DETAILS DES INFORMATIONS DE L'ECOLE
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-12">
                         <div class="form-group">
                             <label for="id_devise">Devise/Slogan</label>
@@ -103,29 +106,44 @@ DETAILS DES INFORMATIONS DE L'ECOLE
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="id_dg">Directeur général</label>
+                            <label for="id_dg">Directeur(trice) Général(e)</label>
                             <input type="text" name="dg" id="id_dg" value="{{ecole.dg}}" class="form-control" readonly>
                         </div>
                     </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="id_dga">Directeur(trice) Général(e) Adjoint(e)</label>
+                            <input type="text" name="dga" id="id_dga" value="{{ecole.dga}}" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="id_coordo_maternelle">Coordinateur Maternelle</label>
+                            <input type="text" name="coordomat" id="id_coordo_maternelle" value="{{ecole.coordo_maternelle}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3">
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="id_coordo_primaire">Coordinateur Primaire</label>
                             <input type="text" name="coordop" id="id_coordo_primaire" value="{{ecole.coordo_primaire}}" class="form-control" readonly>
                         </div>
                     </div>
-                </div>
 
-                <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-3">
                         <div class="form-group">
                             <label for="id_coordo_second">Coordinateur Secondaire</label>
                             <input type="text" name="coordos" id="id_coordo_second" value="{{ecole.coordo_secondaire}}" class="form-control" readonly>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-3">
                         <div class="form-group">
                             <label for="id_comptable">Comptable</label>
                             <input type="text" name="comptable" id="id_comptable" value="{{ecole.comptable}}" class="form-control" readonly>
@@ -133,8 +151,32 @@ DETAILS DES INFORMATIONS DE L'ECOLE
                     </div>
                 </div>
 
-                <div class="row">
-                    <div class="col-md-12">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_delai_t1">Date limite première tranche</label>
+                            <input type="text" id="id_delai_t1" name="delai_tranche1" value="{{ecole.delai_tranche1}}" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="id_delai_t2">Date limite deuxième tranche</label>
+                            <input type="text" id="id_delai_t2" name="delai_tranche2" value="{{ecole.delai_tranche2}}" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="id_delai_reinscription">Date début reinscription</label>
+                            <input type="text" id="id_delai_reinscription" name="delai_reinscription" value="{{ecole.delai_reinscription}}" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
                         <div class="form-group">
                             <div class="text-center">
                                 {% if ecole.logo_ecole %}
@@ -145,10 +187,8 @@ DETAILS DES INFORMATIONS DE L'ECOLE
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-3">
                         <div class="form-group">
                             <div class="text-left">
                                 {% if ecole.signa_dg %}
@@ -159,7 +199,7 @@ DETAILS DES INFORMATIONS DE L'ECOLE
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-3">
                         <div class="form-group">
                             <div class="text-right">
                                 {% if ecole.signa_de %}
@@ -171,13 +211,10 @@ DETAILS DES INFORMATIONS DE L'ECOLE
                         </div>
                     </div>
                 </div>
+         </div> 
 
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="text-center">
-                        <a href="{% url 'listeinfos' %}" target="_self" class="btn btn-sm btn-secondary">Retour &nbsp;<i class="fa fa-arrow-circle-left"></i></a>
-                        </div>
-                    </div>
+                <div class="card-footer text-center">
+                    <a href="{% url 'listeinfos' %}" target="_self" class="btn btn-primary btn-md">Retour &nbsp;<i class="fa fa-arrow-circle-left"></i></a>
                 </div>
   </form>
 {% endblock %}

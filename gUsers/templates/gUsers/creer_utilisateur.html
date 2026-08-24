@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% block titre_page %} GESTION DES UTILISATEURS {% endblock %}
+{% block titre_formulaire %} AJOUT D'UN COMPTE UTILISATEUR {% endblock %}
+{% load crispy_forms_tags %}
+{% block fil_ariane %}Administration / Utilisateurs /  Nouveau {% endblock %}
+{% block titre_cadre %}
+CREER UN UTILISATEUR
+{% endblock %}
+
+{% block formulaire %}
+
+    <form method="post" enctype="multipart/form-data" action="" id="fregistration">
+        {% csrf_token %}
+        
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-12">
+                    {{form.username|as_crispy_field}}
+                </div>
+            </div>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    {{form.first_name|as_crispy_field}}
+                </div>
+                <div class="col-md-6">
+                    {{form.last_name|as_crispy_field}}
+                </div>
+            </div>
+            <div class="row g-3">
+
+                <div class="col-md-3">
+                    {{form.email|as_crispy_field}}
+                </div>
+
+                <div class="col-md-3">
+                    {{form.password1|as_crispy_field}}
+                </div>
+
+                <div class="col-md-3">
+                    {{form.password2|as_crispy_field}}
+                </div>
+
+                <div class="col-md-3">
+                    {{form.niveau_acces|as_crispy_field}}
+                </div>
+
+            </div>
+            
+            <div class="row g-3">
+                <div class="col-md-12">
+                    <div class="form-group text-center">
+
+                        {{form.photo_profil|as_crispy_field}}
+
+                        <label for="id_photo_user" class="photo-zone" id="photoUserZone">
+                            <img id="photoUserPreview" src="" alt="" style="display:none;">
+                            <div id="photoUserPlaceholder">
+                                    <div class="placeholder-icon">
+                                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#adb5bd" stroke-width="1.5">
+                                                <path d="M4 7h3l2-2h6l2 2h3a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z"/>
+                                                <circle cx="12" cy="13" r="4"/>
+                                        </svg>
+                                    </div>
+                                    <div class="placeholder-text">Cliquer pour ajouter la photo de profil de l'utilisateur</div>
+                            </div>
+                        </label>
+                        
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+                    
+        <div class="card-footer text-center">
+            <button type="submit" class="btn btn-success btn-md">Créer &nbsp; <i class="fa-solid fa-user-plus"></i></button>
+            <button type="reset" class="btn btn-warning btn-md">Annuler &nbsp;<i class="fa fa-refresh"></i></button>
+            <a href="{% url 'liste_utilisateurs' %}" target="_self" class="btn btn-primary btn-md" title="Afficher la liste des utilisateurs">Retour &nbsp;<i class="fa fa-arrow-circle-left"></i></a>
+        </div>
+        
+        
+    </form>
+
+{% endblock %}
+
+{% block javascript %}
+
+<script>
+
+    $("#fregistration")[0].addEventListener("reset", function(){
+            // On laisse le navigateur vider le input file lui-même,
+            // mais on doit remettre l'aperçu à zéro manuellement
+            setTimeout(resetPhotoUserZone, 0);
+        });
+    
+</script>
+
+
+{% endblock %}

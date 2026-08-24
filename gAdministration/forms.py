@@ -1,6 +1,7 @@
 from django import forms
 from django.forms import ModelForm
 from .models import *
+
 class FormCycle(ModelForm):
     class Meta:
         model = CycleScolaire
@@ -21,12 +22,13 @@ class FormClasse(ModelForm):
     class Meta:
         model = Classe
         fields = (
-            'nom_classe', 'frais_inscription', 'frais_reinscription', 'tranche1', 'idcycle')
+            'nom_classe', 'frais_inscription', 'frais_reinscription', 'tranche1','tranche2','idcycle')
         labels = {
             'nom_classe': 'Nom classe',
             'frais_inscription': 'Frais inscription',
             'frais_reinscription': 'Frais reinscription',
-            'tranche1': 'Mensualité',
+            'tranche1': 'Première tranche',
+            'tranche2':'Deuxième tranche',
             'idcycle': 'Cycle'
         }
 
@@ -38,8 +40,9 @@ class FormClasse(ModelForm):
             'frais_reinscription': forms.NumberInput(
                 attrs={'class': 'form-control', 'placeholder': 'Frais reinscription',
                        'title': 'Saisissez le frais de réinscription'}),
-            'tranche1': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Mensualité',
-                                                 'title': 'Saisissez le montant de la mensualité'}),
+            'tranche1': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Tranche 1',
+                                                 'title': 'Saisissez le montant de la première tranche'}),
+            'tranche2': forms.NumberInput(attrs={'class':'form-control','placeholder':'Tranche 2','title':'Saisissez le montant de la deuxième tranche'}),
             'idcycle': forms.Select(attrs={'class': 'form-control', 'selected': 'Selectionnez',
                                            'title': 'Sélectionnez le cycle associé à la classe'})
         }
@@ -71,7 +74,7 @@ class FormEcole(ModelForm):
         fields = (
             'nom_ecole', 'ville_ecole', 'prefect_commune', 'dsee', 'telephone1', 'telephone2', 'agrement_ecole',
             'bp_ecole',
-            'email_ecole', 'site_internet', 'devise_ecole', 'dg', 'coordo_primaire', 'coordo_secondaire', 'comptable',
+            'email_ecole', 'site_internet', 'devise_ecole', 'dg', 'dga', 'coordo_maternelle', 'coordo_primaire', 'coordo_secondaire', 'comptable','delai_tranche1','delai_tranche2','delai_reinscription',
             'logo_ecole', 'signa_dg', 'signa_de')  # '__all__'
         labels = {
             'nom_ecole': 'Nom école/Raison sociale',
@@ -85,10 +88,15 @@ class FormEcole(ModelForm):
             'email_ecole': 'Email/Adresse electronique',
             'site_internet': 'Site web',
             'devise_ecole': 'Devise/Slogan',
-            'dg': 'Directeur Général',
+            'dg': 'Directeur(trice) Général(e)',
+            'dga': 'Directeur(trice) Général(e) Adjoint(e)',
+            'coordo_maternelle': 'Coordinateur Maternelle',
             'coordo_primaire': 'Coordinateur Primaire',
             'coordo_secondaire': 'Coordinateur Secondaire',
             'comptable': 'Comptable',
+            'delai_tranche1': 'Date limite première tranche',
+            'delai_tranche2': 'Date limite deuxième tranche',
+            'delai_reinscription': 'Date ouverture reinscription',
             'logo_ecole': 'Logo école',
             'signa_dg': 'Signature du DG',
             'signa_de': 'Signature du DE'
@@ -105,43 +113,57 @@ class FormEcole(ModelForm):
             'dsee': forms.TextInput(
                 attrs={'class': 'form-control', 'placeholder': 'DSEE', 'title': 'Saisissez le nom de la DSEE'}),
             'telephone1': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Contact 1', 'type': 'tel',
-                                                 'pattern': "(\\+224)?[36][0-9]{8}",
-                                                 'title': 'Saisissez un numéro de téléphone guinéen'}),
+                                                 'pattern': "^(\\+?[0-9]{1,3}[\\s\\-]?)?[0-9\\s\\-\\(\\)]{7,15}$",
+                                                 'title': 'Saisissez un numéro de téléphone valide'}),
             'telephone2': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Contact 2', 'type': 'tel',
-                                                 'pattern': "(\\+224)?[36][0-9]{8}",
-                                                 'title': 'Saisissez un numéro de téléphone guinéen'}),
+                                                 'pattern': "^(\\+?[0-9]{1,3}[\\s\\-]?)?[0-9\\s\\-\\(\\)]{7,15}$",
+                                                 'title': 'Saisissez un numéro de téléphone valide'}),
             'agrement_ecole': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'N°agrement',
                                                      'title': 'Saisissez le numéro de l\'agrement de votre école'}),
             'bp_ecole': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Boîte Postale (BP)',
                                                'title': 'Saisissez une boite postale'}),
             'email_ecole': forms.EmailInput(
                 attrs={'class': 'form-control', 'placeholder': 'Ex: contact@universtechgroup.com',
-                       'pattern': "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\'.[a-zA-Z]{2,}", 'title': 'Saisissez un email correct!'}),
+                       'pattern': "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}", 'title': 'Saisissez un email correct!'}),
             'site_internet': forms.URLInput(
                 attrs={'class': 'form-control', 'placeholder': 'Ex: https://www.universtechgroup.com',
-                       'pattern': "https?://[a-zA-Z0-9.-]+\\'.[a-zA-Z]{2,}.*",
+                       'pattern': "https?://[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}.*",
                        'title': 'Saisissez un site web correct!'}),
             'devise_ecole': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Devise de l\'école',
                                                    'title': 'Saisissez la devise/slogan de l\'école'}),
-            'dg': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nom et Prénoms du DG',
-                                         'title': 'Saisissez le nom et prénoms du DG'}),
+            'dg': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Prénoms et Nom DG',
+                                         'title': 'Saisissez le prénoms et nom du/de la Directeur(trice) Général(e)'}),
+            'dga': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Prénoms et Nom DGA',
+                                         'title': 'Saisissez le prénoms et nom du/de la Directeur(trice) Général(e) Adjoint(e)'}),
+            'coordo_maternelle': forms.TextInput(
+                attrs={'class': 'form-control', 'placeholder': 'Prénoms et Nom du Coordinateur Maternelle',
+                       'title': 'Saisissez le prénoms et nom du coordinateur de la maternelle'}),  
+
             'coordo_primaire': forms.TextInput(
-                attrs={'class': 'form-control', 'placeholder': 'Nom et Prénoms Coordinateur Primaire',
-                       'title': 'Saisissez le nom et prénoms du coordinateur du primaire'}),
+                attrs={'class': 'form-control', 'placeholder': 'Prénoms et Nom du Coordinateur Primaire',
+                       'title': 'Saisissez le prénoms et nom du coordinateur du primaire'}),
+
             'coordo_secondaire': forms.TextInput(
-                attrs={'class': 'form-control', 'placeholder': 'Nom et Prénoms Coordinateur Secondaire',
-                       'title': 'Saisissez le nom et prénoms du coordinateur du secondaire'}),
-            'comptable': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nom et Prénoms Comptable',
-                                                'title': 'Saisissez le nom et prénoms du/de la comptable'}),
+                attrs={'class': 'form-control', 'placeholder': 'Prénoms et Nom du Coordinateur Secondaire',
+                       'title': 'Saisissez le prénoms et nom du coordinateur du secondaire'}),
+                       
+            'comptable': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Prénoms et Nom Comptable', 'title': 'Saisissez le prénoms et nom du/de la comptable'}),
+
+            'delai_tranche1': forms.DateInput(attrs={'type':'date', 'class':'form-control', 'title':'Date limite de paiement pour la première tranche'}),
+
+            'delai_tranche2': forms.DateInput(attrs={'type':'date', 'class':'form-control', 'title':'Date limite de paiement pour la deuxième tranche'}),
+
+            'delai_reinscription' : forms.DateInput(attrs={'type':'date','class':'form-control', 'title':'Date d\'ouverture des reinscriptions'}),
+
             'logo_ecole': forms.FileInput(
-                attrs={'class': 'form-control', 'title': 'Importez le logo de l\'école',
-                       'accept': 'image/jpeg, image/png'}),
+                attrs={'class': 'd-none', 'title': 'Importez le logo de l\'école',
+                       'accept': 'image/*', 'id':'id_logo_ecole', 'onchange': 'previewLogoEcole(this)'}),
             'signa_dg': forms.FileInput(
-                attrs={'class': 'form-control', 'title': 'Importez la signature du DG',
-                       'accept': 'image/jpeg, image/png'}),
+                attrs={'class': 'd-none', 'title': 'Importez la signature du DG',
+                       'accept': 'image/*', 'id':'id_signa_dg', 'onchange': 'previewSignatureDG(this)'}),
             'signa_de': forms.FileInput(
-                attrs={'class': 'form-control', 'title': 'Importez la signature du DE',
-                       'accept': 'image/jpeg, image/png'})  # 'accept': 'image/jpeg, image/png, image/*'
+                attrs={'class': 'd-none', 'title': 'Importez la signature du DE',
+                       'accept': 'image/*', 'id':'id_signa_de', 'onchange': 'previewSignatureDE(this)'})  # 'accept': 'image/jpeg, image/png, image/*'
 
         }
 
@@ -154,5 +176,8 @@ class FormEcole(ModelForm):
         self.fields['signa_de'].required = False
         self.fields['email_ecole'].required=False
         self.fields['site_internet'].required=False
+        self.fields['coordo_primaire'].required=False
+        self.fields['coordo_maternelle'].required=False
+        self.fields['coordo_secondaire'].required=False
         
         

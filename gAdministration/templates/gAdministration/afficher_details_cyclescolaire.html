@@ -1,16 +1,19 @@
 {% extends "base.html" %}
 {% block titre_page %} CONSULTATION {% endblock %}
+{% block titre_formulaire %} DETAILS D'UN CYCLE SCOLAIRE {% endblock %}
+{% block fil_ariane %}Administration /  Cycle scolaire / Consultation {% endblock %}
 {% block titre_cadre %}
-DETAILS D'UN CYCLE SCOLAIRE
+INFORMATION SUR UN CYCLE SCOLAIRE
 {% endblock %}
 
 {% block formulaire %}
 
-        <form class="form-horizontal" action="" method="POST">
+        <form  action="" method="get" class="needs-validation">
 
                         {% csrf_token %}
 
-                        <div class="row">
+                    <div class="card-body">  
+                        <div class="row g-3">
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="IDCycle">ID Cycle</label>
@@ -19,7 +22,7 @@ DETAILS D'UN CYCLE SCOLAIRE
                             </div>
                         </div>
 
-                        <div class="row">
+                        <div class="row g-3">
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="id_ncycle">Cycle scolaire</label>
@@ -27,14 +30,11 @@ DETAILS D'UN CYCLE SCOLAIRE
                                 </div>
                             </div>
                         </div>
-
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="text-center">
-                                    <a href="{% url 'listecycle' %}" target="_self" class="btn btn-sm btn-primary">Retour &nbsp;<i class="fa fa-arrow-circle-left"></i></a>
-                                </div>
-                            </div>
-                        </div>
+                    </div> 
+                    
+                    <div class="card-footer text-center">
+                        <a href="{% url 'listecycle' %}" target="_self" class="btn btn-primary btn-md">Retour &nbsp;<i class="fa fa-arrow-circle-left"></i></a>
+                    </div>    
 
         </form>
 

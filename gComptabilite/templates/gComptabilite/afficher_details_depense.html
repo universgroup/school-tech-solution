@@ -1,16 +1,18 @@
 {% extends "base.html" %}
 {% block titre_page %} CONSULTATION {% endblock %}
+{% block titre_formulaire %} DETAILS D'UNE LIGNE DE DEPENSE {% endblock %}
+{% block fil_ariane %}Comptabilité /  Dépenses  / Consultation {% endblock %}
 {% block titre_cadre %}
-DETAILS D'UNE LIGNE DE DEPENSE
+INFORMATIONS SUR LA LIGNE DE DEPENSES
 {% endblock %}
 
 {% block formulaire %}
 
-   <form class="form-horizontal" action="" method="POST">
+   <form class="needs-validation" action="" method="get">
 
                 {% csrf_token %}
-
-                <div class="row">
+            <div class="card-body">
+                <div class="row g-3">
                     <div class="col-md-12">
                         <div class="form-group">
                             <label for="IDcaisse">ID</label>
@@ -19,7 +21,7 @@ DETAILS D'UNE LIGNE DE DEPENSE
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="id_categ">Catégorie dépense</label>
@@ -34,7 +36,7 @@ DETAILS D'UNE LIGNE DE DEPENSE
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-12">
                         <div class="form-group">
                             <label for="id_libelle">Désignation</label>
@@ -43,7 +45,7 @@ DETAILS D'UNE LIGNE DE DEPENSE
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="id_qte">Quantité</label>
@@ -58,7 +60,7 @@ DETAILS D'UNE LIGNE DE DEPENSE
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="id_provenance">Provient de</label>
@@ -73,7 +75,7 @@ DETAILS D'UNE LIGNE DE DEPENSE
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="id_type_op">Type opération</label>
@@ -87,7 +89,7 @@ DETAILS D'UNE LIGNE DE DEPENSE
                         </div>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-12">
                         <div class="form-group">
                             <label for="id_memo">Observation/Mémo</label>
@@ -95,7 +97,7 @@ DETAILS D'UNE LIGNE DE DEPENSE
                         </div>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-12">
                         <div class="form-group">
                             <label for="id_annee">Année Scolaire</label>
@@ -104,7 +106,7 @@ DETAILS D'UNE LIGNE DE DEPENSE
                     </div>
                 </div>
        
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-12">
                         <div class="text-center">
                             {% if depense.piece_jointe %}
@@ -115,14 +117,11 @@ DETAILS D'UNE LIGNE DE DEPENSE
                         </div>
                     </div>
                 </div>
-                <br>
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="text-center">
-                            <a href="{% url 'listedepense' %}" target="_self" class="btn btn-primary btn-sm">Retour &nbsp;<i class="fa fa-arrow-circle-left"></i></a>
-                        </div>
-                    </div>
-              </div>
+            </div>
+            
+            <div class="card-footer text-center">
+               <a href="{% url 'listedepense' %}" target="_self" class="btn btn-primary btn-md">Retour &nbsp;<i class="fas fa-arrow-circle-left"></i></a>
+            </div>
 
    </form>
 

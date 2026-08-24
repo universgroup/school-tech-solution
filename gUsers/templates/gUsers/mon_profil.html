@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block titre_page %} CONSULTATION {% endblock %}
+{% block titre_formulaire %} DETAILS DE VOTRE PROFIL {% endblock %}
+{% block fil_ariane %} Administration / Utilisateur /  Mon profil {% endblock %}
+{% block titre_cadre %}
+INFORMATIONS DE L'UTILISATEUR
+{% endblock %}
+{% load permissions_tags %}
+
+{% block formulaire %}
+
+    <form method="get" class="needs-validation" action="">
+        
+        {% csrf_token %}
+
+        <div class="card-body">   
+                <div class="row g-3">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="IDuser">ID</label>
+                            <input type="text" id="IDuser" value="{{user.id}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="id_username">Nom utilisateur</label>
+                            <input type="text" name="username" id="id_username" value="{{user.username}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_firstname">Prénom(s)</label>
+                            <input type="text" name="first_name" id="id_firstname" value="{{user.first_name}}" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_lastname">Nom famille</label>
+                            <input type="text" name="last_name" id="id_lastname" value="{{user.last_name}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_email">Adresse email</label>
+                            <input type="text" name="email_user" id="id_email" value="{{user.email}}" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                          <label for="id_niv_acces">Niveau d'accès</label>
+                          <input type="text" name="niveau_acces" id="id_niv_acces" value="{{user.niveau_acces}}" class="form-control" readonly>
+                        </div>
+                    </div>
+             
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="id_date_creation">Date création</label>
+                            <input type="text" name="date_joined" id="id_date_creation" value="{{user.date_joined|date:'j-n-Y'}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-12">
+                        <div class="form-group text-center">
+                            {% if user.photo_profil %}
+                                <a href="{{user.photo_profil.url}}" title="Photo du profil">
+                                    <img src="{{user.photo_profil.url}}" width="150px">
+                                </a>
+                            {% else %}
+                                <label>Photo indisponible</label>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                </div>
+        </div> 
+
+        <div class="card-footer text-center">
+
+            <a href="{% url 'accueil' %}" target="_self" class="btn btn-primary btn-md" title="Retour au tableau de bord">Accueil &nbsp;<i class="fa fa-arrow-circle-left"></i></a>
+
+            <a href="{% url 'password_reset' %}" target="_blank" class="btn btn-info btn-md" title="Cliquez ici pour changer votre mot de passe">Reinitialiser mon mot de passe &nbsp; <i class="fa-solid fa-unlock-keyhole"></i></a>
+
+            {% peut request.user 'menu_administration' as ok_admin %}
+
+            {% if ok_admin %}
+            <a href="{% url 'liste_utilisateurs' %}" target="_self" class="btn btn-secondary btn-md" title="Retour à la liste des utilisateurs">Liste utilisateurs &nbsp;<i class="fa-solid fa-users"></i></a>
+            {% endif %}
+        </div>
+
+    </form>
+
+{% endblock %}

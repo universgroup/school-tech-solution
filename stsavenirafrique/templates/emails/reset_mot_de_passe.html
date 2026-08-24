@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="fr">
+<body style="font-family: Arial, sans-serif;">
+    <div style="max-width:600px; margin:auto; padding:20px;">
+        <h2>Réinitialisation de votre mot de passe</h2>
+        <p>Bonjour {{ user.first_name }},</p>
+        <p>Cliquez sur le lien ci-dessous pour choisir un nouveau mot de passe :</p>
+        <p><a href="{{ protocol }}://{{ domain }}{% url 'password_reset_confirm' uidb64=uid token=token %}">Réinitialiser mon mot de passe</a></p>
+        <p>Ce lien expire dans 1 heure. Si vous n'êtes pas à l'origine de cette demande, ignorez cet e-mail.</p>
+        <hr style="border:none; border-top:1px solid #ddd; margin:20px 0;">
+        <p style="color:#0f0f0f; font-size:12px;">{{ nom_ecole }}</p>
+    </div>
+</body>
+</html>

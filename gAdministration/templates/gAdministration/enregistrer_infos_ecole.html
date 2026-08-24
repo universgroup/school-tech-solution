@@ -1,19 +1,21 @@
 {% extends "base.html" %}
-{% block titre_page %} PARAMETRAGE DES INFORMATIONS DE L'ECOLE {% endblock %}
+{% block titre_page %} CONFIGURATION DE L'ECOLE {% endblock %}
 {% load crispy_forms_tags %}
-
+{% block titre_formulaire %} PARAMETRAGE DES INFORMATIONS DE L'ECOLE {% endblock %}
+{% block fil_ariane %}Administration /  Ecole / Nouveau {% endblock %}
  {% block titre_cadre %}
-ENREGISTREMENT DES INFORMATIONS DE L'ECOLE
+    ENREGISTREMENT DES DONNEES DE L'ECOLE
  {% endblock %}
 
 
  {% block formulaire %}
 
-    <form action="" method="POST" enctype="multipart/form-data" class="form-horizontal">
+    <form action="" method="POST" enctype="multipart/form-data" class="needs-validation" id="finfosecole">
 
                     {% csrf_token %}
-                    
-                    <div class="row">
+                
+                <div class="card-body">    
+                    <div class="row g-3">
                         <div class="col-md-12">
                             <div class="form-group">
                                 {{form.nom_ecole|as_crispy_field}}
@@ -21,7 +23,7 @@ ENREGISTREMENT DES INFORMATIONS DE L'ECOLE
                         </div>
                     </div>
 
-                    <div class="row">
+                    <div class="row g-3">
                         <div class="col-md-6">
                             <div class="form-group">
                                 {{form.ville_ecole|as_crispy_field}}
@@ -35,7 +37,7 @@ ENREGISTREMENT DES INFORMATIONS DE L'ECOLE
                         </div>
                     </div>
 
-                    <div class="row">
+                    <div class="row g-3">
                         <div class="col-md-12">
                             <div class="form-group">
                                 {{form.dsee|as_crispy_field}}                                
@@ -43,7 +45,7 @@ ENREGISTREMENT DES INFORMATIONS DE L'ECOLE
                         </div>
                     </div>
 
-                    <div class="row">
+                    <div class="row g-3">
                         <div class="col-md-6">
                             <div class="form-group">
                                 {{form.telephone1|as_crispy_field}}
@@ -57,7 +59,7 @@ ENREGISTREMENT DES INFORMATIONS DE L'ECOLE
                         </div>
                     </div>
 
-                    <div class="row">
+                    <div class="row g-3">
                         <div class="col-md-6">
                             <div class="form-group">
                                 {{form.agrement_ecole|as_crispy_field}}
@@ -71,7 +73,7 @@ ENREGISTREMENT DES INFORMATIONS DE L'ECOLE
                         </div>
                     </div>
 
-                    <div class="row">
+                    <div class="row g-3">
                         <div class="col-md-6">
                             <div class="form-group">
                                 {{form.email_ecole|as_crispy_field}}
@@ -85,7 +87,7 @@ ENREGISTREMENT DES INFORMATIONS DE L'ECOLE
                         </div>
                     </div>
 
-                    <div class="row">
+                    <div class="row g-3">
                         <div class="col-md-12">
                             <div class="form-group">
                                 {{form.devise_ecole|as_crispy_field}}
@@ -93,74 +95,146 @@ ENREGISTREMENT DES INFORMATIONS DE L'ECOLE
                         </div>
                     </div>
 
-                    <div class="row">
-                        <div class="col-md-12">
+                    <div class="row g-3">
+                        <div class="col-md-6">
                             <div class="form-group">
                                 {{form.dg|as_crispy_field}}
                             </div>
                         </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{form.dga|as_crispy_field}}
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="row">
+                    <div class="row g-3">
                         <div class="col-md-6">
+                            <div class="form-group">
+                                {{form.coordo_maternelle|as_crispy_field}}
+                            </div>
+                        </div>
+                        <div class="col-md-3">
                             <div class="form-group">
                                 {{form.coordo_primaire|as_crispy_field}}
                             </div>
                         </div>
-
-                        <div class="col-md-6">
+                        <div class="col-md-3">
                             <div class="form-group">
                                 {{form.coordo_secondaire|as_crispy_field}}
                             </div>
                         </div>
                     </div>
 
-                    <div class="row">
-                        <div class="col-md-12">
+                    <div class="row g-3">
+                        <div class="col-md-6">
                             <div class="form-group">
                                 {{form.comptable|as_crispy_field}}
                             </div>
                         </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                {{form.delai_tranche1|as_crispy_field}}
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                {{form.delai_tranche2|as_crispy_field}}
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                {{form.delai_reinscription|as_crispy_field}}
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-group">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-group text-center">
                                 {{form.logo_ecole|as_crispy_field}}
+
+                                <label for="id_logo_ecole" class="photo-zone" id="logoZone">
+                                    <img id="logoPreview" src="" alt="" style="display:none;">
+                                    <div id="logoPlaceholder">
+                                            <div class="placeholder-icon">
+                                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#adb5bd" stroke-width="1.5">
+                                                        <path d="M4 7h3l2-2h6l2 2h3a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z"/>
+                                                        <circle cx="12" cy="13" r="4"/>
+                                                </svg>
+                                            </div>
+                                            <div class="placeholder-text">Cliquer pour ajouter le logo de l'école</div>
+                                    </div>
+                                </label>
+
                             </div>
                         </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-group">
+                   
+                        <div class="col-md-3">
+                            <div class="form-group text-center">
                                 {{form.signa_dg|as_crispy_field}}
+
+                                <label for="id_signa_dg" class="photo-zone" id="signaDGZone">
+                                    <img id="SignaDGPreview" src="" alt="" style="display:none;">
+                                    <div id="SignaDGPlaceholder">
+                                            <div class="placeholder-icon">
+                                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#adb5bd" stroke-width="1.5">
+                                                        <path d="M4 7h3l2-2h6l2 2h3a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z"/>
+                                                        <circle cx="12" cy="13" r="4"/>
+                                                </svg>
+                                            </div>
+                                            <div class="placeholder-text">Cliquer pour ajouter la signature de la DG/Fondatrice</div>
+                                    </div>
+                                </label>
+
                             </div>
                         </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-group">
+                    
+                        <div class="col-md-3">
+                            <div class="form-group text-center">
                                 {{form.signa_de|as_crispy_field}}
+
+                                <label for="id_signa_de" class="photo-zone" id="signaDEZone">
+                                    <img id="SignaDEPreview" src="" alt="" style="display:none;">
+                                    <div id="SignaDEPlaceholder">
+                                            <div class="placeholder-icon">
+                                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#adb5bd" stroke-width="1.5">
+                                                        <path d="M4 7h3l2-2h6l2 2h3a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z"/>
+                                                        <circle cx="12" cy="13" r="4"/>
+                                                </svg>
+                                            </div>
+                                            <div class="placeholder-text">Cliquer pour ajouter la signature du directeur des études</div>
+                                    </div>
+                                </label>
+
                             </div>
                         </div>
                     </div>
-
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="text-center">
-
-                                <button type="submit" class="btn btn-success btn-sm">Enregistrer &nbsp; <i class="fa fa-save"></i></button>
-                                <button type="reset" class="btn btn-warning btn-sm">Annuler &nbsp; <i class="fa fa-refresh"></i></button>
-                                <a href="{% url 'listeinfos' %}" class="btn btn-primary btn-sm" target="_self" title="Afficher les détails des informations de l'école">Retour &nbsp; <i class="fa fa-arrow-circle-right"></i></a>
-
-                            </div>
-                            
-                        </div>
-
-                    </div>
+                </div>
+                
+                <div class="card-footer text-center">
+                    <button type="submit" class="btn btn-success btn-md">Enregistrer &nbsp; <i class="fa fa-save"></i></button>
+                    <button type="reset" class="btn btn-warning btn-md">Annuler &nbsp; <i class="fa fa-refresh"></i></button>
+                    <a href="{% url 'listeinfos' %}" class="btn btn-primary btn-md" target="_self" title="Afficher les détails des informations de l'école">Retour &nbsp; <i class="fa fa-arrow-circle-left"></i></a>
+                </div>
 
     </form>
+
+{% endblock %}
+
+{% block javascript %}
+
+<script>
+
+    $("#finfosecole")[0].addEventListener("reset", function(){
+        // On laisse le navigateur vider le input file lui-même,
+        // mais on doit remettre l'aperçu à zéro manuellement
+        setTimeout(resetLogoZone, 0);
+        setTimeout(resetSignaDGZone,0);
+        setTimeout(resetSignaDEZone, 0);
+    });
+
+
+</script>
 
 {% endblock %}

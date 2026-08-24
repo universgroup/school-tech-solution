@@ -1,16 +1,18 @@
 {% extends "base.html" %}
 {% block titre_page %} CONSULTATION {% endblock %}
+{% block titre_formulaire %} DETAILS DES INFORMATIONS D'UNE CLASSE {% endblock%}
+{% block fil_ariane %}Administration /  Classe / Consultation {% endblock %}
 {% block titre_cadre %}
-DETAILS DES INFORMATIONS D'UNE CLASSE
+INFORMATIONS DE LA CLASSE
 {% endblock %}
 
 {% block formulaire %}
 
-    <form class="form-horizontal" action="" method="POST">
+    <form action="" method="get" class="needs-validation">
 
                 {% csrf_token %}
-
-                <div class="row">
+            <div class="card-body">
+                <div class="row g-3">
                     <div class="col-md-12">
                         <div class="form-group">
                             <label for="IDclasse">ID Classe</label>
@@ -19,7 +21,7 @@ DETAILS DES INFORMATIONS D'UNE CLASSE
                      </div>
                 </div>
 
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-12">
                         <div class="form-group">
                             <label for="id_nomclasse">Nom de la classe</label>
@@ -28,7 +30,7 @@ DETAILS DES INFORMATIONS D'UNE CLASSE
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="id_frais_inscrip">Frais inscription</label>
@@ -43,22 +45,27 @@ DETAILS DES INFORMATIONS D'UNE CLASSE
                     </div>
                 </div>
 
-                <div class="row">
-                    <div class="col-md-12">
+                <div class="row g-3">
+                    <div class="col-md-6">
                         <div class="form-group">
-                            <label for="id_tranche1">Mensualité</label>
+                            <label for="id_tranche1">Première tranche</label>
                             <input type="text" name="tranche1" id="id_tranche1" value="{{clas.tranche1|floatformat:'2g'}}" class="form-control" readonly>
                         </div>
                     </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="text-center">
-                            <a href="{% url 'listeclasse' %}" target="_self" class="btn btn-sm btn-secondary">Retour &nbsp;<i class="fa fa-arrow-circle-left"></i></a>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_tranche2">Deuxième tranche</label>
+                            <input type="text" name="tranche2" id="id_tranche2" value="{{clas.tranche2|floatformat:'2g'}}" class="form-control" readonly>
                         </div>
                     </div>
                 </div>
+            </div>
+            
+            <div class="card-footer text-center">
+      
+             <a href="{% url 'listeclasse' %}" target="_self" class="btn btn-primary btn-md">Retour &nbsp;<i class="fa fa-arrow-circle-left"></i></a>
+
+            </div>
 
     </form>
 

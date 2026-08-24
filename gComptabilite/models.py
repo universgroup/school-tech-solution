@@ -1,5 +1,5 @@
 from django.db import models
-from gAdministration.models import AnneeScolaire, Classe, Historique
+from gAdministration.models import AnneeScolaire, Classe, CycleScolaire
 from gEleve.models import Eleve
 
 TYPE_OPERATION_CAISSE_CHOICES = (
@@ -19,42 +19,50 @@ CATEGORIE_DEPENSE_CHOICES = (
     ('Amortissements', 'Amortissements'),  # 7
     ('Charges Recurrentes', 'Charges récurrentes'),  # 8
     ('Créances', 'Créances'),  # 9
-    ('Dettes', 'Dettes'),  # 10
-    ('Autres Charges', 'Autres charges')  # 11
+    ('Dettes Fournisseurs', 'Dettes Fournisseurs'),  # 10
+    ('Autres Charges', 'Autres charges'),  # 11
+    ('Matériels Informatiques','Matériels Informatiques'), # 12
+    ('Matériels Didactiques','Matériels Didactiques'), # 13
 )
 
 CATEGORIE_RECETTE_CHOICES = (
     ('Selectionnez', 'Sélectionnez'),  # 0
     ('Scolarité', 'Scolarité'),  # 1
-    ('Cours Revision', 'Cours révision'),  # 2
-    ('Cours Coraniques', 'Cours coraniques'),  # 3
-    ('Arriere Scolaire', 'Arriere scolaire'),  # 4
-    ('Remboursement Prêt', 'Remboursement prêt'),  # 5
-    ('Autres Recettes', 'Autres recettes')  # 6
+    ('Cantine', 'Cantine'),  # 2
+    ('Sport', 'Sport'),  # 3
+    ('Karaté','Karaté'), # 4
+    ('Natation','Natation'), # 5
+    ('Autres Extra Scolaires','Autres Extra Scolaires'), # 6
+    ('Arriere Scolaire', 'Arriere scolaire'),  # 7
+    ('Remboursement Prêt', 'Remboursement prêt'),  # 8
+    ('Autres Recettes', 'Autres recettes')  # 9
 )
 
 TYPE_PAIEMENT_MENSUALITE_CHOICES = (
-    ('Selectionnez', 'Sélectionnez'),
-    ('Scolarite', 'Scolarité'),
-    ('Cours Revision', 'Cours révision'),
-    ('Cours Coraniques', 'Cours coraniques'),
-    ('Arriere Scolaire', 'Arriere scolaire')
+    ('Selectionnez', 'Sélectionnez'), # 0
+    ('Scolarite', 'Scolarité'), # 1
+    ('Cours Revision', 'Cours révision'), # 2
+    ('Cours Coraniques', 'Cours coraniques'), # 3
+    ('Arriere Scolaire', 'Arriere scolaire') # 4
 )
 
-MOIS_CHOICES = (
-    ('Selectionnez', 'Sélectionnez'),
-    ('janvier', 'janvier'),
-    ('fevrier', 'fevrier'),
-    ('mars', 'mars'),
-    ('avril', 'avril'),
-    ('mai', 'mai'),
-    ('juin', 'juin'),
-    ('juillet', 'juillet'),
-    ('aout', 'aout'),
-    ('septembre', 'septembre'),
-    ('octobre', 'octobre'),
-    ('novembre', 'novembre'),
-    ('decembre', 'decembre')
+DEUX_TRANCHES_CHOICES = (
+    ('Premiere tranche', 'Première tranche'), # 0
+    ('Deuxieme tranche', 'Deuxième tranche') # 1
+)
+
+TROIS_TRANCHES_CHOICES = (
+    ('Premiere tranche', 'Première tranche'), # 0
+    ('Deuxieme tranche', 'Deuxième tranche'), # 1
+    ('Troisieme tranche','Troisième tranche') # 2
+)
+
+MODE_PAIEMENT_CHOICES = (
+    ('Espèce','Espèce'), # 0
+    ('Chèque','Chèque'), # 1
+    ('Virement bancaire','Virement bancaire'), # 2
+    ('Orange Money','Orange Money'), # 3
+    ('MTN Mobile Money','MTN Mobile Money'), # 4
 )
 
 
@@ -62,8 +70,8 @@ MOIS_CHOICES = (
 class Caisse(models.Model):
     libelle_operation = models.TextField()
     montant_encaisse = models.DecimalField(max_digits=20, decimal_places=2)
-    type_operation = models.CharField(max_length=15, default=TYPE_OPERATION_CAISSE_CHOICES[0][0], choices=TYPE_OPERATION_CAISSE_CHOICES)
-    date_operation = models.DateField(auto_now=True)
+    type_operation = models.CharField(max_length=15, default=TYPE_OPERATION_CAISSE_CHOICES[1][0], choices=TYPE_OPERATION_CAISSE_CHOICES)
+    date_operation = models.DateField(null=True) # Il se peut qu'en pratique l'opération soit effectuée avant la date du jour. Donc, l'utilisateur a besoin de saisir
     solde_actuel = models.DecimalField(max_digits=20, decimal_places=2, default=0)
     heure_operation = models.TimeField(auto_now=True)
     qte = models.IntegerField(null=True, default=0)
@@ -76,33 +84,30 @@ class Caisse(models.Model):
     categ_depense = models.CharField(max_length=100, default=CATEGORIE_DEPENSE_CHOICES[0][0])
 
     def __str__(self):
-        return '{} {} {} '.format(self.libelle_operation, str(self.montant_encaisse), self.type_operation)
+        return '{} | {} | {} | {}'.format(self.date_operation,self.libelle_operation, str(self.montant_encaisse), self.type_operation)
 
     @property
     def annee(self):
         return self.anscolaire
 
 
-class EtatPaiementCoran(models.Model):
+class EtatPaiementTranche(models.Model):
     anneescolaire = models.ForeignKey(AnneeScolaire, on_delete=models.CASCADE)
     inscription = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
     m_rabais = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
-    fjanvier = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
-    ffevreir = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
-    fmars = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
-    favril = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
-    fmai = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
-    fjuin = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
-    fjuillet = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
-    faout = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
-    fseptembre = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
-    fnovembre = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
-    fdecembre = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
+    premiere_tranche = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
+    deuxieme_tranche = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
+    troisieme_tranche = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True) # Pour le cas des écoles qui font payer jusqu'à trois tranches
+    fscolarite = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
+    reste_a_payer = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
+    date_paie = models.DateField()
+    mode_paie = models.CharField(max_length=50, choices=MODE_PAIEMENT_CHOICES, default=MODE_PAIEMENT_CHOICES[0][0], null=True)
     mateleve = models.ForeignKey(Eleve, on_delete=models.CASCADE)
     idclasse = models.ForeignKey(Classe, on_delete=models.CASCADE)
+    idcycle = models.ForeignKey(CycleScolaire, on_delete=models.CASCADE)
 
     def __str__(self):
-        return '{} {}'.format(self.mateleve, self.inscription)
+        return '{} | {} | {} | {}'.format(self.mateleve, self.inscription, self.premiere_tranche, self.deuxieme_tranche)
 
     @property
     def eleve(self):
@@ -115,153 +120,7 @@ class EtatPaiementCoran(models.Model):
     @property
     def annee(self):
         return self.anneescolaire
-
-
-class EtatPaiementRevision(models.Model):
-    anneescolaire = models.ForeignKey(AnneeScolaire, on_delete=models.CASCADE)
-    inscription = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
-    m_rabais = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
-    fjanvier = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
-    ffevreir = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
-    fmars = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
-    favril = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
-    fmai = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
-    fjuin = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
-    fjuillet = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
-    faout = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
-    fseptembre = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
-    fnovembre = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
-    fdecembre = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
-    mateleve = models.ForeignKey(Eleve, on_delete=models.CASCADE)
-    idclasse = models.ForeignKey(Classe, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return '{} {}'.format(self.mateleve, self.inscription)
-
+    
     @property
-    def eleve(self):
-        return self.mateleve
-
-    @property
-    def classe(self):
-        return self.idclasse
-
-    @property
-    def annee(self):
-        return self.anneescolaire
-
-
-class EtatPaiementScolarite(models.Model):
-    anneescolaire = models.ForeignKey(AnneeScolaire, on_delete=models.CASCADE)
-    inscription = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
-    m_rabais = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
-    fjanvier = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
-    ffevreir = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
-    fmars = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
-    favril = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
-    fmai = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
-    fjuin = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
-    fjuillet = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
-    faout = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
-    fseptembre = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
-    fnovembre = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
-    fdecembre = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
-    mateleve = models.ForeignKey(Eleve, on_delete=models.CASCADE)
-    idclasse = models.ForeignKey(Classe, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return '{} {}'.format(self.mateleve, self.inscription)
-
-    @property
-    def eleve(self):
-        return self.mateleve
-
-    @property
-    def classe(self):
-        return self.idclasse
-
-    @property
-    def annee(self):
-        return self.anneescolaire
-
-
-class PaiementCoran(models.Model):
-    mois_paye = models.CharField(max_length=15, default='Selectionnez', choices=MOIS_CHOICES)
-    date_payement = models.DateField(auto_now=True)
-    anneescolaire = models.ForeignKey(AnneeScolaire, on_delete=models.CASCADE)
-    detail = models.TextField()
-    montant_paye = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    mont_du = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    reste_paye = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    mateleve = models.ForeignKey(Eleve, on_delete=models.CASCADE)
-    idclasse = models.ForeignKey(Classe, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return '{} {} {} {}'.format(self.mateleve, self.mois_paye, self.date_payement, str(self.montant_paye))
-
-    @property
-    def eleve(self):
-        return self.mateleve
-
-    @property
-    def classe(self):
-        return self.idclasse
-
-    @property
-    def annee(self):
-        return self.anneescolaire
-
-
-class PaiementRevision(models.Model):
-    mois_paye = models.CharField(max_length=15, default='Selectionnez', choices=MOIS_CHOICES)
-    date_payement = models.DateField(auto_now=True)
-    anneescolaire = models.ForeignKey(AnneeScolaire, on_delete=models.CASCADE)
-    detail = models.TextField()
-    montant_paye = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    mont_du = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    reste_paye = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    mateleve = models.ForeignKey(Eleve, on_delete=models.CASCADE)
-    idclasse = models.ForeignKey(Classe, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return '{} {} {} {} '.format(self.mateleve, self.mois_paye, self.date_payement, str(self.montant_paye))
-
-    @property
-    def eleve(self):
-        return self.mateleve
-
-    @property
-    def classe(self):
-        return self.idclasse
-
-    @property
-    def annee(self):
-        return self.anneescolaire
-
-
-class PaiementScolarite(models.Model):
-    mois_paye = models.CharField(max_length=15, default=MOIS_CHOICES[0][0], choices=MOIS_CHOICES)
-    date_payement = models.DateField(auto_now=True)
-    anneescolaire = models.ForeignKey(AnneeScolaire, on_delete=models.CASCADE)
-    detail = models.TextField()
-    montant_paye = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    mont_du = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    reste_paye = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    tranche_paye = models.CharField(max_length=25)
-    mateleve = models.ForeignKey(Eleve, on_delete=models.CASCADE)
-    idclasse = models.ForeignKey(Classe, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return '{} {} {} {}'.format(self.mateleve, self.mois_paye, self.date_payement, self.montant_paye)
-
-    @property
-    def eleve(self):
-        return self.mateleve
-
-    @property
-    def classe(self):
-        return self.idclasse
-
-    @property
-    def annee(self):
-        return self.anneescolaire
+    def cycle(self):
+        return self.idcycle

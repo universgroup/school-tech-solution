@@ -4,7 +4,6 @@ from .views import *
 urlpatterns = [
     path('enregistrereleve/', enregistrereleve, name='enregistrereleve'),
     path('chargerlisteclasse/', chargerlisteclasse, name='chargerlisteclasse'),
-    path('inscriptioneleve/<str:mat>', validerinscription, name='inscriptioneleve'),
     path('registrematricule/', registrematricule, name='registrematricule'),
     path('afficherdetailsinscription/<int:pkins>', detailsinscription, name='afficherdetailsinscription'),
     path('editioninscription/<int:pk>', editerinscription, name='editioninscription'),
@@ -12,7 +11,7 @@ urlpatterns = [
     path('suppinscription/<int:pkins>', supprimerinscription, name='suppinscription'),
     path('filtrerlistegenerale/', filtrelistegenerale,
          name='filtrerlistegenerale'),
-    path('chargeranneecourante/', chargeranneescolairecourante, name='chargeranneecourante'),
+    path('chargeranneecourante/', listeinscritsanneescolairecourante, name='chargeranneecourante'),
     path('filtrerlisteinscrits/', filtrelisteinscrits, name='filtrerlisteinscrits'),
     path('recuinscription/<int:idinsc>', recuinscription, name='recuinscription'),
     path('imprimerecuinscription/<int:idins>', imprimerecuinscription, name='imprimerecuinscription'),
@@ -22,4 +21,10 @@ urlpatterns = [
     path('recureinscription/<int:idinsc>', recureinscription, name='recureinscription'),
     path('imprimerecureinscription/<int:idins>', imprimerecureinscription,
          name='imprimerecureinscription'),
+    path('chargerinfoeleveclasse/', chargerinfoeleveclasse, name='chargerinfoeleveclasse'), # url permettant de charger les prénoms, nom et photo de l'élève lors de la reinscription
+    path('listereinscritsanneecourante/',listereinscritsanneescolairecourante,name='listereinscritsanneecourante'),
+    path('filtrerlistereinscrits/',filtrelistereinscrits,name='filtrerlistereinscrits'),
+    path('rapportlisteinscrits/', rapportlisteinscrits, name='rapportlisteinscrits'),
+    path('rapportlistereinscrits/', rapportlistereinscrits, name='rapportlistereinscrits'),
+    path('rapportmatriculation/',rapportlistegenerale, name='rapportmatriculation'),
 ]

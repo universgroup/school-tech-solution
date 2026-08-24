@@ -1,32 +1,32 @@
 {% extends "base.html" %}
 {% block titre_page %} GESTION DES ANNEES SCOLAIRES {% endblock %}
 {% load crispy_forms_tags %}
-
+{% block titre_formulaire %} PARAMETRAGE DES ANNEES SCOLAIRES {% endblock %}
+{% block fil_ariane %}Administration /  Année scolaire / Nouveau {% endblock %}
  {% block titre_cadre %}
-AJOUT DE L'ANNEE SCOLAIRE
+    CREATION DES ANNEES SCOLAIRES
  {% endblock %}
+
  {% block formulaire %}
 
-     <form action="" method="POST" class="form-horizontal">
+     <form action="" method="POST" class="needs-validation">
 
             {% csrf_token %}
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="form-group">
-                        {{form|crispy}}
+
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            {{form|crispy}}
+                        </div>
                     </div>
                 </div>
             </div>
 
-
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="text-center">
-                            <button type="submit" class="btn btn-success btn-sm">Ajouter &nbsp;<i class="fa fa-add"></i></button>
-                            <button type="reset" class="btn btn-warning btn-sm">Annuler &nbsp;<i class="fa fa-refresh"></i></button>
-                            <a href="{% url 'listeanneescolaire' %}" class="btn btn-primary btn-sm" title="Afficher/Voir la liste" target="_self">Retour &nbsp;<i class="fa fa-arrow-circle-right"></i></a>
-                    </div>
-                </div>
+            <div class="card-footer text-center">    
+                <button type="submit" class="btn btn-success btn-md">Ajouter &nbsp;<i class="fa fa-add"></i></button>
+                <button type="reset" class="btn btn-warning btn-md">Annuler &nbsp;<i class="fa fa-refresh"></i></button>
+                <a href="{% url 'listeanneescolaire' %}" class="btn btn-primary btn-md" title="Afficher/Voir la liste" target="_self">Retour &nbsp;<i class="fa fa-arrow-circle-left"></i></a>
             </div>
      </form>
 {% endblock %}

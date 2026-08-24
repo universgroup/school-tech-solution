@@ -1,16 +1,19 @@
 {% extends "base.html" %}
 {% block titre_page %} CONSULTATION {% endblock %}
+{% block titre_formulaire %} DETAILS DE L'INSCRIPTION D'UN ELEVE {% endblock %}
+{% block fil_ariane %} Eleves /  Consultation {% endblock %}
 {% block titre_cadre %}
-DETAILS DE L'INSCRIPTION D'UN ELEVE
+INFORMATIONS SUR L'INSCRIPTION
 {% endblock %}
 
 {% block formulaire %}
 
-    <form class="form-horizontal" action="" method="POST">
+    <form class="needs-validation" action="" method="get">
 
                 {% csrf_token %}
 
-                <div class="row">
+            <div class="card-body">   
+                <div class="row g-3">
                     <div class="col-md-12">
                         <div class="form-group">
                             <label for="IDInscrip">ID</label>
@@ -19,7 +22,7 @@ DETAILS DE L'INSCRIPTION D'UN ELEVE
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="id_dateins">Date inscription</label>
@@ -35,7 +38,7 @@ DETAILS DE L'INSCRIPTION D'UN ELEVE
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="id_cycle">Cycle</label>
@@ -51,16 +54,16 @@ DETAILS DE L'INSCRIPTION D'UN ELEVE
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-12">
                         <div class="form-group">
                             <label for="id_mat">Matricule</label>
-                            <input type="text" name="matricule" id="id_mat" value="{{ins.mateleve}}" class="form-control" readonly>
+                            <input type="text" name="matricule" id="id_mat" value="{{ins.mateleve.matricule}}" class="form-control" readonly>
                         </div>
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-6">
                         <div class="form-group">
                           <label for="id_nom">Nom Famille</label>
@@ -76,7 +79,7 @@ DETAILS DE L'INSCRIPTION D'UN ELEVE
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-12">
                         <div class="form-group">
                             <label for="id_sexe">Sexe</label>
@@ -85,7 +88,7 @@ DETAILS DE L'INSCRIPTION D'UN ELEVE
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="id_pere">Prénom(s) du Père</label>
@@ -95,45 +98,94 @@ DETAILS DE L'INSCRIPTION D'UN ELEVE
 
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="id_mere">Nom & Prénom(s) mère</label>
+                            <label for="id_mere">Prénom(s) et Nom de la mère</label>
                             <input type="text" name="mere" id="id_mere" value="{{ins.mateleve.mere}}" class="form-control" readonly>
                         </div>
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="id_tuteur">Nom & Prénom(s) tuteur</label>
+                            <label for="id_tuteur">Prénom(s) et Nom du tuteur</label>
                             <input type="text" name="tuteur" id="id_tuteur" value="{{ins.mateleve.tuteur}}" class="form-control" readonly>
                         </div>
                     </div>
 
-                    <div class="col-md-6">
+                    <div class="col-md-3">
                         <div class="form-group">
-                            <label for="id_contact">Contact tuteur</label>
-                            <input type="text" name="contact" id="id_contact" value="{{ins.mateleve.contact_parent}}" class="form-control" readonly>
+                            <label for="id_contact_pere">Contact du père</label>
+                            <input type="text" name="contact_pere" id="id_contact_pere" value="{{ins.mateleve.contact_pere}}" class="form-control" readonly>
                         </div>
                     </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="id_contact_mere">Contact de la mère</label>
+                            <input type="text" name="contact_mere" id="id_contact_mere" value="{{ins.mateleve.contact_mere}}" class="form-control" readonly>
+                        </div>
+                    </div>
+
                 </div>
 
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="id_adresse">Adresse</label>
+                            <label for="id_email_pere">Email du père</label>
+                            <input type="text" name="email_pere" id="id_email_pere" value="{{ins.mateleve.email_pere}}" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_email_mere">Email de la mère</label>
+                            <input type="text" name="email_mere" id="id_email_mere" value="{{ins.mateleve.email_mere}}" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_profes_pere">Profession du père</label>
+                            <input type="text" name="profes_pere" id="id_profes_pere" value="{{ins.mateleve.profes_pere}}" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_profes_mere">Profession de la mère</label>
+                            <input type="text" name="profes_mere" id="id_profes_mere" value="{{ins.mateleve.profes_mere}}" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="id_personne_contact">Personne contact</label>
+                            <input type="text" name="personne_contact" id="id_personne_contact" value="{{ins.mateleve.personne_contact}}" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="id_adresse">Adresse/Résidence</label>
                             <input type="text" name="adresse" id="id_adresse" value="{{ins.mateleve.adresse}}" class="form-control" readonly>
                         </div>
                     </div>
 
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="id_ecole">Ecole origine</label>
+                            <label for="id_ecole">Ecole d'origine</label>
                             <input type="text" name="ecole_origine" id="id_ecole" value="{{ins.mateleve.ecole_origine}}" class="form-control" readonly>
                         </div>
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="id_datenais">Date naissance</label>
@@ -149,7 +201,7 @@ DETAILS DE L'INSCRIPTION D'UN ELEVE
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="id_date_entree">Date entrée</label>
@@ -165,9 +217,9 @@ DETAILS DE L'INSCRIPTION D'UN ELEVE
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-12">
-                        <div class="form-group">
+                        <div class="form-group text-center">
                             {% if ins.mateleve.photo_eleve %}
                                 <a href="{{ins.mateleve.photo_eleve.url}}" title="Photo ID">
                                     <img src="{{ins.mateleve.photo_eleve.url}}" width="150px">
@@ -179,15 +231,11 @@ DETAILS DE L'INSCRIPTION D'UN ELEVE
                     </div>
 
                 </div>
+            </div> 
 
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="text-center">
-                            <a href="{% url 'chargeranneecourante' %}" target="_self" class="btn-secondary btn-sm" title="Retour la liste des inscrits">Retour &nbsp;<i class="fa fa-arrow-circle-left"></i></a>
-                        </div>
-                    </div>
-
-                </div>
+            <div class="card-footer text-center">
+               <a href="{% url 'chargeranneecourante' %}" target="_self" class="btn btn-primary btn-md" title="Retour sur la liste des inscrits">Retour &nbsp;<i class="fa fa-arrow-circle-left"></i></a>
+            </div>
 
     </form>
 

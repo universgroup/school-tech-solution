@@ -1,24 +1,26 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
-
+{% load static %}
 {% block titre_page %} GESTION DES REINSCRIPTIONS {% endblock %}
-
+{% block titre_formulaire %} GESTION DE LA REINSCRIPTION DES ELEVES {% endblock %}
+{% block fil_ariane %}Eleves /  Reinscriptions {% endblock %}
  {% block titre_cadre %}
-REINSCRIPTION DES ELEVES
+    REINSCRIPTION DES ELEVES
  {% endblock %}
 
  
  {% block formulaire %}
 
-     <form action="{% url 'validerreinscription' %}" method="POST" id="finscription" data-classe-url="{% url 'chargerlisteclasse' %}" data-eleve-classe-url="{% url 'chargerlisteeleveclasse' %}">
+     <form class="needs-validation" action="{% url 'validerreinscription' %}" method="POST" id="finscription" data-classe-url="{% url 'chargerlisteclasse' %}" data-eleve-classe-url="{% url 'chargerlisteeleveclasse' %}">
 
                     {% csrf_token %}
 
-                    <div class="row">
-                        <div class="col-md-12">
+                <div class="card-body">    
+                    <div class="row g-3">
+                        <div class="col-md-3">
                             <div class="form-group">
                               <label for="cboanneold">Année scolaire antérieure<strong style="color:red">*</strong></label>
-                              <select class="form-control" name="annee_scolaire" id="cboanneold">
+                              <select class="form-control" name="annee_scolaire_old" id="cboanneold" required>
                                   <option value="" selected>Selectionnez</option>
                                   {% for an in ans %}
                                     <option value="{{an.annee_scolaire.id}}">{{an.annee_scolaire.descript_annee}}</option>
@@ -26,14 +28,11 @@ REINSCRIPTION DES ELEVES
                               </select>
                             </div>
                         </div>
-                    </div>
 
-
-                    <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-3">
                           <div class="form-group">
                               <label for="cbocycle">Cycle<strong style="color:red">*</strong></label>
-                              <select class="form-control" name="cycle" id="cbocycle">
+                              <select class="form-control" name="cycle" id="cbocycle" required>
                                   <option value="" selected>Selectionnez</option>
                                   {% for cl in cycles %}
                                     <option value="{{cl.id}}">{{cl.cycle}}</option>
@@ -45,31 +44,53 @@ REINSCRIPTION DES ELEVES
                         <div class="col-md-6">
                           <div class="form-group">
                               <label for="cboclassepasse">Classe antérieure<strong style="color:red">*</strong></label>
-                              <select class="form-control" name="id_classe_old" id="cboclassepasse">
-
+                              <select class="form-control" name="id_classe_old" id="cboclassepasse" required>
+                                <option value="" selected>Selectionnez</option>
                               </select>
                           </div>
                         </div>
 
                     </div>
 
-                    <div class="row">
-                        <div class="col-md-12">
+                    <div class="row g-3">
+                        <div class="col-md-6">
                             <div class="form-group">
                                   <label for="cbomateleve">Elève<strong style="color:red">*</strong></label>
-                                  <select class="form-control" name="matricule" id="cbomateleve">
-
+                                  <select class="form-control" name="matricule" id="cbomateleve" required>
+                                    <option value="" selected>Selectionnez</option>
                                   </select>
                             </div>
                         </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label for="idprenom">Prénom(s)</label>
+                                <input type="text" id="idprenom" class="form-control" name="prenom" readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label for="idnom">Nom famille</label>
+                                <input type="text" id="idnom" class="form-control" name="nomfamille" readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group text-center">
+                                <label>Photo</label><br>
+                                <img id="photoel" src="{% static 'assets/dist/img/avatar.png' %}" 
+                                    width="95" height="95" 
+                                    style="border-radius: 50%; object-fit: cover; border: 2px solid #ddd;">
+                            </div>
+
+                        </div>
+
                     </div>
 
 
-                    <div class="row">
+                    <div class="row g-3">
                         <div class="col-md-6">
                            <div class="form-group">
                                   <label for="cboannenew">Année scolaire courante<strong style="color:red">*</strong></label>
-                                  <select class="form-control" name="annee_scolaire_new" id="cboannenew">
+                                  <select class="form-control" name="annee_scolaire_new" id="cboannenew" required>
                                       <option value="" selected>Selectionnez</option>
                                       {% for an in ane %}
                                         <option value="{{an.id}}">{{an.descript_annee}}</option>
@@ -81,7 +102,7 @@ REINSCRIPTION DES ELEVES
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="cboclassenew">Classe supérieure<strong style="color:red">*</strong></label>
-                                <select class="form-control" name="id_classe_new" id="cboclassenew">
+                                <select class="form-control" name="id_classe_new" id="cboclassenew" required>
                                     <option value="" selected>Selectionnez</option>
                                       {% for cla in clas %}
                                         <option value="{{cla.id}}">{{cla.nom_classe}}</option>
@@ -90,26 +111,21 @@ REINSCRIPTION DES ELEVES
                             </div>
                         </div>
                     </div>
+                </div>
+   
+                <div class="card-footer text-center">
+                    <button type="submit" class="btn btn-success btn-md mr-2">Valider &nbsp;<i class="fas fa-circle-check"></i></button>
+                    <button type="reset" class="btn btn-warning btn-md mr-2">Annuler &nbsp;<i class="fas fa-refresh"></i></button>
+                    <a href="{% url 'listereinscritsanneecourante' %}" target="_self" class="btn btn-primary btn-md" title="Retour à la page précédente">Liste des élèves reinscrits &nbsp;<i class="fas fa-circle-arrow-left"></i></a>
+                </div>
 
-                    <br>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="text-center">
-                                <button type="submit" class="btn btn-success btn-sm">Valider &nbsp;<i class="fa fa-circle-check"></i></button>
-                                <button type="reset" class="btn btn-warning btn-sm">Annuler &nbsp;<i class="fa fa-refresh"></i></button>
-                                <a href="{% url 'reinscriptioneleve' %}" target="_blank" class="btn btn-secondary btn-sm">Liste Elèves Reinscrits &nbsp;<i class="fa fa-circle-arrow-right"></i></a>
-                           </div>
-                        </div>
-                    </div>
-
-     </form>
+    </form>
 
  {% endblock %}
 
 
  {% block javascript %}
  
- <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
  <script>
     // Cette fonction javascript (JQuery) m'a permis de filtrer les classes selon le cycle choisi
     $("#cbocycle").change(function(){
@@ -129,12 +145,6 @@ REINSCRIPTION DES ELEVES
         });
     });
     
-
- </script>
-
-
-<script>
-
     // Cette fonction javascript (JQuery) m'a permis de filtrer les eleves selon la classe et l'annee scolaire choisies
     $("#cboclassepasse").change(function(){
         var url = $("#finscription").attr("data-eleve-classe-url");
@@ -154,6 +164,29 @@ REINSCRIPTION DES ELEVES
 
         });
       
+    });
+</script>
+
+<script>
+    var defaultPhoto = "{% static 'assets/dist/img/avatar.png' %}";
+
+    // Cette fonction permet d'afficher les infos de l'élève sélectionné
+    $("#cbomateleve").change(function(){
+        var matricule = $(this).val();
+        
+        $.ajax({
+                url: "{% url 'chargerinfoeleveclasse' %}",
+                data: { 'matricule': matricule },
+                success: function(data){
+                    $("#idprenom").val(data.prenom);
+                    $("#idnom").val(data.nom);
+                    if(data.photo){
+                        $("#photoel").attr("src", "/media/" + data.photo);
+                    } else {
+                        $("#photoel").attr("src", defaultPhoto);
+                    }
+                    }
+                });
     });
 
 </script>

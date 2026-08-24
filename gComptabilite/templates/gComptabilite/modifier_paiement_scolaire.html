@@ -1,0 +1,341 @@
+{% extends "base.html" %}
+{% block titre_page %} MIS A JOUR {% endblock %}
+{% block titre_formulaire %} EDITION D'UN PAIEMENT DE SCOLARITE {% endblock %}
+{% block fil_ariane %}Comptabilité /  Paiement scolarité  / Mise à jour {% endblock %}
+{% block titre_cadre %}
+INFORMATIONS SUR LE PAIEMENT
+{% endblock %}
+{% load static %}
+
+{% block formulaire %}
+
+   <form class="needs-validation" action="{% url 'modifierpaiement' paie.id %}" method="post" id="fscolarite" data-classe-url="{% url 'chargerlisteclassepaie' %}" data-eleve-classe-url="{% url 'chargerlisteelevepaie' %}">
+
+                {% csrf_token %}
+
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="IDpaie">ID</label>
+                            <input type="text" id="IDpaie" value="{{paie.id}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="cboanne">Année scolaire</label>
+                            <select class="form-control" id="cboanne" name="annee_scolaire">
+                                <option value="{{paie.anneescolaire.id}}" selected>{{paie.anneescolaire}}</option>
+                                {% for ane in annee %}
+                                <option value="{{ane.id}}">{{ane.descript_annee}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="cbocycle">Cycle</label>
+                            <select id="cbocycle" class="form-control" name="cycle_scolaire">
+                                <option value="{{paie.idcycle.id}}" selected>{{paie.idcycle.cycle}}</option>
+                                {% for cy in cycles %}
+                                <option value="{{cy.id}}">{{cy.cycle}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="cboclasse">Classe</label>
+                            <select id="cboclasse" class="form-control" name="classe">
+                                <option value="{{paie.idclasse.id}}" selected>{{paie.idclasse.nom_classe}}</option>
+
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="cbomateleve">Elève</label>
+                            <select id="cbomateleve" class="form-control" name="matricule">
+                                <option value="{{paie.mateleve.matricule}}" selected>{{paie.mateleve.matricule}}</option>
+                               
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                            <div class="form-group">
+                                <label for="idprenom">Prénom(s)</label>
+                                <input type="text" id="idprenom" value="{{paie.mateleve.prenom}}" class="form-control" name="prenom" readonly>
+                            </div>
+                    </div>
+                    <div class="col-md-2">
+                            <div class="form-group">
+                                <label for="idnom">Nom famille</label>
+                                <input type="text" id="idnom" value="{{paie.mateleve.nom}}" class="form-control" name="nomfamille" readonly>
+                            </div>
+                    </div>
+                    <div class="col-md-2">
+                            <div class="form-group text-center">
+                                <label>Photo</label><br>
+                                <img id="photoel" src="{{paie.mateleve.photo_eleve.url}}" 
+                                    width="95" height="95" 
+                                    style="border-radius: 50%; object-fit: cover; border: 2px solid #ddd;">
+                            </div>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_nom_tranche">Tranche payée</label>
+                            <select id="id_nom_tranche" name="nom_tranche" class="form-control" title="Sélectionnez la tranche à payer">
+                                <option value="" selected>Sélectionnez</option>
+                                {% for tranche in tranche_paye %}
+                                <option value="{{tranche.0}}">{{tranche.1}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_mode_paie">Mode paiement</label>
+                            <select id="id_mode_paie" name="mode_paiement" class="form-control" title="Sélectionnez le mode de paiement">
+                                <option value="{{paie.mode_paie}}" selected>{{paie.mode_paie}}</option>
+                                {% for modep in modepaie %}
+                                <option value="{{modep.0}}">{{modep.1}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="id_date_paie">Date paiement</label>
+                            <input type="text" name="date_paiement" id="id_date_paie" value="{{paie.date_paie|date:'Y-n-j'}}" class="form-control">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="id_montant_inscription">Inscription/reinscription</label>
+                            <input type="text" id="id_montant_inscription" name="montant_inscription" class="form-control" readonly value="{{paie.inscription|floatformat:'2g'}}" title="Affiche le montant de l'inscription ou de la reinscription payé par l'élève" style="color:red; font-weight:bold; font-size:12pt;">
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="id_montant_premiere_tranche">1ère Tranche payée</label>
+                            <input type="text" id="id_montant_premiere_tranche" name="montant_premiere_tranche" class="form-control" readonly value="{{paie.premiere_tranche|floatformat:'2g'}}" title="Affiche le montant de la première tranche payée par l'élève" style="color:red; font-weight:bold; font-size:12pt;">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="id_montant_deuxieme_tranche">2ème Tranche payée</label>
+                            <input type="text" id="id_montant_deuxieme_tranche" name="montant_deuxieme_tranche" class="form-control" readonly value="{{paie.deuxieme_tranche|floatformat:'2g'}}"  title="Affiche le montant de la deuxième tranche payée par l'élève" style="color:red; font-weight:bold; font-size:12pt;">
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_montant_annuel">Paiement annuel</label>
+                            <input type="text" id="id_montant_annuel" name="frais_scolarite" class="form-control" readonly title="Affiche le montant annuel de la scolarité" style="color:red; font-weight:bold; font-size:12pt;">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="id_montant_reliquat">Reste à payer</label>
+                            <input type="text" id="id_montant_reliquat" name="reste_a_payer" class="form-control" readonly value="{{paie.reste_a_payer|floatformat:'2g'}}" title="Affiche le montant du reliquat de la scolarité après payement des différentes tranches" style="color:red; font-weight:bold; font-size:12pt;">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="id_montant_remise">Montant de la remise</label>
+                            <input type="number" id="id_montant_remise" name="montant_remise" class="form-control" value="{{paie.m_rabais|floatformat:'2g'}}" title="Saisissez le montant de la remise accordée s'il y en a">
+                        </div>
+                    </div>
+
+                </div>
+                    
+            </div>
+            
+            <div class="card-footer text-center">
+            <button type="submit" class="btn btn-success btn-md">Modifier &nbsp;<i class="fa fa-edit"></i></button>
+            <a href="{% url 'listepaiemensuel' %}" target="_self" class="btn btn-primary btn-md">Retour &nbsp;<i class="fa fa-arrow-circle-left"></i></a>
+            </div>
+
+   </form>
+
+{% endblock %}
+
+
+{% block javascript %}
+ 
+ <script>
+    // Cette fonction javascript (JQuery) m'a permis de filtrer les classes selon le cycle choisi
+    $("#cbocycle").change(function(){
+        var url = $("#fscolarite").attr("data-classe-url");
+        var idcycle = $(this).val();
+
+        $.ajax({
+            url:url,
+            data:{
+                'idcycle':idcycle
+            },
+            success:function(data){
+                $("#cboclasse").html(data);
+            }
+
+
+        });
+    });
+    
+    // Cette fonction javascript (JQuery) m'a permis de filtrer les eleves selon la classe et l'annee scolaire choisies
+    $("#cboclasse").change(function(){
+        var url = $("#fscolarite").attr("data-eleve-classe-url");
+        var id_annee = $('#cboanne').val(); // Je recupère ici la valeur (ID) de l'année scolaire
+        var idclasse = $(this).val(); // Je recupère ici la valeur (ID) de la classe selectionnée
+
+        $.ajax({
+            url:url,
+            data:{
+                'anneesco':id_annee,
+                'id_classe':idclasse
+                },
+            success:function(data){
+                $("#cbomateleve").html(data);
+            }
+
+
+        });
+      
+    });
+
+    var defaultPhoto = "{% static 'assets/dist/img/avatar.png' %}";
+    
+    // Cette fonction permet d'afficher les infos de l'élève sélectionné y compris ses paiements de scolarité
+    $("#cbomateleve").change(function(){
+        var matricule = $(this).val();
+        
+        $.ajax({
+                url: "{% url 'chargerinfoelevepaie' %}",
+                data: {'matricule': matricule },
+                success: function(data){
+                    $("#idprenom").val(data.prenom);
+                    $("#idnom").val(data.nom);
+                    
+                    if(data.photo){
+                        $("#photoel").attr("src", "/media/" + data.photo);
+                    } else {
+                        $("#photoel").attr("src", defaultPhoto);
+                    }
+                    }
+                });
+    });
+
+    $(document).ready(function () {
+            // Au clic sur le champ date, changer le type en "date" pour permettre la modification
+            $('#id_date_paie').on('click', function () {
+                $(this).attr('type', 'date');
+                $(this).focus();
+            });
+
+            // Quand on quitte le champ, reformater en texte lisible
+            $('#id_date_paie').on('blur', function () {
+                if ($(this).val() !== '') {
+                    //let date = new Date($(this).val());
+                    //let formatted = date.toLocaleDateString('fr-FR');
+                    $(this).attr('type', 'text');
+                    $(this).val(formatted);
+                }
+            });
+    });
+
+    $("#id_nom_tranche").change(function(){
+
+            var tranche = $(this).val();
+            var $premiere = $("#id_montant_premiere_tranche");
+            var $deuxieme = $("#id_montant_deuxieme_tranche");
+
+            // Par défaut, les deux champs restent en lecture seule
+            // $premiere.prop("readonly", true);
+            // $deuxieme.prop("readonly", true);
+
+            if (tranche === "Premiere tranche") {
+                // 1ère tranche sélectionnée -> on active uniquement ce champ
+                $premiere.prop("readonly", false);
+                $deuxieme.prop("readonly",true); // On maintient le champ deuxième tranche en readonly
+
+            } else if (tranche === "Deuxieme tranche") {
+                // 2ème tranche sélectionnée -> on active uniquement ce champ
+                $deuxieme.prop("readonly", false);
+                $premiere.prop("readonly",true); // On maintient le champ première tranche en readonly
+            }
+            else if(tranche === "Sélectionnez"){
+                 // Si tranche === "" (Sélectionnez), les deux restent en readonly
+                 $premiere.prop("readonly",true);
+                 $deuxieme.prop("readonly", true);
+            }
+           
+    });
+
+    // Permet de convertir les montants affichés du texte en numerique pour eviter la troncature et faire une opération correcte dans la fonction calculerScolarite
+    function nettoyerMontant(valeur) {
+
+        if (!valeur) return 0;
+        var str = valeur.toString().trim();
+
+        var lastComma = str.lastIndexOf(",");
+        var lastDot = str.lastIndexOf(".");
+
+        if (lastComma > -1 && lastDot > -1) {
+            // Les deux séparateurs présents : le dernier rencontré est forcément le décimal
+            if (lastComma > lastDot) {
+                // 300.000,00 -> format français
+                str = str.replace(/\./g, "").replace(",", ".");
+            } else {
+                // 300,000.00 -> format anglo-saxon
+                str = str.replace(/,/g, "");
+            }
+        } else if (lastComma > -1) {
+            // Seule la virgule présente : décimale si 1-2 chiffres après, sinon milliers
+            var decimales = str.length - lastComma - 1;
+            str = decimales <= 2 ? str.replace(",", ".") : str.replace(/,/g, "");
+        } else if (lastDot > -1) {
+            // Seul le point présent : décimale si 1-2 chiffres après, sinon milliers
+            var decimales2 = str.length - lastDot - 1;
+            if (decimales2 > 2) {
+                str = str.replace(/\./g, "");
+            }
+            // sinon : déjà un point décimal valide, on ne touche à rien
+        }
+
+        return parseFloat(str) || 0;
+    }
+
+    function calculerScolarite() {
+            // Récupération des valeurs, en gérant les champs vides ou non numériques
+            var inscription = nettoyerMontant($("#id_montant_inscription").val());
+            var premiereTranche = nettoyerMontant($("#id_montant_premiere_tranche").val());
+            var deuxiemeTranche = nettoyerMontant($("#id_montant_deuxieme_tranche").val());
+
+            var total = inscription + premiereTranche + deuxiemeTranche;
+
+            $("#id_montant_annuel").val(total.toFixed(2));
+        }
+
+        // Recalcul à chaque saisie (au fur et à mesure que l'utilisateur tape)
+        $("#id_montant_premiere_tranche, #id_montant_deuxieme_tranche").on("input", calculerScolarite);
+
+        // Recalcul aussi au chargement, si des valeurs sont déjà pré-remplies (modification d'un paiement existant)
+        $(document).ready(function(){
+            calculerScolarite();
+        });
+
+</script>
+
+{% endblock %}

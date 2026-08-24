@@ -6,16 +6,18 @@ from .models import *
 class FormCaisseScolarite(ModelForm):
     class Meta:
         model = Caisse
-        fields = ('anscolaire', 'type_operation', 'libelle_operation', 'categ_depense', 'montant_encaisse', 'observ')
+        fields = ('date_operation','anscolaire', 'type_operation', 'libelle_operation', 'categ_depense', 'montant_encaisse', 'observ')
         labels = {
+            'date_operation': 'Date opération',
             'anscolaire': 'Année Scolaire',
             'type_operation': 'Type d\'opération',
-            'libelle_operation': 'Désignation',
+            'libelle_operation': 'Désignation opération',
             'categ_depense': 'Catégorie recette',
             'montant_encaisse': 'Montant recette',
             'observ': 'Observation/Mémo'
         }
         widgets = {
+            'date_operation': forms.DateInput(attrs={'class':'form-control','title':'Tapez la date exacte de l\'opération ou défilez dans le calendrier pour choisir la date exacte','type':'date'}),
             'anscolaire': forms.Select(attrs={'class': 'form-control', 'title': 'Sélectionnez une année scolaire'}),
             'type_operation': forms.Select(
                 attrs={'class': 'form-control', 'title': 'Sélectionnez le type d\'opération de caisse'},
@@ -42,12 +44,13 @@ class FormDepense(ModelForm):
     class Meta:
         model = Caisse
         fields = (
-            'anscolaire', 'type_operation', 'libelle_operation', 'categ_depense', 'qte', 'pua', 'provient', 'destine',
+            'date_operation','anscolaire', 'type_operation', 'libelle_operation', 'categ_depense', 'qte', 'pua', 'provient', 'destine',
             'observ', 'piece_jointe')
         labels = {
+            'date_operation': 'Date opération',
             'anscolaire': 'Année scolaire',
             'type_operation': 'Type d\'opération',
-            'libelle_operation': 'Désignation',
+            'libelle_operation': 'Désignation opération',
             'categ_depense': 'Catégorie dépense',
             'qte': 'Quantité',
             'pua': 'Prix unitaire',
@@ -57,6 +60,7 @@ class FormDepense(ModelForm):
             'piece_jointe': 'Pièce jointe'
         }
         widgets = {
+            'date_operation' : forms.DateInput(attrs={'class':'form-control','title':'Tapez la date exacte de l\'opération ou défilez dans le calendrier pour choisir la date exacte','type':'date'}),
             'anscolaire': forms.Select(attrs={'class': 'form-control', 'title': 'Sélectionnez une année scolaire'}),
             'type_operation': forms.Select(
                 attrs={'class': 'form-control', 'title': 'Sélectionnez le type d\'opération de caisse'},
@@ -77,7 +81,7 @@ class FormDepense(ModelForm):
                                               'title': 'Saisissez le bénéficiaire'}),
             'observ': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Observation/Mémo',
                                              'title': 'Saisissez une observation/mémo pour votre opération'}),
-            'piece_jointe': forms.FileInput(attrs={'class': 'form-control', 'title': 'Importez la pièce justificative'})
+            'piece_jointe': forms.FileInput(attrs={'class': 'd-none','accept':'image/*', 'title': 'Importez la pièce justificative', 'id': 'id_piece_jointe', 'onchange':'previewPieceJointe(this)'})
         }
 
     def __init__(self, *args, **kwargs):

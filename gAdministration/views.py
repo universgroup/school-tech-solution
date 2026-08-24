@@ -6,9 +6,11 @@ from django.utils.datastructures import MultiValueDictKeyError
 from .models import *
 from .forms import *
 from django.db.models import Q
+from gUsers.decorators import action_requise
 
 
 # Gestion des Cycles Scolaires
+@action_requise('menu_administration')
 def enregistrercycle(request):
     if request.method == 'POST':
         formcycle = FormCycle(request.POST)
@@ -34,7 +36,7 @@ def enregistrercycle(request):
 
     return render(request, 'gAdministration/enregistrer_cycle.html', dict(form=formcycle))
 
-
+@action_requise('menu_administration')
 def listecyclescolaire(request):
     cycles = CycleScolaire.objects.all().order_by('id')
     paginecycle = Paginator(cycles, 10)
@@ -42,17 +44,17 @@ def listecyclescolaire(request):
     cycles = paginecycle.get_page(numpagecycle)
     return render(request, 'gAdministration/liste_cycle.html', dict(cycles=cycles))
 
-
+@action_requise('menu_administration')
 def detailscyclescolaire(request, pk_cycle):
     cy = CycleScolaire.objects.get(id=pk_cycle)
     return render(request, 'gAdministration/afficher_details_cyclescolaire.html', dict(cycle=cy))
 
-
+@action_requise('menu_administration')
 def editercyclescolaire(request, pk):
     cy = CycleScolaire.objects.get(id=pk)
-    return render(request, 'gAdministration/modifier_cyclescolaire.html', dict(cycle=cy))
+    return render(request, 'gAdministration/modifier_cyclescolaire.html', dict(cycle=cy,cycles=CYCLE_CHOICES))
 
-
+@action_requise('menu_administration')
 def modifiercyclescolaire(request, idcycle):
     if request.method == 'POST':
         cy = CycleScolaire.objects.get(id=idcycle)
@@ -62,7 +64,7 @@ def modifiercyclescolaire(request, idcycle):
     else:
         return redirect('../listecycle/')
 
-
+@action_requise('menu_administration')
 def supprimercyclescolaire(request, idc):
     cy = CycleScolaire.objects.get(id=idc)
     cy.delete()
@@ -71,6 +73,7 @@ def supprimercyclescolaire(request, idc):
 
 
 # Gestion des Classes
+@action_requise('menu_administration')
 def enregistrerclasse(request):
     if request.method == 'POST':
         formclasse = FormClasse(request.POST)  # Ici je vais recuperer les données saisies
@@ -81,14 +84,16 @@ def enregistrerclasse(request):
                 id=c)  # Je fais une requete sur la table CycleScolaire pour recuperer l'ID Cycle concerné
             fi = Decimal(request.POST['frais_inscription'])
             fr = Decimal(request.POST['frais_reinscription'])
-            mens = Decimal(request.POST['tranche1'])
-            fs = Decimal(mens * 9)
+            tr1 = Decimal(request.POST['tranche1'])
+            tr2 = Decimal(request.POST['tranche2'])
+            fs = Decimal(tr1 + tr2) # La scolarité est la somme des deux tranches
+
             existeclasse = Classe.objects.filter(
                 nom_classe__exact=nc)  # Ici je cherche à gerer les doublons dans la saisie des noms de classe
             if existeclasse.exists():
                 messages.error(request, 'Cette classe existe déjà')
             else:
-                cls = Classe(nom_classe=nc, idcycle=cy, frais_inscription=fi, frais_reinscription=fr, tranche1=mens,
+                cls = Classe(nom_classe=nc, idcycle=cy, frais_inscription=fi, frais_reinscription=fr, tranche1=tr1, tranche2=tr2,
                              frais_scolarite=fs)
                 cls.save()
                 formclasse = FormClasse()  # je vide ensuite le formulaire
@@ -101,7 +106,7 @@ def enregistrerclasse(request):
     return render(request, 'gAdministration/enregistrer_classe.html', {'form': formclasse})
 
 
-#
+@action_requise('menu_administration')
 def listeclasse(request):
     clas = Classe.objects.all().order_by(
         'idcycle')  # Permet d'afficher la liste des Classes par ordre croissant des Cycles
@@ -112,17 +117,19 @@ def listeclasse(request):
 
 
 # # Cette fonction permet de recuperer les données de l'objet selectionné dans le formulaire Liste Classe
+@action_requise('menu_administration')
 def editerclasse(request, idclas):
     clas = Classe.objects.get(id=idclas)
     return render(request, 'gAdministration/modifier_classe.html', {'clas': clas})
 
-
+@action_requise('menu_administration')
 def detailsclasse(request, pk):
     clas = Classe.objects.get(id=pk)
     return render(request, 'gAdministration/afficher_details_classe.html', dict(clas=clas))
 
 
 # # Cette autre fonction me permet de valider la mis à jour d'une Classe
+@action_requise('menu_administration')
 def modifierclasse(request, idclasse):
     if request.method == 'POST':
         clas = Classe.objects.get(id=idclasse)
@@ -130,13 +137,14 @@ def modifierclasse(request, idclasse):
         clas.frais_inscription = Decimal(request.POST['frais_inscription'])
         clas.frais_reinscription = Decimal(request.POST['frais_reinscription'])
         clas.tranche1 = Decimal(request.POST['tranche1'])
-        clas.frais_scolarite = Decimal(clas.tranche1 * 9)
+        clas.tranche2 = Decimal(request.POST['tranche2'])
+        clas.frais_scolarite = Decimal(clas.tranche1 + clas.tranche2)
         clas.save()
         return redirect('../listeclasse/')
     else:
         return redirect('../listeclasse/')
 
-
+@action_requise('menu_administration')
 def supprimerclasse(request, idclasse):
     clas = Classe.objects.get(id=idclasse)
     clas.delete()
@@ -145,6 +153,7 @@ def supprimerclasse(request, idclasse):
 
 
 # Gestion de l'année scolaire
+@action_requise('menu_administration')
 def ajouteranneescolaire(request):
     if request.method == 'POST':
         formannee = FormAnneeScolaire(request.POST)
@@ -165,7 +174,7 @@ def ajouteranneescolaire(request):
     context = {'form': formannee}
     return render(request, 'gAdministration/enregistrer_anneescolaire.html', context)
 
-
+@action_requise('menu_administration')
 def listeanneescolaire(request):
     ansc = AnneeScolaire.objects.all().order_by('descript_annee')
     pagineans = Paginator(ansc, 10)
@@ -173,18 +182,18 @@ def listeanneescolaire(request):
     ansc = pagineans.get_page(numpageans)
     return render(request, 'gAdministration/liste_annee_scolaire.html', dict(ansc=ansc))
 
-
+@action_requise('menu_administration')
 def editeranneescolaire(request, idanne):
     ans = AnneeScolaire.objects.get(id=idanne)
     context = {'ansc': ans}
     return render(request, 'gAdministration/modifier_anneescolaire.html', context)
 
-
+@action_requise('menu_administration')
 def detailsanneescolaire(request, idans):
     ansc = AnneeScolaire.objects.get(id=idans)
     return render(request, 'gAdministration/afficher_details_anneescolaire.html', dict(ansc=ansc))
 
-
+@action_requise('menu_administration')
 def modifieranneescolaire(request, idanne):
     if request.method == 'POST':
         ans = AnneeScolaire.objects.get(id=idanne)
@@ -194,7 +203,7 @@ def modifieranneescolaire(request, idanne):
     else:
         return redirect('../listeanneescolaire/')
 
-
+@action_requise('menu_administration')
 def supprimeranneescolaire(request, pk):
     ans = AnneeScolaire.objects.get(id=pk)
     ans.delete()
@@ -203,6 +212,7 @@ def supprimeranneescolaire(request, pk):
 
 
 # Gestion des informations de l'ecole
+@action_requise('menu_administration')
 def enregistrerinfosecole(request):
     if request.method == 'POST':
         fecole = FormEcole(request.POST)
@@ -234,9 +244,14 @@ def enregistrerinfosecole(request):
                     pass
                 ecole.dsee = request.POST['dsee']
                 ecole.dg = request.POST['dg']
+                ecole.dga = request.POST['dga']
+                ecole.coordo_maternelle = request.POST['coordo_maternelle']
                 ecole.coordo_primaire = request.POST['coordo_primaire']
                 ecole.coordo_secondaire = request.POST['coordo_secondaire']
                 ecole.comptable = request.POST['comptable']
+                ecole.delai_tranche1 = request.POST['delai_tranche1']
+                ecole.delai_tranche2 = request.POST['delai_tranche2']
+                ecole.delai_reinscription = request.POST['delai_reinscription']
                 ecole.save()
 
                 messages.success(request, 'Informations de l\'école validées avec succès')
@@ -250,25 +265,28 @@ def enregistrerinfosecole(request):
 
     return render(request, 'gAdministration/enregistrer_infos_ecole.html', dict(form=fecole))
 
-
+@action_requise('menu_administration')
 def listeinfosecole(request):
+    infos = {}
+    infos = Ecole.objects.none()
+
     infos = Ecole.objects.all()
     pagineecole = Paginator(infos, 10)
     numpageecole = request.GET.get('page')
     infos = pagineecole.get_page(numpageecole)
     return render(request, 'gAdministration/liste_infos_ecole.html', dict(ecole=infos))
 
-
+@action_requise('menu_administration')
 def detailsinfosecole(request, idec):
     infos = Ecole.objects.get(id=idec)
     return render(request, 'gAdministration/afficher_details_ecole.html', dict(ecole=infos))
 
-
+@action_requise('menu_administration')
 def editerinfosecole(request, pk):
     infos = Ecole.objects.get(id=pk)
     return render(request, 'gAdministration/modifier_infos_ecole.html', dict(ecole=infos))
 
-
+@action_requise('menu_administration')
 def modifierinfosecole(request, idec):
     
     if request.method == 'POST':
@@ -285,9 +303,14 @@ def modifierinfosecole(request, idec):
         infos.site_internet = request.POST['site_web']
         infos.devise_ecole = request.POST['devise']
         infos.dg = request.POST['dg']
+        infos.dga = request.POST['dga']
+        infos.coordo_maternelle = request.POST['coordomat']
         infos.coordo_primaire = request.POST['coordop']
         infos.coordo_secondaire = request.POST['coordos']
         infos.comptable = request.POST['comptable']
+        infos.delai_tranche1 = request.POST['delai_tranche1']
+        infos.delai_tranche2 = request.POST['delai_tranche2']
+        infos.delai_reinscription = request.POST['delai_reinscription']
         
         if request.FILES.get('logo_new'):
             infos.logo_ecole = request.FILES.get('logo_new')

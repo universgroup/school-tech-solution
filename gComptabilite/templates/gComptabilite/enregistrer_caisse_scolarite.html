@@ -1,19 +1,26 @@
 {% extends "base.html" %}
 {% block titre_page %} GESTION CAISSE SCOLARITE {% endblock %}
+{% block titre_formulaire %} RECETTES ANNUELLES DE LA SCOLARITE {% endblock %}
 {% load crispy_forms_tags %}
-
+{% block fil_ariane %}Comptabilité /  Recettes  / Nouveau {% endblock %}
  {% block titre_cadre %}
   RECETTES DE LA SCOLARITE
  {% endblock %}
 
  {% block formulaire %}
 
-  <form action="" method="POST" class="form-horizontal">
+  <form action="" method="POST" class="needs-validation">
 
                     {% csrf_token %}
 
-                    <div class="row">
-                        <div class="col-md-6">
+               <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                {{form.date_operation|as_crispy_field}}
+                            </div>
+                        </div>
+                        <div class="col-md-3">
                             <div class="form-group">
                                 {{form.anscolaire|as_crispy_field}}
                             </div>
@@ -26,7 +33,7 @@
                         </div>
                     </div>
 
-                    <div class="row">
+                    <div class="row g-3">
                         <div class="col-md-12">
                             <div class="form-group">
                                 {{form.libelle_operation|as_crispy_field}}
@@ -34,7 +41,7 @@
                         </div>
                     </div>
 
-                    <div class="row">
+                    <div class="row g-3">
                         <div class="col-md-6">
                             <div class="form-group">
                                 {{form.categ_depense|as_crispy_field}}
@@ -48,23 +55,20 @@
                         </div>
                     </div>
 
-                    <div class="row">
+                    <div class="row g-3">
                         <div class="col-md-12">
                             <div class="form-group">
                                 {{form.observ|as_crispy_field}}
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="text-center">
-                                <button type="submit" class="btn btn-success btn-sm">Valider &nbsp;<i class="fa fa-check-circle"></i></button>
-                                <button type="reset" class="btn btn-warning btn-sm">Annuler &nbsp;<i class="fa fa-refresh"></i></button>
-                                <a href="{% url 'listerecette' %}" target="_self" class="btn btn-primary btn-sm">Situation globale &nbsp;<i class="fa fa-arrow-circle-left"></i></a>
-                            </div>
-                        </div>
-                    </div>
+                <div class="card-footer text-center">
+                    <button type="submit" class="btn btn-success btn-md">Valider &nbsp;<i class="fa fa-check-circle"></i></button>
+                    <button type="reset" class="btn btn-warning btn-md">Annuler &nbsp;<i class="fa fa-refresh"></i></button>
+                    <a href="{% url 'listerecette' %}" target="_self" class="btn btn-primary btn-md">Situation globale &nbsp;<i class="fa fa-arrow-circle-left"></i></a>
+                </div>
   </form>
 
  {% endblock %}

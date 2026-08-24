@@ -8,6 +8,7 @@
 # For the full list of settings and their values, see
 # https://docs.djangoproject.com/en/4.2/ref/settings/
 
+from decouple import config
 from pathlib import Path
 import os
 from django.contrib.messages import constants as messages
@@ -20,15 +21,10 @@ BASE_DIR = Path(__file__).resolve().parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-e%+*dw)^))b8ixg$a9&nn01w@61bugp^6@)h1+07ylu1eo$lz8'
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1'
-]
+DEBUG = config('DEBUG', default=False, cast=bool)
 
 # Application definition
 
@@ -50,6 +46,7 @@ INSTALLED_APPS = [
     'gUsers',
     'crispy_forms',
     'fontawesomefree',
+    'core', # C'est l'application partagee contenant les fonctions d'envoi des emails groupes et d'autres fonctions partagees
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
@@ -88,6 +85,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'core.context_processor.annee_scolaire_actuelle', # Peut être affiché dans tous les templates du projet
             ],
         },
     },
@@ -101,11 +99,11 @@ WSGI_APPLICATION = 'stsavenirafrique.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'school',
-        'HOST': 'localhost',
-        'USER': 'utg',
-        'PASSWORD': 'UTech@@2026',
-        'PORT': 5432
+        'NAME': config('DB_NAME'),
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_PASSWORD'),
+        'HOST': config('DB_HOST', default='localhost'),
+        'PORT': config('DB_PORT', default='5432'),
     }
 }
 
@@ -142,7 +140,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 STATIC_ROOT = os.path.normpath(os.path.join(BASE_DIR, 'staticfiles'))
 STATIC_URL = '/static/'
-STATICFILES_DIR = os.path.join(BASE_DIR, 'static')
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 # MEDIA_DIR = BASE_DIR/'media'
 
@@ -158,15 +156,41 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 DATE_INPUT_FORMATS = ['%d-%m-%Y', '%Y-%m-%d', '%m-%d-%Y']
 DATE_FORMAT = 'j N, Y'
 
-LOGIN_REDIRECT_URL = '//'
+# Déclare le nouveau modèle utilisateur au projet
+AUTH_USER_MODEL = 'gUsers.Utilisateur'
+
+LOGIN_REDIRECT_URL = 'accueil'
 LOGIN_URL = '/'  # C'est l'URL de la page de connexion
 LOGOUT_REDIRECT_URL = '/'
 LOGOUT_URL = '/'
 
+# Durée de validité du lien de réinitialisation de mot de passe (1h)
+PASSWORD_RESET_TIMEOUT = 3600
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'school.tech.solution.26@gmail.com'
-DEFAULT_FROM_EMAIL = 'school.tech.solution.26@gmail.com'
-EMAIL_HOST_PASSWORD = 'uepr ggqq mpud piuv'  # Ce mot de passe est généré depuis le compte gmail de l'expediteur dans "App Password"
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
+EMAIL_HOST = config('EMAIL_HOST')
+EMAIL_PORT = config('EMAIL_PORT', cast=int)
+EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool)
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = f"GS Ecole les Champions <{config('EMAIL_HOST_USER')}>"
+
+# À la fin de votre fichier settings.py
+
+if not DEBUG:
+    # Configuration de sécurité pour la production
+    ALLOWED_HOSTS = [
+    '://school-tech-solution.universtechgroup.com',
+    '://www.school-tech-solution.universtechgroup.com',
+]    
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+else:
+    # Configuration pour le développement local
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+

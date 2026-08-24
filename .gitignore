@@ -216,3 +216,8 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+*.pyc
+
+#Fichiers statiques du projet tels que les media uploadés lors du test
+/staticfiles/
+/media/

@@ -1,16 +1,19 @@
 {% extends "base.html" %}
 {% block titre_page %} MIS A JOUR {% endblock %}
+{% block titre_formulaire %} DETAILS D'UN CYCLE SCOLAIRE {% endblock %}
+{% block fil_ariane %}Administration /  Cycle scolaire / Mis à jour {% endblock %}
 {% block titre_cadre %}
 EDITION D'UN CYCLE SCOLAIRE
 {% endblock %}
 
 {% block formulaire %}
 
-            <form class="form-horizontal" action="{% url 'modifiecycle' cycle.id %}" method="POST">
+            <form  action="{% url 'modifiecycle' cycle.id %}" method="POST" class="needs-validation">
 
                             {% csrf_token %}
 
-                            <div class="row">
+                      <div class="card-body">    
+                            <div class="row g-3">
                                 <div class="col-md-12">
                                     <div class="form-group">
                                         <label for="IDCycle">ID Cycle</label>
@@ -18,31 +21,25 @@ EDITION D'UN CYCLE SCOLAIRE
                                     </div>
                                 </div>
                             </div>
-                            <div class="row">
+                            <div class="row g-3">
                                 <div class="col-md-12">
                                     <div class="form-group">
                                         <label for="id_ncycle">Cycle scolaire</label>
                                         <select name="nom_cycle" class="form-control" id="id_ncycle">
                                             <option value="{{cycle.cycle}}" selected>{{ cycle.cycle }}</option>
-                                            <option value="Maternelle">Maternelle</option>
-                                            <option value="Primaire">Primaire</option>
-                                            <option value="Collège">Collège</option>
-                                            <option value="Lycée SM">Lycée SM</option>
-                                            <option value="Lycée SS">Lycée SS</option>
-                                            <option value="Lycée SE">Lycée SE</option>
+                                            {% for cy in cycles %}
+                                            <option value="{{cy.cycle}}">{{cy.cycle}}</option>
+                                            {% endfor %}                                            
                                         </select>
                                     </div>
                                 </div>
                             </div>
-
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="text-center">
-                                        <button type="submit" class="btn btn-success btn-sm">Modifier &nbsp;<i class="fa fa-edit"></i></button>
-                                        <a href="{% url 'listecycle' %}" target="_self" class="btn btn-primary btn-sm">Retour &nbsp;<i class="fa fa-arrow-circle-left"></i></a>
-                                    </div>
-                                </div>
-                            </div>
+                        </div>
+                        
+                        <div class="card-footer text-center">
+                            <button type="submit" class="btn btn-success btn-md">Modifier &nbsp;<i class="fa fa-edit"></i></button>
+                            <a href="{% url 'listecycle' %}" target="_self" class="btn btn-primary btn-md">Retour &nbsp;<i class="fa fa-arrow-circle-left"></i></a>
+                        </div>
             </form>
 
 {% endblock %}
