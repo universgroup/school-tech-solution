@@ -182,7 +182,9 @@ if not DEBUG:
     ALLOWED_HOSTS = [
     '://school-tech-solution.universtechgroup.com',
     '://www.school-tech-solution.universtechgroup.com',
-]    
+]   
+    # Prévient la boucle infinie de redirections sur o2switch 🔑
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
