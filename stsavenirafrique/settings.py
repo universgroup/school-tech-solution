@@ -13,11 +13,11 @@ from pathlib import Path
 import os
 from django.contrib.messages import constants as messages
 
-# Patch absolu pour contourner la restriction de version PostgreSQL sur o2switch
-from django.db.backends.base.base import BaseDatabaseWrapper
+# # Patch absolu pour contourner la restriction de version PostgreSQL sur o2switch
+# from django.db.backends.base.base import BaseDatabaseWrapper
 
-# On vide la fonction de vérification pour que Django ne bloque plus jamais
-BaseDatabaseWrapper.check_database_version_supported = lambda self: None
+# # On vide la fonction de vérification pour que Django ne bloque plus jamais
+# BaseDatabaseWrapper.check_database_version_supported = lambda self: None
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 # BASE_DIR = Path(__file__).resolve().parent.parent
@@ -186,8 +186,8 @@ DEFAULT_FROM_EMAIL = f"GS Ecole les Champions <{config('EMAIL_HOST_USER')}>"
 if not DEBUG:
     # Configuration de sécurité pour la production
     ALLOWED_HOSTS = [
-    '://school-tech-solution.universtechgroup.com',
-    '://www.school-tech-solution.universtechgroup.com',
+    'school-tech-solution.universtechgroup.com',
+    'www.school-tech-solution.universtechgroup.com',
 ]   
     # Prévient la boucle infinie de redirections sur o2switch 🔑
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
