@@ -14,7 +14,6 @@ import os
 from django.contrib.messages import constants as messages
 
 
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 # BASE_DIR = Path(__file__).resolve().parent.parent
 BASE_DIR = Path(__file__).resolve().parent
@@ -99,16 +98,54 @@ WSGI_APPLICATION = 'stsavenirafrique.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+DB_ENGINE = config('DB_ENGINE', default='postgresql')
+ENV = config('ENVIRONMENT', default='local')
+
+if ENV == 'test':
+    DB_ENGINE = 'mysql'
+    DB_NAME = config('DB_NAME_TEST')
+    DB_USER = config('DB_USER_TEST')
+    DB_PASSWORD = config('DB_PASSWORD_TEST')
+    DB_HOST = config('DB_HOST_TEST', default='localhost')
+    DB_PORT = config('DB_PORT_TEST', default='3306')
+elif ENV == 'prod':
+    DB_ENGINE = 'mysql'
+    DB_NAME = config('DB_NAME_PROD')
+    DB_USER = config('DB_USER_PROD')
+    DB_PASSWORD = config('DB_PASSWORD_PROD')
+    DB_HOST = config('DB_HOST_PROD', default='localhost')
+    DB_PORT = config('DB_PORT_PROD', default='3306')
+else:  # local
+    DB_ENGINE = 'postgresql'
+    DB_NAME = config('DB_NAME')
+    DB_USER = config('DB_USER')
+    DB_PASSWORD = config('DB_PASSWORD')
+    DB_HOST = config('DB_HOST', default='localhost')
+    DB_PORT = config('DB_PORT', default='5432')
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DB_NAME'),
-        'USER': config('DB_USER'),
-        'PASSWORD': config('DB_PASSWORD'),
-        'HOST': config('DB_HOST', default='localhost'),
-        'PORT': config('DB_PORT', default='5432'),
+        'ENGINE': f'django.db.backends.{DB_ENGINE}',
+        'NAME': DB_NAME,
+        'USER': DB_USER,
+        'PASSWORD': DB_PASSWORD,
+        'HOST': DB_HOST,
+        'PORT': DB_PORT,
+        'OPTIONS': {'charset': 'utf8mb4'} if DB_ENGINE == 'mysql' else {},
     }
 }
+
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': config('DB_NAME'),
+#         'USER': config('DB_USER'),
+#         'PASSWORD': config('DB_PASSWORD'),
+#         'HOST': config('DB_HOST', default='localhost'),
+#         'PORT': config('DB_PORT', default='5432'),
+#     }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -187,6 +224,8 @@ if not DEBUG:
     ALLOWED_HOSTS = [
     'school-tech-solution.universtechgroup.com',
     'www.school-tech-solution.universtechgroup.com',
+    'ecole-les-champions.universtechgroup.com',
+    'www.ecole-les-champions.universtechgroup.com',
 ]   
     # Prévient la boucle infinie de redirections sur o2switch 🔑
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -199,5 +238,7 @@ if not DEBUG:
     SECURE_HSTS_PRELOAD = True
 else:
     # Configuration pour le développement local
-    ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+    config('ALLOWED_HOSTS',default='localhost,127.0.0.1', 
+           cast=lambda v: [h.strip() for h in v.split(',')]
+        )
 
