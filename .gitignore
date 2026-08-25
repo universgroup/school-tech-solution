@@ -219,5 +219,4 @@ __marimo__/
 *.pyc
 
 #Fichiers statiques du projet tels que les media uploadés lors du test
-/staticfiles/
 /media/
