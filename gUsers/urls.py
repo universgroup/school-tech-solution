@@ -12,6 +12,7 @@ urlpatterns = [
     path('modifier_utilisateur/<int:pk>', modifierutilisateur, name='modifier_utilisateur'),
     path('mon-profil/<int:iduser>', affichermonprofil, name='mon_profil'),
     path('suppressionutilisateur/<int:iduser>',supprimerutilisateur, name='suppressionutilisateur'),
+    path('utilisateurs/changer-photo/', changer_photo_profil, name='changer_photo_profil'),
 
     # Réinitialisation du mot de passe (flux natif Django, rien à recoder)
    
@@ -29,4 +30,7 @@ urlpatterns = [
     path('reinitialiser/complet/', auth_views.PasswordResetCompleteView.as_view(
         template_name='gUsers/reinitialiser_mot_de_passe_complet.html'
     ), name='password_reset_complete'),
+
+    path('mot-de-passe/modifier/', PasswordChangeCustomView.as_view(), name='password_change'),
+    path('mot-de-passe/modifie/', PasswordChangeDoneCustomView.as_view(), name='password_change_done'),
 ]

@@ -22,9 +22,9 @@ PERMISSIONS = {
     "menu_administration": [DG],
     "menu_eleves": [DG, SCOL, COMPTA],
     "menu_comptabilite": [DG, SCOL ,COMPTA],
-    "menu_personnel": [DG, COMPTA],
-    "menu_evaluation": [DG, SCOL, ENS],
-    "menu_services": [DG, SCOL ,COMPTA],
+    "menu_personnel": [],
+    "menu_evaluation": [],
+    "menu_services": [],
 
     # Élèves
     "eleve_inscrire": [DG, SCOL, COMPTA],
@@ -40,16 +40,16 @@ PERMISSIONS = {
     "compta_cloturer_mois": [DG, COMPTA],
 
     # Personnel
-    "personnel_gerer": [DG],
+    "personnel_gerer": [],
 
     # Évaluation
-    "matiere_gerer": [DG, SCOL],
-    "periode_gerer": [DG, SCOL],
-    "bulletin_generer": [DG, SCOL],
-    "note_modifier": [DG, SCOL],      # ENS : voir peut_modifier_note() ci-dessous
+    "matiere_gerer": [],
+    "periode_gerer": [],
+    "bulletin_generer": [],
+    "note_modifier": [],      # ENS : voir peut_modifier_note() ci-dessous
 
     # Services
-    "services_gerer": [DG, SCOL, COMPTA],
+    "services_gerer": [],
 }
 
 

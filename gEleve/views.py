@@ -624,7 +624,7 @@ def imprimerecuinscription(request, idins):
 # Gestion des reinscription des élèves
 @login_required
 def chargeranneecycle(request):
-    ans = Inscription.objects.all().distinct('annee_scolaire')
+    ans = Inscription.objects.values('annee_scolaire').distinct()
     cy = CycleScolaire.objects.all()
     an = AnneeScolaire.objects.all()
     clas = Classe.objects.all()
@@ -949,7 +949,7 @@ effectif_total_filles = 0
 @login_required
 def listeinscritsanneescolairecourante(request):
 
-    ans = Inscription.objects.all().distinct('annee_scolaire')
+    ans = Inscription.objects.values('annee_scolaire').distinct()
     cy = CycleScolaire.objects.all()
 
     listeeleves = {}
@@ -978,7 +978,7 @@ def listeinscritsanneescolairecourante(request):
 @login_required
 def listereinscritsanneescolairecourante(request):
 
-    ans = Inscription.objects.all().distinct('annee_scolaire')
+    ans = Inscription.objects.values('annee_scolaire').distinct()
     cy = CycleScolaire.objects.all().order_by('id')
 
     listeeleves = {}
@@ -1015,7 +1015,7 @@ def filtrelisteinscrits(request):
     listeinsclasse = Inscription.objects.none()
 
     # Pour permettre un rechargement des donnees relatives a l'annee scolaire et le cycle
-    ans = Inscription.objects.all().distinct('annee_scolaire')
+    ans = Inscription.objects.values('annee_scolaire').distinct()
     cy = CycleScolaire.objects.all().order_by('id')
 
     global effectif_total
@@ -1048,7 +1048,7 @@ def filtrelistereinscrits(request):
     idcy = request.GET.get('cycle')
     idansc = request.GET.get('annee_scolaire')
 
-    ans = Inscription.objects.all().distinct('annee_scolaire')
+    ans = Inscription.objects.values('annee_scolaire').distinct()
     cy = CycleScolaire.objects.all().order_by('id')
 
     listeinsclasse = {}

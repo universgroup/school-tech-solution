@@ -1,5 +1,6 @@
 from django import forms
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, PasswordResetForm, SetPasswordForm
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, PasswordResetForm, SetPasswordForm, PasswordChangeForm
+
 from .models import Utilisateur, NIVEAU_ACCES_CHOICES
 from django.core.exceptions import ValidationError
 
@@ -10,6 +11,11 @@ class ConnexionForm(AuthenticationForm):
     password = forms.CharField(
        widget=forms.PasswordInput(attrs={'id':'idpassword', 'placeholder': ' ', 'class': 'form-control floating-input'})
     )
+
+    def __init__(self,*args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].required = True
+        self.fields['password'].required = True
 
 
 class CreationUtilisateurForm(UserCreationForm):
@@ -89,3 +95,41 @@ class ReinitialiserMotDePasseForm(SetPasswordForm):
             'class': 'form-control floating-input'
         }),
     )
+
+class PhotoProfilForm(forms.ModelForm):
+    class Meta:
+        model = Utilisateur
+        fields = ['photo_profil']
+
+
+class PasswordChangeCustomForm(PasswordChangeForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Personnaliser les labels ou les widgets
+        self.fields['old_password'].label = 'Ancien mot de passe'
+        self.fields['new_password1'].label = 'Nouveau mot de passe'
+        self.fields['new_password2'].label = 'Confirmer le nouveau mot de passe'
+
+        self.fields['old_password'].required = True
+        self.fields['new_password1'].required = True
+        self.fields['new_password2'].required = True
+
+        self.fields['old_password'].help_text = 'Au moins 8 caractères, avec lettres, chiffres et caractères spéciaux'
+        self.fields['new_password1'].help_text = 'Au moins 8 caractères, avec lettres, chiffres et caractères spéciaux'
+        self.fields['new_password2'].help_text = 'Confirmer le mot de passe en le retapant à nouveau'
+
+        self.fields['old_password'].widget.attrs.update({'placeholder': 'Votre ancien mot de passe'}) # Permet de définir un placeholder pour la zone de saisie password1
+        self.fields['new_password1'].widget.attrs.update({'placeholder': 'Votre nouveau mot de passe'}) # Permet de définir un placeholder pour la zone de saisie password2
+        self.fields['new_password2'].widget.attrs.update({'placeholder': 'Confirmer votre nouveau mot de passe'})
+
+        # Ajouter des classes CSS
+        for field in self.fields.values():
+            field.widget.attrs.update({'class': 'form-control'})
+
+    # def clean_newpassword2(self):                
+    #     new_password1 = self.cleaned_data.get('new_password1')
+    #     new_password2 = self.cleaned_data.get('new_password2')
+
+    #     if new_password1 and new_password2 and new_password1 != new_password2:
+    #         raise ValidationError('Les deux mots de passe ne correspondent pas.', code='password_mismatch')
+    #     return new_password2

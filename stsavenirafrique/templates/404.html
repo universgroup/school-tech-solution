@@ -4,17 +4,25 @@
     {% load static %}
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Page introuvable (404) - École Les Champions</title>
-    <link rel="icon" type="image/png" href="{% static 'assets/dist/img/LogoEC.png' %}">
+    {% if nom_ecole %}
+    <title>Page introuvable (404) - {{ nom_ecole }}</title>
+    {% else %}
+    <title>Page introuvable (404) - Votre école</title>
+    {% endif %}
+
+    {% if logo_ecole %}
+    <link rel="icon" type="image/png" href="{{ logo_ecole.url }}">
+    {% endif %}
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
     <link rel="stylesheet" href="{% static 'assets/css/loginstyle.css' %}">
-
+    
+    {% if logo_ecole %}
     <style>
     .login-form::before,
     .login-brand::after {
-        background-image: url("{% static 'assets/dist/img/LogoEC.png' %}");
+        background-image: url("{{ logo_ecole.url }}");
     }
     .error-code {
         font-size: 4rem;
@@ -23,15 +31,26 @@
         color: #4361ee;
     }
     </style>
+    {% endif %}
+
 </head>
 <body>
     <div class="login-card">
         <div class="login-brand">
             <div class="brand-content">
                 <div class="school-logo">
-                    <img src="{% static 'assets/dist/img/LogoEC.png' %}" alt="Logo de l'école les Champions" />
+                    {% if logo_ecole %}
+                    <img src="{{ logo_ecole.url }}" alt="Logo de l'école" />
+                    {% else %}
+                    <img src="#" alt="Logo de l'école" />
+                    {% endif %}
                 </div>
-                <h1>École Les Champions</h1>
+                {% if nom_ecole %}
+                <h1>{{ nom_ecole }}</h1>
+                {% else %}
+                <h1>Votre école</h1>
+                {% endif %}
+
                 <p>L'excellence au service de l'éducation</p>
                 <div class="brand-divider"></div>
                 <div class="school-feature">
@@ -44,7 +63,11 @@
 
         <div class="login-form">
             <div class="form-header text-center">
+                {% logo_ecole %}
                 <div class="error-code">404</div>
+                {% else %}
+                <div style="font-size: 4rem; font-weight: 800; line-height: 1; color: #4361ee;">404</div>
+                {% endif %}
                 <i class="fas fa-map-signs fa-2x text-primary mb-3"></i>
                 <h2>Page introuvable</h2>
                 <p>
