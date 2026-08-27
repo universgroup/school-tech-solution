@@ -1,16 +1,17 @@
 # Create your views here.
 from django.contrib.auth import get_user_model
-from django.contrib.auth.decorators import login_required, user_passes_test
-from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView, PasswordChangeDoneView
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .forms import ConnexionForm, CreationUtilisateurForm, MotDePasseOublieForm
+from .forms import ConnexionForm, CreationUtilisateurForm, MotDePasseOublieForm, PhotoProfilForm, PasswordChangeCustomForm
 from django.core.paginator import Paginator
 from .models import NIVEAU_ACCES_CHOICES
 from django.contrib.auth import views as auth_views
 from django.urls import reverse_lazy
 from django.db.models import Sum, Count, Q
 from django.db.models.functions import TruncMonth
+from django.contrib.auth.mixins import LoginRequiredMixin # Pour les vues basées sur une classe, on utilise LoginRequiredMixin (pas le décorateur @login_required)
 
 from gComptabilite.models import EtatPaiementTranche, Caisse, TYPE_OPERATION_CAISSE_CHOICES
 from gAdministration.models import Ecole, Classe
@@ -18,6 +19,7 @@ from gEleve.models import Inscription, ETAT_INSCRIPTION, SEXE_ELEVE_CHOICES
 from gComptabilite.views import affichersoldecaisse
 from gPersonnel.models import Personnel
 from core.context_processor import annee_scolaire_actuelle
+from gUsers.decorators import action_requise
 
 Utilisateur = get_user_model()
 
@@ -34,12 +36,11 @@ class DeconnexionView(LogoutView):
     next_page = 'connexion'
 
 
-def _est_directeur_general(user):
-    return user.is_authenticated and user.est_directeur_general()
+# def _est_directeur_general(user):
+#     return user.is_authenticated and user.est_directeur_general()
 
 
-@login_required
-@user_passes_test(_est_directeur_general)
+@action_requise('menu_administration')
 def listeutilisateurs(request):
     use = Utilisateur.objects.all().order_by('id')
 
@@ -50,8 +51,7 @@ def listeutilisateurs(request):
     return render(request, 'gUsers/liste_utilisateurs.html', {'utilisateurs': use})
 
 
-@login_required
-@user_passes_test(_est_directeur_general)
+@action_requise('menu_administration')
 def creerutilisateur(request):
     if request.method == 'POST':
         form = CreationUtilisateurForm(request.POST, request.FILES)
@@ -65,9 +65,7 @@ def creerutilisateur(request):
         form = CreationUtilisateurForm()
     return render(request, 'gUsers/creer_utilisateur.html', {'form': form})
 
-
-@login_required
-@user_passes_test(_est_directeur_general)
+@action_requise('menu_administration')
 def editerutilisateur(request, iduser):
     use = Utilisateur.objects.get(id=iduser)
     return render(request,'gUsers/modifier_utilisateur.html',dict(user=use, niveau_acces=NIVEAU_ACCES_CHOICES))
@@ -81,8 +79,7 @@ def affichermonprofil(request, iduser):
 
 
 
-@login_required
-@user_passes_test(_est_directeur_general)
+@action_requise('menu_administration')
 def modifierutilisateur(request, pk):
     if request.method == 'POST':
             use = Utilisateur.objects.get(id=pk)
@@ -103,8 +100,7 @@ def modifierutilisateur(request, pk):
         return redirect('../liste_utilisateurs/')
 
 
-@login_required
-@user_passes_test(_est_directeur_general)
+@action_requise('menu_administration')
 def supprimerutilisateur(request, iduser):
     use = Utilisateur.objects.get(id=iduser)
     use.delete()
@@ -272,8 +268,6 @@ def home(request):
     return render(request,'global/dashboard.html', context)
 
 
-
-
 # Permet de personnaliser le mail envoyé à l'utilisateur pour la reinitialisation de son mot de passe en y ajoutant le nom de l'école comme signature
 class MotDePasseOublieView(auth_views.PasswordResetView):
     template_name = "gUsers/mot_de_passe_oublie.html"
@@ -290,3 +284,31 @@ class MotDePasseOublieView(auth_views.PasswordResetView):
             "nom_ecole": ecole.nom_ecole if ecole else "Ecole les Champions-Service Scolarité"
         }
         return super().form_valid(form)
+
+
+@login_required
+def changer_photo_profil(request):
+    if request.method == 'POST':
+        form = PhotoProfilForm(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Photo de profil mise à jour avec succès.")
+        else:
+            messages.error(request, "Le fichier envoyé n'est pas valide.")
+
+    return redirect(request.META.get('HTTP_REFERER', 'accueil'))
+
+
+
+class PasswordChangeCustomView(LoginRequiredMixin, PasswordChangeView):
+    form_class = PasswordChangeCustomForm
+    template_name = 'gUsers/password_change_form.html'
+    success_url = reverse_lazy('password_change_done')
+
+    def form_valid(self, form):
+        messages.success(self.request, 'Votre mot de passe a été modifié avec succès !')
+        return super().form_valid(form)
+
+
+class PasswordChangeDoneCustomView(LoginRequiredMixin, PasswordChangeDoneView):
+    template_name = 'gUsers/password_change_done.html'

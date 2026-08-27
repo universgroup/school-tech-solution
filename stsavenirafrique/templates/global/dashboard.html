@@ -4,14 +4,25 @@
   {% load static %}
   {% load permissions_tags %}
   <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Ecole les Champions-Tableau de bord</title>
+  
+  {% if nom_ecole %}
+  <title>{{nom_ecole}} &nbsp; --Tableau de bord</title>
+  {% else %}
+  <title>Votre école &nbsp; --Tableau de bord</title>
+  {% endif %}
+
   <!-- Tell the browser to be responsive to screen width -->
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/png" href="{% static 'assets/dist/img/LogoEC.png' %}">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  {% if logo_ecole %}
+    <link rel="icon" type="image/png" href="{{ logo_ecole.url }}">
+    {% endif %}
 
    <!-- Style du template dashboard à applique sur tous les autres templates-->
   <link rel="stylesheet" href="{% static 'assets/css/dashboard.css' %}">
+
+  <!-- Affichage de la photo sous forme de zone dans tous les templates utilisant la photo-->
+  <link rel="stylesheet" href="{% static 'assets/css/zonephoto.css' %}">
 
    <!-- Google Font: Source Sans Pro -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
@@ -33,11 +44,11 @@
 
   <!--begin::Third Party Plugin(Bootstrap Icons)-->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"/> 
-   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
 
 </head>
-<body class="hold-transition sidebar-mini layout-fixed">
+<body class="hold-transition sidebar-mini">  <!-- layout-fixed -->
 <div class="wrapper">
 
   <nav class="main-header navbar navbar-expand navbar-white navbar-light">
@@ -207,7 +218,7 @@
     </ul>
 
     <!-- SEARCH FORM -->
-    <form class="form-inline ml-3">
+    <form class="form-inline ml-3 d-none d-lg-flex">
       <div class="input-group input-group-sm">
         <input class="form-control form-control-navbar" type="search" placeholder="Rechercher..." aria-label="Search">
         <div class="input-group-append">
@@ -218,109 +229,33 @@
       </div>
     </form>
 
-    <!-- Right navbar links -->
-    <ul class="navbar-nav ml-auto">
-      <!-- Messages Dropdown Menu -->
-      <li class="nav-item dropdown">
-        <a class="nav-link" data-toggle="dropdown" href="#">
-          <i class="far fa-comments"></i>
-          <span class="badge badge-danger navbar-badge">3</span>
-        </a>
-        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-          <a href="#" class="dropdown-item">
-            <!-- Message Start -->
-            <div class="media">
-              <img src="{% static 'assets/dist/img/user1-128x128.jpg' %}" alt="User Avatar" class="img-size-50 mr-3 img-circle">
-              <div class="media-body">
-                <h3 class="dropdown-item-title">
-                  Brad Diesel
-                  <span class="float-right text-sm text-danger"><i class="fas fa-star"></i></span>
-                </h3>
-                <p class="text-sm">Call me whenever you can...</p>
-                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
-              </div>
-            </div>
-            <!-- Message End -->
-          </a>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item">
-            <!-- Message Start -->
-            <div class="media">
-              <img src="{% static 'assets/dist/img/user8-128x128.jpg' %}" alt="Avatar utilisateur" class="img-size-50 img-circle mr-3">
-              <div class="media-body">
-                <h3 class="dropdown-item-title">
-                  John Pierce
-                  <span class="float-right text-sm text-muted"><i class="fas fa-star"></i></span>
-                </h3>
-                <p class="text-sm">I got your message bro</p>
-                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
-              </div>
-            </div>
-            <!-- Message End -->
-          </a>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item">
-            <!-- Message Start -->
-            <div class="media">
-              <img src="{% static 'assets/dist/img/user3-128x128.jpg' %}" alt="Avatar utilisateur" class="img-size-50 img-circle mr-3">
-              <div class="media-body">
-                <h3 class="dropdown-item-title">
-                  Nora Silvester
-                  <span class="float-right text-sm text-warning"><i class="fas fa-star"></i></span>
-                </h3>
-                <p class="text-sm">The subject goes here</p>
-                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
-              </div>
-            </div>
-            <!-- Message End -->
-          </a>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item dropdown-footer">See All Messages</a>
-        </div>
-      </li>
-      <!-- Notifications Dropdown Menu -->
-      <li class="nav-item dropdown">
-        <a class="nav-link" data-toggle="dropdown" href="#">
-          <i class="far fa-bell"></i>
-          <span class="badge badge-warning navbar-badge">15</span>
-        </a>
-        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-          <span class="dropdown-item dropdown-header">15 Notifications</span>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item">
-            <i class="fas fa-envelope mr-2"></i> 4 new messages
-            <span class="float-right text-muted text-sm">3 mins</span>
-          </a>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item">
-            <i class="fas fa-users mr-2"></i> 8 friend requests
-            <span class="float-right text-muted text-sm">12 hours</span>
-          </a>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item">
-            <i class="fas fa-file mr-2"></i> 3 new reports
-            <span class="float-right text-muted text-sm">2 days</span>
-          </a>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
-        </div>
-      </li>
+    <!-- Année scolaire / session -->
+    <div class="navbar-text mx-3 d-none d-md-inline-block" style="color: #1a8eec; font-weight: bold; font-size: 0.85rem;">
+        ANNEE SCOLAIRE : {{ annee_scolaire }} &nbsp;&nbsp; SESSION : {{ session_scolaire }}
+    </div>
 
-      <li class="nav-item dropdown">
-          <a class="nav-link" data-toggle="dropdown" href="{% url 'mon_profil' request.user.id %}" title="Acceder à vos informations personnelles">
-              {% if request.user.photo_profil %}
-              <img src="{{ request.user.photo_profil.url }}" alt="Avatar" class="img-size-24 img-circle">
-              {% else %}
-              <img src="{% static 'assets/dist/img/user1-128x128.jpg' %}" alt="Avatar" class="img-size-24 img-circle">
-              {% endif %}
-          </a>
-      </li>
-
-      <li class="nav-item">
-        <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button">
-          <i class="fas fa-th-large"></i>
-        </a>
-      </li>
+      <ul class="navbar-nav ml-auto">       
+        <li class="nav-item dropdown">
+            <a class="nav-link" data-toggle="dropdown" href="#" aria-haspopup="true" aria-expanded="false" title="Menu du profil">
+                {% if request.user.photo_profil %}
+                <img src="{{ request.user.photo_profil.url }}" alt="Avatar" class="img-size-24 img-circle">
+                {% else %}
+                <img src="{% static 'assets/dist/img/avatar5.png' %}" alt="Avatar" class="img-size-24 img-circle">
+                {% endif %}
+            </a>
+            <ul class="dropdown-menu dropdown-menu-right border-0 shadow">
+                <li><a href="{% url 'mon_profil' request.user.id %}" class="dropdown-item"><i class="fas fa-user mr-2"></i>Mon profil</a></li>
+                <li><a href="#" class="dropdown-item" data-toggle="modal" data-target="#modalPhotoProfil"><i class="fas fa-camera mr-2"></i>Changer ma photo de profil</a></li>
+                <li><a href="{% url 'password_change' %}" class="dropdown-item"><i class="fas fa-key mr-2"></i>Changer mon mot de passe</a></li>
+                <li class="dropdown-divider"></li>
+                <li>
+                    <form action="{% url 'deconnexion' %}" method="post" class="m-0">
+                        {% csrf_token %}
+                        <button type="submit" class="dropdown-item"><i class="fas fa-sign-out-alt mr-2"></i>Déconnexion</button>
+                    </form>
+                </li>
+            </ul>
+        </li>
     </ul>
   </nav>
   <!-- /.navbar -->
@@ -329,11 +264,26 @@
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
     <a href="{% url 'accueil' %}" class="brand-link" title="Acceder au tableau de bord">
-      <img src="{% static 'assets/dist/img/LogoEC.png' %}"
-           alt="Logo Ecole les Champions"
+
+      {% if logo_ecole %}
+      <img src="{{logo_ecole.url}}"
+           alt="Logo Ecole"
            class="img-size-24 img-circle"
-           style="opacity: .8">
-      <span class="brand-text font-weight-light">Ecole les Champions</span>
+           style="opacity: .8" title="Logo de l'école">
+      {% else %}
+        <img src="#"
+           alt="Logo Ecole"
+           class="img-size-24 img-circle"
+           style="opacity: .8" title="Logo de l'école">
+
+      {% endif %}
+
+      <!-- <span class="brand-text font-weight-light">{{nom_ecole}}</span> -->
+       {% if nom_ecole %}
+      <span style="color: rgb(240, 233, 233); font-weight: bold; font-size: medium;">{{nom_ecole}}</span>
+      {% else %}
+      <span style="color: rgb(240, 233, 233); font-weight: bold; font-size: medium;">Nom de l'école</span>
+      {% endif %}
     </a>
 
     <!-- Sidebar -->
@@ -343,9 +293,9 @@
       <div class="user-panel mt-3 pb-3 mb-3 d-flex">
         <div class="image">
           {% if request.user.photo_profil %}
-          <img src="{{ request.user.photo_profil.url }}" alt="Avatar" class="img-size-24 mr-2 img-circle">
+          <img src="{{ request.user.photo_profil.url }}" alt="Avatar du compte" title="Votre photo de profil" class="img-size-24 mr-2 img-circle">
           {% else %}
-          <img src="{% static 'assets/dist/img/user1-128x128.jpg' %}" alt="Avatar" class="img-size-24 mr-2 img-circle">
+          <img src="{% static 'assets/dist/img/avatar5.png' %}" alt="Avatar du compte" title="Votre photo de profil" class="img-size-24 mr-2 img-circle">
           {% endif %}
         </div>
         <div class="info">
@@ -762,37 +712,31 @@
   
 
   <!-- Content Wrapper. Contains page content -->
-  <div class="content-wrapper">
+<div class="content-wrapper">
     <!-- Content Header (Page header) -->
     <div class="content-header">
       <div class="container-fluid">
         <div class="row mb-2">
-          <div class="col-sm-3">
-            <h1 class="m-0">TABLEAU DE BORD &nbsp; &nbsp;</h1>
-          </div><!-- /.col -->
-          <div class="col-sm-3">
-            <h1 class="m-2" style="font-size: 1rem; color: rgb(26, 142, 236); font-weight: bold;">
-                    ANNEE SCOLAIRE : &nbsp;{{ annee_scolaire }} &nbsp; SESSION : &nbsp; {{ session_scolaire }}
-            </h1>
-          </div>
-
-          <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="#">Accueil</a></li>
-              <li class="breadcrumb-item active" aria-current="page">Tableau de bord</li>
-            </ol>
-          </div><!-- /.col -->
-        </div><!-- /.row -->
+            <div class="col-sm-6">
+                <h1 class="m-0">TABLEAU DE BORD DES ACTIVITES</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="#">Accueil</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Tableau de bord</li>
+                </ol>
+            </div>
+        </div>
       </div><!-- /.container-fluid -->
     </div>
     <!-- /.content-header -->
 
     <!-- Main content -->
-    <section class="content">
+  <section class="content">
       <div class="container-fluid">
         <!-- Small boxes (Stat box) -->
         <div class="row mb-4">
-          <div class="col-lg-3 col-6">
+          <div class="col-lg-3 col-sm-6 col-12">
               <div class="stat-card">
                   <div class="stat-icon blue"><i class="fas fa-user-graduate"></i></div>
                   <div class="stat-label">Effectif inscrits</div>
@@ -802,7 +746,7 @@
                   </div>
               </div>
           </div>
-          <div class="col-lg-3 col-6">
+          <div class="col-lg-3 col-sm-6 col-12">
               <div class="stat-card">
                   <div class="stat-icon yellow"><i class="fas fa-child"></i></div>
                   <div class="stat-label">Effectif garçons</div>
@@ -812,7 +756,7 @@
                   </div>
               </div>
           </div>
-          <div class="col-lg-3 col-6">
+          <div class="col-lg-3 col-sm-6 col-12">
               <div class="stat-card">
                   <div class="stat-icon purple"><i class="fas fa-child-dress"></i></div>
                   <div class="stat-label">Effectif filles</div>
@@ -822,7 +766,7 @@
                   </div>
               </div>
           </div>
-          <div class="col-lg-3 col-6">
+          <div class="col-lg-3 col-sm-6 col-12">
               <div class="stat-card">
                   <div class="stat-icon green"><i class="fas fa-chalkboard-teacher"></i></div>
                   <div class="stat-label">Personnel</div>
@@ -836,7 +780,7 @@
 
 
       <div class="row mb-4">
-          <div class="col-lg-3 col-6">
+          <div class="col-lg-3 col-sm-6 col-12">
               <div class="stat-card">
                   <div class="stat-icon blue"><i class="fas fa-user-graduate"></i></div>
                   <div class="stat-label">Effectif reinscrits</div>
@@ -846,7 +790,7 @@
                   </div>
               </div>
           </div>
-          <div class="col-lg-3 col-6">
+          <div class="col-lg-3 col-sm-6 col-12">
               <div class="stat-card">
                   <div class="stat-icon green"><i class="fas fa-hand-holding-dollar"></i></div>
                   <div class="stat-label">Total encaissé</div>
@@ -856,7 +800,7 @@
                   </div>
               </div>
           </div>
-          <div class="col-lg-3 col-6">
+          <div class="col-lg-3 col-sm-6 col-12">
               <div class="stat-card">
                   <div class="stat-icon yellow"><i class="fas fa-sack-dollar"></i></div>
                   <div class="stat-label">Total dépensé</div>
@@ -866,7 +810,7 @@
                   </div>
               </div>
           </div>
-          <div class="col-lg-3 col-6">
+          <div class="col-lg-3 col-sm-6 col-12">
               <div class="stat-card">
                   <div class="stat-icon purple"><i class="fas fa-scale-balanced"></i></div>
                   <div class="stat-label">Solde disponible</div>
@@ -877,11 +821,9 @@
               </div>
           </div>
       </div>
-            
-   </div>
 
    <div class="row g-3">
-      <div class="col-md-8">
+      <div class="col-12 col-md-8">
           <div class="card-dash">
               <div class="card-header-dash">
                   <h5><i class="fas fa-chart-line text-primary-custom mr-2"></i>Évolution des inscriptions</h5>
@@ -891,7 +833,7 @@
               </div>
           </div>
       </div>
-      <div class="col-md-4">
+      <div class="col-12 col-md-4">
           <div class="card-dash">
               <div class="card-header-dash">
                   <h5><i class="fas fa-chart-bar text-primary-custom mr-2"></i>Répartition par classe</h5>
@@ -938,12 +880,13 @@
                           {% endfor %}
                       </tbody>
                       <tfoot>
-
+                        <tr>
                           <th>Classe</th>
                           <th>Montant attendu</th>
                           <th>Première tranche</th>
                           <th>Deuxième tranche</th>
                           <th>Montant restant</th>
+                        </tr>
 
                       </tfoot>
                   </table>
@@ -952,17 +895,12 @@
       </div>
   </div>      
 
-            <!-- /.card -->
-</section>
-          <!-- right col -->
-</div>
-<!-- /.row (main row) -->
 </div><!-- /.container-fluid -->
 </section>
 <!-- /.content -->
-</div>
-  
-  <!-- /.content-wrapper -->
+</div>  <!-- /.content-wrapper -->
+
+
   <footer class="main-footer">
     <div class="float-right d-none d-sm-block">
       <b>Version</b> 1.0.0.1
@@ -978,6 +916,49 @@
 </div>
 <!-- ./wrapper -->
 
+<!-- Fenetre modale permettant a l'utiliateur de modifier sa photo de profil-->
+<div class="modal fade" id="modalPhotoProfil" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+
+      <form method="post" action="{% url 'changer_photo_profil' %}" enctype="multipart/form-data" id="fmodalphotoprofil">
+        {% csrf_token %}
+
+        <div class="modal-header">
+          <h5 class="modal-title">Changer votre photo de profil</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Fermer"><span aria-hidden="true">&times;</span></button>
+        </div>
+
+        <div class="modal-body">
+          <div class="form-group text-center">
+
+            <input type="file" name="photo_profil" id="id_photo_profil" class="d-none" accept="image/*" required onchange="previewPhotoProfilModal(this)">
+            
+            <label for="id_photo_profil" class="photo-zone" id="photoProfilZone">
+                <img id="photoProfilPreview" src="" alt="" style="display:none;">
+                <div id="photoProfilPlaceholder">
+                        <div class="placeholder-icon">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#adb5bd" stroke-width="1.5">
+                                    <path d="M4 7h3l2-2h6l2 2h3a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z"/>
+                                    <circle cx="12" cy="13" r="4"/>
+                            </svg>
+                        </div>
+                        <div class="placeholder-text">Cliquer pour charger votre photo de profil</div>
+                </div> 
+            </label>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="reset" class="btn btn-warning" data-dismiss="modal">Annuler &nbsp; <i class="fas fa-refresh"></i></button>
+          <button type="submit" class="btn btn-primary">Modifier &nbsp; <i class="fas fa-edit"></i></button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+
 <script src="{% static 'assets/plugins/jquery/jquery.min.js' %}"></script>
 <script src="{% static 'assets/plugins/jquery-ui/jquery-ui.min.js' %}"></script>
 <script>$.widget.bridge('uibutton', $.ui.button)</script>
@@ -992,6 +973,9 @@
 <script src="{% static 'assets/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js' %}"></script>
 <script src="{% static 'assets/dist/js/adminlte.js' %}"></script>
 <script src="{% static 'assets/dist/js/demo.js' %}"></script>
+
+<!-- Affichage de la photo dans les differents templates qui utilisent les photos -->
+<script src="{% static 'assets/js/zonephoto.js' %}"></script>
 
 <!-- Chart.js (graphiques du tableau de bord) -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -1042,6 +1026,16 @@
                                   } }
             });
         });
+
+
+        $("#fmodalphotoprofil")[0].addEventListener("reset", function(){
+        // On laisse le navigateur vider le input file lui-même,
+        // mais on doit remettre l'aperçu à zéro manuellement
+        setTimeout(resetPhotoProfilZone, 0);
+    });
+
+
+
   </script>
 
 

@@ -380,3 +380,69 @@
         $("#photoUserPreview").attr("src", "").hide();  // masque et vide l'aperçu
         $("#photoUserPlaceholder").show();               // réaffiche l'icône + le texte par défaut
     }
+
+
+
+    // Fonction commune : affiche l'aperçu de la photo de profil dans la fenetre modale
+    function afficherApercuPhotoUserModale(file) {
+        if (!file || !file.type.startsWith("image/")) return;
+        var reader = new FileReader();
+        reader.onload = function(e) {
+        $("#photoProfilPreview").attr("src", e.target.result).show();
+        $("#photoProfilPlaceholder").hide();
+        };
+        reader.readAsDataURL(file);
+    }
+
+    
+    // Cas de la Photo de profil de l'utilisateur dans la navbar
+    function previewPhotoProfilModal(input) {
+        if (input.files && input.files[0]) {
+        afficherApercuPhotoUserModale(input.files[0]);
+        }
+    }
+
+    // Cas du template Modifier la photo de l'utilisateur dans le navbar des différents templates
+    var PhotoProfilZone = document.getElementById("photoProfilZone");
+    var PhotoProfilinputFile = document.getElementById("id_photo_profil");
+
+    if(PhotoProfilZone){
+            // Empêcher le navigateur d'ouvrir l'image dans un nouvel onglet
+            ["dragenter", "dragover", "dragleave", "drop"].forEach(function(evt){
+                        PhotoProfilZone.addEventListener(evt, function(e){
+                        e.preventDefault();
+                        e.stopPropagation();
+                        });
+            });
+
+            // Effet visuel pendant le survol avec un fichier
+            ["dragenter", "dragover"].forEach(function(evt){
+                        PhotoProfilZone.addEventListener(evt, function(){
+                        PhotoProfilZone.classList.add("drag-over");
+                        });
+            });
+            
+            ["dragleave", "drop"].forEach(function(evt){
+                        PhotoProfilZone.addEventListener(evt, function(){
+                        PhotoProfilZone.classList.remove("drag-over");
+                        });
+            });
+        
+            // Cas 2 : dépôt du fichier (drag & drop)
+            PhotoProfilZone.addEventListener("drop", function(e){
+                    var files = e.dataTransfer.files;
+                    if (files.length > 0) {
+                    deinputFile.files = files;
+                    // injecte le fichier dans l'input Django
+                    afficherApercuPhotoUserModale(files[0]);
+                    }
+            });
+    } // fin de if(PhotoProfilZone)
+
+    // Reinitialisation de la zone PhotoUserZone
+    function resetPhotoProfilZone() {
+        $("#id_photo_profil").val("");            // vide le contenu du input file
+        $("#photoProfilPreview").attr("src", "").hide();  // masque et vide l'aperçu
+        $("#photoProfilPlaceholder").show();               // réaffiche l'icône + le texte par défaut
+    }
+

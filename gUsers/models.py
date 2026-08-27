@@ -17,7 +17,7 @@ NIVEAU_ACCES_CHOICES = (
 class Utilisateur(AbstractUser):
     email = models.EmailField(unique=True)   # on force l'unicité, car on va se connecter par email
     photo_profil = models.FileField(upload_to='media/photos_profil/', blank=True, null=True)
-    niveau_acces = models.CharField(max_length=10, choices=NIVEAU_ACCES_CHOICES, default=ENSEIGNANT)
+    niveau_acces = models.CharField(max_length=10, choices=NIVEAU_ACCES_CHOICES, default=DIRECTEUR_GENERAL)
 
     USERNAME_FIELD = 'email'          # connexion par email au lieu de username
     REQUIRED_FIELDS = ['username']    # username reste requis pour createsuperuser, mais pas pour se connecter
@@ -25,5 +25,5 @@ class Utilisateur(AbstractUser):
     def __str__(self):
         return f"{self.get_full_name() or self.username} — {self.get_niveau_acces_display()}"
 
-    def est_directeur_general(self):
-        return self.is_superuser or self.niveau_acces == self.DIRECTEUR_GENERAL
+    # def est_directeur_general(self):
+    #     return self.is_superuser or self.niveau_acces == self.DIRECTEUR_GENERAL

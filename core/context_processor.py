@@ -1,4 +1,5 @@
 from datetime import date
+from gAdministration.models import Ecole
 
 def annee_scolaire_actuelle(request):
     """
@@ -20,8 +21,30 @@ def annee_scolaire_actuelle(request):
         'annee_scolaire': f"{debut}-{fin}", # 2026-2027
         'annee_scolaire_debut': debut,
         'annee_scolaire_fin': fin,
-        'session_scolaire': fin, # 2027
+        'session_scolaire': fin # 2027
     }
+
+
+def afficher_logoEcole(request):
+
+    ecole = Ecole.objects.first()
+    logo_ecole = None
+    nom_ecole = None
+
+    if ecole is not None:
+        logo_ecole = ecole.logo_ecole
+        nom_ecole = ecole.nom_ecole
+
+
+    context = {'logo_ecole':logo_ecole,
+               'nom_ecole': nom_ecole}
+
+    return context
+
+
+
+
+
 
 # def donnees_menu_rapports(request):
 
