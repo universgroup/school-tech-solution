@@ -132,7 +132,7 @@ DATABASES = {
         'PASSWORD': DB_PASSWORD,
         'HOST': DB_HOST,
         'PORT': DB_PORT,
-        'OPTIONS': {'charset': 'utf8mb4'} if DB_ENGINE == 'mysql' else {},
+        'OPTIONS': {'charset': 'utf8mb4', 'init_command': "SET sql_mode='STRICT_TRANS_TABLES,NO_ZERO_DATE,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO,STRICT_ALL_TABLES'"} if DB_ENGINE == 'mysql' else {},
     }
 }
 

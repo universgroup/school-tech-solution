@@ -15,8 +15,9 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 from django.views.generic import RedirectView
+from django.views.static import serve
 
 # from . import views # c est une autre methode/facon d'importer les views
 
@@ -35,10 +36,13 @@ urlpatterns = [   # Racine du site "/" redirige vers la page de connexion
                   # path('notes/', include('gNotes.urls'), name='notes'),
                   # path('personnel/', include('gPersonnel.urls'), name='personnel'),
                   
-                  path('utilisateurs/', include('gUsers.urls'), name='utilisateurs'),  # l'attribut name devant chaque url contenant le include n'a pas d'effet, donc facultatif              
+                  path('utilisateurs/', include('gUsers.urls'), name='utilisateurs'),  # l'attribut name devant chaque url contenant le include n'a pas d'effet, donc facultatif    
+
+                  # Sert /media/ en permanence (dev et prod), car static() ignore MEDIA en prod
+                  re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),          
                   
 
-              ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+              ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 
 # Handler 403 personnalisé (page affichée quand PermissionDenied est levée)
