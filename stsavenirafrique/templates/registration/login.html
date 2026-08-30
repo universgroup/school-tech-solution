@@ -3,7 +3,7 @@
 <head>
     {% load static %}
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     
     {% if nom_ecole %}
     <title>Connexion--{{nom_ecole}}</title>
@@ -70,11 +70,9 @@
                 <p>Connectez-vous à votre espace personnel</p>
             </div>
 
-
             <form method="post" class="needs-validation">
-                
-                {% csrf_token %}
 
+                {% csrf_token %}
 
                 {% if form.errors %}
                 <div class="alert alert-danger">Adresse e-mail ou mot de passe incorrect.</div>
@@ -98,11 +96,10 @@
                     <a href="{% url 'password_reset' %}" class="text-primary fw-bold" style="font-size:0.85rem;">Mot de passe oublié ?</a>
                 </div>
 
-
                 <button type="submit" class="btn-login">
-                    Se connecter &nbsp; <i class="fas fa-arrow-right-to-bracket"></i> 
+                    Se connecter &nbsp; <i class="fas fa-arrow-right-to-bracket"></i>
                 </button>
-                
+
                 <!-- <div class="social-login">
                     <button type="button" class="btn-social"><i class="fab fa-google"></i> Gmail</button>
                     <button type="button" class="btn-social"><i class="fab fa-facebook"></i> Facebook</button>
@@ -121,7 +118,6 @@
                 }
             });
         });
-
 
     </script>
 </body>

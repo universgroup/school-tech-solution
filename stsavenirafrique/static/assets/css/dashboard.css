@@ -257,3 +257,99 @@
     border: 2px solid #fff; /* Ajoute un petit contour blanc sympa */
     box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Une légère ombre */
 }
+
+/* ===================================================================
+   RESPONSIVE OVERRIDES (fusionnés) — base.html sur mobile/tablette
+   ===================================================================
+   Contexte : les menus (Administration, Elèves, Comptabilité, Personnel,
+   Evaluation, Services) de la navbar du haut sont désormais masqués sous
+   992px directement dans base.html (classes d-none d-lg-block), car ils
+   sont dupliqués à l'identique dans la sidebar (accessible via le bouton
+   ☰), qui reste tactile et déjà responsive nativement grâce à AdminLTE.
+   Les règles ci-dessous gèrent le reste : débordement de texte, tableaux
+   trop larges, et resserrement de la mise en page sur petit écran.
+   =================================================================== */
+
+/* Empêche tout débordement horizontal de la page */
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+/* Nom de l'école dans le brand-link : coupe proprement si trop long
+   pour la largeur de la sidebar, plutôt que de déborder ou de la
+   faire éclater sur plusieurs lignes */
+.brand-text-ellipsis {
+    display: inline-block;
+    max-width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+}
+
+/* Nom de l'utilisateur connecté dans le panneau sidebar : même logique */
+.user-info-ellipsis {
+    display: inline-block;
+    max-width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+}
+
+/* Tableaux (.table-dash ou toute table du contenu) : autorise le défilement
+   horizontal interne plutôt que de casser la mise en page de la page */
+@media (max-width: 767.98px) {
+    .table-dash,
+    .card-dash table,
+    .card-body table {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        white-space: nowrap;
+    }
+}
+
+/* Petits téléphones (≤ 575px) : resserre l'en-tête de page et les cartes */
+@media (max-width: 575.98px) {
+    .content-header .container-fluid {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+    }
+
+    .content-header h1 {
+        font-size: 1.3rem;
+    }
+
+    .breadcrumb {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.8rem;
+    }
+
+    .card-header .card-title {
+        font-size: 1rem;
+    }
+
+    .main-footer {
+        font-size: 0.75rem;
+        padding: 0.6rem 0.9rem;
+        text-align: center;
+    }
+
+    .main-footer .float-right {
+        float: none !important;
+        display: block;
+        margin-bottom: 0.25rem;
+    }
+}
+
+/* Modale "Changer ma photo de profil" : la fenêtre elle-même doit garder
+   une marge confortable sur un petit écran. La taille de .photo-zone
+   est gérée globalement dans zonephoto.css (partagé par plusieurs
+   templates), pas ici. */
+@media (max-width: 400px) {
+    #modalPhotoProfil .modal-dialog {
+        margin: 0.75rem;
+    }
+}

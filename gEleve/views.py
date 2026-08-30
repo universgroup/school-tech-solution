@@ -400,7 +400,7 @@ def recuinscription(request, idinsc):
     if ec == 0:
         messages.error(request, 'Veuillez saisir les informations de l\'école')
     else:
-        ecole = Ecole.objects.get(id=1)
+        ecole = Ecole.objects.first()
         if ecole.logo_ecole:
             data_ecole = [ecole.nom_ecole, ecole.ville_ecole, ecole.prefect_commune,
                           ecole.telephone1, ecole.telephone2, ecole.logo_ecole.path,
@@ -493,7 +493,7 @@ def recuinscription(request, idinsc):
 
             # ── NOM ET DEVISE ECOLE ──
             p.setFont('Helvetica-Bold', 11)
-            p.drawString(200, 740 + y_offset, str(data_ecole[0]))
+            p.drawString(220, 740 + y_offset, str(data_ecole[0]))
             p.setFont('Helvetica-Oblique', 9)
             p.drawString(220, 725 + y_offset, str(data_ecole[6]))
 
@@ -725,7 +725,7 @@ def recureinscription(request, idinsc):
     if ec == 0:
         messages.error(request, 'Veuillez saisir les informations de l\'école')
     else:
-        ecole = Ecole.objects.get(id=1)
+        ecole = Ecole.objects.first()
         if ecole.logo_ecole:
             data_ecole = [ecole.nom_ecole, ecole.ville_ecole, ecole.prefect_commune,
                           ecole.telephone1, ecole.telephone2, ecole.logo_ecole.path,
@@ -817,7 +817,7 @@ def recureinscription(request, idinsc):
 
             # ── NOM ET DEVISE ECOLE ──
             p.setFont('Helvetica-Bold', 11)
-            p.drawString(200, 740 + y_offset, str(data_ecole[0]))
+            p.drawString(220, 740 + y_offset, str(data_ecole[0]))
             p.setFont('Helvetica-Oblique', 9)
             p.drawString(220, 725 + y_offset, str(data_ecole[6]))
 

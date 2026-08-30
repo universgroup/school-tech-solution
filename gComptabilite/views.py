@@ -691,7 +691,7 @@ def recupaiementscolarite(request, idetat, nom_tranche, mont_paye):
     if ec==0:
         messages.error(request,'Veuillez saisir les informations de l\'école')
     else:
-        ecole = Ecole.objects.get(id=1)
+        ecole = Ecole.objects.first()
         if ecole.logo_ecole:
             data_ecole = [ecole.nom_ecole, ecole.ville_ecole, ecole.prefect_commune, ecole.telephone1, ecole.telephone2,
                           ecole.logo_ecole.path, ecole.devise_ecole, ecole.dsee, ecole.comptable]
@@ -1153,7 +1153,7 @@ def rapportpaiementtranche(request):
     if ec == 0:
         messages.error(request, 'Veuillez saisir les informations de l\'école')
     else:
-        ecole = Ecole.objects.get(id=1)
+        ecole = Ecole.objects.first()
         if ecole.logo_ecole:
             data_ecole = [ecole.nom_ecole, ecole.ville_ecole, ecole.prefect_commune,
                           ecole.telephone1, ecole.telephone2, ecole.logo_ecole.path,

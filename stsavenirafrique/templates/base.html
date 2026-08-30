@@ -51,12 +51,20 @@
       <li class="nav-item d-none d-sm-inline-block">
         <a href="{% url 'accueil' %}" class="nav-link" title="Acceder au tableau de bord">Accueil</a>
       </li>
-      
+
+      <!-- Les menus ci-dessous sont dupliqués à l'identique (en version
+           plate, tactile) dans la sidebar accessible via le bouton ☰.
+           On les masque en dessous de 992px (lg) car :
+           1) ils n'ont pas la place de s'afficher proprement sur mobile/tablette
+           2) leurs sous-menus (.dropdown-submenu.dropdown-hover) reposent
+              sur un survol souris et sont donc inutilisables au doigt
+           La sidebar reste la seule navigation sur mobile/tablette. -->
+
       {% peut request.user 'menu_administration' as ok_admin %}
 
       {% if ok_admin %}
 
-      <li class="nav-item dropdown">
+      <li class="nav-item dropdown d-none d-lg-block">
             <a id="dropdownSubMenu1" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle">Administration</a>
             <ul aria-labelledby="dropdownSubMenu1" class="dropdown-menu border-0 shadow">
               <li><a href="{% url 'listeinfos' %}" class="dropdown-item">Paramètres de l'école </a></li>
@@ -85,7 +93,7 @@
 
       {% if ok_eleves %}
 
-      <li class="nav-item dropdown">
+      <li class="nav-item dropdown d-none d-lg-block">
             <a id="dropdownSubMenu3" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle">Elèves</a>
             <ul aria-labelledby="dropdownSubMenu3" class="dropdown-menu border-0 shadow">
               <li><a href="{% url 'chargeranneecourante' %}" class="dropdown-item">Inscription</a></li>
@@ -102,7 +110,7 @@
 
       {% if ok_compta %}
 
-      <li class="nav-item dropdown">
+      <li class="nav-item dropdown d-none d-lg-block">
             <a id="dropdownSubMenu4" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle">Comptabilité</a>
             <ul aria-labelledby="dropdownSubMenu4" class="dropdown-menu border-0 shadow">
               <li><a href="{% url 'listepaiemensuel' %}" class="dropdown-item">Paiement de la scolarité</a></li>
@@ -132,7 +140,7 @@
 
       {% if ok_personnel %}
 
-      <li class="nav-item dropdown">
+      <li class="nav-item dropdown d-none d-lg-block">
             <a id="dropdownSubMenu6" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle">Personnel</a>
             <ul aria-labelledby="dropdownSubMenu6" class="dropdown-menu border-0 shadow">
               <li><a href="#" class="dropdown-item">Enregistrer un employé</a></li>
@@ -149,7 +157,7 @@
 
       {% if ok_eval %}
 
-      <li class="nav-item dropdown">
+      <li class="nav-item dropdown d-none d-lg-block">
             <a id="dropdownSubMenu7" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle">Evaluation</a>
             <ul aria-labelledby="dropdownSubMenu7" class="dropdown-menu border-0 shadow">
               
@@ -194,7 +202,7 @@
 
       {% if ok_services %}
 
-      <li class="nav-item dropdown">
+      <li class="nav-item dropdown d-none d-lg-block">
             <a id="dropdownSubMenu11" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle">Services</a>
             <ul aria-labelledby="dropdownSubMenu11" class="dropdown-menu border-0 shadow">
               <li><a href="#" class="dropdown-item">Cantine</a></li>
@@ -272,9 +280,9 @@
 
       <!-- <span class="brand-text font-weight-light">{{nom_ecole}}</span> -->
        {% if nom_ecole %}
-      <span style="color: rgb(240, 233, 233); font-weight: bold; font-size: medium;">{{nom_ecole}}</span>
+      <span class="brand-text-ellipsis" style="color: rgb(240, 233, 233); font-weight: bold; font-size: medium;">{{nom_ecole}}</span>
       {% else %}
-      <span style="color: rgb(240, 233, 233); font-weight: bold; font-size: medium;">Nom de l'école</span>
+      <span class="brand-text-ellipsis" style="color: rgb(240, 233, 233); font-weight: bold; font-size: medium;">Nom de l'école</span>
       {% endif %}
     </a>
 
@@ -291,7 +299,7 @@
           {% endif %}
         </div>
         <div class="info">
-          <a href="{% url 'mon_profil' request.user.id %}" class="d-block" title="Acceder à vos informations personnelles">{{ request.user.get_full_name|default:request.user.username }}</a>
+          <a href="{% url 'mon_profil' request.user.id %}" class="d-block user-info-ellipsis" title="Acceder à vos informations personnelles">{{ request.user.get_full_name|default:request.user.username }}</a>
         </div>
       </div>
 
@@ -318,58 +326,50 @@
             <ul class="nav nav-treeview">
               <li class="nav-item">
                 <a href="{% url 'listeinfos' %}" class="nav-link" title="Permet de saisir les renseignements de l'école">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Paramères de l'école &nbsp;</p>
-                  <i class="fas fa-gears"></i>
+                  <i class="fas fa-gears">&nbsp;</i> 
+                  <p>Paramères de l'école</p>                  
                 </a>
               </li>
               <li class="nav-item">
                 <a href="#" class="nav-link" title="Permet d'éditer le certificat de scolarité d'un élève">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Certificat de scolarité &nbsp;</p>
-                  <i class="fas fa-award"></i>
+                  <i class="fas fa-award">&nbsp;</i>
+                  <p>Certificat de scolarité</p>                  
                 </a>
               </li>
               <li class="nav-item">
                 <a href="#" class="nav-link" title="Permet d'éditer le contrat de travail d'un employé de l'école">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Contrat de travail &nbsp;</p>
-                  <i class="fas fa-file-signature"></i>
+                  <i class="fas fa-file-signature">&nbsp;</i>
+                  <p>Contrat de travail</p>                  
                 </a>
               </li>
               <li class="nav-item">
                 <a href="{% url 'listeanneescolaire' %}" class="nav-link" title="Permet d'ajouter de nouvelles années scolaires">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Créer une année scolaire &nbsp;</p>
-                  <i class="fas fa-calendar-plus"></i>
+                  <i class="fas fa-calendar-plus">&nbsp;</i>
+                  <p>Créer une année scolaire</p>                  
                 </a>
               </li>
               <li class="nav-item">
                 <a href="{% url 'listecycle' %}" class="nav-link" title="Permet d'ajouter un nouveau cycle scolaire">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Créer un cycle scolaire &nbsp;</p>
-                  <i class="fa-brands fa-google-scholar"></i>
+                  <i class="fa-brands fa-google-scholar">&nbsp;</i>
+                  <p>Créer un cycle scolaire</p>                  
                 </a>
               </li>
               <li class="nav-item">
                 <a href="{% url 'listeclasse' %}" class="nav-link" title="Permet d'ajouter de nouvelles classes dans le système">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Créer une classe &nbsp;</p>
-                  <i class="fas fa-school"></i>
+                  <i class="fas fa-school">&nbsp;</i>
+                  <p>Créer une classe</p>                  
                 </a>
               </li>
               <li class="nav-item">
                 <a href="#" class="nav-link" title="Permet d'ajouter de nouvelles matières et leurs coefficients respectifs">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Créer une matière &nbsp;</p>
-                  <i class="fas fa-book-skull"></i>
+                  <i class="fas fa-book-skull">&nbsp;</i>
+                  <p>Créer une matière</p>                  
                 </a>
               </li>
               <li class="nav-item">
                 <a href="{% url 'liste_utilisateurs' %}" class="nav-link" title="Permet de créer un compte utilisateur pour le personnel"> 
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Créer un utilisateur &nbsp;</p>
-                  <i class="fas fa-user-plus"></i>
+                  <i class="fas fa-user-plus">&nbsp;</i>
+                  <p>Créer un utilisateur</p>                  
                 </a>
               </li>
 
@@ -393,44 +393,39 @@
             <ul class="nav nav-treeview">
               <li class="nav-item">
                 <a href="{% url 'chargeranneecourante' %}" class="nav-link" title="Permet d'effectuer les inscriptions des nouvels élèves">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Inscription &nbsp;</p>
-                  <i class="fas fa-info"></i>
+                  <i class="fas fa-info">&nbsp;</i>
+                  <p>Inscription</p>                  
                 </a>
               </li>
               <li class="nav-item">
                 <a href="{% url 'listereinscritsanneecourante' %}" class="nav-link" title="Permet d'effectuer la reinscription des anciens élèves">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Reinscription &nbsp;</p>
-                  <i class="fas fa-registered"></i>
+                  <i class="fas fa-registered">&nbsp;</i>
+                  <p>Reinscription</p>                  
                 </a>
               </li>
               <li class="nav-item">
                 <a href="{% url 'listepaiemensuel' %}" class="nav-link" title="Permet de consulter l'état des paiements de la scolarité">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Etat des paiements &nbsp;</p>
-                  <i class="fas fa-file-invoice-dollar"></i>
+                  <i class="fas fa-file-invoice-dollar">&nbsp;</i>
+                  <p>Etat des paiements</p>                  
                 </a>
               </li>
               <li class="nav-item">
                 <a href="#" class="nav-link" title="Permet de consulter l'état des paiements des inscriptions/reinscriptions">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Etat inscriptions &nbsp;</p>
-                  <i class="fas fa-file-invoice"></i>
+                  <i class="fas fa-file-invoice">&nbsp;</i>
+                  <p>Etat inscriptions</p>
+                  
                 </a>
               </li>
               <li class="nav-item">
                 <a href="#" class="nav-link" title="Permet de consulter la liste des élèves par classe et par cycle scolaire">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Liste par classe &nbsp;</p>
-                  <i class="fas fa-list"></i>
+                  <i class="fas fa-list">&nbsp;</i>
+                  <p>Liste par classe</p>                  
                 </a>
               </li>
               <li class="nav-item">
                 <a href="{% url 'registrematricule' %}" class="nav-link" title="Permet de consulter le registre de matriculation de l'école">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Registre de matricule &nbsp;</p>
-                  <i class="fas fa-list-ol"></i>
+                  <i class="fas fa-list-ol">&nbsp;</i>
+                  <p>Registre de matricule</p>                  
                 </a>
               </li>
               
@@ -454,65 +449,56 @@
             <ul class="nav nav-treeview">
               <li class="nav-item">
                 <a href="{% url 'listepaiemensuel' %}" class="nav-link" title="Permet de procéder au paiement des frais de scolarité">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Paiement scolarité &nbsp;</p>
-                  <i class="fa-brands fa-cc-visa"></i>
+                  <i class="fa-brands fa-cc-visa">&nbsp;</i>
+                  <p>Paiement scolarité</p>                  
                 </a>
               </li>
               <li class="nav-item">
                 <a href="{% url 'listerecette' %}" class="nav-link" title="Permet de gérer la situation des recettes générées par le paiement des frais à la scolarité">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Recettes scolarité &nbsp;</p>
-                  <i class="fa-brands fa-cc-mastercard"></i>
+                  <i class="fa-brands fa-cc-mastercard">&nbsp;</i>
+                  <p>Recettes scolarité</p>                  
                 </a>
               </li>
               <li class="nav-item">
                 <a href="#" class="nav-link" title="Permet de gérer la situation des recettes générées par le paiement des frais de cantine">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Recettes cantine &nbsp;</p>
-                  <i class="fas fa-cash-register"></i>
+                  <i class="fas fa-cash-register">&nbsp;</i>
+                  <p>Recettes cantine</p>                  
                 </a>
               </li>
               <li class="nav-item">
                 <a href="#" class="nav-link" title="Permet de gérer la situation des recettes générées par le paiement des activités extra scolaires">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Recettes extra scolaires &nbsp;</p>
-                  <i class="fas fa-person-swimming"></i>
+                  <i class="fas fa-person-swimming">&nbsp;</i>
+                  <p>Recettes extra scolaires</p>                  
                 </a>
               </li>
               <li class="nav-item">
                 <a href="{% url 'listedepense' %}" class="nav-link" title="Permet de gérer la situation des dépenses quotidiennes">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Gestion dépenses &nbsp;</p>
-                  <i class="fas fa-credit-card"></i>
+                  <i class="fas fa-credit-card">&nbsp;</i>                 
+                  <p>Gestion dépenses</p>                  
                 </a>
               </li>
               <li class="nav-item">
                 <a href="#" class="nav-link" title="Permet d'imprimer le rapport des recettes générées durant une période donnée">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Rapport recettes &nbsp;</p>
-                  <i class="fas fa-chart-pie"></i>
+                  <i class="fas fa-chart-pie">&nbsp;</i>
+                  <p>Rapport recettes</p>                  
                 </a>
               </li>
               <li class="nav-item">
                 <a href="#" class="nav-link" title="Permet d'imprimer le rapport des dépenses réalisées durant une période donnée">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Rapport dépenses &nbsp;</p>
-                  <i class="fas fa-chart-area"></i>
+                  <i class="fas fa-chart-area">&nbsp;</i>
+                  <p>Rapport dépenses</p>                  
                 </a>
               </li>
               <li class="nav-item">
                 <a href="#" class="nav-link" title="Permet d'imprimer le rapport global des recettes et dépenses durant une période donnée">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Rapport global période &nbsp;</p>
-                  <i class="fas fa-table"></i>
+                  <i class="fas fa-table">&nbsp;</i>
+                  <p>Rapport global période</p>                  
                 </a>
               </li>
               <li class="nav-item">
                 <a href="#" class="nav-link" title="Permet d'imprimer le rapport global des recettes et dépenses durant l'année scolaire">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Rapport global annuel &nbsp;</p>
-                  <i class="fas fa-file-pdf"></i>
+                  <i class="fas fa-file-pdf">&nbsp;</i>
+                  <p>Rapport global annuel</p>                  
                 </a>
               </li>
             </ul>
@@ -535,37 +521,32 @@
             <ul class="nav nav-treeview">
               <li class="nav-item">
                 <a href="#" class="nav-link" title="Permet d'enregistrer les informations de chaque employé de l'école">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Ajouter un employé &nbsp;</p>
-                  <i class="fas fa-user-check"></i>
+                  <i class="fas fa-user-check">&nbsp;</i>
+                  <p>Ajouter un employé</p>                  
                 </a>
               </li>
               <li class="nav-item">
                 <a href="#" class="nav-link" title="Permet de saisir les avances sur salaire accordées aux employés">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Ajouter bon paiement &nbsp;</p>
-                  <i class="fas fa-sack-dollar"></i>
+                  <i class="fas fa-sack-dollar">&nbsp;</i>
+                  <p>Ajouter bon paiement</p>                  
                 </a>
               </li>
               <li class="nav-item">
                 <a href="#" class="nav-link" title="Permet de saisir les salaires mensuels versés aux employés">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Paiement salaires &nbsp;</p>
-                  <i class="fas fa-hand-holding-dollar"></i>
+                  <i class="fas fa-hand-holding-dollar">&nbsp;</i>
+                  <p>Paiement salaires </p>                  
                 </a>
               </li>
               <li class="nav-item">
                 <a href="#" class="nav-link" title="Permet d'enregistrer les absences du personnel enseignant">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Suivi absences &nbsp;</p>
-                  <i class="fas fa-person-chalkboard"></i>
+                  <i class="fas fa-person-chalkboard">&nbsp;</i>
+                  <p>Suivi absences</p>                  
                 </a>
               </li>
               <li class="nav-item">
                 <a href="#" class="nav-link" title="Permet d'imprimer la liste générale du personnel">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Liste employés &nbsp;</p>
-                  <i class="fa-solid fa-users"></i>
+                  <i class="fa-solid fa-users">&nbsp;</i>
+                  <p>Liste employés</p>                  
                 </a>
               </li>
             </ul>
@@ -594,16 +575,15 @@
 
                   <li class="nav-item">
                     <a href="#" class="nav-link" title="Permet de faire la saisie des notes par classe">
-                      <i class="far fa-circle nav-icon"></i>
-                      <p>Saisie par classe &nbsp;</p>
-                      <i class="fas fa-chalkboard-user"></i>
+                      <i class="fas fa-chalkboard-user">&nbsp;</i>
+                      <p>Saisie par classe</p>                      
                     </a>
                   </li>
                   <li class="nav-item">
                     <a href="#" class="nav-link" title="Permet de faire la saisie des notes par élève">
-                      <i class="far fa-circle nav-icon"></i>
-                      <p>Saisie par élève &nbsp;</p>
-                      <i class="fas fa-child"></i>
+                      <i class="fas fa-child">&nbsp;</i>
+                      <p>Saisie par élève</p>
+                      
                     </a>
                   </li>
 
@@ -611,44 +591,41 @@
 
               <li class="nav-item">
                 <a href="#" class="nav-link" title="Permet de consulter et imprimer les résultats d'une classe aucours d'une période donnée">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Résultat périodique &nbsp;</p>
-                  <i class="fas fa-file-pdf"></i>
+                  <i class="fas fa-file-pdf">&nbsp;</i>
+                  <p>Résultat périodique</p>
+                  
                 </a>
               </li>
               <li class="nav-item">
                 <a href="#" class="nav-link" title="Permet de consulter et imprimer les résultats d'une classe aucours d'un trimestre ou semestre">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Résultat trimestriel &nbsp;</p>
-                  <i class="fas fa-file-lines"></i>
+                  <i class="fas fa-file-lines">&nbsp;</i>
+                  <p>Résultat trimestriel</p>
+                  
                 </a>
               </li>
               <li class="nav-item">
                 <a href="#" class="nav-link" title="Permet de consulter et imprimer les résultats d'une classe aucours d'une année scolaire">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Résultat annuel &nbsp;</p>
-                  <i class="fas fa-newspaper"></i>
+                 <i class="fas fa-newspaper">&nbsp;</i>
+                  <p>Résultat annuel</p>
+                  
                 </a>
               </li>
               <li class="nav-item">
                 <a href="#" class="nav-link" title="Permet de consulter et imprimer les bulletins d'une classe aucours d'une période donnée">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Bulletin périodique &nbsp;</p>
-                  <i class="fas fa-address-card"></i>
+                  <i class="fas fa-address-card">&nbsp;</i>
+                  <p>Bulletin périodique</p>                  
                 </a>
               </li>
               <li class="nav-item">
                 <a href="#" class="nav-link" title="Permet de consulter et imprimer les bulletins d'une classe aucours d'un trimestre ou semestre">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Bulletin trimestriel &nbsp;</p>
-                  <i class="fas fa-id-badge"></i>
+                  <i class="fas fa-id-badge">&nbsp;</i>
+                  <p>Bulletin trimestriel</p>                  
                 </a>
               </li>
               <li class="nav-item">
                 <a href="#" class="nav-link" title="Permet de consulter et imprimer les bulletins d'une classe aucours d'une année scolaire">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Bulletin annuel &nbsp;</p>
-                  <i class="fas fa-layer-group"></i>
+                  <i class="fas fa-layer-group">&nbsp;</i>
+                  <p>Bulletin annuel</p>                  
                 </a>
               </li>
             </ul>
@@ -671,16 +648,14 @@
             <ul class="nav nav-treeview">
               <li class="nav-item">
                 <a href="#" class="nav-link" title="Permet de gérer les opérations de paiement des frais de cantine">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Gestion cantine &nbsp;</p>
-                  <i class="fas fa-utensils"></i>
+                  <i class="fas fa-utensils">&nbsp;</i>
+                  <p>Gestion cantine</p>                  
                 </a>
               </li>
               <li class="nav-item">
                 <a href="#" class="nav-link" title="Permet de gérer les activités extra scolaires comme le Karaté, la Natation, le Football, etc.">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Activités extra scolaires &nbsp;</p>
-                  <i class="fas fa-futbol"></i>
+                  <i class="fas fa-futbol">&nbsp;</i>
+                  <p>Activités extra scolaires</p>                  
                 </a>
               </li>
             </ul>
