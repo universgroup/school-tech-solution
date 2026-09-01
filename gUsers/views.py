@@ -115,7 +115,7 @@ eff_personnel = 0
 t_entree = 0
 t_sortie = 0
 solde = 0
-
+montant_restant = 0
 
 @login_required
 def home(request):
@@ -128,6 +128,7 @@ def home(request):
     global t_entree
     global t_sortie
     global solde
+    global montant_restant
 
     liste_eleves = {}
     liste_personnel = {}
@@ -183,7 +184,7 @@ def home(request):
     t_sortie = total_s['total_depense'] if total_s['total_depense'] is not None else 0
 
     solde = affichersoldecaisse()
-
+    
 
     # ---------- 1. Tableau "Progression des paiements de scolarité" ----------
     paiements_par_classe = (
@@ -193,7 +194,7 @@ def home(request):
         .annotate(
             premiere_tranche=Sum('premiere_tranche'),
             deuxieme_tranche=Sum('deuxieme_tranche'),
-            montant_restant=Sum('reste_a_payer'),
+            # montant_restant=Sum('reste_a_payer'),
         )
     )
     paiements_dict = {p['idclasse_id']: p for p in paiements_par_classe} # Permet de faire le cumul des paiements des différentes tranches par classe durant l'année scolaire encours (cle=p[idclasse_id]: valeur=p)
@@ -213,13 +214,19 @@ def home(request):
     for ligne in inscrits_par_classe:
         classe_id = ligne['idclasse_id']
         montant_attendu = frais_par_classe.get(classe_id, 0) * ligne['nb_eleves']
+
         paiement = paiements_dict.get(classe_id, {})
+        premiere = paiement.get('premiere_tranche') or 0
+        deuxieme = paiement.get('deuxieme_tranche') or 0
+        montant_restant = montant_attendu - (premiere + deuxieme)
+        
+        
         progression_paiements.append({
             'nom_classe': ligne['idclasse__nom_classe'],
             'montant_attendu': montant_attendu,
-            'premiere_tranche': paiement.get('premiere_tranche') or 0,
-            'deuxieme_tranche': paiement.get('deuxieme_tranche') or 0,
-            'montant_restant': paiement.get('montant_restant') or 0,
+            'premiere_tranche': premiere,
+            'deuxieme_tranche': deuxieme,
+            'montant_restant': montant_restant
         })
 
     # ---------- 2. Graphique "Évolution des inscriptions" ----------

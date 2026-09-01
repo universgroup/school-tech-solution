@@ -228,7 +228,13 @@ if not DEBUG:
     SECURE_HSTS_PRELOAD = True
 else:
     # Configuration pour le développement local
-    config('ALLOWED_HOSTS',default='localhost,127.0.0.1', 
-           cast=lambda v: [h.strip() for h in v.split(',')]
-        )
+    ALLOWED_HOSTS = [
+        'localhost',
+        '127.0.0.1',
+        'school-tech-solution.universtechgroup.com',
+        'www.school-tech-solution.universtechgroup.com',
+    ]
+    # config('ALLOWED_HOSTS',default='localhost,127.0.0.1', 
+    #        cast=lambda v: [h.strip() for h in v.split(',')]
+    #     )
 

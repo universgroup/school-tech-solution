@@ -35,6 +35,9 @@
   <!-- Style des astérisques des champs requis (crispy-forms) dans tous les templates -->
   <link rel="stylesheet" href="{% static 'assets/css/myforms.css' %}">
 
+  <!-- Modernisation générique des éléments de formulaire (inputs, selects, dates, radios/checkboxes, onglets) -->
+  <link rel="stylesheet" href="{% static 'assets/css/formulaires-modernes.css' %}">
+
   <!-- Style du template dashboard à applique sur tous les autres templates-->
   <link rel="stylesheet" href="{% static 'assets/css/dashboard.css' %}">
 
@@ -794,7 +797,12 @@
 
 
 <!-- jQuery -->
-<script src="{% static 'assets/plugins/jquery/jquery.min.js' %}"></script>
+<!-- jQuery 3.7.1 (dernière version stable de la branche 3.x, corrige les CVE
+     de la 3.4.1 : XSS via .html()/.append() sur contenu non fiable, corrigé
+     en 3.5.0). Reste sur la branche 3.x pour éviter la rupture de
+     compatibilité de jQuery 4.0 avec les anciens plugins (jquery-validation,
+     etc.). Hash SRI officiel vérifié via code.jquery.com. -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 <!-- Overlayscrollbars -->
 <script src="{% static 'assets/plugins/overlayScrollbars/js/OverlayScrollbars.min.js' %}"></script>
 <!--Popper -->

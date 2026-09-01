@@ -712,59 +712,70 @@
           <div class="col-12">
             <!-- jquery validation -->
             <div class="card card-primary">
-              <div class="card-header">
-                <div class="d-flex justify-content-between align-items-center"">
-                    
-                        <h2 class="card-title mb-0">Filtrez la situation des dépenses réalisées au quotidien</h2>
-                            
-                        <div class="d-flex align-items-center">
-
-                            <form class="form-inline ml-3" action="{% url 'rechercherdepense' %}" method="GET">
-
-                                <div class="d-flex align-items-center">
+              <div class="card-header filtres-header">
                                     
-                                    <label for="idannee" class="mr-2 mb-0">Année scolaire</label>
-                                    <select class="form-control form-control-sm mr-3" name="nom_annee" id="idannee" title="Sélectionnez une année scolaire pour afficher les opérations effectuées">
-                                        <option value="" selected>Sélectionnez</option>
-                                        {% for an in annee %}
-                                        <option value="{{ an.id }}">{{ an.descript_annee }}</option>
-                                        {% endfor %}
-                                    </select>
+                        <h2 class="card-title mb-0 filtres-titre">Filtrez la situation des dépenses réalisées au quotidien</h2>
+                            
+                        
+                        <form class="filtres-form" action="{% url 'rechercherdepense' %}" method="GET">
 
-                                    <label for="datedebut" class="mr-2 mb-0">Période du : </label>
-                                    <input type="date" id="datedebut" name="ddebut" class="form-control form-control-sm mr-3">
+                              <div class="filtres-champs">
 
-                                    <label for="datefin" class="mr-2 mb-0">au : </label>
-                                    <input type="date" id="datefin" name="dfin" class="form-control form-control-sm mr-3">
+                                  <div class="filtres-selects">
+
+                                    <div class="filtre-group">                                      
+                                        <label for="idannee" class="mr-2 mb-0">Année scolaire</label>
+                                        <select class="form-control form-control-sm select-modern" name="nom_annee" id="idannee" title="Sélectionnez une année scolaire pour afficher les opérations effectuées">
+                                            <option value="" selected>Sélectionnez</option>
+                                            {% for an in annee %}
+                                            <option value="{{ an.id }}">{{ an.descript_annee }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+
+                                    <div class="filtre-group">
+                                        <label for="datedebut" class="mr-2 mb-0">Période du : </label>
+                                        <input type="date" id="datedebut" name="ddebut" class="form-control form-control-sm input-modern">
+                                    </div>
+
+
+                                    <div class="filtre-group">
+                                        <label for="datefin" class="mr-2 mb-0">au : </label>
+                                        <input type="date" id="datefin" name="dfin" class="form-control form-control-sm input-modern">
+                                    </div>
+
+                                  </div>
+                                  
+                                  <div class="filtres-actions">
  
-                                    <button type="submit" class="btn btn-secondary btn-md mr-2" title="Filtrer la liste des dépenses par année scolaire et/ou période">Rechercher &nbsp; <i class="fas fa-search"></i></button>
-                                    <a href="{% url 'listedepense' %}" target="_self" title="Actualiser la liste des dépenses" class="btn btn-warning btn-md mr-3">Actualiser &nbsp;<i class="fas fa-refresh"></i></a>
-                                </div>
+                                        <button type="submit" class="btn btn-secondary btn-md mr-2" title="Filtrer la liste des dépenses par année scolaire et/ou période">Rechercher &nbsp; <i class="fas fa-search"></i></button>
+
+                                        <a href="{% url 'listedepense' %}" target="_self" title="Actualiser la liste des dépenses" class="btn btn-warning btn-md mr-3">Actualiser &nbsp;<i class="fas fa-refresh"></i></a>
+
+                                        <a href="{% url 'enregistrerdepense' %}" class="btn btn-success btn-md" target="_self" title="Cliquez ici pour enregistrer une dépense">Enregistrer une sortie &nbsp;<i class="fa fa-solid fa-save"></i></a>
+
+                                  </div>
+
+                                  <div class="filtres-situation">
+
+                                    {% if cais %}
+                                      <h5 class="situation-titre">
+                                          Situation globale du mois de &nbsp;: &nbsp;{{ mois_actuel }}
+                                      </h5>
+                                    {% elif depense %}
+                                      <h5 class="situation-titre">
+                                          Situation globale de la période du &nbsp;: &nbsp;
+                                          {{ ddebut|date:'j-n-Y' }} &nbsp; au &nbsp;: &nbsp; {{ dfin|date:'j-n-Y' }}
+                                      </h5>
+                                    {% endif %}
+
+                                  </div>
+
+
+                               </div>
 
                             </form>
-                        </div>
-
-                            <div class="text-right">
-                                <a href="{% url 'enregistrerdepense' %}" class="btn btn-success btn-md" target="_self" title="Cliquez ici pour enregistrer une dépense">Enregistrer une sortie &nbsp;<i class="fa fa-solid fa-save"></i></a>
-                            </div>
-            
-                </div>
-
-                <div class="row mt-2">
-                    <div class="col-md-12 text-center">
-                        {% if cais %}
-                        <h5 class="text-center font-weight-bold text-white mt-2 mb-0">
-                            Situation globale du mois de &nbsp;: &nbsp;{{ mois_actuel }}
-                        </h5>
-                        {% elif depense %}
-                        <h5 class="text-center font-weight-bold text-white mt-2 mb-0">
-                            Situation globale de la période du &nbsp;: &nbsp;
-                            {{ ddebut|date:'j-n-Y' }} &nbsp; au &nbsp;: &nbsp; {{ dfin|date:'j-n-Y' }}
-                        </h5>
-                        {% endif %}
-                    </div>
-                </div>    
-
+                
             </div>
               <!-- /.card-header -->
 

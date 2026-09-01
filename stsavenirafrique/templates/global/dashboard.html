@@ -939,8 +939,16 @@
   </div>
 </div>
 
-<script src="{% static 'assets/plugins/jquery/jquery.min.js' %}"></script>
-<script src="{% static 'assets/plugins/jquery-ui/jquery-ui.min.js' %}"></script>
+<!-- jQuery 3.7.1 (dernière version stable de la branche 3.x, corrige les CVE
+     de la 3.4.1 : XSS via .html()/.append() sur contenu non fiable, corrigé
+     en 3.5.0). Hash SRI officiel vérifié via code.jquery.com. -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+<!-- jQuery UI 1.13.3 (corrige les CVE de la 1.12.1 : XSS dialog, datepicker,
+     sélecteur :animated — corrigé en 1.13.0). Remplace le fichier statique
+     local : pense à retirer assets/plugins/jquery-ui s'il n'est plus utilisé
+     ailleurs. Pas de hash SRI vérifié pour cette version précise — à ajouter
+     toi-même depuis https://releases.jquery.com/ui/ si besoin. -->
+<script src="https://code.jquery.com/ui/1.13.3/jquery-ui.min.js" crossorigin="anonymous"></script>
 <script>$.widget.bridge('uibutton', $.ui.button)</script>
 <script src="{% static 'assets/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
 <script src="{% static 'assets/plugins/jqvmap/jquery.vmap.min.js' %}"></script>

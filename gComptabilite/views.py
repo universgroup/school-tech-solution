@@ -89,7 +89,7 @@ def enregistrer_recette(request):
 
     return render(request, 'gComptabilite/enregistrer_caisse_scolarite.html', dict(form=formrecette))
 
-@login_required 
+@action_requise('menu_comptabilite')
 def listerecette(request):
       
     mois_courant = datetime.strftime(datetime.now(),'%m') # Je recupere le numero du mois en cours en vue de filtrer les operations conformement a cela
@@ -172,7 +172,7 @@ solde_dispo = 0
 debut = None
 fin = None
 
-@login_required
+@action_requise('menu_comptabilite')
 def recherchersituationrecette(request):
     
     ans = request.GET.get('nom_annee')
@@ -306,7 +306,8 @@ def enregistrerdepense(request):
         fdepense = FormDepense()
     return render(request, 'gComptabilite/enregistrer_depense.html', dict(form=fdepense))
 
-@login_required
+
+@action_requise('menu_comptabilite')
 def listedepense(request):
   
     mois_courant = datetime.strftime(datetime.now(),'%m') # Je recupere le numero du mois en cours en vue de filtrer les operations conformement a cela
@@ -357,7 +358,7 @@ debut = None
 fin = None
 solde_dispo = 0
 
-@login_required
+@action_requise('menu_comptabilite')
 def recherchersituationdepense(request):
     
     ans = request.GET.get('nom_annee')
@@ -481,7 +482,7 @@ def supprimerdepense(request, pk):
 
 # Cette fonction me permet de charger la liste des élèves inscrits dans une classe donnée aucours d'une année
 # scolaire donnée
-@login_required
+@action_requise('menu_comptabilite')
 def chargerlisteelevepaiement(request):
     ane = request.GET.get('anneesco') # anneesco est la valeur renvoyée depuis la fonction JQuery dans le template paiement_scolarite.html
     clas = request.GET.get('id_classe') # id_classe est recupérée depuis la fonction JQuery
@@ -492,7 +493,7 @@ def chargerlisteelevepaiement(request):
 
 # La fonction chargerlisteclasse m'a permis de gerer l'affichage des classes selon le cycle selectionné lors de
 # l'inscription associé au JQuery en Front-end
-@login_required
+@action_requise('menu_comptabilite')
 def chargerlisteclassepaiement(request):
     cy = request.GET.get('idcycle')
     clas = Classe.objects.filter(idcycle=cy).all()
@@ -500,7 +501,7 @@ def chargerlisteclassepaiement(request):
     return render(request, 'gComptabilite/liste_classe_cycle_paiement.html', context)
 
 # Cette fonction me permet de charger les infos de l'élève sélectionné lors de la reinscription à savoir le prénom, le nom et la photo
-@login_required
+@action_requise('menu_comptabilite')
 def chargerinfoeleveclasse(request):
 
     matricule = request.GET.get('matricule')
@@ -684,7 +685,7 @@ def validerpaiementscolarite(request):
 
     return render(request,'gComptabilite/paiement_scolarite.html',dict(ans=annee,cycles=cycle, tranche_paye=DEUX_TRANCHES_CHOICES, modepaie=MODE_PAIEMENT_CHOICES))
 
-@login_required
+@action_requise('menu_comptabilite')
 def recupaiementscolarite(request, idetat, nom_tranche, mont_paye):
     # Et là je tente de recuperer les données d'identification de l'école
     ec = Ecole.objects.count()
@@ -767,7 +768,7 @@ def recupaiementscolarite(request, idetat, nom_tranche, mont_paye):
             p.drawString(55, 772 + y_offset, str(data_ecole[7]))
             p.setFont('Helvetica-Bold', 10)
             p.drawString(20, 757 + y_offset, 'TEL : ')
-            p.setFont('Helvetmodifierica', 10)
+            p.setFont('Helvetica', 10)
             p.drawString(55, 757 + y_offset, str(data_ecole[3]) + ' / ' + str(data_ecole[4]))
 
             # ── LOGO ──
@@ -802,7 +803,7 @@ def recupaiementscolarite(request, idetat, nom_tranche, mont_paye):
 
             # ── NOM ET DEVISE ECOLE ──
             p.setFont('Helvetica-Bold', 11)
-            p.drawString(200, 740 + y_offset, str(data_ecole[0]))
+            p.drawString(220, 740 + y_offset, str(data_ecole[0]))
             p.setFont('Helvetica-Oblique', 9)
             p.drawString(220, 725 + y_offset, str(data_ecole[6]))
 
@@ -914,7 +915,7 @@ def recupaiementscolarite(request, idetat, nom_tranche, mont_paye):
             email = EmailMessage(
                 subject='Reçu de paiement scolarité',
                 body=f'Veuillez trouver votre reçu de paiement en pièce jointe.\n'
-                     f'Cordialement.\nLa Comptabilité : {data_ecole[8]}',
+                     f'Cordialement.\n La Comptabilité : \n {data_ecole[8]}',
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 to=[data[8]],
             )
@@ -933,11 +934,11 @@ def recupaiementscolarite(request, idetat, nom_tranche, mont_paye):
         buffer.seek(0)
         return FileResponse(buffer, as_attachment=False, filename=f'Recu_paiement_{str(data[2])}.pdf', content_type='application/pdf')
 
-@login_required
+@action_requise('menu_comptabilite')
 def imprimerecuscolarite(request, idetat, nom_tranche, mont_paye):
     return HttpResponseRedirect(reverse('recupaiementscolarite',args=(idetat,nom_tranche,str(mont_paye),)))
 
-@login_required
+@action_requise('menu_comptabilite')
 def listepaiementmensuel(request):
     
     anne = {}
@@ -996,7 +997,7 @@ def listepaiementmensuel(request):
 
     return render(request,'gComptabilite/liste_etat_paiement_scolarite.html',dict(ans=anne, cycles=cy, listepaiementmensuel=listepaiemensuel, total_tranche1=total_tranche1, total_tranche2=total_tranche2, total_reste_a_payer=total_reste_a_payer, tranche_paye=DEUX_TRANCHES_CHOICES, total_paiement_annuel=total_paiement_annuel))
 
-@login_required
+@action_requise('menu_comptabilite')
 def filtrelistepaiementclasse(request):
 
     anne = request.GET.get('annee_scolaire')
@@ -1141,7 +1142,7 @@ def supprimerpaiementscolaire(request, idpaie):
     return redirect('../listepaiemensuel/')
 
 # Vue permettant de generer à partir de la fonction utilitaire le rapport des etats de paiement
-@login_required
+@action_requise('menu_comptabilite')
 def rapportpaiementtranche(request):
 
     anne = request.GET.get('annee')  

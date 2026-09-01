@@ -236,8 +236,15 @@
                 'idcycle':idcycle
             },
             success:function(data){
-                $("#cboclasse").html(data);
-            }
+                // .trigger('change') est indispensable ici : sans lui, le
+                // gestionnaire $("#cboclasse").change(...) ci-dessous ne se
+                // déclenche que si l'utilisateur choisit MANUELLEMENT une
+                // option. Quand la classe chargée est unique (une seule
+                // <option> en plus de "Sélectionnez"), il n'y a rien
+                // d'autre à choisir : sans ce trigger, la liste des élèves
+                // ne se charge alors jamais.
+                $("#cboclasse").html(data).trigger('change');
+            }   
 
 
         });
@@ -249,6 +256,14 @@
         var id_annee = $('#cboanne').val(); // Je recupère ici la valeur (ID) de l'année scolaire
         var idclasse = $(this).val(); // Je recupère ici la valeur (ID) de la classe selectionnée
 
+        // Si aucune classe n'est sélectionnée (valeur vide, ex: après un
+        // .trigger('change') déclenché par une réponse AJAX vide), on ne
+        // lance pas la requête et on vide simplement la liste des élèves.
+        if (!idclasse) {
+            $("#cbomateleve").html('<option value="" selected>Sélectionnez</option>');
+            return;
+        }
+
         $.ajax({
             url:url,
             data:{
@@ -256,7 +271,11 @@
                 'id_classe':idclasse
                 },
             success:function(data){
-                $("#cbomateleve").html(data);
+                // Même raisonnement que ci-dessus : sans .trigger('change'),
+                // le chargement des infos de l'élève (Nom, Prénom, Photo,
+                // Date/Lieu de naissance...) ne se déclenche jamais quand
+                // la classe ne contient qu'un seul élève.
+                $("#cbomateleve").html(data).trigger('change');
             }
 
 
@@ -270,6 +289,15 @@
     // Cette fonction permet d'afficher les infos de l'élève sélectionné y compris ses paiements de scolarité
     $("#cbomateleve").change(function(){
         var matricule = $(this).val();
+
+        // Si aucun élève n'est sélectionné (liste vide ou valeur "" après
+        // un .trigger('change')), on réinitialise les champs plutôt que
+        // d'appeler l'API avec un matricule vide.
+        if (!matricule) {
+            $("#idprenom, #idnom, #id_datenaissance, #id_lieu_naissance, #id_pays_naissance, #id_pere, #id_mere, #id_contact_pere, #id_montant_premiere_tranche, #id_montant_deuxieme_tranche, #id_montant_annuel, #id_montant_reliquat").val('');
+            $("#photoel").attr("src", defaultPhoto);
+            return;
+        }
         
         $.ajax({
                 url: "{% url 'chargerinfoelevepaie' %}",
