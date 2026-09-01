@@ -623,7 +623,8 @@ def imprimerecuinscription(request, idins):
 # Gestion des reinscription des élèves
 @action_requise('menu_eleves')
 def chargeranneecycle(request):
-    ans = Inscription.objects.values('annee_scolaire').distinct()
+    annee_ids = Inscription.objects.values_list('annee_scolaire', flat=True).distinct()
+    ans = AnneeScolaire.objects.filter(id__in=annee_ids)
     cy = CycleScolaire.objects.all()
     an = AnneeScolaire.objects.all()
     clas = Classe.objects.all()
@@ -948,7 +949,8 @@ effectif_total_filles = 0
 @action_requise('menu_eleves')
 def listeinscritsanneescolairecourante(request):
 
-    ans = Inscription.objects.values('annee_scolaire').distinct()
+    annee_ids = Inscription.objects.values_list('annee_scolaire', flat=True).distinct()
+    ans = AnneeScolaire.objects.filter(id__in=annee_ids)
     cy = CycleScolaire.objects.all()
 
     listeeleves = {}
@@ -967,17 +969,20 @@ def listeinscritsanneescolairecourante(request):
     effectif_total = listeeleves.count()
     effectif_total_garcons = listeeleves.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[1][0]).count() # SEXE_ELEVE_CHOICES[1][0] correspond à M
     effectif_total_filles = listeeleves.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[2][0]).count() # SEXE_ELEVE_CHOICES[2][0] correspond à F
-    
+
+        
     pagineins = Paginator(listeeleves, 10)
     numpageins = request.GET.get('page')
     listeeleves = pagineins.get_page(numpageins)
     
     return render(request, 'gEleve/liste_eleves_inscrits.html', dict(ans=ans, cycles=cy, listeeleves=listeeleves, effectif_total=effectif_total, effectif_total_garcons=effectif_total_garcons, effectif_total_filles=effectif_total_filles))
 
+
 @action_requise('menu_eleves')
 def listereinscritsanneescolairecourante(request):
 
-    ans = Inscription.objects.values('annee_scolaire').distinct()
+    annee_ids = Inscription.objects.values_list('annee_scolaire', flat=True).distinct()
+    ans = AnneeScolaire.objects.filter(id__in=annee_ids)
     cy = CycleScolaire.objects.all().order_by('id')
 
     listeeleves = {}
@@ -1014,7 +1019,8 @@ def filtrelisteinscrits(request):
     listeinsclasse = Inscription.objects.none()
 
     # Pour permettre un rechargement des donnees relatives a l'annee scolaire et le cycle
-    ans = Inscription.objects.values('annee_scolaire').distinct()
+    annee_ids = Inscription.objects.values_list('annee_scolaire', flat=True).distinct()
+    ans = AnneeScolaire.objects.filter(id__in=annee_ids)
     cy = CycleScolaire.objects.all().order_by('id')
 
     global effectif_total
@@ -1047,7 +1053,8 @@ def filtrelistereinscrits(request):
     idcy = request.GET.get('cycle')
     idansc = request.GET.get('annee_scolaire')
 
-    ans = Inscription.objects.values('annee_scolaire').distinct()
+    annee_ids = Inscription.objects.values_list('annee_scolaire', flat=True).distinct()
+    ans = AnneeScolaire.objects.filter(id__in=annee_ids)
     cy = CycleScolaire.objects.all().order_by('id')
 
     listeinsclasse = {}

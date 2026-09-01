@@ -726,7 +726,7 @@
                                       <select class="form-control form-control-sm select-modern" name="annee_scolaire" id="idannee" title="Sélectionnez une année scolaire pour afficher la liste des élèves reinscrits">
                                           <option value="" selected>Sélectionnez</option>
                                           {% for an in ans %}
-                                          <option value="{{an.annee_scolaire.id}}">{{an.annee_scolaire.descript_annee}}</option>
+                                          <option value="{{an.id}}">{{an.descript_annee}}</option>
                                           {% endfor %}
                                       </select>
                                     </div>
