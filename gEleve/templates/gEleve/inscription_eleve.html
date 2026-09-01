@@ -13,7 +13,7 @@ INSCRIPTION DES ELEVES
                     
                     {% csrf_token %}
 
-        <!-- Navigation des onglets -->
+        <!-- Navigation des onglets (modernisée via .nav-tabs dans formulaires-modernes.css) -->
         <div class="card-header p-0 pt-1">
             <ul class="nav nav-tabs" id="inscriptionTabs" role="tablist">
                 <li class="nav-item">
@@ -197,13 +197,15 @@ INSCRIPTION DES ELEVES
 
                     <!-- Bouton Suivant -->
                     <div class="row mt-3">
-                        <div class="col-md-12 text-right">
-                            <a href="{% url 'chargeranneecourante' %}" target="_self" class="btn btn-secondary btn-md mr-2">Retour &nbsp;<i class="fas fa-circle-chevron-left"></i></a>
-                            <button type="reset" class="btn btn-warning btn-md  mr-2">Actualiser &nbsp; <i class="fas fa-refresh"></i></button>
-                            <button type="button" class="btn btn-primary btn-md"
-                                    onclick="$('#tab-inscription').tab('show')">
-                                Suivant <i class="fas fa-arrow-right ml-1"></i>
-                            </button>
+                        <div class="col-md-12">
+                            <div class="filtres-actions">
+                                <a href="{% url 'chargeranneecourante' %}" target="_self" class="btn btn-secondary btn-md mr-2">Retour &nbsp;<i class="fas fa-circle-chevron-left"></i></a>
+                                <button type="reset" class="btn btn-warning btn-md  mr-2">Actualiser &nbsp; <i class="fas fa-refresh"></i></button>
+                                <button type="button" class="btn btn-primary btn-md"
+                                        onclick="$('#tab-inscription').tab('show')">
+                                    Suivant <i class="fas fa-arrow-right ml-1"></i>
+                                </button>
+                            </div>    
                         </div>
                     </div>
 
@@ -237,14 +239,16 @@ INSCRIPTION DES ELEVES
                     
                     <!-- Boutons -->
                     <div class="row mt-3">
-                        <div class="col-md-12 text-right">
-                            <button type="button" class="btn btn-secondary btn-md mr-2"
-                                    onclick="$('#tab-perso').tab('show')">
-                                <i class="fas fa-arrow-left mr-1"></i> Précédent
-                            </button>
-                            <button type="submit" class="btn btn-success btn-md mr-2" title="Cliquez ici pour valider l'inscription de l'élève">Terminer &nbsp;<i class="fas fa-check"></i></button>
-                            <button type="reset" class="btn btn-warning  btn-md mr-2">Actualiser &nbsp; <i class="fas fa-refresh"></i></button>
-                            <a href="{% url 'chargeranneecourante' %}" target="_self" class="btn btn-primary btn-md">Liste Elèves Inscrits &nbsp;<i class="fas fa-circle-chevron-right"></i></a>
+                        <div class="col-md-12">
+                            <div class="filtres-actions">
+                                <button type="button" class="btn btn-secondary btn-md mr-2"
+                                        onclick="$('#tab-perso').tab('show')">
+                                    <i class="fas fa-arrow-left mr-1"></i> Précédent
+                                </button>
+                                <button type="submit" class="btn btn-success btn-md mr-2" title="Cliquez ici pour valider l'inscription de l'élève">Terminer &nbsp;<i class="fas fa-check"></i></button>
+                                <button type="reset" class="btn btn-warning  btn-md mr-2">Actualiser &nbsp; <i class="fas fa-refresh"></i></button>
+                                <a href="{% url 'chargeranneecourante' %}" target="_self" class="btn btn-primary btn-md">Liste Elèves Inscrits &nbsp;<i class="fas fa-circle-chevron-right"></i></a>
+                            </div>    
                         </div>
                     </div>
 

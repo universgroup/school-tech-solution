@@ -674,3 +674,95 @@ html, body {
         word-break: break-word;
     }
 }
+
+/* Boutons : coins arrondis cohérents avec le reste de l'interface */
+.btn {
+    border-radius: 0.6rem;
+    font-weight: 500;
+    transition: transform 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+/* ===================================================================
+   TITRES DE PAGE MODERNISÉS
+   ===================================================================
+   Cible les classes génériques déjà présentes sur TOUS les templates
+   (ceux qui étendent base.html comme inscription.html/paiement_scolarite.html,
+   ET les pages autonomes comme accueil.html/situation_inscrits.html qui
+   partagent les mêmes classes .content-header / .card-header .card-title).
+   Une seule modification ici s'applique donc partout, sans toucher à
+   chaque template individuellement.
+   =================================================================== */
+
+/* Titre principal de page (h1 dans .content-header) : barre d'accent
+   colorée à gauche façon dashboard SaaS moderne, typographie plus affirmée */
+.content-header h1 {
+    font-weight: 800;
+    font-size: 1.55rem;
+    color: var(--secondary);
+    letter-spacing: -0.01em;
+    position: relative;
+    padding-left: 1.1rem;
+    margin-bottom: 0;
+}
+
+.content-header h1::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.1em;
+    bottom: 0.1em;
+    width: 5px;
+    border-radius: 4px;
+    background: linear-gradient(180deg, var(--primary), var(--primary-dark));
+}
+
+/* Fil d'ariane : pilule blanche avec ombre légère, plus discret et lisible
+   qu'un texte brut aligné à droite */
+.content-header .breadcrumb {
+    background: #fff;
+    padding: 0.45rem 1rem;
+    border-radius: 999px;
+    box-shadow: var(--card-shadow);
+    font-size: 0.82rem;
+    margin-bottom: 0;
+}
+
+.content-header .breadcrumb-item + .breadcrumb-item::before {
+    color: #cbd5e1;
+}
+
+.content-header .breadcrumb-item.active {
+    color: var(--primary);
+    font-weight: 600;
+}
+
+/* Bannière de titre des cartes (card-primary > card-header > h3.card-title) :
+   dégradé indigo cohérent avec le reste de l'interface (au lieu du bleu
+   Bootstrap par défaut), titre plus affirmé */
+.card-primary > .card-header {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    border: none;
+}
+
+.card-primary > .card-header .card-title {
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: 0.02em;
+}
+
+/* Sous 575px : on resserre pour laisser respirer le contenu sur mobile */
+@media (max-width: 575.98px) {
+    .content-header h1 {
+        font-size: 1.25rem;
+        padding-left: 0.9rem;
+    }
+
+    .content-header .breadcrumb {
+        font-size: 0.75rem;
+        padding: 0.35rem 0.8rem;
+    }
+}

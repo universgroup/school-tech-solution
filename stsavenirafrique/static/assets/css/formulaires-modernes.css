@@ -1,0 +1,169 @@
+/* =====================================================================
+   FORMULAIRES MODERNES — inputs, selects, dates, radios/checkboxes,
+   onglets. Cible les classes déjà générées par Bootstrap 4 / crispy-
+   forms (.form-control, .custom-select, .form-check, .nav-tabs, etc.)
+   donc s'applique automatiquement à tous les templates qui étendent
+   base.html, sans toucher aux templates ni aux formulaires Django.
+   Réutilise le même langage visuel que login.html et dashboard.css :
+   coins arrondis, halo violet au focus, transitions douces.
+   ===================================================================== */
+
+/* Libellés de champ */
+.form-group > label,
+label.form-label {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--secondary, #0f172a);
+    margin-bottom: 0.35rem;
+}
+
+/* Champs texte, email, tél, nombre, mot de passe, textarea, select */
+input.form-control,
+textarea.form-control,
+select.form-control,
+.custom-select {
+    border: 1.5px solid #e2e8f0;
+    border-radius: 0.6rem;
+    padding: 0.55rem 0.85rem;
+    font-size: 0.92rem;
+    background-color: #fafbfc;
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-color 0.2s ease-in-out;
+}
+
+input.form-control:focus,
+textarea.form-control:focus,
+select.form-control:focus,
+.custom-select:focus {
+    border-color: var(--primary, #4f46e5);
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.12);
+    background-color: #fff;
+    outline: none;
+}
+
+input.form-control:hover:not(:focus),
+select.form-control:hover:not(:focus) {
+    border-color: #cbd5e1;
+}
+
+input.form-control::placeholder,
+textarea.form-control::placeholder {
+    color: #94a3b8;
+}
+
+/* Selects natifs : chevron personnalisé, cohérent avec .select-modern */
+select.form-control,
+.custom-select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%234f46e5' d='M6 8 0 0h12z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.85rem center;
+    background-size: 10px 7px;
+    padding-right: 2.2rem;
+}
+
+/* Champs date : icône native repositionnée proprement, curseur pointeur */
+input[type="date"].form-control {
+    padding-right: 0.75rem;
+}
+
+input[type="date"].form-control::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.65;
+    transition: opacity 0.2s;
+}
+
+input[type="date"].form-control::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+}
+
+/* États de validation (crispy-forms / Bootstrap4) */
+.form-control.is-invalid {
+    border-color: #ef4444;
+}
+
+.form-control.is-invalid:focus {
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.12);
+}
+
+.invalid-feedback {
+    font-size: 0.78rem;
+}
+
+/* Cases à cocher et boutons radio (ex : sexe_eleve) */
+.form-check {
+    padding-left: 1.6rem;
+}
+
+.form-check-input {
+    width: 1.05rem;
+    height: 1.05rem;
+    margin-top: 0.2rem;
+    cursor: pointer;
+}
+
+.form-check-input:checked {
+    background-color: var(--primary, #4f46e5);
+    border-color: var(--primary, #4f46e5);
+}
+
+.form-check-label {
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+/* Champ fichier natif (fallback si crispy en génère un en plus de la
+   photo-zone personnalisée) */
+.custom-file-label {
+    border-radius: 0.6rem;
+    border: 1.5px dashed #cbd5e1;
+    background-color: #fafbfc;
+}
+
+.custom-file-label::after {
+    border-radius: 0 0.6rem 0.6rem 0;
+}
+
+/* Onglets de l'assistant multi-étapes (ex : INFORMATIONS PERSONNELLES / INSCRIPTION) */
+.nav-tabs {
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.nav-tabs .nav-link {
+    border: none;
+    border-bottom: 3px solid transparent;
+    border-radius: 0;
+    color: #64748b;
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 0.75rem 1.1rem;
+    transition: color 0.2s, border-color 0.2s;
+}
+
+.nav-tabs .nav-link:hover {
+    color: var(--primary, #4f46e5);
+    border-color: transparent;
+}
+
+.nav-tabs .nav-link.active {
+    color: var(--primary, #4f46e5);
+    background: transparent;
+    border-color: var(--primary, #4f46e5);
+}
+
+/* Boutons : coins arrondis cohérents avec le reste de l'interface */
+.btn {
+    border-radius: 0.6rem;
+    font-weight: 500;
+    transition: transform 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+/* Espacement homogène entre groupes de champs sur les formulaires longs */
+.form-group {
+    margin-bottom: 1.1rem;
+}

@@ -35,7 +35,6 @@ from gComptabilite.models import *
 from gComptabilite.views import affichersoldecaisse
 from gAdministration.models import AnneeScolaire, CycleScolaire, Classe, Ecole
 from gUsers.decorators import action_requise
-from django.contrib.auth.decorators import login_required
 
 # --- Styles réutilisables pour les rapports PDF ---
 
@@ -221,7 +220,7 @@ def enregistrereleve(request):
 
 # La fonction chargerlisteclasse m'a permis de gerer l'affichage des classes selon le cycle selectionné lors de
 # l'instruction associé au JQuery en Front-end
-@login_required
+@action_requise('menu_eleves')
 def chargerlisteclasse(request):
     cy = request.GET.get('idcycle')
     clas = Classe.objects.filter(idcycle=cy).all()
@@ -230,7 +229,7 @@ def chargerlisteclasse(request):
 
 
 # Permet d'afficher la liste générale des élèves (registre de matriculation)
-@login_required
+@action_requise('menu_eleves')
 def registrematricule(request):
     
     liste = Inscription.objects.select_related('annee_scolaire', 'mateleve', 'idcycle', 'idclasse').all().order_by(
@@ -327,7 +326,7 @@ def supprimerinscription(request, pkins):
 
 
 # Fonctions me permettant de filtrer la liste des inscrits par matricule, par classe, par nom de famille
-@login_required
+@action_requise('menu_eleves')
 def filtrelistegenerale(request):
     listeins = {}
     listeinsclasse = {}
@@ -393,7 +392,7 @@ def filtrelistegenerale(request):
 
 
 # Gestion de l'impression des recus d'inscription à la scolarité
-@login_required
+@action_requise('menu_eleves')
 def recuinscription(request, idinsc):
     # Et là je tente de recuperer les données d'identification de l'école
     ec = Ecole.objects.count()
@@ -614,7 +613,7 @@ def recuinscription(request, idinsc):
 
 
 # Cette fonction permet d'imprimer les recus d'inscription de manière permanente
-@login_required
+@action_requise('menu_eleves')
 def imprimerecuinscription(request, idins):
     return HttpResponseRedirect(reverse('recuinscription',
                                         args=(
@@ -622,7 +621,7 @@ def imprimerecuinscription(request, idins):
 
 
 # Gestion des reinscription des élèves
-@login_required
+@action_requise('menu_eleves')
 def chargeranneecycle(request):
     ans = Inscription.objects.values('annee_scolaire').distinct()
     cy = CycleScolaire.objects.all()
@@ -633,7 +632,7 @@ def chargeranneecycle(request):
 
 # Cette fonction me permet de charger la liste des élèves inscrits dans une classe donnée aucours d'une année
 # scolaire donnée
-@login_required
+@action_requise('menu_eleves')
 def chargerlisteeleveclasse(request):
     ane = request.GET.get('anneesco') # anneesco est la valeur renvoyée depuis la fonction JQuery dans le template reinscription_eleve.html
     clas = request.GET.get('id_classe') # id_classe est recupérée depuis la fonction JQuery
@@ -643,7 +642,7 @@ def chargerlisteeleveclasse(request):
 
 
 # Cette fonction me permet de charger les infos de l'élève sélectionné lors de la reinscription à savoir le prénom, le nom et la photo
-@login_required
+@action_requise('menu_eleves')
 def chargerinfoeleveclasse(request):
     matricule = request.GET.get('matricule')
     try:
@@ -717,7 +716,7 @@ def validerreinscription(request):
     else:
         return redirect('../listereinscritsanneecourante/')
 
-@login_required
+@action_requise('menu_eleves')
 def recureinscription(request, idinsc):
     
     # Et là je tente de recuperer les données d'identification de l'école    
@@ -936,7 +935,7 @@ def recureinscription(request, idinsc):
         buffer.seek(0)
         return FileResponse(buffer, as_attachment=False, filename=f'Recu_reinscription_{str(data[2])}.pdf', content_type='application/pdf')
 
-@login_required
+@action_requise('menu_eleves')
 def imprimerecureinscription(request, idins):
     return HttpResponseRedirect(reverse('recureinscription',
                                         args=(
@@ -946,7 +945,7 @@ effectif_total = 0
 effectif_total_garcons = 0
 effectif_total_filles = 0
 
-@login_required
+@action_requise('menu_eleves')
 def listeinscritsanneescolairecourante(request):
 
     ans = Inscription.objects.values('annee_scolaire').distinct()
@@ -975,7 +974,7 @@ def listeinscritsanneescolairecourante(request):
     
     return render(request, 'gEleve/liste_eleves_inscrits.html', dict(ans=ans, cycles=cy, listeeleves=listeeleves, effectif_total=effectif_total, effectif_total_garcons=effectif_total_garcons, effectif_total_filles=effectif_total_filles))
 
-@login_required
+@action_requise('menu_eleves')
 def listereinscritsanneescolairecourante(request):
 
     ans = Inscription.objects.values('annee_scolaire').distinct()
@@ -1004,7 +1003,7 @@ def listereinscritsanneescolairecourante(request):
     
     return render(request, 'gEleve/liste_eleves_reinscrits.html', dict(ans=ans, cycles=cy, listeeleves=listeeleves, effectif_total=effectif_total, effectif_total_garcons=effectif_total_garcons, effectif_total_filles=effectif_total_filles))
 
-@login_required
+@action_requise('menu_eleves')
 def filtrelisteinscrits(request):
     
     idclass = request.GET.get('id_classe')
@@ -1041,7 +1040,7 @@ def filtrelisteinscrits(request):
                   dict(listeinscrits=listeinsclasse, effectif_total=effectif_total,
                        effectif_total_garcons=effectif_total_garcons, effectif_total_filles=effectif_total_filles, ans=ans, cycles=cy))
 
-@login_required
+@action_requise('menu_eleves')
 def filtrelistereinscrits(request):
     
     idclass = request.GET.get('id_classe')
@@ -1078,19 +1077,19 @@ def filtrelistereinscrits(request):
                        effectif_total_garcons=effectif_total_garcons, effectif_total_filles=effectif_total_filles, ans=ans, cycles=cy))
 
 # Permet de generer le rapport contenant la liste des inscrits par classe
-@login_required
+@action_requise('menu_eleves')
 def rapportlisteinscrits(request):
     """Génère le rapport pour les élèves au statut 'Inscrit'"""
     return _generer_rapport_liste_inscription(request, etat_recherche=ETAT_INSCRIPTION[0][0], nom_fichier='Liste_des_inscrits', titre="LISTE DES INSCRITS PAR CLASSE")
 
 # Permet de generer le rapport contenant la liste des reinscrits par classe
-@login_required
+@action_requise('menu_eleves')
 def rapportlistereinscrits(request):
     """Génère le rapport pour les élèves au statut 'Réinscrit'"""
     return _generer_rapport_liste_inscription(request, etat_recherche=ETAT_INSCRIPTION[1][0], nom_fichier='Liste_des_reinscrits', titre="LISTE DES REINSCRITS PAR CLASSE")
 
 # Permet de generer le rapport contenant la liste générale/registre de matriculation de l'école
-@login_required
+@action_requise('menu_eleves')
 def rapportlistegenerale(request):
        """Génère le registre de matriculation de l'école """
        return _generer_rapport_matriculation(request, nom_fichier='Registre_matriculation_scolaire', titre="REGISTRE DE MATRICULATION")
