@@ -685,8 +685,20 @@ def validerpaiementscolarite(request):
 
     return render(request,'gComptabilite/paiement_scolarite.html',dict(ans=annee,cycles=cycle, tranche_paye=DEUX_TRANCHES_CHOICES, modepaie=MODE_PAIEMENT_CHOICES))
 
+
+
 @action_requise('menu_comptabilite')
 def recupaiementscolarite(request, idetat, nom_tranche, mont_paye):
+
+    montant_tranche = 0
+    montant_paye = 0
+    reste_a_payer = 0
+    
+    montant_tranche_formate = None
+    montant_paye_formate = None
+    reste_formate = None
+    tranche_name = None
+
     # Et là je tente de recuperer les données d'identification de l'école
     ec = Ecole.objects.count()
     if ec==0:
@@ -709,8 +721,13 @@ def recupaiementscolarite(request, idetat, nom_tranche, mont_paye):
                 ]
         
         if nom_tranche == DEUX_TRANCHES_CHOICES[0][0]: # Si c'est la première tranche qui a été choisie, je recupère le montant de la tranche dans la table classe
+
+            tranche_name = DEUX_TRANCHES_CHOICES[0][1] # i.e Première tranche
             montant_tranche = etatpaie.idclasse.tranche1
+
         elif nom_tranche == DEUX_TRANCHES_CHOICES[1][0]: # Si c'est la deuxième tranche, je recupère le montant correspondant dans la table classe
+
+            tranche_name = DEUX_TRANCHES_CHOICES[1][0] # i.e Deuxième tranche
             montant_tranche = etatpaie.idclasse.tranche2
 
         montant_paye     = Decimal(mont_paye)
@@ -881,7 +898,7 @@ def recupaiementscolarite(request, idetat, nom_tranche, mont_paye):
             p.setFillColor(colors.black)
             p.setFont('Helvetica', 10)
             p.rect(20, 535 + y_offset, 500, 20, stroke=True, fill=False)
-            p.drawString(25,  540 + y_offset, nom_tranche)
+            p.drawString(25,  540 + y_offset, tranche_name)
             p.drawString(160, 540 + y_offset, montant_tranche_formate)
             p.drawString(300, 540 + y_offset, montant_paye_formate)
             p.drawString(410, 540 + y_offset, reste_formate)
