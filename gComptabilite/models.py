@@ -13,16 +13,26 @@ CATEGORIE_DEPENSE_CHOICES = (
     ('Salaires', 'Salaires'),  # 1
     ('Charges locatives', 'Charges locatives'),  # 2
     ('Mobiliers et Infrastructures', 'Mobiliers et Infrastructures'),  # 3
-    ('Fournitures Scolaires', 'Fournitures scolaires et de Bureau'),  # 4
-    ('Autres Fournitures', 'Autres fournitures'),  # 5
-    ('Investissements', 'Investissements'),  # 6
-    ('Amortissements', 'Amortissements'),  # 7
-    ('Charges Recurrentes', 'Charges récurrentes'),  # 8
-    ('Créances', 'Créances'),  # 9
-    ('Dettes Fournisseurs', 'Dettes Fournisseurs'),  # 10
-    ('Autres Charges', 'Autres charges'),  # 11
-    ('Matériels Informatiques','Matériels Informatiques'), # 12
-    ('Matériels Didactiques','Matériels Didactiques'), # 13
+    ('Fournitures Scolaires', 'Fournitures Scolaires'),  # 4
+    ('Fournitures Bureau','Fournitures de Bureau'), # 5
+    ('Autres Fournitures', 'Autres Fournitures'),  # 6
+    ('Investissements', 'Investissements'),  # 7
+    ('Amortissements', 'Amortissements'),  # 8
+    ('Charges Recurrentes', 'Charges Récurrentes'),  # 9
+    ('Creances', 'Créances'),  # 10
+    ('Dettes Fournisseurs', 'Dettes Fournisseurs'),  # 11
+    ('Autres Charges', 'Autres Charges'),  # 12
+    ('Materiels Informatiques','Matériels Informatiques'), # 13
+    ('Materiels Didactiques','Matériels Didactiques'), # 14
+    ('Banque','Banque'), # 15
+    ('Primes stagiaires','Primes stagiaires'), # 16
+    ('Facture Fournisseurs','Facture Fournisseurs'), # 17
+    ('Facture Intervenant','Facture Intervenant'), # 18
+    ('Facture Prestataire','Facture Prestataire'), # 19
+    ('Impots','Impôts'), # 20
+    ('CNSS','CNSS'), # 21
+    ('Homme Charge','Homme de Charge'), # 22
+
 )
 
 CATEGORIE_RECETTE_CHOICES = (
@@ -47,14 +57,14 @@ TYPE_PAIEMENT_MENSUALITE_CHOICES = (
 )
 
 DEUX_TRANCHES_CHOICES = (
-    ('Premiere tranche', 'Première tranche'), # 0
-    ('Deuxieme tranche', 'Deuxième tranche') # 1
+    ('PremiereT', 'Première tranche'), # 0
+    ('DeuxiemeT', 'Deuxième tranche') # 1
 )
 
 TROIS_TRANCHES_CHOICES = (
-    ('Premiere tranche', 'Première tranche'), # 0
-    ('Deuxieme tranche', 'Deuxième tranche'), # 1
-    ('Troisieme tranche','Troisième tranche') # 2
+    ('PremiereT', 'Première tranche'), # 0
+    ('DeuxiemeT', 'Deuxième tranche'), # 1
+    ('TroisiemeT','Troisième tranche') # 2
 )
 
 MODE_PAIEMENT_CHOICES = (
