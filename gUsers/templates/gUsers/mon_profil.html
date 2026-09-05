@@ -91,8 +91,6 @@ INFORMATIONS DE L'UTILISATEUR
 
             <a href="{% url 'accueil' %}" target="_self" class="btn btn-primary btn-md" title="Retour au tableau de bord">Accueil &nbsp;<i class="fa fa-arrow-circle-left"></i></a>
 
-            <a href="{% url 'password_reset' %}" target="_blank" class="btn btn-info btn-md" title="Cliquez ici pour changer votre mot de passe">Reinitialiser mon mot de passe &nbsp; <i class="fa-solid fa-unlock-keyhole"></i></a>
-
             {% peut request.user 'menu_administration' as ok_admin %}
 
             {% if ok_admin %}

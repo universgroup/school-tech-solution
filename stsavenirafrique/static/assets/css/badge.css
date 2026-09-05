@@ -1,0 +1,320 @@
+/* =====================================================================
+           BADGE ÉLÈVE — carte PVC format CR80 (85,60 mm x 53,98 mm), le
+           standard des cartes de crédit / badges scolaires. Un badge = une
+           carte = une page à l'impression (page-break-after), pour un envoi
+           direct vers une imprimante à cartes (Evolis, Zebra, etc.) ou une
+           imprimante classique avec du papier/PVC au format carte.
+           ===================================================================== */
+
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --secondary: #0f172a;
+            --card-w: 85.6mm;
+            --card-h: 53.98mm;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', 'Source Sans Pro', system-ui, sans-serif;
+            background: #eef2ff;
+            margin: 0;
+            padding: 1.5rem;
+        }
+
+        /* ---------- Barre d'outils (écran uniquement) ---------- */
+        .toolbar {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.6rem;
+            background: #fff;
+            border-radius: 1rem;
+            box-shadow: 0 10px 30px rgba(79,70,229,0.12);
+            padding: 0.9rem 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .toolbar h1 {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--secondary);
+            margin: 0;
+            flex: 1 1 auto;
+        }
+
+        .toolbar .btn {
+            border: none;
+            border-radius: 0.6rem;
+            padding: 0.5rem 0.9rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.15s ease-in-out;
+        }
+
+        .toolbar .btn:hover { transform: translateY(-1px); }
+
+        .btn-select-all { background: #e2e8f0; color: var(--secondary); }
+        .btn-select-none { background: #e2e8f0; color: var(--secondary); }
+        .btn-print-selection { background: var(--primary); color: #fff; }
+        .btn-print-selection:hover { background: var(--primary-dark); }
+
+        .selection-count {
+            font-size: 0.8rem;
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        /* ---------- Grille d'aperçu à l'écran ---------- */
+        .badges-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            justify-content: flex-start;
+        }
+
+        /* ---------- Le badge lui-même ---------- */
+        .badge-wrapper {
+            position: relative;
+        }
+
+        .badge-checkbox {
+            position: absolute;
+            top: -0.5rem;
+            left: -0.5rem;
+            z-index: 2;
+            width: 1.3rem;
+            height: 1.3rem;
+            cursor: pointer;
+            accent-color: var(--primary);
+        }
+
+        .badge-print-single {
+            position: absolute;
+            top: -0.5rem;
+            right: -0.5rem;
+            z-index: 2;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 999px;
+            width: 1.9rem;
+            height: 1.9rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(79,70,229,0.35);
+        }
+
+        .badge-print-single:hover { background: var(--primary-dark); }
+
+        .badge-card {
+            width: var(--card-w);
+            height: var(--card-h);
+            background: #fff;
+            border-radius: 3mm;
+            box-shadow: 0 12px 30px rgba(15,23,42,0.15);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            font-size: 2.6mm;
+            color: var(--secondary);
+        }
+
+        /* Bandeau supérieur */
+        .badge-top {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #fff;
+            padding: 1.8mm 3mm;
+            display: flex;
+            align-items: center;
+            gap: 1.8mm;
+        }
+
+        .badge-top .ecole-logo {
+            width: 6mm;
+            height: 6mm;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .badge-top .ecole-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .badge-top .ecole-nom {
+            font-size: 3mm;
+            font-weight: 800;
+            line-height: 1.1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .badge-top .badge-label {
+            font-size: 2mm;
+            opacity: 0.85;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        /* Corps du badge */
+        .badge-body {
+            flex: 1;
+            display: flex;
+            padding: 2mm 3mm;
+            gap: 2mm;
+        }
+
+        .badge-infos {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 1mm;
+            min-width: 0;
+        }
+
+        .badge-nom {
+            font-size: 3.3mm;
+            font-weight: 800;
+            text-transform: uppercase;
+            line-height: 1.15;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .badge-prenom {
+            font-size: 2.7mm;
+            font-weight: 600;
+            color: #475569;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .badge-matricule {
+            display: inline-block;
+            margin-top: 0.6mm;
+            background: rgba(79,70,229,0.10);
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 2.3mm;
+            padding: 0.6mm 1.6mm;
+            border-radius: 999px;
+            width: fit-content;
+            letter-spacing: 0.03em;
+        }
+
+        .badge-meta {
+            margin-top: 1mm;
+            font-size: 2.3mm;
+            color: #475569;
+            line-height: 1.5;
+        }
+
+        .badge-meta strong {
+            color: var(--secondary);
+            font-weight: 700;
+        }
+
+        /* Photo, bordure arrondie, à droite */
+        .badge-photo {
+            flex-shrink: 0;
+            width: 18mm;
+            height: 22mm;
+            border-radius: 2.4mm;
+            border: 0.4mm solid var(--primary);
+            overflow: hidden;
+            align-self: center;
+            background: #f1f5f9;
+        }
+
+        .badge-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* Bandeau inférieur : contacts parents */
+        .badge-bottom {
+            background: #f8fafc;
+            border-top: 0.3mm solid #e2e8f0;
+            padding: 1.3mm 3mm;
+            display: flex;
+            justify-content: space-between;
+            gap: 2mm;
+            font-size: 2.1mm;
+            color: #475569;
+        }
+
+        .badge-bottom .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 0.8mm;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .badge-bottom i { color: var(--primary); font-size: 2.1mm; }
+
+        /* =====================================================================
+           IMPRESSION — une carte = une page, dimensions exactes, sans marge
+           ===================================================================== */
+        @media print {
+            @page {
+                size: 85.6mm 53.98mm;
+                margin: 0;
+            }
+
+            html, body {
+                margin: 0;
+                padding: 0;
+                background: #fff;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .badges-grid {
+                display: block;
+                gap: 0;
+            }
+
+            .badge-wrapper {
+                page-break-after: always;
+                break-after: page;
+            }
+
+            .badge-wrapper:last-child {
+                page-break-after: auto;
+                break-after: auto;
+            }
+
+            .badge-card {
+                width: 85.6mm;
+                height: 53.98mm;
+                box-shadow: none;
+                border-radius: 0;
+            }
+
+            /* Un badge décoché pour l'impression sélective */
+            .badge-wrapper.print-hide {
+                display: none !important;
+            }
+        }

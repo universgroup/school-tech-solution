@@ -943,10 +943,10 @@
                               {% if listeinscrits.has_previous %}
 
                               <li class="page-item">
-                                  <a class="page-link" href="?page=1">1</a>
+                                  <a class="page-link" href="?page=1&{{ query_string }}">1</a>
                               </li>
                               <li class="page-item">
-                                  <a class="page-link" href="?page={{ listeinscrits.previous_page_number }}"><i class="fa-solid fa-backward fa-sm"></i>&nbsp; Précédent</a>
+                                  <a class="page-link" href="?page={{ listeinscrits.previous_page_number }}&{{ query_string }}"><i class="fa-solid fa-backward fa-sm"></i>&nbsp; Précédent</a>
                               </li>
 
                               {% endif %}
@@ -960,11 +960,11 @@
                               {% if listeinscrits.has_next %}
 
                               <li class="page-item">
-                                  <a class="page-link" href="?page={{ listeinscrits.next_page_number }}"><i class="fa-solid fa-forward fa-sm"></i>&nbsp; Suivant</a>
+                                  <a class="page-link" href="?page={{ listeinscrits.next_page_number }}&{{ query_string }}"><i class="fa-solid fa-forward fa-sm"></i>&nbsp; Suivant</a>
                               </li>
 
                               <li class="page-item">
-                                  <a class="page-link" href="?page={{ listeinscrits.paginator.num_pages }}"><i class="fa-solid fa-step-forward fa-sm"></i>&nbsp; Dernier</a>
+                                  <a class="page-link" href="?page={{ listeinscrits.paginator.num_pages }}&{{ query_string }}"><i class="fa-solid fa-step-forward fa-sm"></i>&nbsp; Dernier</a>
                               </li>
 
                               {% endif %}

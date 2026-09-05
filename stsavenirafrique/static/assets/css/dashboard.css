@@ -740,6 +740,28 @@ html, body {
     font-weight: 600;
 }
 
+/* ===================================================================
+   Fil d'ariane (.breadcrumb) sur mobile/petite tablette : entre 576px
+   et 768px, .col-sm-6 + .float-sm-right ne laissent que la moitié de
+   la largeur au fil d'ariane, ce qui le fait déborder sur 2 lignes dès
+   que le chemin est un peu long (ex: "Administration / Utilisateur /
+   Mon profil"). On force les deux colonnes en pleine largeur et on
+   désactive le float dans cette plage, pour que le fil d'ariane passe
+   simplement sous le titre, sur toute la largeur disponible.
+   =================================================================== */
+   
+@media (max-width: 767.98px) {
+    .content-header .row.mb-2 > .col-sm-6 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+
+    .content-header .breadcrumb.float-sm-right {
+        float: none !important;
+        margin-top: 0.5rem;
+    }
+}
+
 /* Bannière de titre des cartes (card-primary > card-header > h3.card-title) :
    dégradé indigo cohérent avec le reste de l'interface (au lieu du bleu
    Bootstrap par défaut), titre plus affirmé */
@@ -764,5 +786,36 @@ html, body {
     .content-header .breadcrumb {
         font-size: 0.75rem;
         padding: 0.35rem 0.8rem;
+    }
+}
+
+
+/* ===================================================================
+   Footers de carte à boutons multiples (.card-footer text-center),
+   utilisés notamment sur mon_profil.html — repli responsive dédié,
+   indépendant de .filtres-actions (bandeau de filtre) pour éviter
+   tout couplage entre ces deux contextes d'UI distincts.
+   =================================================================== */
+.card-footer.text-center {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.card-footer.text-center .btn {
+    margin: 0 !important; /* neutralise les marges Bootstrap par défaut entre boutons inline */
+}
+
+@media (max-width: 575.98px) {
+    .card-footer.text-center {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .card-footer.text-center .btn {
+        width: 100%;
+        text-align: center;
+        justify-content: center;
     }
 }

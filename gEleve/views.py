@@ -345,7 +345,15 @@ def filtrelistegenerale(request):
     listeinsclasse = Inscription.objects.none()
     listeinsnp = Inscription.objects.none()
 
-    if mat != '' and mat is not None:
+    annee_ids = Inscription.objects.values_list('annee_scolaire', flat=True).distinct()
+    ans = AnneeScolaire.objects.filter(id__in=annee_ids)
+    cy = CycleScolaire.objects.all().order_by('id')
+
+    querydict = request.GET.copy()
+    querydict.pop('page', None)
+    query_string = querydict.urlencode()
+
+    if mat not in (None,''):
 
         listeins = Inscription.objects.select_related('annee_scolaire', 'mateleve', 'idcycle', 'idclasse').filter(
             mateleve__exact=mat)
@@ -359,8 +367,7 @@ def filtrelistegenerale(request):
         numpageinscrit = request.GET.get('page')
         listeins = pagineinscrit.get_page(numpageinscrit)
 
-    elif (idclass != '' and idclass is not None) and (idcy != '' and idcy is not None) and (
-            idansc != '' and idansc is not None):
+    elif idclass not in (None,'') and idcy not in (None,'') and idansc not in (None,''):
 
         listeinsclasse = Inscription.objects.select_related('annee_scolaire', 'mateleve', 'idcycle', 'idclasse').filter(
             Q(idclasse__exact=idclass), Q(idcycle__exact=idcy), Q(annee_scolaire__exact=idansc))
@@ -373,7 +380,7 @@ def filtrelistegenerale(request):
         numpageinscrit = request.GET.get('page')
         listeinsclasse = pagineinscrit.get_page(numpageinscrit)
 
-    elif np != '' and np is not None:
+    elif np not in (None,''):
         listeinsnp = Inscription.objects.select_related('annee_scolaire', 'mateleve', 'idcycle', 'idclasse').filter(
             Q(mateleve__nom__icontains=np) | Q(mateleve__prenom__icontains=np))
 
@@ -388,7 +395,7 @@ def filtrelistegenerale(request):
     return render(request, 'gEleve/liste_generale_eleves.html',
                   dict(listeinsmat=listeins, listeinsclasse=listeinsclasse, listenp=listeinsnp,
                        effectif_total=effectif_total, effectif_total_garcons=effectif_total_garcons,
-                       effectif_total_filles=effectif_total_filles))
+                       effectif_total_filles=effectif_total_filles, query_string=query_string, ansc=ans, cycles=cy))
 
 
 # Gestion de l'impression des recus d'inscription à la scolarité
@@ -1027,6 +1034,12 @@ def filtrelisteinscrits(request):
     global effectif_total_garcons
     global effectif_total_filles
 
+    # Construction de la query string SANS le paramètre 'page'
+    querydict = request.GET.copy()
+    querydict.pop('page', None)
+    query_string = querydict.urlencode()
+
+
     if (idclass != '' and idclass is not None) and (idcy != '' and idcy is not None) and (
             idansc != '' and idansc is not None):
         listeinsclasse = Inscription.objects.select_related('annee_scolaire', 'mateleve', 'idcycle', 'idclasse').filter(
@@ -1044,7 +1057,7 @@ def filtrelisteinscrits(request):
         
     return render(request, 'gEleve/liste_eleves_inscrits.html',
                   dict(listeinscrits=listeinsclasse, effectif_total=effectif_total,
-                       effectif_total_garcons=effectif_total_garcons, effectif_total_filles=effectif_total_filles, ans=ans, cycles=cy))
+                       effectif_total_garcons=effectif_total_garcons, effectif_total_filles=effectif_total_filles, ans=ans, cycles=cy, query_string=query_string))
 
 @action_requise('menu_eleves')
 def filtrelistereinscrits(request):
@@ -1064,6 +1077,11 @@ def filtrelistereinscrits(request):
     global effectif_total_garcons
     global effectif_total_filles
 
+    # Construction de la query string SANS le paramètre 'page'
+    querydict = request.GET.copy()
+    querydict.pop('page', None)
+    query_string = querydict.urlencode()
+
     if (idclass != '' and idclass is not None) and (idcy != '' and idcy is not None) and (
             idansc != '' and idansc is not None):
         listeinsclasse = Inscription.objects.select_related('annee_scolaire', 'mateleve', 'idcycle', 'idclasse').filter(
@@ -1081,7 +1099,7 @@ def filtrelistereinscrits(request):
         
     return render(request, 'gEleve/liste_eleves_reinscrits.html',
                   dict(listereinscrits=listeinsclasse, effectif_total=effectif_total,
-                       effectif_total_garcons=effectif_total_garcons, effectif_total_filles=effectif_total_filles, ans=ans, cycles=cy))
+                       effectif_total_garcons=effectif_total_garcons, effectif_total_filles=effectif_total_filles, ans=ans, cycles=cy, query_string=query_string))
 
 # Permet de generer le rapport contenant la liste des inscrits par classe
 @action_requise('menu_eleves')
@@ -1231,7 +1249,7 @@ def generer_rapport_inscrits(request, data_ecole, annee, cycle, classe, titre_ra
     ])
 
     # --- Largeurs proportionnelles, garanties de tenir dans largeur_frame ---
-    poids = [0.4, 1.1, 1.3, 1.3, 0.8, 1.1, 1.3, 1.3, 1.3, 1.3, 1.4, 1.8, 1.8, 1.6]
+    poids = [0.6, 1.1, 1.3, 1.3, 0.8, 1.1, 1.3, 1.3, 1.3, 1.3, 1.4, 1.8, 1.8, 1.6] # 0.4 pour N°
     somme_poids = sum(poids)
     col_widths = [(p / somme_poids) * largeur_frame for p in poids]
 
@@ -1254,18 +1272,18 @@ def generer_rapport_inscrits(request, data_ecole, annee, cycle, classe, titre_ra
     table.setStyle(style)
 
     # --- 3. Éléments du flux ---
-    elements = [NextPageTemplate('Suivantes'), Spacer(1, 0.3*cm)]
+    elements = [NextPageTemplate('Suivantes'),Spacer(1, 0.3*cm)] # , Spacer(1, 0.3*cm)
     elements.append(table)
-    elements.append(Spacer(1, 1.0*cm))
+    elements.append(Spacer(1, 0.3*cm)) # <-- 1.0cm -> 0.3cm
 
     style_signature = ParagraphStyle('Signature', parent=getSampleStyleSheet()['Normal'], alignment=TA_RIGHT, fontName='Helvetica-Bold')
     date_str = datetime.now().strftime('%d/%m/%Y')
 
     bloc_signature = [
         [Paragraph(f"Conakry, le {date_str}", style_signature)],
-        [Spacer(1, 0.8*cm)],
+        [Spacer(1, 0.1*cm)],                      # <-- 0.8cm -> 0.3cm -> 0.1cm
         [Paragraph("Le Service Scolarité", style_signature)],
-        [Spacer(1, 1.5*cm)],
+        [Spacer(1, 0.6*cm)],                      # <-- 1.5cm -> 0.6cm
         [Paragraph(str(data_ecole[8]) if len(data_ecole) > 8 and data_ecole[8] else '', style_signature)],
     ]
     table_signature = RLTable(bloc_signature, colWidths=[largeur_frame])
@@ -1421,8 +1439,9 @@ def generer_rapport_inscrits(request, data_ecole, annee, cycle, classe, titre_ra
     y_fin_entete = 450   # nouvelle valeur compatible avec une hauteur de page paysage de ~595 points
     hauteur_frame_page1 = y_fin_entete - marge_bas
 
-    frame_page1 = Frame(marge_gauche_droite, marge_bas, largeur_frame, hauteur_frame_page1, id='page1', showBoundary=0)
-    frame_suivantes = Frame(marge_gauche_droite, marge_bas, largeur_frame, landscape(A4)[1] - marge_bas - 1.5*cm, id='suivantes', showBoundary=0)
+    frame_page1 = Frame(marge_gauche_droite, marge_bas, largeur_frame, hauteur_frame_page1, id='page1', showBoundary=0,topPadding=0, bottomPadding=0, leftPadding=0, rightPadding=0)
+
+    frame_suivantes = Frame(marge_gauche_droite, marge_bas, largeur_frame, landscape(A4)[1] - marge_bas - 1.5*cm, id='suivantes', showBoundary=0, topPadding=0, bottomPadding=0, leftPadding=0, rightPadding=0)
 
     doc = BaseDocTemplate(buffer, pagesize=landscape(A4), title=titre_rapport)
     doc.addPageTemplates([
@@ -1489,7 +1508,7 @@ def generer_rapport_matriculation(request, data_ecole, annee, titre_rapport):
     ])
 
     # --- Largeurs proportionnelles, garanties de tenir dans largeur_frame ---
-    poids = [0.4, 1.1, 1.3, 1.3, 0.8, 1.1, 1.3, 1.3, 1.3, 1.3, 1.4, 1.8, 1.8, 1.6]
+    poids = [0.6, 1.1, 1.3, 1.3, 0.8, 1.1, 1.3, 1.3, 1.3, 1.3, 1.4, 1.8, 1.8, 1.6] # 0.4
     somme_poids = sum(poids)
     col_widths = [(p / somme_poids) * largeur_frame for p in poids]
 
@@ -1512,18 +1531,18 @@ def generer_rapport_matriculation(request, data_ecole, annee, titre_rapport):
     table.setStyle(style)
 
     # --- 3. Éléments du flux ---
-    elements = [NextPageTemplate('Suivantes'), Spacer(1, 0.3*cm)]
+    elements = [NextPageTemplate('Suivantes'),Spacer(1, 0.3*cm)] # , Spacer(1, 0.3*cm)
     elements.append(table)
-    elements.append(Spacer(1, 1.0*cm))
+    elements.append(Spacer(1, 0.3*cm)) # <-- 1.0cm -> 0.3cm
 
     style_signature = ParagraphStyle('Signature', parent=getSampleStyleSheet()['Normal'], alignment=TA_RIGHT, fontName='Helvetica-Bold')
     date_str = datetime.now().strftime('%d/%m/%Y')
 
     bloc_signature = [
         [Paragraph(f"Conakry, le {date_str}", style_signature)],
-        [Spacer(1, 0.8*cm)],
+        [Spacer(1, 0.1*cm)],
         [Paragraph("Le Service Scolarité", style_signature)],
-        [Spacer(1, 1.5*cm)],
+        [Spacer(1, 0.6*cm)],
         [Paragraph(str(data_ecole[8]) if len(data_ecole) > 8 and data_ecole[8] else '', style_signature)],
     ]
     table_signature = RLTable(bloc_signature, colWidths=[largeur_frame])
@@ -1667,8 +1686,9 @@ def generer_rapport_matriculation(request, data_ecole, annee, titre_rapport):
     y_fin_entete = 450   # nouvelle valeur compatible avec une hauteur de page paysage de ~595 points
     hauteur_frame_page1 = y_fin_entete - marge_bas
 
-    frame_page1 = Frame(marge_gauche_droite, marge_bas, largeur_frame, hauteur_frame_page1, id='page1', showBoundary=0)
-    frame_suivantes = Frame(marge_gauche_droite, marge_bas, largeur_frame, landscape(A4)[1] - marge_bas - 1.5*cm, id='suivantes', showBoundary=0)
+    frame_page1 = Frame(marge_gauche_droite, marge_bas, largeur_frame, hauteur_frame_page1, id='page1', showBoundary=0,topPadding=0, bottomPadding=0, leftPadding=0, rightPadding=0)
+
+    frame_suivantes = Frame(marge_gauche_droite, marge_bas, largeur_frame, landscape(A4)[1] - marge_bas - 1.5*cm, id='suivantes', showBoundary=0, topPadding=0, bottomPadding=0, leftPadding=0, rightPadding=0)
 
     doc = BaseDocTemplate(buffer, pagesize=landscape(A4), title=titre_rapport)
     doc.addPageTemplates([

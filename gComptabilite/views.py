@@ -188,7 +188,10 @@ def recherchersituationrecette(request):
     total_entree = 0
     total_sortie = 0
     recette = Caisse.objects.none() # Initialisation de base pour eviter le bug lié au keyerror slice(0,0,None) lors du filtre par annee scolaire
-    
+
+    querydict = request.GET.copy()
+    querydict.pop('page', None)
+    query_string = querydict.urlencode()
            
     if (ans !='' and ans is not None) and (ddebut =='' and ddebut is None) and (dfin =='' and dfin is None):
         
@@ -257,7 +260,7 @@ def recherchersituationrecette(request):
     numpagecais = request.GET.get('page')
     recette = paginecais.get_page(numpagecais)
     return render(request, 'gComptabilite/liste_recettes.html',
-                  dict(recette=recette, total_entree=total_entree, total_sortie=total_sortie, solde_dispo=solde_dispo, ddebut=debut, dfin=fin, annee=annee))
+                  dict(recette=recette, total_entree=total_entree, total_sortie=total_sortie, solde_dispo=solde_dispo, ddebut=debut, dfin=fin, annee=annee, query_string=query_string))
 
 @action_requise('compta_ajouter')
 def enregistrerdepense(request):
@@ -373,6 +376,10 @@ def recherchersituationdepense(request):
     total_entree = 0
     total_sortie = 0
     depense = Caisse.objects.none()
+
+    querydict = request.GET.copy()
+    querydict.pop('page', None)
+    query_string = querydict.urlencode()
     
     if (ans !='' and ans is not None) and (ddebut =='' and ddebut is None) and (dfin =='' and dfin is None):
         
@@ -443,7 +450,7 @@ def recherchersituationdepense(request):
     depense = paginecais.get_page(numpagecais)
 
     return render(request, 'gComptabilite/liste_depenses.html',
-                  dict(depense=depense, total_entree=total_entree, total_sortie=total_sortie, solde_dispo=solde_dispo, ddebut=debut, dfin=fin, annee=annee))
+                  dict(depense=depense, total_entree=total_entree, total_sortie=total_sortie, solde_dispo=solde_dispo, ddebut=debut, dfin=fin, annee=annee, query_string=query_string))
 
 @action_requise('compta_modifier')
 def detailsdepense(request, id):
@@ -727,7 +734,7 @@ def recupaiementscolarite(request, idetat, nom_tranche, mont_paye):
 
         elif nom_tranche == DEUX_TRANCHES_CHOICES[1][0]: # Si c'est la deuxième tranche, je recupère le montant correspondant dans la table classe
 
-            tranche_name = DEUX_TRANCHES_CHOICES[1][0] # i.e Deuxième tranche
+            tranche_name = DEUX_TRANCHES_CHOICES[1][1] # i.e Deuxième tranche
             montant_tranche = etatpaie.idclasse.tranche2
 
         montant_paye     = Decimal(mont_paye)
@@ -1035,6 +1042,10 @@ def filtrelistepaiementclasse(request):
     an = AnneeScolaire.objects.none()
     cy = CycleScolaire.objects.none()
 
+    querydict = request.GET.copy()
+    querydict.pop('page', None)
+    query_string = querydict.urlencode()
+
     listepaieclasse = {}
     listepaieclasse = EtatPaiementTranche.objects.none()
 
@@ -1075,7 +1086,7 @@ def filtrelistepaiementclasse(request):
     numpagepaie = request.GET.get('page')
     listepaieclasse = paginepaie.get_page(numpagepaie)
 
-    return render(request,'gComptabilite/liste_etat_paiement_scolarite.html',{'listepaiementclasse':listepaieclasse, 'ans': an, 'cycles': cy, 'total_tranche1': total_tranche1, 'total_tranche2': total_tranche2, 'total_reste_a_payer': total_reste_a_payer, 'tranche_paye': DEUX_TRANCHES_CHOICES, 'total_paiement_annuel': total_paiement_annuel})
+    return render(request,'gComptabilite/liste_etat_paiement_scolarite.html',{'listepaiementclasse':listepaieclasse, 'ans': an, 'cycles': cy, 'total_tranche1': total_tranche1, 'total_tranche2': total_tranche2, 'total_reste_a_payer': total_reste_a_payer, 'tranche_paye': DEUX_TRANCHES_CHOICES, 'total_paiement_annuel': total_paiement_annuel, 'query_string': query_string})
 
 @action_requise('compta_modifier')
 def detailpaiementscolaire(request, idpaie):
@@ -1166,6 +1177,7 @@ def rapportpaiementtranche(request):
     cycl = request.GET.get('cycle')   
     clas = request.GET.get('classe')
     nom_tranche = request.GET.get('tranche')
+    tranche_name = None
 
     ec = Ecole.objects.count()
     if ec == 0:
@@ -1181,8 +1193,16 @@ def rapportpaiementtranche(request):
                           ecole.telephone1, ecole.telephone2, 'Logo',
                           ecole.devise_ecole, ecole.dsee, ecole.comptable]
 
+    if nom_tranche == DEUX_TRANCHES_CHOICES[0][0]: # Si c'est la première tranche qui a été choisie, je recupère le montant de la tranche dans la table classe
+
+        tranche_name = DEUX_TRANCHES_CHOICES[0][1] # i.e Première tranche
+
+    elif nom_tranche == DEUX_TRANCHES_CHOICES[1][0]: # Si c'est la deuxième tranche, je recupère le montant correspondant dans la table classe
+
+        tranche_name = DEUX_TRANCHES_CHOICES[1][1] # i.e Deuxième tranche
+
     # Titre du rapport
-    titre = f"SUIVI DES PAIEMENTS DE LA {nom_tranche.upper()}"
+    titre = f"SUIVI DES PAIEMENTS DE LA {tranche_name.upper()}"
 
     # Appel de la fonction utilitaire
 
@@ -1217,6 +1237,7 @@ def generer_rapport_paiement_scolarite(request, data_ecole, annee, cycle, classe
     total_paye_t2 = 0 # Contient le montant total des paiements de la deuxième tranche
     total_tranche = 0 
     total_reste = 0
+    tranche_name = None
 
     an = AnneeScolaire.objects.get(id=annee)
     cy = CycleScolaire.objects.get(id=cycle)
@@ -1246,9 +1267,17 @@ def generer_rapport_paiement_scolarite(request, data_ecole, annee, cycle, classe
     if effectif == 0:
         messages.error(request,"Aucun élève trouvé pour les critères donnés.")
     else:
+
+        if nom_tranche == DEUX_TRANCHES_CHOICES[0][0]: # Si c'est la première tranche qui a été choisie, je recupère le montant de la tranche dans la table classe
+                    
+            tranche_name = DEUX_TRANCHES_CHOICES[0][1] # i.e Première tranche
+    
+        elif nom_tranche == DEUX_TRANCHES_CHOICES[1][0]: # Si c'est la deuxième tranche, je recupère le montant correspondant dans la table classe
+    
+            tranche_name = DEUX_TRANCHES_CHOICES[1][1] # i.e Deuxième tranche
          
         # --- 2. Construction du tableau (identique) ---
-        entetes = ['N°', 'Matricule', 'Prénoms', 'Nom', nom_tranche, 'Montant payé', 'Reste à payer', 'Date paiement']
+        entetes = ['N°', 'Matricule', 'Prénoms', 'Nom', tranche_name, 'Montant payé', 'Reste à payer', 'Date paiement']
         table_data = [entetes]
 
         for i, etat in enumerate(etatpaie, start=1):
