@@ -1,5 +1,5 @@
 from decimal import Decimal
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.core.paginator import Paginator  # Utilisé dans la gestion des paginations des différentes listes de données
 from django.utils.datastructures import MultiValueDictKeyError
@@ -646,7 +646,20 @@ def chargerlisteeleveclasse(request):
     clas = request.GET.get('id_classe') # id_classe est recupérée depuis la fonction JQuery
     el = Inscription.objects.select_related('annee_scolaire', 'mateleve', 'idcycle', 'idclasse').filter(
         Q(annee_scolaire=ane), Q(idclasse=clas))
+    
     return render(request, 'gEleve/charger_liste_eleve_classe_cycle.html', dict(eleve=el))
+
+
+# Cette fonction me permet de charger la liste des élèves dont les badges doivent etre imprimes dans une classe donnée aucours d'une année
+# scolaire donnée
+@action_requise('menu_eleves')
+def chargerlisteelevebadge(request):
+    ane = request.GET.get('anneesco') # anneesco est la valeur renvoyée depuis la fonction JQuery dans le template reinscription_eleve.html
+    clas = request.GET.get('id_classe') # id_classe est recupérée depuis la fonction JQuery
+    el = Inscription.objects.select_related('annee_scolaire', 'mateleve', 'idcycle', 'idclasse').filter(
+        Q(annee_scolaire=ane), Q(idclasse=clas))
+    
+    return render(request, 'gEleve/charger_liste_eleve_badge.html', dict(eleve=el))
 
 
 # Cette fonction me permet de charger les infos de l'élève sélectionné lors de la reinscription à savoir le prénom, le nom et la photo
@@ -1699,3 +1712,75 @@ def generer_rapport_matriculation(request, data_ecole, annee, titre_rapport):
     doc.build(elements)
     buffer.seek(0)
     return buffer
+
+# Gestion des Badges des eleves
+def afficher_listebadge_eleves(request):
+
+    ane = None
+    cycl = None
+    ane = AnneeScolaire.objects.all().order_by('id')
+    cycl = CycleScolaire.objects.all().order_by('id')
+
+    return render(request,'gEleve/liste_badges_eleves.html',dict(ans=ane, cycles=cycl))
+
+
+def imprimerbadgesclasse(request):
+    """
+    Rend badges_eleves.html avec tous les élèves inscrits dans la classe
+    (et éventuellement l'année scolaire) passées en paramètres GET.
+    Appelée depuis listebadgeseleves.html via :
+    window.open(url + '?idclasse=...&anneesco=...')
+    """
+    idclasse = request.GET.get('idclasse')
+    idannee = request.GET.get('anneesco')
+
+    if not idclasse:
+        messages.warning('Aucune classe spécifiée.')
+        
+    eleves = Inscription.objects.select_related('mateleve', 'idclasse').filter(
+        idclasse_id=idclasse
+    )
+
+    # Si l'année scolaire est précisée, on filtre aussi dessus.
+    # (Si elle est vide, on affiche la classe toutes années confondues.)
+    if idannee:
+        eleves = eleves.filter(annee_scolaire_id=idannee)
+
+    # Optionnel : ne garder que les inscriptions réellement actives —
+    # adapte 'etat_inscription' au nom/valeur exacts utilisés dans la
+    # vue qui alimente 'listeinscrits' sur situation_inscrits.html.
+    # eleves = eleves.filter(etat_inscription='Inscrit')
+
+    premiere = eleves.first()
+    if premiere:
+        classe_nom = str(premiere.idclasse)
+    else:
+        classe_nom = str(get_object_or_404(Classe, pk=idclasse))
+
+    context = {
+        'eleves': eleves,
+        'classe_nom': classe_nom,
+        # nom_ecole / logo_ecole : à ajouter ici si tu n'as pas déjà un
+        # context processor global qui les injecte (comme semblent le
+        # suggérer tes autres templates, qui ne les passent jamais
+        # explicitement depuis une vue).
+    }
+    return render(request, 'gEleve/badge_eleve.html', context)
+
+
+def imprimerbadgeeleve(request, pk):
+    """
+    Rend badges_eleves.html avec un seul élève (impression individuelle).
+    'pk' correspond à l'id de l'Inscription — le même que 'le.id' utilisé
+    dans le bouton 🪪 de situation_inscrits.html.
+    """
+    inscription = get_object_or_404(
+        Inscription.objects.select_related('mateleve', 'idclasse'),
+        id=pk
+    )
+
+    context = {
+        'eleves': [inscription],
+        'classe_nom': str(inscription.idclasse),
+    }
+    return render(request, 'gEleve/badge_eleve.html', context)

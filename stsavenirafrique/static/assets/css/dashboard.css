@@ -491,6 +491,9 @@ html, body {
     padding: 0.35rem 1.9rem 0.35rem 0.75rem;
     font-size: 0.85rem;
     font-weight: 500;
+    line-height: 1.5;
+    height: auto;
+    min-height: 2.35rem;
     box-shadow: 0 1px 3px rgba(0,0,0,0.10);
     transition: 0.2s ease-in-out;
     background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%234f46e5' d='M6 8 0 0h12z'/%3E%3C/svg%3E");

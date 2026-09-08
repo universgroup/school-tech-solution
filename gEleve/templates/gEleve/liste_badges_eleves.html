@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block titre_page %} GESTION DES BADGES SCOLAIRES {% endblock %}
+{% block titre_formulaire %} IMPRESSION DES BADGES ELEVES {% endblock %}
+{% block fil_ariane %}Eleves /  Badges {% endblock %}
+{% block titre_cadre %}
+GENERATION DES BADGES
+{% endblock %}
+
+{% block formulaire %}
+
+<!-- ===================================================================
+     Cette page ne fait QUE filtrer/sélectionner : l'impression réelle se
+     fait dans badges_eleves.html, ouvert dans un nouvel onglet, sans
+     navbar ni sidebar. Les deux boutons ci-dessous construisent l'URL
+     d'ouverture à partir des sélections en cours.
+
+     Hypothèses sur tes URLs Django (à adapter à tes noms réels) :
+     - 'imprimerbadgesclasse'  : vue qui lit ?idclasse=...&anneesco=...
+                                 et rend badges_eleves.html avec la liste
+                                 complète des élèves de cette classe.
+     - 'imprimerbadgeeleve'    : vue qui prend un pk positionnel (comme
+                                 dans situation_inscrits.html : le.id) et
+                                 rend badges_eleves.html avec un seul élève.
+                                 Le "0" ci-dessous est un pk factice que le
+                                 JS remplace par le véritable id sélectionné.
+     ===================================================================== -->
+
+    <div class="card-header filtres-header">
+
+        <p class="filtres-titre">Sélectionnez la classe ou l'élève dont vous voulez imprimer le(s) badge(s)</p>
+
+            <form class="filtres-form" id="fbadges"
+                data-classe-url="{% url 'chargerlisteclasse' %}"
+                data-eleve-classe-url="{% url 'chargerlisteelevebadge' %}"
+                data-classe-badges-url="{% url 'imprimerbadgesclasse' %}"
+                data-eleve-badge-url-base="{% url 'imprimerbadgeeleve' 0 %}">
+
+                <div class="filtres-champs">
+
+                    <div class="filtres-selects">
+
+                        <div class="filtre-group">
+                            <label for="cboanne" class="mr-2 mb-0">Année scolaire</label>
+                            <select class="form-control form-control-sm select-modern" id="cboanne" title="Sélectionnez l'année scolaire">
+                                <option value="" selected>Sélectionnez</option>
+                                {% for an in ans %}
+                                <option value="{{an.id}}">{{an.descript_annee}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="filtre-group">
+                            <label for="cbocycle" class="mr-2 mb-0">Cycle</label>
+                            <select class="form-control form-control-sm select-modern" id="cbocycle" title="Sélectionnez le cycle">
+                                <option value="" selected>Sélectionnez</option>
+                                {% for cl in cycles %}
+                                <option value="{{cl.id}}">{{cl.cycle}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="filtre-group">
+                            <label for="cboclasse" class="mr-2 mb-0">Classe</label>
+                            <select class="form-control form-control-sm select-modern" id="cboclasse" title="Sélectionnez la classe">
+                                <option value="" selected>Sélectionnez</option>
+                            </select>
+                        </div>
+
+                        <div class="filtre-group">
+                            <!-- La valeur de ce select est désormais l'ID de l'inscription
+                         (et non le matricule) : chargerlisteelevepaie doit renvoyer
+                         <option value="{{ inscription.id }}">...</option> pour cet usage -->
+                            <label for="cbomateleve" class="mr-2 mb-0">Elève (facultatif — pour une impression individuelle)</label>
+                            <select class="form-control form-control-sm select-modern" id="cbomateleve" title="Sélectionnez un élève pour n'imprimer que son badge">
+                                <option value="" selected>Tous</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <div class="filtres-actions">
+                        <button type="button" id="btn_badges_classe" class="btn btn-primary btn-md" title="Ouvre les badges de tous les élèves de la classe sélectionnée, dans un nouvel onglet">
+                            Imprimer les badges de la classe &nbsp; <i class="fas fa-users mr-1"></i>
+                        </button>
+                        <button type="button" id="btn_badge_eleve" class="btn btn-success btn-md" title="Ouvre uniquement le badge de l'élève sélectionné, dans un nouvel onglet" disabled>
+                            Imprimer le badge de cet élève &nbsp; <i class="fas fa-id-card mr-1"></i>
+                        </button>
+                        <button type="button" class="btn btn-warning btn-md" onclick="location.reload()" title="Recharge la page et réinitialise les listes déroulantes">
+                            Actualiser &nbsp; <i class="fas fa-refresh mr-1"></i>
+                        </button>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+
+        <div class="card-body">
+            <p class="text-muted mb-0 mt-3">
+                <i class="fas fa-circle-info mr-1"></i>
+                Choisissez une année scolaire, un cycle puis une classe. Le bouton <strong>« Imprimer les badges de la classe »</strong>
+                ouvre alors la fiche complète de tous les élèves de cette classe, avec sélection possible avant impression.
+                Pour n'imprimer qu'un seul élève, choisissez-le ensuite dans la liste « Elève » puis utilisez le second bouton.
+            </p>
+        </div>
+
+{% endblock %}
+
+{% block javascript %}
+<script>
+
+    // ---------- Cascade Année / Cycle / Classe / Elève ----------
+    // (.trigger('change') indispensable : voir le correctif appliqué sur
+    // paiement_scolarite.html — sans lui, une classe/liste ne comportant
+    // qu'une seule option ne déclenche jamais le maillon suivant.)
+
+    $("#cbocycle").change(function () {
+        var url = $("#fbadges").attr("data-classe-url");
+        var idcycle = $(this).val();
+
+        $.ajax({
+            url: url,
+            data: { 'idcycle': idcycle },
+            success: function (data) {
+                $("#cboclasse").html(data).trigger('change');
+            }
+        });
+    });
+
+    $("#cboclasse").change(function () {
+        var url = $("#fbadges").attr("data-eleve-classe-url");
+        var id_annee = $('#cboanne').val();
+        var idclasse = $(this).val();
+
+        // Le bouton "classe" n'a besoin que d'une classe sélectionnée
+        $("#btn_badges_classe").prop('disabled', !idclasse);
+
+        if (!idclasse) {
+            $("#cbomateleve").html('<option value="" selected>Tous</option>');
+            $("#btn_badge_eleve").prop('disabled', true);
+            return;
+        }
+
+        $.ajax({
+            url: url,
+            data: { 'anneesco': id_annee, 'id_classe': idclasse },
+            success: function (data) {
+                // On garde notre propre option "Tous les élèves de la classe"
+                // en tête, puis on ajoute les élèves renvoyés par le serveur.
+                $("#cbomateleve").html('<option value="" selected>Tous</option>' + data).trigger('change');
+            }
+        });
+    });
+
+    $("#cbomateleve").change(function () {
+        var idinscription = $(this).val();
+        $("#btn_badge_eleve").prop('disabled', !idinscription);
+    });
+
+    // ---------- Ouverture des badges dans un nouvel onglet ----------
+
+    $("#btn_badges_classe").click(function () {
+        var idclasse = $("#cboclasse").val();
+        var idannee = $("#cboanne").val();
+
+        if (!idclasse) {
+            alert("Merci de sélectionner une classe.");
+            return;
+        }
+
+        var baseUrl = $("#fbadges").attr("data-classe-badges-url");
+        var url = baseUrl + "?idclasse=" + encodeURIComponent(idclasse) + "&anneesco=" + encodeURIComponent(idannee);
+        window.open(url, '_blank');
+    });
+
+    $("#btn_badge_eleve").click(function () {
+        var idinscription = $("#cbomateleve").val();
+
+        if (!idinscription) {
+            alert("Merci de sélectionner un élève.");
+            return;
+        }
+
+        // Remplace le pk factice "0" de l'URL modèle par l'ID d'inscription réel.
+        var baseUrl = $("#fbadges").attr("data-eleve-badge-url-base");
+        var url = baseUrl.replace(/0\/?$/, idinscription + '/');
+        window.open(url, '_blank');
+    });
+
+</script>
+{% endblock %}

@@ -1,320 +1,444 @@
 /* =====================================================================
-           BADGE ÉLÈVE — carte PVC format CR80 (85,60 mm x 53,98 mm), le
-           standard des cartes de crédit / badges scolaires. Un badge = une
-           carte = une page à l'impression (page-break-after), pour un envoi
-           direct vers une imprimante à cartes (Evolis, Zebra, etc.) ou une
-           imprimante classique avec du papier/PVC au format carte.
-           ===================================================================== */
+   BADGE ÉLÈVE — carte PVC format CR80 (85,60 mm x 53,98 mm), le
+   standard des cartes de crédit / badges scolaires. Un badge = une
+   carte = une page à l'impression (page-break-after), pour un envoi
+   direct vers une imprimante à cartes (Evolis, Zebra, etc.) ou une
+   imprimante classique avec du papier/PVC au format carte.
+   ===================================================================== */
 
-        :root {
-            --primary: #4f46e5;
-            --primary-dark: #4338ca;
-            --secondary: #0f172a;
-            --card-w: 85.6mm;
-            --card-h: 53.98mm;
-        }
+:root {
+    --primary: #4f46e5;
+    --primary-dark: #4338ca;
+    --secondary: #0f172a;
+    --card-w: 85.6mm;
+    --card-h: 53.98mm;
+}
 
-        * { box-sizing: border-box; }
+* { box-sizing: border-box; }
 
-        body {
-            font-family: 'Inter', 'Source Sans Pro', system-ui, sans-serif;
-            background: #eef2ff;
-            margin: 0;
-            padding: 1.5rem;
-        }
+body {
+    font-family: 'Inter', 'Source Sans Pro', system-ui, sans-serif;
+    background: #eef2ff;
+    margin: 0;
+    padding: 1.5rem;
+}
 
-        /* ---------- Barre d'outils (écran uniquement) ---------- */
-        .toolbar {
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 0.6rem;
-            background: #fff;
-            border-radius: 1rem;
-            box-shadow: 0 10px 30px rgba(79,70,229,0.12);
-            padding: 0.9rem 1.2rem;
-            margin-bottom: 1.5rem;
-        }
+/* ---------- Barre d'outils (écran uniquement) ---------- */
+.toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem;
+    background: #fff;
+    border-radius: 1rem;
+    box-shadow: 0 10px 30px rgba(79,70,229,0.12);
+    padding: 0.9rem 1.2rem;
+    margin-bottom: 1.5rem;
+}
 
-        .toolbar h1 {
-            font-size: 1.1rem;
-            font-weight: 800;
-            color: var(--secondary);
-            margin: 0;
-            flex: 1 1 auto;
-        }
+.toolbar h1 {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--secondary);
+    margin: 0;
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow-wrap: break-word;
+}
 
-        .toolbar .btn {
-            border: none;
-            border-radius: 0.6rem;
-            padding: 0.5rem 0.9rem;
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.15s ease-in-out;
-        }
+.toolbar .btn {
+    border: none;
+    border-radius: 0.6rem;
+    padding: 0.5rem 0.9rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.15s ease-in-out;
+    white-space: nowrap;
+}
 
-        .toolbar .btn:hover { transform: translateY(-1px); }
+.toolbar .btn:hover { transform: translateY(-1px); }
 
-        .btn-select-all { background: #e2e8f0; color: var(--secondary); }
-        .btn-select-none { background: #e2e8f0; color: var(--secondary); }
-        .btn-print-selection { background: var(--primary); color: #fff; }
-        .btn-print-selection:hover { background: var(--primary-dark); }
+.btn-select-all { background: #e2e8f0; color: var(--secondary); }
+.btn-select-none { background: #e2e8f0; color: var(--secondary); }
+.btn-print-selection { background: var(--primary); color: #fff; }
+.btn-print-selection:hover { background: var(--primary-dark); }
 
-        .selection-count {
-            font-size: 0.8rem;
-            color: #64748b;
-            font-weight: 600;
-        }
+.selection-count {
+    font-size: 0.8rem;
+    color: #64748b;
+    font-weight: 600;
+    white-space: nowrap;
+}
 
-        /* ---------- Grille d'aperçu à l'écran ---------- */
-        .badges-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1.5rem;
-            justify-content: flex-start;
-        }
+/* ---------- Grille d'aperçu à l'écran ---------- */
+.badges-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    justify-content: flex-start;
+}
 
-        /* ---------- Le badge lui-même ---------- */
-        .badge-wrapper {
-            position: relative;
-        }
+/* ---------- Le badge lui-même ---------- */
+.badge-wrapper {
+    position: relative;
+}
 
-        .badge-checkbox {
-            position: absolute;
-            top: -0.5rem;
-            left: -0.5rem;
-            z-index: 2;
-            width: 1.3rem;
-            height: 1.3rem;
-            cursor: pointer;
-            accent-color: var(--primary);
-        }
+.badge-checkbox {
+    position: absolute;
+    top: -0.5rem;
+    left: -0.5rem;
+    z-index: 2;
+    width: 1.3rem;
+    height: 1.3rem;
+    cursor: pointer;
+    accent-color: var(--primary);
+}
 
-        .badge-print-single {
-            position: absolute;
-            top: -0.5rem;
-            right: -0.5rem;
-            z-index: 2;
-            background: var(--primary);
-            color: #fff;
-            border: none;
-            border-radius: 999px;
-            width: 1.9rem;
-            height: 1.9rem;
-            font-size: 0.8rem;
-            cursor: pointer;
-            box-shadow: 0 4px 10px rgba(79,70,229,0.35);
-        }
+.badge-print-single {
+    position: absolute;
+    top: -0.5rem;
+    right: -0.5rem;
+    z-index: 2;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    width: 1.9rem;
+    height: 1.9rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(79,70,229,0.35);
+}
 
-        .badge-print-single:hover { background: var(--primary-dark); }
+.badge-print-single:hover { background: var(--primary-dark); }
 
-        .badge-card {
-            width: var(--card-w);
-            height: var(--card-h);
-            background: #fff;
-            border-radius: 3mm;
-            box-shadow: 0 12px 30px rgba(15,23,42,0.15);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            font-size: 2.6mm;
-            color: var(--secondary);
-        }
+.badge-card {
+    width: var(--card-w);
+    height: var(--card-h);
+    background: #fff;
+    border-radius: 3mm;
+    box-shadow: 0 12px 30px rgba(15,23,42,0.15);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    font-size: 2.6mm;
+    color: var(--secondary);
+    position: relative;
+}
 
-        /* Bandeau supérieur */
-        .badge-top {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: #fff;
-            padding: 1.8mm 3mm;
-            display: flex;
-            align-items: center;
-            gap: 1.8mm;
-        }
+/* Bandeau supérieur : fond blanc + titre noir. Un fond coloré (dégradé)
+   n'est PAS imprimé par défaut par la plupart des navigateurs (case
+   "Graphiques d'arrière-plan" décochée par défaut dans les boîtes de
+   dialogue d'impression) — ça donnait un titre gris illisible sur le
+   PDF exporté. Le titre reste donc noir, lisible à coup sûr, avec une
+   fine bordure colorée en accent pour garder une touche de marque sans
+   dépendre du rendu des couleurs de fond à l'impression. */
+.badge-top {
+    background: #fff;
+    color: var(--secondary);
+    border-bottom: 0.5mm solid var(--primary);
+    padding: 1.6mm 3mm;
+    display: flex;
+    align-items: center;
+    gap: 1.8mm;
+    position: relative;
+    z-index: 1;
+}
 
-        .badge-top .ecole-logo {
-            width: 6mm;
-            height: 6mm;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            flex-shrink: 0;
-        }
+.badge-top .ecole-logo {
+    width: 6mm;
+    height: 6mm;
+    border-radius: 50%;
+    background: rgba(79,70,229,0.10);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+}
 
-        .badge-top .ecole-logo img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+.badge-top .ecole-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
 
-        .badge-top .ecole-nom {
-            font-size: 3mm;
-            font-weight: 800;
-            line-height: 1.1;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+.badge-top .ecole-nom {
+    font-size: 3mm;
+    font-weight: 800;
+    color: var(--secondary);
+    line-height: 1.1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
-        .badge-top .badge-label {
-            font-size: 2mm;
-            opacity: 0.85;
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-        }
+.badge-top .badge-label {
+    font-size: 2mm;
+    color: #64748b;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
 
-        /* Corps du badge */
-        .badge-body {
-            flex: 1;
-            display: flex;
-            padding: 2mm 3mm;
-            gap: 2mm;
-        }
+/* Corps du badge */
+.badge-body {
+    flex: 1;
+    display: flex;
+    padding: 2mm 3mm;
+    gap: 2mm;
+    position: relative;
+    z-index: 1;
+}
 
-        .badge-infos {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            gap: 1mm;
-            min-width: 0;
-        }
+/* Filigrane discret en fond de carte : logo de l'école en très faible
+   opacité si disponible (classe .has-logo-watermark ajoutée par le
+   template, avec l'URL du logo injectée en style inline — même
+   technique que le filigrane de login.html), sinon un motif générique
+   à base de rayures très légères. Dans les deux cas, non-envahissant :
+   opacité minime, ne gêne jamais la lecture du texte par-dessus. */
+.badge-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: repeating-linear-gradient(
+        135deg,
+        rgba(79,70,229,0.035) 0mm,
+        rgba(79,70,229,0.035) 2mm,
+        transparent 2mm,
+        transparent 4mm
+    );
+}
 
-        .badge-nom {
-            font-size: 3.3mm;
-            font-weight: 800;
-            text-transform: uppercase;
-            line-height: 1.15;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+.badge-card.has-logo-watermark::before {
+    background: none;
+}
 
-        .badge-prenom {
-            font-size: 2.7mm;
-            font-weight: 600;
-            color: #475569;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+.badge-card.has-logo-watermark::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 30mm;
+    height: 30mm;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-image: var(--logo-watermark-url);
+    opacity: 0.06;
+    transform: translate(-50%, -50%);
+    z-index: 0;
+    pointer-events: none;
+}
 
-        .badge-matricule {
-            display: inline-block;
-            margin-top: 0.6mm;
-            background: rgba(79,70,229,0.10);
-            color: var(--primary);
-            font-weight: 700;
-            font-size: 2.3mm;
-            padding: 0.6mm 1.6mm;
-            border-radius: 999px;
-            width: fit-content;
-            letter-spacing: 0.03em;
-        }
+.badge-infos {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1mm;
+    min-width: 0;
+}
 
-        .badge-meta {
-            margin-top: 1mm;
-            font-size: 2.3mm;
-            color: #475569;
-            line-height: 1.5;
-        }
+.badge-nom {
+    font-size: 3.3mm;
+    font-weight: 800;
+    text-transform: uppercase;
+    line-height: 1.15;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
-        .badge-meta strong {
-            color: var(--secondary);
-            font-weight: 700;
-        }
+.badge-prenom {
+    font-size: 2.7mm;
+    font-weight: 600;
+    color: #475569;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
-        /* Photo, bordure arrondie, à droite */
-        .badge-photo {
-            flex-shrink: 0;
-            width: 18mm;
-            height: 22mm;
-            border-radius: 2.4mm;
-            border: 0.4mm solid var(--primary);
-            overflow: hidden;
-            align-self: center;
-            background: #f1f5f9;
-        }
+.badge-matricule {
+    display: inline-block;
+    margin-top: 0.6mm;
+    background: rgba(79,70,229,0.10);
+    color: var(--primary);
+    font-weight: 700;
+    font-size: 2.3mm;
+    padding: 0.6mm 1.6mm;
+    border-radius: 999px;
+    width: fit-content;
+    letter-spacing: 0.03em;
+}
 
-        .badge-photo img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
+.badge-meta {
+    margin-top: 1mm;
+    font-size: 2.3mm;
+    color: #475569;
+    line-height: 1.5;
+}
 
-        /* Bandeau inférieur : contacts parents */
-        .badge-bottom {
-            background: #f8fafc;
-            border-top: 0.3mm solid #e2e8f0;
-            padding: 1.3mm 3mm;
-            display: flex;
-            justify-content: space-between;
-            gap: 2mm;
-            font-size: 2.1mm;
-            color: #475569;
-        }
+.badge-meta strong {
+    color: var(--secondary);
+    font-weight: 700;
+}
 
-        .badge-bottom .contact-item {
-            display: flex;
-            align-items: center;
-            gap: 0.8mm;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+/* Photo, bordure arrondie, à droite */
+.badge-photo {
+    flex-shrink: 0;
+    width: 18mm;
+    height: 22mm;
+    border-radius: 2.4mm;
+    border: 0.4mm solid var(--primary);
+    overflow: hidden;
+    align-self: center;
+    background: #f1f5f9;
+}
 
-        .badge-bottom i { color: var(--primary); font-size: 2.1mm; }
+.badge-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
 
-        /* =====================================================================
-           IMPRESSION — une carte = une page, dimensions exactes, sans marge
-           ===================================================================== */
-        @media print {
-            @page {
-                size: 85.6mm 53.98mm;
-                margin: 0;
-            }
+/* Bandeau inférieur : contacts parents */
+.badge-bottom {
+    background: #f8fafc;
+    border-top: 0.3mm solid #e2e8f0;
+    padding: 1.3mm 3mm;
+    display: flex;
+    justify-content: space-between;
+    gap: 2mm;
+    font-size: 2.1mm;
+    color: #475569;
+    position: relative;
+    z-index: 1;
+}
 
-            html, body {
-                margin: 0;
-                padding: 0;
-                background: #fff;
-            }
+.badge-bottom .contact-item {
+    display: flex;
+    align-items: center;
+    gap: 0.8mm;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
-            .no-print {
-                display: none !important;
-            }
+.badge-bottom i { color: var(--primary); font-size: 2.1mm; }
 
-            .badges-grid {
-                display: block;
-                gap: 0;
-            }
+/* =====================================================================
+   RESPONSIVE (écran uniquement — l'impression garde toujours la taille
+   CR80 exacte, cf. @media print plus bas, jamais affectée par ces règles)
+   ===================================================================== */
 
-            .badge-wrapper {
-                page-break-after: always;
-                break-after: page;
-            }
+/* Barre d'outils : empilement complet sous 700px, sinon les boutons
+   se retrouvaient compressés ou débordaient sur les petits écrans */
+@media (max-width: 700px) {
+    .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        position: static; /* évite les soucis d'un sticky empilé en colonne sur mobile */
+    }
 
-            .badge-wrapper:last-child {
-                page-break-after: auto;
-                break-after: auto;
-            }
+    .toolbar h1 {
+        text-align: center;
+        font-size: 1rem;
+    }
 
-            .badge-card {
-                width: 85.6mm;
-                height: 53.98mm;
-                box-shadow: none;
-                border-radius: 0;
-            }
+    .toolbar .selection-count {
+        text-align: center;
+    }
 
-            /* Un badge décoché pour l'impression sélective */
-            .badge-wrapper.print-hide {
-                display: none !important;
-            }
-        }
+    .toolbar .btn {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+/* Corps de page : centre la grille de badges et réduit le padding sur
+   petit écran pour laisser un maximum de place à la prévisualisation */
+@media (max-width: 700px) {
+    body {
+        padding: 0.75rem;
+    }
+
+    .badges-grid {
+        justify-content: center;
+    }
+}
+
+/* Sur très petit écran, la carte de 85,6mm (~324px) peut approcher ou
+   dépasser la largeur utile de l'écran : on réduit sa taille d'aperçu
+   à l'écran uniquement (la taille réelle à l'impression n'est jamais
+   affectée, cf. @media print qui la fixe explicitement en mm) */
+@media (max-width: 380px) {
+    :root {
+        --card-w: 82vw;
+        --card-h: calc(82vw * 53.98 / 85.6);
+    }
+}
+
+/* =====================================================================
+   IMPRESSION — une carte = une page, dimensions exactes, sans marge
+   ===================================================================== */
+@media print {
+    @page {
+        size: 85.6mm 53.98mm;
+        margin: 0;
+    }
+
+    html, body {
+        margin: 0;
+        padding: 0;
+        background: #fff;
+    }
+
+    /* Force l'impression des background-color/background-image, que le
+       navigateur ignore par défaut tant que la case "Graphiques
+       d'arrière-plan" n'est pas cochée dans la boîte de dialogue
+       d'impression. C'est ce qui faisait disparaître le bandeau coloré
+       et le filigrane. Le titre reste noir par ailleurs (voir plus
+       haut), donc même si un poste n'applique pas ce réglage, le badge
+       reste lisible. */
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    .no-print {
+        display: none !important;
+    }
+
+    .badges-grid {
+        display: block;
+        gap: 0;
+    }
+
+    .badge-wrapper {
+        page-break-after: always;
+        break-after: page;
+    }
+
+    .badge-wrapper:last-child {
+        page-break-after: auto;
+        break-after: auto;
+    }
+
+    .badge-card {
+        width: 85.6mm;
+        height: 53.98mm;
+        box-shadow: none;
+        border-radius: 0;
+    }
+
+    /* Un badge décoché pour l'impression sélective */
+    .badge-wrapper.print-hide {
+        display: none !important;
+    }
+}

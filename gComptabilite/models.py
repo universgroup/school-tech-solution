@@ -82,10 +82,10 @@ class Caisse(models.Model):
     montant_encaisse = models.DecimalField(max_digits=20, decimal_places=2)
     type_operation = models.CharField(max_length=15, default=TYPE_OPERATION_CAISSE_CHOICES[1][0], choices=TYPE_OPERATION_CAISSE_CHOICES)
     date_operation = models.DateField(null=True) # Il se peut qu'en pratique l'opération soit effectuée avant la date du jour. Donc, l'utilisateur a besoin de saisir
-    solde_actuel = models.DecimalField(max_digits=20, decimal_places=2, default=0)
+    solde_actuel = models.DecimalField(max_digits=25, decimal_places=2, default=0)
     heure_operation = models.TimeField(auto_now=True)
     qte = models.IntegerField(null=True, default=0)
-    pua = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
+    pua = models.DecimalField(max_digits=15, decimal_places=2, default=0, null=True)
     provient = models.CharField(max_length=50, null=True)
     destine = models.CharField(max_length=50, null=True)
     observ = models.CharField(max_length=90, null=True)
@@ -103,13 +103,13 @@ class Caisse(models.Model):
 
 class EtatPaiementTranche(models.Model):
     anneescolaire = models.ForeignKey(AnneeScolaire, on_delete=models.CASCADE)
-    inscription = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
-    m_rabais = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
-    premiere_tranche = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
-    deuxieme_tranche = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
-    troisieme_tranche = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True) # Pour le cas des écoles qui font payer jusqu'à trois tranches
-    fscolarite = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
-    reste_a_payer = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
+    inscription = models.DecimalField(max_digits=20, decimal_places=2, default=0, null=True)
+    m_rabais = models.DecimalField(max_digits=20, decimal_places=2, default=0, null=True)
+    premiere_tranche = models.DecimalField(max_digits=20, decimal_places=2, default=0, null=True)
+    deuxieme_tranche = models.DecimalField(max_digits=20, decimal_places=2, default=0, null=True)
+    troisieme_tranche = models.DecimalField(max_digits=20, decimal_places=2, default=0, null=True) # Pour le cas des écoles qui font payer jusqu'à trois tranches
+    fscolarite = models.DecimalField(max_digits=20, decimal_places=2, default=0, null=True)
+    reste_a_payer = models.DecimalField(max_digits=20, decimal_places=2, default=0, null=True)
     date_paie = models.DateField()
     mode_paie = models.CharField(max_length=50, choices=MODE_PAIEMENT_CHOICES, default=MODE_PAIEMENT_CHOICES[0][0], null=True)
     mateleve = models.ForeignKey(Eleve, on_delete=models.CASCADE)
