@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <title>BADGES DES ELEVES DE {% if classe_nom %} — {{ classe_nom }}{% endif %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    {% if logo_ecole %}
+    <link rel="icon" type="image/png" href="{{ logo_ecole.url }}">
+    {% endif %}
+
+    <link rel="stylesheet" href="{% static 'assets/plugins/fontawesome-free/css/all.min.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/badge.css' %}">
+
+    {% if logo_ecole %}
+    <!-- Filigrane discret du logo en fond de carte (voir .has-logo-watermark
+         dans badge.css) — même technique que le filigrane de login.html :
+         l'URL du logo est injectée ici en variable CSS, car badge.css est
+         un fichier statique qui n'a pas accès aux variables Django. -->
+    <style>
+        :root {
+            --logo-watermark-url: url("{{ logo_ecole.url }}");
+        }
+    </style>
+    {% endif %}
+
+</head>
+<body>
+
+    <!-- ============ Barre d'outils (écran uniquement) ============ -->
+    <div class="toolbar no-print">
+        <h1><i class="fas fa-id-card mr-2"></i>&nbsp;BADGES DES ELEVES DE {% if classe_nom %} — {{ classe_nom }}{% endif %}</h1>
+        <span class="selection-count"><span id="nbSelectionnes">0</span> Sélectionné(s)</span>
+        <button type="button" class="btn btn-select-all" onclick="toutSelectionner()">Tout sélectionner</button>
+        <button type="button" class="btn btn-select-none" onclick="toutDeselectionner()">Tout désélectionner</button>
+        <button type="button" class="btn btn-print-selection" onclick="imprimerSelection()">
+            Imprimer la sélection &nbsp; <i class="fas fa-print mr-1"></i>
+        </button>
+    </div>
+
+    <!-- ============ Grille des badges ============ -->
+    <div class="badges-grid">
+
+        {% for eleve in eleves %}
+            <div class="badge-wrapper" data-badge-id="badge-{{ forloop.counter }}">
+
+                <input type="checkbox" class="badge-checkbox no-print" checked
+                    onchange="majCompteur()" title="Inclure ce badge dans l'impression groupée">
+
+                <button type="button" class="badge-print-single no-print"
+                        onclick="imprimerUnSeul('badge-{{ forloop.counter }}')"
+                        title="Imprimer uniquement ce badge">
+                    <i class="fas fa-print"></i>
+                </button>
+
+                <div class="badge-card{% if logo_ecole %} has-logo-watermark{% endif %}" id="badge-{{ forloop.counter }}">
+
+                    <!-- Bandeau supérieur : logo + nom école -->
+                    <div class="badge-top">
+                        <div class="ecole-logo">
+                            {% if logo_ecole %}
+                            <img src="{{ logo_ecole.url }}" alt="Logo">
+                            {% else %}
+                            <i class="fas fa-school" style="font-size:2.6mm;"></i>
+                            {% endif %}
+                        </div>
+                        <div style="min-width:0;">
+                            <div class="ecole-nom">{{ nom_ecole|default:"Nom de l'école" }}</div>
+                            <div class="badge-label">Carte d'identité scolaire</div>
+                        </div>
+                    </div>
+
+                    <!-- Corps : infos à gauche, photo à droite -->
+                    <div class="badge-body">
+                        <div class="badge-infos">
+                            <div class="badge-nom">{{ eleve.mateleve.nom }}</div>
+                            <div class="badge-prenom">{{ eleve.mateleve.prenom }}</div>
+                            <div class="badge-matricule">N° {{ eleve.mateleve.matricule }}</div>
+                            <div class="badge-meta">
+                                <strong>Classe :</strong> {{ eleve.idclasse }}<br>
+                                <strong>Année :</strong> {{ eleve.annee_scolaire }}
+                            </div>
+                        </div>
+
+                        <div class="badge-photo">
+                            {% if eleve.mateleve.photo_eleve %}
+                            <img src="{{ eleve.mateleve.photo_eleve.url }}" alt="Photo élève">
+                            {% else %}
+                            <img src="{% static 'assets/dist/img/avatar.png' %}" alt="Photo élève">
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Bandeau inférieur : contacts -->
+                    <div class="badge-bottom">
+                        <div class="contact-item">
+                            <i class="fas fa-phone"></i>
+                            <span>Père : {{ eleve.mateleve.contact_pere|default:"—" }}</span>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-phone"></i>
+                            <span>Mère : {{ eleve.mateleve.contact_mere|default:"—" }}</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        {% empty %}
+        <p class="no-print">Aucun élève à afficher.</p>
+        {% endfor %}
+
+    </div>
+
+    <script>
+        function majCompteur() {
+            const total = document.querySelectorAll('.badge-checkbox:checked').length;
+            document.getElementById('nbSelectionnes').textContent = total;
+        }
+
+        function toutSelectionner() {
+            document.querySelectorAll('.badge-checkbox').forEach(cb => cb.checked = true);
+            majCompteur();
+        }
+
+        function toutDeselectionner() {
+            document.querySelectorAll('.badge-checkbox').forEach(cb => cb.checked = false);
+            majCompteur();
+        }
+
+        // Imprime uniquement les badges dont la case est cochée
+        function imprimerSelection() {
+            document.querySelectorAll('.badge-wrapper').forEach(wrapper => {
+                const checkbox = wrapper.querySelector('.badge-checkbox');
+                if (!checkbox.checked) {
+                    wrapper.classList.add('print-hide');
+                }
+            });
+            window.print();
+        }
+
+        // Imprime un seul badge, quel que soit l'état des cases à cocher
+        function imprimerUnSeul(badgeId) {
+            document.querySelectorAll('.badge-wrapper').forEach(wrapper => {
+                if (wrapper.getAttribute('data-badge-id') !== badgeId) {
+                    wrapper.classList.add('print-hide');
+                }
+            });
+            window.print();
+        }
+
+        // Après impression (ou annulation), on restaure l'affichage complet
+        window.addEventListener('afterprint', function () {
+            document.querySelectorAll('.badge-wrapper').forEach(wrapper => {
+                wrapper.classList.remove('print-hide');
+            });
+        });
+
+        majCompteur();
+    </script>
+
+</body>
+</html>

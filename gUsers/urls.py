@@ -33,4 +33,8 @@ urlpatterns = [
 
     path('mot-de-passe/modifier/', PasswordChangeCustomView.as_view(), name='password_change'),
     path('mot-de-passe/modifie/', PasswordChangeDoneCustomView.as_view(), name='password_change_done'),
+
+    # pour l'exportation du tableau de progression des paiements de scolarité en Excel et PDF
+    path('paiements/export/excel/', export_paiements_excel, name='export_paiements_excel'),
+    path('paiements/export/pdf/', export_paiements_pdf, name='export_paiements_pdf'),
 ]

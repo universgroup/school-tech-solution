@@ -111,6 +111,7 @@
               <li><a href="{% url 'listepaiemensuel' %}" class="dropdown-item">Etat des paiements</a></li>
               <li><a href="#" class="dropdown-item">Etat des inscriptions/reinscriptions</a></li>              
               <li><a href="{% url 'registrematricule' %}" class="dropdown-item">Registre de matriculation</a></li>
+              <li><a href="{% url 'listebadgeseleves' %}" class="dropdown-item">Cartes / Badges élèves</a></li>
             </ul>
       </li>
 
@@ -436,6 +437,13 @@
                 <a href="{% url 'registrematricule' %}" class="nav-link" title="Permet de consulter le registre de matriculation de l'école">
                   <i class="fas fa-list-ol">&nbsp;</i>
                   <p>Registre de matricule</p>                  
+                </a>
+              </li>
+
+              <li class="nav-item">
+                <a href="{% url 'listebadgeseleves' %}" class="nav-link" title="Permet de générer et imprimer les badges élèves, par classe ou individuellement">
+                  <i class="fas fa-id-card"> &nbsp;</i>
+                  <p>Cartes/Badges élèves</p>                  
                 </a>
               </li>
               
@@ -805,8 +813,12 @@
    <div class="row g-3">
       <div class="col-12 col-md-8">
           <div class="card-dash">
-              <div class="card-header-dash">
+              <div class="card-header-dash align-items-center">
                   <h5><i class="fas fa-chart-line text-primary-custom mr-2"></i>Évolution des inscriptions</h5>
+                  <!-- Bouton export pour la ligne -->
+                  <button type="button" class="btn-export-chart" title="Exporter en PNG" data-chart="evolution-inscriptions">
+                      <i class="fas fa-download mr-1"></i> Exporter(PNG)
+                  </button>
               </div>
               <div class="chart-container">
                   <canvas id="chartLine"></canvas>
@@ -815,9 +827,25 @@
       </div>
       <div class="col-12 col-md-4">
           <div class="card-dash">
-              <div class="card-header-dash">
-                  <h5><i class="fas fa-chart-bar text-primary-custom mr-2"></i>Répartition par classe</h5>
+              <div class="card-header-dash align-items-start flex-wrap">
+                <!-- Groupe titre + légende forcé à gauche -->
+                <div class="d-flex flex-column style-header-left">
+                    <h5><i class="fas fa-chart-bar text-primary-custom mr-2"></i>Répartition par classe</h5>
+                    
+                    <!-- Nouvelle légende HTML moderne repositionnée en dessous-->
+                    <div class="chart-legend-custom">
+                        <span class="legend-item"><span class="dot maternelle"></span>Maternelle</span>
+                        <span class="legend-item"><span class="dot primaire"></span>Primaire</span>
+                        <span class="legend-item"><span class="dot college"></span>Collège</span>
+                        <span class="legend-item"><span class="dot lycee"></span>Lycée</span>
+                    </div>
+                </div>  
+                <!-- Bouton export pour les barres placé à droite -->
+                <button type="button" class="btn-export-chart" title="Exporter en PNG" data-chart="repartition-classes">
+                    <i class="fas fa-download mr-1"></i> Exporter(PNG)
+                </button> 
               </div>
+
               <div class="chart-container">
                   <canvas id="chartBar"></canvas>
               </div>
@@ -827,51 +855,67 @@
 
     <!-- Ligne du tableau de progression des paiements -->
   <div class="row mt-4">
-      <div class="col-12">
-          <div class="card-dash">
-              <div class="card-header-dash">
-                  <h5>
-                      <i class="fas fa-coins text-primary-custom mr-2"></i>
-                      Progression des paiements de scolarité
-                  </h5>
-              </div>
-              <div class="table-responsive">
-                  <table class="table table-dash">
-                      <thead>
-                          <tr>
-                              <th>Classe</th>
-                              <th>Montant attendu</th>
-                              <th>Première tranche</th>
-                              <th>Deuxième tranche</th>
-                              <th>Montant restant</th>
-                          </tr>
-                      </thead>
-                      <tbody>
-                          {% for ligne in progression_paiements %}
-                              <tr>
-                                <td>{{ ligne.nom_classe }}</td>
-                                <td>{{ ligne.montant_attendu|floatformat:'2g' }}</td>
-                                <td>{{ ligne.premiere_tranche|floatformat:'2g' }}</td>
-                                <td>{{ ligne.deuxieme_tranche|floatformat:'2g' }}</td>
-                                <td>{{ ligne.montant_restant|floatformat:'2g' }}</td>
-                              </tr>
-                          {% empty %}
-                              <tr><td colspan="5" class="text-center">Aucune donnée de paiement disponible.</td></tr>
-                          {% endfor %}
-                      </tbody>
-                      <tfoot>
-                        <tr>
-                          <th>Classe</th>
-                          <th>Montant attendu</th>
-                          <th>Première tranche</th>
-                          <th>Deuxième tranche</th>
-                          <th>Montant restant</th>
-                        </tr>
+      <div class="col-12">          
+        <div class="card-dash">
+            <div class="card-header-dash">
+                <h5><i class="fas fa-coins text-primary-custom mr-2"></i>Progression des paiements de scolarité</h5>
+                <div>
+                  <a href="{% url 'export_paiements_excel' %}" class="btn btn-sm btn-outline-success" title="Exporter en Excel">
+                      <i class="fas fa-file-excel"></i> Exporter Excel
+                  </a>
+                  <a href="{% url 'export_paiements_pdf' %}" class="btn btn-sm btn-outline-danger" title="Exporter en PDF">
+                      <i class="fas fa-file-pdf"></i> Exporter PDF
+                  </a>
+                </div>
+           </div>
 
-                      </tfoot>
-                  </table>
-              </div>
+          <div class="table-paiements-wrapper">
+        
+                <table class="table-paiements">
+                    <thead>
+                        <tr>
+                            <th>Classe</th>
+                            <th class="text-right">Montant attendu</th>
+                            <th class="text-right">1ère tranche</th>
+                            <th class="text-right">2ème tranche</th>
+                            <th class="text-right">Montant restant</th>
+                        </tr>
+                    </thead>
+                <tbody>
+                {% for ligne in progression_paiements %}
+                <tr>
+                    <td class="classe-nom">{{ ligne.nom_classe }}</td>
+                    <td class="text-right montant">{{ ligne.montant_attendu|floatformat:0 }} GNF</td>
+                    <td class="text-right montant">{{ ligne.premiere_tranche|floatformat:0 }} GNF</td>
+                    <td class="text-right montant">{{ ligne.deuxieme_tranche|floatformat:0 }} GNF</td>
+                    <td class="text-right">
+                        {% if ligne.montant_restant <= 0 %}
+                        <span class="badge-solde solde-zero"><i class="fas fa-check-circle"></i> Soldé</span>
+                        {% else %}
+                        <span class="badge-solde solde-restant">{{ ligne.montant_restant|floatformat:0 }} GNF</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr class="empty-state">
+                    <td colspan="5">Aucune donnée de paiement disponible.</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+                {% if totaux_paiements %}
+                <tfoot>
+                    <tr>
+                        <td>TOTAUX</td>
+                        <td class="text-right">{{ totaux_paiements.montant_attendu|floatformat:0 }} GNF</td>
+                        <td class="text-right">{{ totaux_paiements.premiere_tranche|floatformat:0 }} GNF</td>
+                        <td class="text-right">{{ totaux_paiements.deuxieme_tranche|floatformat:0 }} GNF</td>
+                        <td class="text-right">{{ totaux_paiements.montant_restant|floatformat:0 }} GNF</td>
+                    </tr>
+                </tfoot>
+                {% endif %}
+            </table>
           </div>
+        </div>
       </div>
   </div>      
 
@@ -968,60 +1012,186 @@
 <!-- Chart.js (graphiques du tableau de bord) -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
+<!-- Librairie permettant d'exporter les graphiques au format image (PNG) en intégralité -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+
   {{ inscriptions_labels|json_script:"inscriptions-labels-data" }}
   {{ inscriptions_data|json_script:"inscriptions-values-data" }}
   {{ classes_labels|json_script:"classes-labels-data" }}
+  {{ classes_cycles|json_script:"classes-cycles-data" }}
   {{ classes_data|json_script:"classes-values-data" }}
 
   <script>
 
+
         $(function () {
-            const inscriptionsLabels = JSON.parse(document.getElementById('inscriptions-labels-data').textContent);
-            const inscriptionsData   = JSON.parse(document.getElementById('inscriptions-values-data').textContent);
-            const classesLabels      = JSON.parse(document.getElementById('classes-labels-data').textContent);
-            const classesData        = JSON.parse(document.getElementById('classes-values-data').textContent);
+              const inscriptionsLabels = JSON.parse(document.getElementById('inscriptions-labels-data').textContent);
+              const inscriptionsData   = JSON.parse(document.getElementById('inscriptions-values-data').textContent);
+              const classesLabels      = JSON.parse(document.getElementById('classes-labels-data').textContent);
+              const classesCycles      = JSON.parse(document.getElementById('classes-cycles-data').textContent);
+              const classesData        = JSON.parse(document.getElementById('classes-values-data').textContent);
 
-            new Chart(document.getElementById('chartLine').getContext('2d'), {
-                type: 'line',
-                data: {
-                    labels: inscriptionsLabels,
-                    datasets: [{
-                        label: 'Nouvelles inscriptions',
-                        data: inscriptionsData,
-                        borderColor: '#4f46e5',
-                        backgroundColor: 'rgba(79,70,229,0.08)',
-                        borderWidth: 3,
-                        tension: 0.4,
-                        fill: true
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#475569' } }, y: { ticks: { color: '#475569' }}
-                                  } }
-            });
+              // --- Configuration globale (Polices & Infobulles) ---
+              Chart.defaults.font.family = "'Plus Jakarta Sans', 'Inter', 'Segoe UI', sans-serif";
+              Chart.defaults.plugins.tooltip.padding = 12;
+              Chart.defaults.plugins.tooltip.backgroundColor = '#1e293b';
+              Chart.defaults.plugins.tooltip.titleFont = { size: 13, weight: '600' };
+              Chart.defaults.plugins.tooltip.bodyFont = { size: 13 };
+              Chart.defaults.plugins.tooltip.borderRadius = 8;
+              Chart.defaults.plugins.tooltip.boxPadding = 6;
 
-            new Chart(document.getElementById('chartBar').getContext('2d'), {
-                type: 'bar',
-                data: {
-                    labels: classesLabels,
-                    datasets: [{
-                        label: 'Effectifs',
-                        data: classesData,
-                        backgroundColor: '#4f46e5',
-                        borderRadius: 6
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#475569' } }, y: { ticks: { color: '#475569' }}
-                                  } }
+              // --- 1. GRAPHIQUE EN LIGNE (Évolution des inscriptions) ---
+              const ctxLine = document.getElementById('chartLine').getContext('2d');
+              const gradientLine = ctxLine.createLinearGradient(0, 0, 0, 240);
+              gradientLine.addColorStop(0, 'rgba(79, 70, 229, 0.35)');
+              gradientLine.addColorStop(1, 'rgba(79, 70, 229, 0.00)');
+
+              new Chart(ctxLine, {
+                  type: 'line',
+                  data: {
+                      labels: inscriptionsLabels,
+                      datasets: [{
+                          label: 'Inscriptions cumulées',
+                          data: inscriptionsData,
+                          borderColor: '#4f46e5',
+                          backgroundColor: gradientLine,
+                          borderWidth: 3,
+                          tension: 0.38,
+                          fill: true,
+                          pointBackgroundColor: '#ffffff',
+                          pointBorderColor: '#4f46e5',
+                          pointBorderWidth: 2,
+                          pointRadius: 4,
+                          pointHoverRadius: 6,
+                          pointHoverBorderWidth: 3,
+                          pointHoverBackgroundColor: '#ffffff'
+                      }]
+                  },
+                  options: { 
+                      responsive: true, 
+                      maintainAspectRatio: false,
+                      // Configuration de l'animation d'apparition progressive (courbe fluide)
+                      animation: {
+                          duration: 1200,
+                          easing: 'easeOutQuart'
+                      },
+                      plugins: { legend: { display: false } }, 
+                      scales: { 
+                          x: { 
+                              grid: { display: false }, 
+                              ticks: { color: '#64748b', font: { weight: '500' } } 
+                          }, 
+                          y: { 
+                              grid: { color: '#e2e8f0', drawBorder: false }, 
+                              ticks: { color: '#64748b', font: { weight: '500' }, stepSize: 1 }
+                          } 
+                      } 
+                  }
+              });
+
+                  // --- 2. LOGIQUE DE COULEURS DYNAMIQUES (Basée sur votre CYCLE_CHOICES) ---
+            const barColors = classesCycles.map(cycle => {
+                switch(cycle) {
+                    case 'Maternelle':
+                        return '#f59e0b'; // Ambre / Jaune
+                    case 'Primaire':
+                        return '#10b981'; // Émeraude / Vert
+                    case 'Collège':
+                        return '#8b5cf6'; // Violet
+                    case 'Lycée SM':
+                    case 'Lycée SS':
+                    case 'Lycée SE':
+                        return '#ec4899'; // Rose moderne pour tous les Lycées
+                    default:
+                        return '#4f46e5'; // Indigo par défaut (ex: 'Sélectionnez')
+                    }
+                });
+
+              // --- 3. GRAPHIQUE EN BARRES (Répartition par classe avec couleurs & animations) ---
+              const ctxBar = document.getElementById('chartBar').getContext('2d');
+
+              new Chart(ctxBar, {
+                  type: 'bar',
+                  data: {
+                      labels: classesLabels,
+                      datasets: [{
+                          label: 'Élèves',
+                          data: classesData,
+                          backgroundColor: barColors, // Application du tableau de couleurs généré dynamiquement
+                          borderRadius: 8,
+                          borderSkipped: false,
+                          barThickness: 24
+                      }]
+                  },
+                  options: { 
+                      responsive: true, 
+                      maintainAspectRatio: false, 
+                      // Animation progressive barre par barre (effet de décalage très moderne)
+                      animation: {
+                          duration: 1000,
+                          easing: 'easeOutCubic',
+                          delay: (context) => context.dataIndex * 80 // Délai de 80ms entre l'apparition de chaque barre
+                      },
+                      plugins: { legend: { display: false } }, 
+                      scales: { 
+                          x: { 
+                              grid: { display: false }, 
+                              ticks: { color: '#64748b', font: { weight: '500' } } 
+                          }, 
+                          y: { 
+                              grid: { color: '#f1f5f9', drawBorder: false }, 
+                              ticks: { color: '#64748b', font: { weight: '500' }, stepSize: 1 }
+                          } 
+                      } 
+                  }
+              });
+          });
+
+
+      $("#fmodalphotoprofil")[0].addEventListener("reset", function(){
+      // On laisse le navigateur vider le input file lui-même,
+      // mais on doit remettre l'aperçu à zéro manuellement
+      setTimeout(resetPhotoProfilZone, 0);
+      });
+
+
+      document.addEventListener('DOMContentLoaded', function () {
+      document.querySelectorAll('.btn-export-chart').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            const card = this.closest('.card-dash');
+            const filename = this.dataset.chart || 'graphique';
+            exportCardAsPng(card, this, filename);
+                });
             });
         });
 
+      function exportCardAsPng(cardElement, buttonElement, filename) {
+            // On désactive le bouton pendant l'export et on masque celui qui a été cliqué
+            const originalHtml = buttonElement.innerHTML;
+            buttonElement.disabled = true;
+            buttonElement.style.visibility = 'hidden';
 
-        $("#fmodalphotoprofil")[0].addEventListener("reset", function(){
-        // On laisse le navigateur vider le input file lui-même,
-        // mais on doit remettre l'aperçu à zéro manuellement
-        setTimeout(resetPhotoProfilZone, 0);
-    });
-
+            html2canvas(cardElement, {
+                backgroundColor: '#ffffff', // évite un fond transparent/noir
+                scale: 2,                   // export en haute résolution (retina)
+                useCORS: true               // au cas où des images externes seraient présentes
+            }).then(function (canvas) {
+                const dateStr = new Date().toISOString().slice(0, 10);
+                const link = document.createElement('a');
+                link.download = `${filename}_${dateStr}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            }).catch(function (err) {
+                console.error('Erreur export PNG :', err);
+                alert("Une erreur est survenue lors de l'export du graphique.");
+            }).finally(function () {
+                buttonElement.disabled = false;
+                buttonElement.style.visibility = 'visible';
+                buttonElement.innerHTML = originalHtml;
+            });
+        }
 
 
   </script>

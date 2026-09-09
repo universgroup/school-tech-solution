@@ -27,4 +27,8 @@ urlpatterns = [
     path('rapportlisteinscrits/', rapportlisteinscrits, name='rapportlisteinscrits'),
     path('rapportlistereinscrits/', rapportlistereinscrits, name='rapportlistereinscrits'),
     path('rapportmatriculation/',rapportlistegenerale, name='rapportmatriculation'),
+    path('listebadgeseleves/',afficher_listebadge_eleves, name='listebadgeseleves'),
+    path('chargerlisteelevebadge',chargerlisteelevebadge,name='chargerlisteelevebadge'),
+    path('imprimerbadgesclasse/', imprimerbadgesclasse, name='imprimerbadgesclasse'),
+    path('imprimerbadgeeleve/<int:pk>', imprimerbadgeeleve, name='imprimerbadgeeleve'),
 ]

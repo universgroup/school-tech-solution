@@ -105,6 +105,7 @@
               <li><a href="{% url 'listepaiemensuel' %}" class="dropdown-item">Etat des paiements</a></li>
               <li><a href="#" class="dropdown-item">Etat des inscriptions/reinscriptions</a></li>              
               <li><a href="{% url 'registrematricule' %}" class="dropdown-item">Registre de matriculation</a></li>
+              <li><a href="{% url 'listebadgeseleves' %}" class="dropdown-item">Cartes / Badges élèves</a></li>
             </ul>
       </li>
 
@@ -430,6 +431,13 @@
                 <a href="{% url 'registrematricule' %}" class="nav-link" title="Permet de consulter le registre de matriculation de l'école">
                   <i class="fas fa-list-ol">&nbsp;</i>
                   <p>Registre de matricule</p>                  
+                </a>
+              </li>
+
+              <li class="nav-item">
+                <a href="{% url 'listebadgeseleves' %}" class="nav-link" title="Permet de générer et imprimer les badges élèves, par classe ou individuellement">
+                  <i class="fas fa-id-card"> &nbsp;</i>
+                  <p>Cartes/Badges élèves</p>                  
                 </a>
               </li>
               
@@ -1098,10 +1106,10 @@
                                 {% if depense.has_previous %}
 
                                 <li class="page-item">
-                                    <a class="page-link" href="?page=1">1</a>
+                                    <a class="page-link" href="?page=1&{{ query_string }}">1</a>
                                 </li>
                                 <li class="page-item">
-                                    <a class="page-link" href="?page={{ depense.previous_page_number }}"><i class="fa-solid fa-backward fa-sm"></i>&nbsp; Précédent</a>
+                                    <a class="page-link" href="?page={{ depense.previous_page_number }}&{{ query_string }}"><i class="fa-solid fa-backward fa-sm"></i>&nbsp; Précédent</a>
                                 </li>
 
                                 {% endif %}
@@ -1115,11 +1123,11 @@
                                 {% if depense.has_next %}
 
                                 <li class="page-item">
-                                    <a class="page-link" href="?page={{ depense.next_page_number }}"><i class="fa-solid fa-forward fa-sm"></i>&nbsp; Suivant</a>
+                                    <a class="page-link" href="?page={{ depense.next_page_number }}&{{ query_string }}"><i class="fa-solid fa-forward fa-sm"></i>&nbsp; Suivant</a>
                                 </li>
 
                                 <li class="page-item">
-                                    <a class="page-link" href="?page={{ depense.paginator.num_pages }}"><i class="fa-solid fa-step-forward fa-sm"></i>&nbsp; Dernier</a>
+                                    <a class="page-link" href="?page={{ depense.paginator.num_pages }}&{{ query_string }}"><i class="fa-solid fa-step-forward fa-sm"></i>&nbsp; Dernier</a>
                                 </li>
 
                                 {% endif %}

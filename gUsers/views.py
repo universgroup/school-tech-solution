@@ -13,12 +13,25 @@ from django.db.models import Sum, Count, Q
 from django.db.models.functions import TruncMonth
 from django.contrib.auth.mixins import LoginRequiredMixin # Pour les vues basées sur une classe, on utilise LoginRequiredMixin (pas le décorateur @login_required)
 
+from django.http import HttpResponse
+from openpyxl import Workbook
+from openpyxl.styles import Font, PatternFill, Alignment
+
+from reportlab.lib.pagesizes import A4, landscape
+from reportlab.lib.units import cm
+from reportlab.lib import colors
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet
+
+
 from gComptabilite.models import EtatPaiementTranche, Caisse, TYPE_OPERATION_CAISSE_CHOICES
 from gAdministration.models import Ecole, Classe
 from gEleve.models import Inscription, ETAT_INSCRIPTION, SEXE_ELEVE_CHOICES
 from gComptabilite.views import affichersoldecaisse
 from gPersonnel.models import Personnel
 from core.context_processor import annee_scolaire_actuelle
+from core.services import get_progression_paiements, get_totaux_paiements
+
 from gUsers.decorators import action_requise
 
 Utilisateur = get_user_model()
@@ -116,6 +129,7 @@ t_entree = 0
 t_sortie = 0
 solde = 0
 montant_restant = 0
+annee_encours = {}
 
 @login_required
 def home(request):
@@ -129,11 +143,12 @@ def home(request):
     global t_sortie
     global solde
     global montant_restant
+    global annee_encours
 
     liste_eleves = {}
     liste_personnel = {}
     liste_operation = {}
-    annee_encours = {}
+    totaux_paiements = {}
 
     liste_eleves = Inscription.objects.none()
     liste_personnel = Personnel.objects.none()
@@ -187,47 +202,8 @@ def home(request):
     
 
     # ---------- 1. Tableau "Progression des paiements de scolarité" ----------
-    paiements_par_classe = (
-        EtatPaiementTranche.objects
-        .filter(anneescolaire__descript_annee__exact=annee_encours)
-        .values('idclasse_id')
-        .annotate(
-            premiere_tranche=Sum('premiere_tranche'),
-            deuxieme_tranche=Sum('deuxieme_tranche'),
-            # montant_restant=Sum('reste_a_payer'),
-        )
-    )
-    paiements_dict = {p['idclasse_id']: p for p in paiements_par_classe} # Permet de faire le cumul des paiements des différentes tranches par classe durant l'année scolaire encours (cle=p[idclasse_id]: valeur=p)
-
-    # Permet de calculer l'effectif par classe durant l'année scolaire actuelle
-    inscrits_par_classe = (
-        Inscription.objects
-        .filter(annee_scolaire__descript_annee__exact=annee_encours)
-        .values('idclasse_id', 'idclasse__nom_classe')
-        .annotate(nb_eleves=Count('id'))
-        .order_by('idclasse_id')
-    )
-
-    frais_par_classe = {c.id: (c.frais_scolarite or 0) for c in Classe.objects.all()} # Permet de créer un dictionnaire comportant les frais de scolarité annuels de chaque classe (cle=c.id, valeur=c.frais_scolarite)
-
-    progression_paiements = []
-    for ligne in inscrits_par_classe:
-        classe_id = ligne['idclasse_id']
-        montant_attendu = frais_par_classe.get(classe_id, 0) * ligne['nb_eleves']
-
-        paiement = paiements_dict.get(classe_id, {})
-        premiere = paiement.get('premiere_tranche') or 0
-        deuxieme = paiement.get('deuxieme_tranche') or 0
-        montant_restant = montant_attendu - (premiere + deuxieme)
-        
-        
-        progression_paiements.append({
-            'nom_classe': ligne['idclasse__nom_classe'],
-            'montant_attendu': montant_attendu,
-            'premiere_tranche': premiere,
-            'deuxieme_tranche': deuxieme,
-            'montant_restant': montant_restant
-        })
+    progression_paiements = get_progression_paiements(annee_encours)
+    totaux_paiements = get_totaux_paiements(progression_paiements)
 
     # ---------- 2. Graphique "Évolution des inscriptions" ----------
     inscriptions_mois = (
@@ -251,16 +227,18 @@ def home(request):
     repartition_classes = (
         Inscription.objects
         .filter(annee_scolaire__descript_annee__exact=annee_encours)
-        .values('idclasse__nom_classe')
+        .values('idclasse__nom_classe', 'idclasse__idcycle__cycle')
         .annotate(total=Count('id'))
         .order_by('idclasse_id')
     )
 
     context = {
         'progression_paiements': progression_paiements,
+        'totaux_paiements': totaux_paiements,
         'inscriptions_labels': labels_inscriptions,         
         'inscriptions_data': cumul_inscriptions,
         'classes_labels': [c['idclasse__nom_classe'] for c in repartition_classes],
+        'classes_cycles': [c['idclasse__idcycle__cycle'] for c in repartition_classes],
         'classes_data': [c['total'] for c in repartition_classes],
         'total_inscrits': eff_total_inscrits,
         'total_garcons': eff_garcon,
@@ -319,3 +297,115 @@ class PasswordChangeCustomView(LoginRequiredMixin, PasswordChangeView):
 
 class PasswordChangeDoneCustomView(LoginRequiredMixin, PasswordChangeDoneView):
     template_name = 'gUsers/password_change_done.html'
+
+
+@login_required
+def export_paiements_excel(request):
+
+    annee_encours = annee_scolaire_actuelle(request)['annee_scolaire']
+    progression_paiements = get_progression_paiements(annee_encours) if annee_encours is not None else []
+    totaux = get_totaux_paiements(progression_paiements) if progression_paiements else None
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Progression des paiements"
+
+    entetes = ["Classe", "Montant attendu", "1ère tranche", "2ème tranche", "Montant restant"]
+    ws.append(entetes)
+
+    for cell in ws[1]:
+        cell.font = Font(bold=True, color="FFFFFF")
+        cell.fill = PatternFill(start_color="4F46E5", end_color="4F46E5", fill_type="solid")
+        cell.alignment = Alignment(horizontal="center")
+
+    for ligne in progression_paiements:
+        ws.append([
+            ligne['nom_classe'],
+            float(ligne['montant_attendu']),
+            float(ligne['premiere_tranche']),
+            float(ligne['deuxieme_tranche']),
+            float(ligne['montant_restant']),
+        ])
+
+    if totaux is not None:
+        ws.append([
+            "TOTAUX",
+            float(totaux['montant_attendu']),
+            float(totaux['premiere_tranche']),
+            float(totaux['deuxieme_tranche']),
+            float(totaux['montant_restant']),
+        ])
+        ligne_total = ws.max_row
+        for cell in ws[ligne_total]:
+            cell.font = Font(bold=True, color="FFFFFF")
+            cell.fill = PatternFill(start_color="0F172A", end_color="0F172A", fill_type="solid")
+
+    for colonne in ws.columns:
+        largeur = max(len(str(cell.value)) for cell in colonne if cell.value is not None) + 4
+        ws.column_dimensions[colonne[0].column_letter].width = largeur
+
+    response = HttpResponse(
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+    response['Content-Disposition'] = 'attachment; filename="tableau_progression_paiements.xlsx"'
+    wb.save(response)
+    return response
+
+
+@login_required
+def export_paiements_pdf(request):
+
+    annee_encours = annee_scolaire_actuelle(request)['annee_scolaire']
+    progression_paiements = get_progression_paiements(annee_encours) if annee_encours is not None else []
+    totaux = get_totaux_paiements(progression_paiements) if progression_paiements else None
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="tableau_progression_paiements.pdf"'
+
+    doc = SimpleDocTemplate(response, pagesize=landscape(A4), topMargin=1.5*cm, bottomMargin=1.5*cm)
+    styles = getSampleStyleSheet()
+    story = [Paragraph("Progression des paiements de scolarité", styles['Title']), Spacer(1, 12)]
+
+    data = [["Classe", "Montant attendu", "1ère tranche", "2ème tranche", "Montant restant"]]
+    for ligne in progression_paiements:
+        data.append([
+            ligne['nom_classe'],
+            f"{ligne['montant_attendu']:,.0f}",
+            f"{ligne['premiere_tranche']:,.0f}",
+            f"{ligne['deuxieme_tranche']:,.0f}",
+            f"{ligne['montant_restant']:,.0f}",
+        ])
+
+    ligne_total_index = None
+    if totaux is not None:
+        data.append([
+            "TOTAUX",
+            f"{totaux['montant_attendu']:,.0f}",
+            f"{totaux['premiere_tranche']:,.0f}",
+            f"{totaux['deuxieme_tranche']:,.0f}",
+            f"{totaux['montant_restant']:,.0f}",
+        ])
+        ligne_total_index = len(data) - 1  # dernière ligne du tableau
+
+    table = Table(data, repeatRows=1)
+    style_commands = [
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#4f46e5')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#dddddd')),
+        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f7f7fb')]),
+        ('ALIGN', (1, 0), (-1, -1), 'RIGHT'),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+    ]
+
+    if ligne_total_index is not None:
+        style_commands += [
+            ('BACKGROUND', (0, ligne_total_index), (-1, ligne_total_index), colors.HexColor('#0f172a')),
+            ('TEXTCOLOR', (0, ligne_total_index), (-1, ligne_total_index), colors.white),
+            ('FONTNAME', (0, ligne_total_index), (-1, ligne_total_index), 'Helvetica-Bold'),
+        ]
+
+    table.setStyle(TableStyle(style_commands))
+    story.append(table)
+    doc.build(story)
+    return response

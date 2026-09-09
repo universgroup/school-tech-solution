@@ -163,13 +163,14 @@ body {
     align-items: center;
     gap: 0.4rem;
 }
+
 /* Côté droit : formulaire */
 .login-form {
     flex: 1 1 50%;
     padding: 3rem 2.8rem;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start; /* le <form> gère lui-même sa répartition verticale, voir plus bas */
     background: #fff;
     position: relative;      /* ajouté pour le logo en filigrane */
     overflow: hidden;        /* ajouté pour le logo en filigrane */
@@ -197,6 +198,21 @@ body {
 .login-form form {
     position: relative;
     z-index: 1;
+}
+
+/* Le <form> occupe tout l'espace restant sous .form-header, ce qui permet
+   de pousser le bouton "Se connecter" tout en bas via margin-top: auto
+   ci-dessous — comble l'espace vide qui restait après la suppression des
+   boutons de connexion sociale, sans casser le centrage des champs entre
+   eux (ils restent groupés en haut du formulaire). */
+.login-form form {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.login-form .btn-login {
+    margin-top: auto;
 }
 
 /* Filigrane logo - côté brand (gauche, violet) */

@@ -150,21 +150,21 @@ EDITION DES INFORMATIONS DE L'ECOLE
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="id_delai_t1">Date limite première tranche</label>
-                            <input type="text" id="id_delai_t1" name="delai_tranche1" value="{{ecole.delai_tranche1}}" class="form-control">
+                            <input type="text" id="id_delai_t1" name="delai_tranche1" value="{{ecole.delai_tranche1|date:'Y-n-j'}}" class="form-control">
                         </div>
                     </div>
 
                     <div class="col-md-3">
                         <div class="form-group">
                             <label for="id_delai_t2">Date limite deuxième tranche</label>
-                            <input type="text" id="id_delai_t2" name="delai_tranche2" value="{{ecole.delai_tranche2}}" class="form-control">
+                            <input type="text" id="id_delai_t2" name="delai_tranche2" value="{{ecole.delai_tranche2|date:'Y-n-j'}}" class="form-control">
                         </div>
                     </div>
 
                     <div class="col-md-3">
                         <div class="form-group">
                             <label for="id_delai_reinscription">Date début reinscription</label>
-                            <input type="text" id="id_delai_reinscription" name="delai_reinscription" value="{{ecole.delai_reinscription}}" class="form-control">
+                            <input type="text" id="id_delai_reinscription" name="delai_reinscription" value="{{ecole.delai_reinscription|date:'Y-n-j'}}" class="form-control">
                         </div>
                     </div>
 
