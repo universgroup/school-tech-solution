@@ -1714,6 +1714,7 @@ def generer_rapport_matriculation(request, data_ecole, annee, titre_rapport):
     return buffer
 
 # Gestion des Badges des eleves
+@action_requise('menu_eleves')
 def afficher_listebadge_eleves(request):
 
     ane = None
@@ -1723,7 +1724,7 @@ def afficher_listebadge_eleves(request):
 
     return render(request,'gEleve/liste_badges_eleves.html',dict(ans=ane, cycles=cycl))
 
-
+@action_requise('menu_eleves')
 def imprimerbadgesclasse(request):
     """
     Rend badges_eleves.html avec tous les élèves inscrits dans la classe
@@ -1767,7 +1768,7 @@ def imprimerbadgesclasse(request):
     }
     return render(request, 'gEleve/badge_eleve.html', context)
 
-
+@action_requise('menu_eleves')
 def imprimerbadgeeleve(request, pk):
     """
     Rend badges_eleves.html avec un seul élève (impression individuelle).
