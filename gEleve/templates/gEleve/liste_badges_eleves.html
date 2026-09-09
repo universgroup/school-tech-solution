@@ -183,7 +183,7 @@ GENERATION DES BADGES
 
         // Remplace le pk factice "0" de l'URL modèle par l'ID d'inscription réel.
         var baseUrl = $("#fbadges").attr("data-eleve-badge-url-base");
-        var url = baseUrl.replace(/0\/?$/, idinscription + '/');
+        var url = baseUrl.replace(/0\/?$/, idinscription);
         window.open(url, '_blank');
     });
 
