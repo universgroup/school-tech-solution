@@ -10,6 +10,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         aujourdhui = datetime.now().date()
+        self.stdout.write(f"[Annonce réinscription] Vérification au {aujourdhui}")
 
         ecole = Ecole.objects.first()
         if not ecole or not ecole.delai_reinscription:
@@ -17,7 +18,7 @@ class Command(BaseCommand):
             return
 
         if ecole.delai_reinscription != aujourdhui:
-            self.stdout.write("Ce n'est pas encore le jour de l'ouverture des réinscriptions.")
+            self.stdout.write(f"Ce n'est pas encore le jour des reinscriptions configuré : {ecole.delai_reinscription}).")
             return
 
         eleves = Eleve.objects.all()   # tous les élèves, puisque la date est globale à l'école, pas par année
