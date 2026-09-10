@@ -77,6 +77,11 @@
                             <div class="badge-nom">{{ eleve.mateleve.nom }}</div>
                             <div class="badge-prenom">{{ eleve.mateleve.prenom }}</div>
                             <div class="badge-matricule">N° {{ eleve.mateleve.matricule }}</div>
+                            <div class="badge-filiation">
+                                    {% if eleve.mateleve.sexe_eleve == 'M' %}Fils{% else %}Fille{% endif %}
+                                    de <strong>{{ eleve.mateleve.pere|default:"—" }}</strong>
+                                    et <strong>{{ eleve.mateleve.mere|default:"—" }}</strong>
+                            </div>
                             <div class="badge-meta">
                                 <strong>Classe :</strong> {{ eleve.idclasse }}<br>
                                 <strong>Année :</strong> {{ eleve.annee_scolaire }}

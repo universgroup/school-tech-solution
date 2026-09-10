@@ -10,6 +10,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         aujourdhui = datetime.now().date()
         date_seuil = aujourdhui + timedelta(days=7)
+        self.stdout.write(f"[Rappels paiement] Vérification au {aujourdhui} (seuil = {date_seuil})")
 
         ecole = Ecole.objects.first()
         if not ecole:
@@ -19,10 +20,14 @@ class Command(BaseCommand):
         # --- Tranche 1 ---
         if ecole.delai_tranche1 == date_seuil:
             self.envoyer_rappel_tranche(champ_paye='premiere_tranche', champ_montant='tranche1', nom_tranche_libelle="1ère tranche", date_limite=ecole.delai_tranche1)
+        else:
+            self.stdout.write(f"Tranche 1 : pas de rappel aujourd'hui (délai configuré : {ecole.delai_tranche1}).")
 
         # --- Tranche 2 ---
         if ecole.delai_tranche2 == date_seuil:
             self.envoyer_rappel_tranche(champ_paye='deuxieme_tranche', champ_montant='tranche2', nom_tranche_libelle="2ème tranche", date_limite=ecole.delai_tranche2)
+        else:
+            self.stdout.write(f"Tranche 2 : pas de rappel aujourd'hui (délai configuré : {ecole.delai_tranche2}).")
 
 
     def envoyer_rappel_tranche(self, champ_paye, champ_montant, nom_tranche_libelle, date_limite):

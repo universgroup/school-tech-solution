@@ -276,6 +276,23 @@ body {
     letter-spacing: 0.03em;
 }
 
+.badge-filiation {
+    margin-top: 0.8mm;
+    font-size: 2.2mm;
+    font-style: italic;
+    color: #334155;
+    line-height: 1.4;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.badge-filiation strong {
+    font-weight: 700;
+    font-style: normal;
+    color: #1e293b;
+}
+
 .badge-meta {
     margin-top: 1mm;
     font-size: 2.3mm;
@@ -290,20 +307,24 @@ body {
 
 /* Photo, bordure arrondie, à droite */
 .badge-photo {
-    flex-shrink: 0;
-    width: 18mm;
-    height: 22mm;
-    border-radius: 2.4mm;
-    border: 0.4mm solid var(--primary);
+    width: 22mm;
+    height: 27mm;
+    border-radius: 2.2mm;
     overflow: hidden;
-    align-self: center;
-    background: #f1f5f9;
+    border: 0.35mm solid var(--primary);
+    box-shadow: 0 0.6mm 1.5mm rgba(0, 0, 0, 0.18);
+    background: #f1f5f9; /* visible en attendant le chargement / si image manquante */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
 }
 
 .badge-photo img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: cover;      /* recadre au lieu de déformer */
+    object-position: center top; /* privilégie le visage en haut du cadre */
     display: block;
 }
 
