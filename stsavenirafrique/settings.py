@@ -24,6 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config('SECRET_KEY')
 
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
@@ -207,6 +208,9 @@ EMAIL_USE_SSL = config('EMAIL_USE_SSL', cast=bool)
 EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = f"GS Ecole les Champions <{config('EMAIL_HOST_USER')}>"
+
+# API des SMS
+# SMS_API_KEY = os.environ.get('SMS_API_KEY')
 
 # À la fin de votre fichier settings.py
 

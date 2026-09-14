@@ -728,8 +728,8 @@
               <!-- /.card-header -->
 
             <div class="card-body">
-              <table id="idliste_users" class="table table-bordered table-striped">
-                <thead class="table-success">
+              <table id="idliste_users" class="dt-school">
+                <thead>
                 
                     <tr>
                             <th>Nom utilisateur</th>
@@ -744,6 +744,21 @@
                             <th>Date connexion</th>
                             <th>ID User</th>
                             <th class="no-export">Actions</th>
+                    </tr>
+
+                    <tr class="filters">
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
                     </tr>
 
                 </thead>
@@ -970,59 +985,100 @@
 
 
 <script>
+
   $(function () {
-    $("#idliste_users").DataTable({
-      "paging": true,
-      "lengthChange": true,
-      "lengthMenu": [10, 25, 50, 100],
-      "ordering": true,
-      "info": true,
-      "responsive": true,
-      "autoWidth": true,
-      "dom": //'Blfrtip',   // B = Boutons, placés juste au-dessus du tableau, avant l/f (longueur/recherche)
-            "<'row'<'col-sm-6'l><'col-sm-6'f>>" +   // ligne 1 : longueur (gauche) + recherche (droite)
-            "<'row'<'col-sm-12 text-right export-buttons-row'B>>" +  // ligne 2 : boutons Excel/PDF, alignés à droite
-            "rt" +                                   // r = processing, t = le tableau lui-même
-            "<'row'<'col-sm-5'i><'col-sm-7'p>>",     // ligne finale : info + pagination
-      "buttons": [
-            {
-              extend: 'excelHtml5',
-              text: '<i class="fa fa-file-excel"></i> Export Excel',
-              titleAttr: 'Télécharger la liste des comptes utilisateurs au format Excel',
-              className: 'btn btn-success btn-sm mr-1',
-              title: 'Liste des utilisateurs',
-              exportOptions: {
-                      columns: ':not(.no-export)',                      
-                  }
-            },
-            {
-              extend: 'pdfHtml5',
-              text: '<i class="fa fa-file-pdf"></i> Export PDF',
-              titleAttr: 'Télécharger la liste des comptes utilisateurs au format PDF',
-              className: 'btn btn-danger btn-sm',
-              title: 'Liste des utilisateurs',
-              orientation: 'landscape',
-              pageSize: 'A4',
-              exportOptions: {
-                    columns: ':not(.no-export)',
-                }
-            }
-          ],
-      "language": {
-        "paginate": {
-          "previous": "Précédent",
-          "next": "Suivant"
-        },
-        "search": "Rechercher :",
-        "info": "Affichage de  _START_ à _END_ sur _TOTAL_ entrées",
-        "lengthMenu": "Afficher  _MENU_ entrées",
-        "buttons": {
-        "excel": "Excel",
-        "pdf": "PDF"
-          }
+      function initDataTableAvecFiltres(selector) {
+          var table = $(selector).DataTable({
+              "paging": false,
+              "lengthChange": true,
+              "lengthMenu": [10, 25, 50, 100],
+              "ordering": true,
+              "info": true,
+              "scrollX":true,
+              "scrollCollapse": true,
+              "searching": true,
+              "autoWidth": true,
+              "orderCellsTop": true,   // empêche le tri de cibler la ligne de filtres
+              "language": {
+                    "search": "Recherche globale :",
+                    "searchPlaceholder": "Rechercher une valeur...",
+                    "info": "Affichage de _START_ à _END_ sur _TOTAL_ éléments",
+                    "infoEmpty": "Aucun élément à afficher",
+                    "infoFiltered": "(filtré depuis _MAX_ éléments au total)"
+              },
+              "columnDefs": [
+                    { targets: [0, 4], width: "50px" },   // Statut, Sexe
+                    { targets: [1], width: "80px" },     // Matricule
+                ],
+              "dom": //'Blfrtip',   // B = Boutons, placés juste au-dessus du tableau, avant l/f (longueur/recherche)
+              "<'row'<'col-12 col-md-6'l><'col-12 col-md-6'f>>" +   // ligne 1 : longueur (gauche) + recherche (droite)
+              "<'row'<'col-sm-12 text-right export-buttons-row'B>>" +  // ligne 2 : boutons Excel/PDF, alignés à droite
+              "rt" +                                   // r = processing, t = le tableau lui-même
+              "<'row'<'col-sm-5'i><'col-sm-7'p>>",     // ligne finale : info + pagination
+              "buttons": [
+              {
+                extend: 'excelHtml5',
+                text: '<i class="fa fa-file-excel"></i> Export Excel',
+                titleAttr: 'Télécharger la liste des comptes utilisateurs au format Excel',
+                className: 'btn btn-success btn-sm mr-1',
+                title: 'Liste des utilisateurs',
+                exportOptions: {
+                        columns: ':not(.no-export)',
+                    }
+              },
+              {
+                extend: 'pdfHtml5',
+                text: '<i class="fa fa-file-pdf"></i> Export PDF',
+                titleAttr: 'Télécharger la liste des comptes utilisateurs au format PDF',
+                className: 'btn btn-danger btn-sm',
+                title: 'Liste des utilisateurs',
+                orientation: 'landscape',
+                pageSize: 'A4',
+                exportOptions: {
+                      columns: ':not(.no-export)',
+                  },
+                  customize: function (doc) {
+                      // Force toutes les colonnes à se partager équitablement la largeur de la page
+                      doc.content[1].table.widths = Array(doc.content[1].table.body[0].length).fill('*');
+
+                      // Réduit la taille de police pour que le contenu tienne mieux
+                      doc.defaultStyle.fontSize = 2;
+                      doc.styles.tableHeader.fontSize = 3;
+
+                      // Réduit les marges de page pour gagner de la place
+                      doc.pageMargins = [10, 20, 10, 20];
+                        }
+              }
+            ]
+            });
+
+
+          // Génère un champ de recherche par colonne, sur la ligne .filters
+          table.columns().every(function (index) {
+              var column = this;
+              var cell = $(selector).find('thead tr.filters th').eq(index);
+
+              // Pas de filtre sur la colonne Actions ou toute colonne marquée no-export
+              if (cell.closest('table').find('thead tr:first th').eq(index).hasClass('no-export')) {
+                  return;
+              }
+
+              var input = $('<input type="text" placeholder="Filtrer..." />')
+                  .appendTo(cell)
+                  .on('keyup change clear', function () {
+                      if (column.search() !== this.value) {
+                          column.search(this.value).draw();
+                      }
+                  });
+          });
+
+          return table;
       }
+
+      initDataTableAvecFiltres('#idliste_users');
     });
-  });
+
+
 </script>
 
 </body>

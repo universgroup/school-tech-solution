@@ -49,13 +49,11 @@ class DeconnexionView(LogoutView):
     next_page = 'connexion'
 
 
-# def _est_directeur_general(user):
-#     return user.is_authenticated and user.est_directeur_general()
 
 
 @action_requise('menu_administration')
 def listeutilisateurs(request):
-    use = Utilisateur.objects.all().order_by('id')
+    use = Utilisateur.objects.filter(~Q(is_superuser=True)).order_by('id') # Affiche la liste de tous les utilisateurs excepté le superuser
 
     pagineuser = Paginator(use, 10)
     numpageuser = request.GET.get('page')

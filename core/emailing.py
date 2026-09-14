@@ -2,6 +2,7 @@ from django.core.mail import get_connection, EmailMultiAlternatives
 from django.template.loader import render_to_string
 from smtplib import SMTPException, SMTPServerDisconnected
 import logging
+from gAdministration.models import Ecole
 
 logger = logging.getLogger(__name__)
 
@@ -16,6 +17,9 @@ def envoyer_emails_masse(destinataires_contexte, template_html, sujet):
 
     envoyes, echecs = 0, 0
 
+    eco = Ecole.objects.first()
+    email_contact = eco.email_ecole if eco else None
+
     for email, contexte in destinataires_contexte:
         if not email:
             continue
@@ -26,6 +30,7 @@ def envoyer_emails_masse(destinataires_contexte, template_html, sujet):
                 body=contexte.get('texte_brut', ''),
                 to=[email],
                 connection=connection,
+                headers={'List-Unsubscribe': f'<mailto:{email_contact}>'} if email_contact else {},
             )
             msg.attach_alternative(html_content, "text/html")
             msg.send()

@@ -127,7 +127,7 @@ def listerecette(request):
     annee = AnneeScolaire.objects.all().order_by(
         'id')  # Permet de recuperer la liste générale des années scolaires en vue de charger la dropdown liste
 
-    paginecais = Paginator(cais, 10)
+    paginecais = Paginator(cais, 20)
     numpagecais = request.GET.get('page')
     cais = paginecais.get_page(numpagecais)
     
@@ -256,7 +256,7 @@ def recherchersituationrecette(request):
             'id')  # Permet de recuperer la liste générale des années scolaires en vue de charger la dropdown liste
 
 
-    paginecais = Paginator(recette, 10)
+    paginecais = Paginator(recette, 20)
     numpagecais = request.GET.get('page')
     recette = paginecais.get_page(numpagecais)
     return render(request, 'gComptabilite/liste_recettes.html',
@@ -349,7 +349,7 @@ def listedepense(request):
     annee = AnneeScolaire.objects.all().order_by(
         'id')  # Permet de recuperer la liste générale des années scolaires en vue de charger la dropdown liste
 
-    paginecais = Paginator(cais, 10)
+    paginecais = Paginator(cais, 20)
     numpagecais = request.GET.get('page')
     cais = paginecais.get_page(numpagecais)
     return render(request, 'gComptabilite/liste_depenses.html',
@@ -445,7 +445,7 @@ def recherchersituationdepense(request):
                 'id')  # Permet de recuperer la liste générale des années scolaires en vue de charger la dropdown liste
             
 
-    paginecais = Paginator(depense, 10)
+    paginecais = Paginator(depense, 20)
     numpagecais = request.GET.get('page')
     depense = paginecais.get_page(numpagecais)
 
@@ -1015,7 +1015,7 @@ def listepaiementmensuel(request):
     anne = AnneeScolaire.objects.all().order_by('id')
     cy = CycleScolaire.objects.all().order_by('id')
 
-    paginepaie = Paginator(listepaiemensuel, 10)
+    paginepaie = Paginator(listepaiemensuel, 20)
     numpagepaie = request.GET.get('page')
     listepaiemensuel = paginepaie.get_page(numpagepaie)
 
@@ -1082,7 +1082,7 @@ def filtrelistepaiementclasse(request):
     an = AnneeScolaire.objects.all().order_by('id')
     cy = CycleScolaire.objects.all().order_by('id')
 
-    paginepaie = Paginator(listepaieclasse, 10)
+    paginepaie = Paginator(listepaieclasse, 20)
     numpagepaie = request.GET.get('page')
     listepaieclasse = paginepaie.get_page(numpagepaie)
 

@@ -155,8 +155,8 @@ def enregistrereleve(request):
                 cy = CycleScolaire.objects.get(id=idcy)
                 el = Eleve.objects.get(matricule=mateleve)
 
-                # Je valide enfin l'inscription de l'elève enregistré
-                inscrip = Inscription(annee_scolaire=an, mateleve=el, idclasse=cl, idcycle=cy)
+                # Je valide enfin l'inscription de l'elève enregistré                
+                inscrip = Inscription(annee_scolaire=an, mateleve=el, idclasse=cl, idcycle=cy, mail_envoye_inscription=True)
                 inscrip.save()
 
                 # Ici je vais recuperer les frais d'inscription de la classe selectionnée
@@ -241,7 +241,7 @@ def registrematricule(request):
     effectif_total_garcons = liste.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[1][0]).count()
     effectif_total_filles = liste.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[2][0]).count()
 
-    pagineinscrit = Paginator(liste, 10)
+    pagineinscrit = Paginator(liste, 20)
     numpageinscrit = request.GET.get('page')
     liste = pagineinscrit.get_page(numpageinscrit)
     return render(request, 'gEleve/liste_generale_eleves.html',
@@ -388,7 +388,7 @@ def filtrelistegenerale(request):
         effectif_total_garcons = listeinsnp.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[1][0]).count()
         effectif_total_filles = listeinsnp.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[2][0]).count()
 
-        pagineinscrit = Paginator(listeinsnp, 10)
+        pagineinscrit = Paginator(listeinsnp, 20)
         numpageinscrit = request.GET.get('page')
         listeinsnp = pagineinscrit.get_page(numpageinscrit)
 
@@ -423,7 +423,7 @@ def recuinscription(request, idinsc):
                 ins.mateleve.nom, ins.mateleve.prenom,
                 ins.mateleve.tuteur, ins.mateleve.contact_pere,
                 ins.mateleve.email_pere, ins.date_inscription,
-                ins.idclasse.frais_inscription]
+                ins.idclasse.frais_inscription, ins.mail_envoye_inscription]
 
         ch  = str(data[1]).split('-')
         ane = ch[1]
@@ -596,6 +596,7 @@ def recuinscription(request, idinsc):
 
         # ── ENVOI EMAIL ──
         try:
+
             email = EmailMessage(
                 subject='Reçu d\'inscription',
                 body=f'Veuillez trouver votre reçu d\'inscription en pièce jointe.\n'
@@ -604,8 +605,10 @@ def recuinscription(request, idinsc):
                 to=[data[8]],
             )
             email.attach(f'Recu_inscription_{str(data[2])}.pdf', buffer.getvalue(), 'application/pdf')
+
             email.send()
             messages.success(request, 'Email envoyé avec succès!')
+
         except SMTPException:
             messages.warning(request, 'Erreur SMTP : impossible d\'envoyer l\'email.')
         except socket.gaierror:
@@ -991,7 +994,7 @@ def listeinscritsanneescolairecourante(request):
     effectif_total_filles = listeeleves.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[2][0]).count() # SEXE_ELEVE_CHOICES[2][0] correspond à F
 
         
-    pagineins = Paginator(listeeleves, 10)
+    pagineins = Paginator(listeeleves, 20)
     numpageins = request.GET.get('page')
     listeeleves = pagineins.get_page(numpageins)
     
@@ -1022,7 +1025,7 @@ def listereinscritsanneescolairecourante(request):
     effectif_total_garcons = listeeleves.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[1][0]).count() # SEXE_ELEVE_CHOICES[1][0] correspond à M
     effectif_total_filles = listeeleves.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[2][0]).count() # SEXE_ELEVE_CHOICES[2][0] correspond à F
     
-    pagineins = Paginator(listeeleves, 10)
+    pagineins = Paginator(listeeleves, 20)
     numpageins = request.GET.get('page')
     listeeleves = pagineins.get_page(numpageins)
     
@@ -1064,7 +1067,7 @@ def filtrelisteinscrits(request):
         effectif_total_garcons = listeinsclasse.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[1][0]).count() # SEXE_ELEVE_CHOICES[1][0] correspond à M
         effectif_total_filles = listeinsclasse.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[2][0]).count() # SEXE_ELEVE_CHOICES[2][0] correspond à F
 
-        pagineinscrit = Paginator(listeinsclasse, 10)
+        pagineinscrit = Paginator(listeinsclasse, 20)
         numpageinscrit = request.GET.get('page')
         listeinsclasse = pagineinscrit.get_page(numpageinscrit)
         
@@ -1106,7 +1109,7 @@ def filtrelistereinscrits(request):
         effectif_total_garcons = listeinsclasse.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[1][0]).count() # SEXE_ELEVE_CHOICES[1][0] correspond à M
         effectif_total_filles = listeinsclasse.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[2][0]).count() # SEXE_ELEVE_CHOICES[2][0] correspond à F
 
-        pagineinscrit = Paginator(listeinsclasse, 10)
+        pagineinscrit = Paginator(listeinsclasse, 20)
         numpageinscrit = request.GET.get('page')
         listeinsclasse = pagineinscrit.get_page(numpageinscrit)
         

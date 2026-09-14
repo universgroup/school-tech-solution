@@ -48,6 +48,7 @@ class Inscription(models.Model):
     date_inscription = models.DateField(auto_now=True)
     annee_scolaire = models.ForeignKey(AnneeScolaire, on_delete=models.CASCADE)
     etat_inscription = models.CharField(max_length=10, default=ETAT_INSCRIPTION[0][1], choices=ETAT_INSCRIPTION)
+    mail_envoye_inscription = models.BooleanField(default=False, null=True) # Me permet de gerer l'exécution multiple du code d'envoi des mails aux parents relatifs au paiement des frais d'inscription/reinscription
     mateleve = models.ForeignKey(Eleve, on_delete=models.CASCADE)
     idcycle = models.ForeignKey(CycleScolaire, on_delete=models.CASCADE, null=True)
     idclasse = models.ForeignKey(Classe, on_delete=models.CASCADE)
