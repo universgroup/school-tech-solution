@@ -112,6 +112,7 @@ class EtatPaiementTranche(models.Model):
     reste_a_payer = models.DecimalField(max_digits=20, decimal_places=2, default=0, null=True)
     date_paie = models.DateField()
     mode_paie = models.CharField(max_length=50, choices=MODE_PAIEMENT_CHOICES, default=MODE_PAIEMENT_CHOICES[0][0], null=True)
+    mail_envoye_paie = models.BooleanField(default=False, null=True) # Permet de gerer l'envoi multiple des mails aux parents pour alerter de la reception du recu de paiement
     mateleve = models.ForeignKey(Eleve, on_delete=models.CASCADE)
     idclasse = models.ForeignKey(Classe, on_delete=models.CASCADE)
     idcycle = models.ForeignKey(CycleScolaire, on_delete=models.CASCADE)

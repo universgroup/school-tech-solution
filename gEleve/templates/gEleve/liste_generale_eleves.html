@@ -783,6 +783,7 @@
               <!-- /.card-header -->
 
         <div class="card-body">
+          
             {% include 'messages.html' %}
 
         {% if listegenerale %}
@@ -1521,7 +1522,7 @@
           // Génère un champ de recherche par colonne, sur la ligne .filters
           table.columns().every(function (index) {
               var column = this;
-              var cell = $(selector).find('thead tr.filters th').eq(index);
+              var cell = $('.filters th').eq(index);
 
               // Pas de filtre sur la colonne Actions ou toute colonne marquée no-export
               if (cell.closest('table').find('thead tr:first th').eq(index).hasClass('no-export')) {

@@ -984,7 +984,7 @@ def listepaiementmensuel(request):
 
     mois = date.today()
     mois_actuel = mois.strftime('%m')
-    listepaiemensuel = EtatPaiementTranche.objects.select_related('anneescolaire','mateleve','idclasse','idcycle').filter(date_paie__month=mois_actuel).order_by('-date_paie')
+    listepaiemensuel = EtatPaiementTranche.objects.select_related('anneescolaire','mateleve','idclasse','idcycle').filter(date_paie__month=mois_actuel).order_by('idclasse','-date_paie')
 
     t_premiere_tranche = EtatPaiementTranche.objects.filter(date_paie__month=mois_actuel).aggregate(pt=Sum('premiere_tranche')) # pt correspond à la clé du dictionnaire resultant de la requếte
     t_deuxieme_tranche = EtatPaiementTranche.objects.filter(date_paie__month=mois_actuel).aggregate(dt=Sum('deuxieme_tranche')) # dt de même
@@ -1049,35 +1049,37 @@ def filtrelistepaiementclasse(request):
     listepaieclasse = {}
     listepaieclasse = EtatPaiementTranche.objects.none()
 
-    listepaieclasse = EtatPaiementTranche.objects.select_related('anneescolaire','mateleve','idclasse','idcycle').filter(Q(anneescolaire__exact=anne),Q(idclasse__exact=clas)).order_by('-date_paie')
+    if anne != '' and clas != '':
+        
+        listepaieclasse = EtatPaiementTranche.objects.select_related('anneescolaire','mateleve','idclasse','idcycle').filter(Q(anneescolaire__exact=anne),Q(idclasse__exact=clas)).order_by('idclasse','-date_paie')
 
-    t_premiere_tranche = EtatPaiementTranche.objects.select_related('anneescolaire','mateleve','idclasse','idcycle').filter(Q(anneescolaire__exact=anne),Q(idclasse__exact=clas)).aggregate(pt=Sum('premiere_tranche')) # pt correspond à la clé du dictionnaire resultant de la requếte
+        t_premiere_tranche = EtatPaiementTranche.objects.select_related('anneescolaire','mateleve','idclasse','idcycle').filter(Q(anneescolaire__exact=anne),Q(idclasse__exact=clas)).aggregate(pt=Sum('premiere_tranche')) # pt correspond à la clé du dictionnaire resultant de la requếte
 
-    t_deuxieme_tranche = EtatPaiementTranche.objects.select_related('anneescolaire','mateleve','idclasse','idcycle').filter(Q(anneescolaire__exact=anne),Q(idclasse__exact=clas)).aggregate(dt=Sum('deuxieme_tranche')) # dt de même
+        t_deuxieme_tranche = EtatPaiementTranche.objects.select_related('anneescolaire','mateleve','idclasse','idcycle').filter(Q(anneescolaire__exact=anne),Q(idclasse__exact=clas)).aggregate(dt=Sum('deuxieme_tranche')) # dt de même
 
-    t_reste_a_payer = EtatPaiementTranche.objects.select_related('anneescolaire','mateleve','idclasse','idcycle').filter(Q(anneescolaire__exact=anne),Q(idclasse__exact=clas)).aggregate(tr=Sum('reste_a_payer'))
+        t_reste_a_payer = EtatPaiementTranche.objects.select_related('anneescolaire','mateleve','idclasse','idcycle').filter(Q(anneescolaire__exact=anne),Q(idclasse__exact=clas)).aggregate(tr=Sum('reste_a_payer'))
 
-    t_paiement_annuel = EtatPaiementTranche.objects.select_related('anneescolaire','mateleve','idclasse','idcycle').filter(Q(anneescolaire__exact=anne),Q(idclasse__exact=clas)).aggregate(ta=Sum('fscolarite'))
+        t_paiement_annuel = EtatPaiementTranche.objects.select_related('anneescolaire','mateleve','idclasse','idcycle').filter(Q(anneescolaire__exact=anne),Q(idclasse__exact=clas)).aggregate(ta=Sum('fscolarite'))
 
-    if t_premiere_tranche['pt'] is not None:
-        total_tranche1 = t_premiere_tranche['pt']
-    else:
-        total_tranche1 = 0
-    
-    if t_deuxieme_tranche['dt'] is not None:
-        total_tranche2 = t_deuxieme_tranche['dt']
-    else:
-        total_tranche2 = 0
-    
-    if t_reste_a_payer['tr'] is not None:
-        total_reste_a_payer = t_reste_a_payer['tr']
-    else:
-        total_reste_a_payer = 0
+        if t_premiere_tranche['pt'] is not None:
+            total_tranche1 = t_premiere_tranche['pt']
+        else:
+            total_tranche1 = 0
+        
+        if t_deuxieme_tranche['dt'] is not None:
+            total_tranche2 = t_deuxieme_tranche['dt']
+        else:
+            total_tranche2 = 0
+        
+        if t_reste_a_payer['tr'] is not None:
+            total_reste_a_payer = t_reste_a_payer['tr']
+        else:
+            total_reste_a_payer = 0
 
-    if t_paiement_annuel['ta'] is not None:
-        total_paiement_annuel = t_paiement_annuel['ta']
-    else:
-        total_paiement_annuel = 0
+        if t_paiement_annuel['ta'] is not None:
+            total_paiement_annuel = t_paiement_annuel['ta']
+        else:
+            total_paiement_annuel = 0
 
     an = AnneeScolaire.objects.all().order_by('id')
     cy = CycleScolaire.objects.all().order_by('id')
