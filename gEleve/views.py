@@ -197,7 +197,6 @@ def enregistrereleve(request):
                 messages.success(request, 'Inscription validée avec succès')
 
                 # Je vide les champs après validation
-
                 formeleve = FormEleve()
                 forminscrit = FormInscription()
 
@@ -205,6 +204,14 @@ def enregistrereleve(request):
                 idi = Inscription.objects.latest(
                 'id')  # Cette instruction permet de recuperer le dernier record suivant l'id
                 lastid = idi.id  # Permet de recuperer l'ID de ce dernier record
+
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({
+                        'success': True,
+                        'recu_url': reverse('recuinscription', args=(lastid,))
+                        })
+
+               
                 return HttpResponseRedirect(reverse('recuinscription',
                                                 args=(
                                                     lastid,)))  # Je redirige l'utilisateur vers l'impression du recu d'inscription (PDF)
@@ -602,7 +609,7 @@ def recuinscription(request, idinsc):
                 email = EmailMessage(
                     subject='Reçu d\'inscription',
                     body=f'Veuillez trouver votre reçu d\'inscription en pièce jointe.\n'
-                        f'Cordialement.\nLa Comptabilité : {data_ecole[8]}',
+                        f'Cordialement.\nLe Service Scolarité : {data_ecole[8]}',
                     from_email=settings.DEFAULT_FROM_EMAIL,
                     to=[data[8]],
                 )
@@ -741,6 +748,13 @@ def validerreinscription(request):
         idi = Inscription.objects.latest(
             'id')  # Cette instruction permet de recuperer le dernier record suivant l'id
         lastid = idi.id  # Permet de recuperer l'ID de ce dernier record
+
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                            return JsonResponse({
+                                'success': True,
+                                'recu_url': reverse('recureinscription', args=(lastid,))
+                                })
+        
         return HttpResponseRedirect(reverse('recureinscription',
                                             args=(
                                                 lastid,)))  # Je redirige l'utilisateur vers l'impression du recu d'inscription (PDF)
@@ -949,7 +963,7 @@ def recureinscription(request, idinsc):
                 email = EmailMessage(
                     subject='Reçu de réinscription',
                     body=f'Veuillez trouver votre reçu de réinscription en pièce jointe.\n'
-                        f'Cordialement.\nLa Comptabilité : {data_ecole[8]}',
+                        f'Cordialement.\nLe Service Scolarité : {data_ecole[8]}',
                     from_email=settings.DEFAULT_FROM_EMAIL,
                     to=[data[8]],
                 )

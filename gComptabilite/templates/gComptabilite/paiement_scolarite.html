@@ -289,6 +289,8 @@
     // Cette fonction permet d'afficher les infos de l'élève sélectionné y compris ses paiements de scolarité
     $("#cbomateleve").change(function(){
         var matricule = $(this).val();
+        var id_annee = $('#cboanne').val(); // Je recupère ici la valeur (ID) de l'année scolaire
+        var idclasse = $('#cboclasse').val(); // Je recupère ici la valeur (ID) de la classe selectionnée
 
         // Si aucun élève n'est sélectionné (liste vide ou valeur "" après
         // un .trigger('change')), on réinitialise les champs plutôt que
@@ -301,7 +303,7 @@
         
         $.ajax({
                 url: "{% url 'chargerinfoelevepaie' %}",
-                data: {'matricule': matricule },
+                data: {'matricule': matricule, 'anneesco':id_annee, 'id_classe':idclasse},
                 success: function(data){
                     $("#idprenom").val(data.prenom);
                     $("#idnom").val(data.nom);
@@ -324,6 +326,36 @@
                     }
                 });
     });
+
+
+    document.getElementById('fscolarite').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+            // Ouverture immédiate, dans le contexte du clic → pas bloqué par le navigateur
+            const nouvelOnglet = window.open('', '_blank');
+
+            const formData = new FormData(this);
+
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {'X-Requested-With': 'XMLHttpRequest'}
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    nouvelOnglet.location.href = data.recu_url;
+                    // Ici : rester sur la page, afficher un message, réinitialiser le formulaire, etc.
+                } else {
+                    nouvelOnglet.close();
+                    alert(data.error || "Une erreur est survenue.");
+                }
+            })
+            .catch(() => {
+                nouvelOnglet.close();
+                alert("Erreur réseau, veuillez réessayer.");
+            });
+        });
 
 </script>
 
