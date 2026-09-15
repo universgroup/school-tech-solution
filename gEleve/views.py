@@ -155,7 +155,7 @@ def enregistrereleve(request):
                 cy = CycleScolaire.objects.get(id=idcy)
                 el = Eleve.objects.get(matricule=mateleve)
 
-                # Je valide enfin l'inscription de l'elève enregistré
+                # Je valide enfin l'inscription de l'elève enregistré                
                 inscrip = Inscription(annee_scolaire=an, mateleve=el, idclasse=cl, idcycle=cy)
                 inscrip.save()
 
@@ -241,7 +241,7 @@ def registrematricule(request):
     effectif_total_garcons = liste.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[1][0]).count()
     effectif_total_filles = liste.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[2][0]).count()
 
-    pagineinscrit = Paginator(liste, 10)
+    pagineinscrit = Paginator(liste, 20)
     numpageinscrit = request.GET.get('page')
     liste = pagineinscrit.get_page(numpageinscrit)
     return render(request, 'gEleve/liste_generale_eleves.html',
@@ -363,7 +363,7 @@ def filtrelistegenerale(request):
         effectif_total_garcons = listeins.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[1][0]).count()
         effectif_total_filles = listeins.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[2][0]).count()
 
-        pagineinscrit = Paginator(listeins, 10)
+        pagineinscrit = Paginator(listeins, 20)
         numpageinscrit = request.GET.get('page')
         listeins = pagineinscrit.get_page(numpageinscrit)
 
@@ -376,7 +376,7 @@ def filtrelistegenerale(request):
         effectif_total_garcons = listeinsclasse.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[1][0]).count()
         effectif_total_filles = listeinsclasse.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[2][0]).count()
 
-        pagineinscrit = Paginator(listeinsclasse, 10)
+        pagineinscrit = Paginator(listeinsclasse, 20)
         numpageinscrit = request.GET.get('page')
         listeinsclasse = pagineinscrit.get_page(numpageinscrit)
 
@@ -388,7 +388,7 @@ def filtrelistegenerale(request):
         effectif_total_garcons = listeinsnp.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[1][0]).count()
         effectif_total_filles = listeinsnp.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[2][0]).count()
 
-        pagineinscrit = Paginator(listeinsnp, 10)
+        pagineinscrit = Paginator(listeinsnp, 20)
         numpageinscrit = request.GET.get('page')
         listeinsnp = pagineinscrit.get_page(numpageinscrit)
 
@@ -595,25 +595,32 @@ def recuinscription(request, idinsc):
         buffer.seek(0)
 
         # ── ENVOI EMAIL ──
-        try:
-            email = EmailMessage(
-                subject='Reçu d\'inscription',
-                body=f'Veuillez trouver votre reçu d\'inscription en pièce jointe.\n'
-                     f'Cordialement.\nLa Comptabilité : {data_ecole[8]}',
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                to=[data[8]],
-            )
-            email.attach(f'Recu_inscription_{str(data[2])}.pdf', buffer.getvalue(), 'application/pdf')
-            email.send()
-            messages.success(request, 'Email envoyé avec succès!')
-        except SMTPException:
-            messages.warning(request, 'Erreur SMTP : impossible d\'envoyer l\'email.')
-        except socket.gaierror:
-            messages.warning(request, 'Pas de connexion internet. Email non envoyé.')
-        except TimeoutError:
-            messages.warning(request, 'Délai de connexion dépassé. Email non envoyé.')
-        except Exception as e:
-            messages.warning(request, f'Erreur inattendue : {str(e)}')
+
+        if not ins.mail_envoye_inscription: # Verifie si l'email n'a pas encore été envoyé alors il y procède sinon pas d'envoi de mail
+            try:
+            
+                email = EmailMessage(
+                    subject='Reçu d\'inscription',
+                    body=f'Veuillez trouver votre reçu d\'inscription en pièce jointe.\n'
+                        f'Cordialement.\nLa Comptabilité : {data_ecole[8]}',
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    to=[data[8]],
+                )
+                email.attach(f'Recu_inscription_{str(data[2])}.pdf', buffer.getvalue(), 'application/pdf')
+                email.send()
+                messages.success(request, 'Email envoyé avec succès!')
+
+                ins.mail_envoye_inscription = True # Je mets le champ mail_envoye a True pour empecher la prochaine fois d'imprimer le recu
+                ins.save(update_fields=['mail_envoye_inscription']) # Je valide enfin la mise à jour
+
+            except SMTPException:
+                messages.warning(request, 'Erreur SMTP : impossible d\'envoyer l\'email.')
+            except socket.gaierror:
+                messages.warning(request, 'Pas de connexion internet. Email non envoyé.')
+            except TimeoutError:
+                messages.warning(request, 'Délai de connexion dépassé. Email non envoyé.')
+            except Exception as e:
+                messages.warning(request, f'Erreur inattendue : {str(e)}')
 
         buffer.seek(0)
         return FileResponse(buffer, as_attachment=False, filename=f'Recu_inscription_{str(data[2])}.pdf', content_type='application/pdf')
@@ -703,6 +710,8 @@ def validerreinscription(request):
         eps.mateleve = el
         eps.inscription = frais
         eps.idclasse = cl
+        eps.idcycle = idcy
+        eps.date_paie = date.today()
         eps.save()
 
         # Je vais enregistrer les frais ainsi validés dans la caisse
@@ -715,6 +724,7 @@ def validerreinscription(request):
         cais.anscolaire = an
         cais.categ_depense = CATEGORIE_RECETTE_CHOICES[1][1]
         cais.solde_actuel = Decimal(soldecaisse) + Decimal(frais)
+        cais.date_operation = date.today() # Recupère la date du système en YYYY-MM-dd
         cais.save()
 
         # Ici je vais enregistrer l'evenement dans la table Historique
@@ -933,25 +943,32 @@ def recureinscription(request, idinsc):
         buffer.seek(0)
 
         # ── ENVOI EMAIL ──
-        try:
-            email = EmailMessage(
-                subject='Reçu de réinscription',
-                body=f'Veuillez trouver votre reçu de réinscription en pièce jointe.\n'
-                     f'Cordialement.\nLa Comptabilité : {data_ecole[8]}',
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                to=[data[8]],
-            )
-            email.attach(f'Recu_reinscription_{str(data[2])}.pdf', buffer.getvalue(), 'application/pdf')
-            email.send()
-            messages.success(request, 'Email envoyé avec succès!')
-        except SMTPException:
-            messages.warning(request, 'Erreur SMTP : impossible d\'envoyer l\'email.')
-        except socket.gaierror:
-            messages.warning(request, 'Pas de connexion internet. Email non envoyé.')
-        except TimeoutError:
-            messages.warning(request, 'Délai de connexion dépassé. Email non envoyé.')
-        except Exception as e:
-            messages.warning(request, f'Erreur inattendue : {str(e)}')
+
+        if not ins.mail_envoye_inscription:
+            try:
+                email = EmailMessage(
+                    subject='Reçu de réinscription',
+                    body=f'Veuillez trouver votre reçu de réinscription en pièce jointe.\n'
+                        f'Cordialement.\nLa Comptabilité : {data_ecole[8]}',
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    to=[data[8]],
+                )
+                email.attach(f'Recu_reinscription_{str(data[2])}.pdf', buffer.getvalue(), 'application/pdf')
+                email.send()
+                messages.success(request, 'Email envoyé avec succès!')
+
+                ins.mail_envoye_inscription = True
+                ins.save(update_fields=['mail_envoye_inscription'])
+
+               
+            except SMTPException:
+                messages.warning(request, 'Erreur SMTP : impossible d\'envoyer l\'email.')
+            except socket.gaierror:
+                messages.warning(request, 'Pas de connexion internet. Email non envoyé.')
+            except TimeoutError:
+                messages.warning(request, 'Délai de connexion dépassé. Email non envoyé.')
+            except Exception as e:
+                messages.warning(request, f'Erreur inattendue : {str(e)}')
 
         buffer.seek(0)
         return FileResponse(buffer, as_attachment=False, filename=f'Recu_reinscription_{str(data[2])}.pdf', content_type='application/pdf')
@@ -991,7 +1008,7 @@ def listeinscritsanneescolairecourante(request):
     effectif_total_filles = listeeleves.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[2][0]).count() # SEXE_ELEVE_CHOICES[2][0] correspond à F
 
         
-    pagineins = Paginator(listeeleves, 10)
+    pagineins = Paginator(listeeleves, 20)
     numpageins = request.GET.get('page')
     listeeleves = pagineins.get_page(numpageins)
     
@@ -1022,7 +1039,7 @@ def listereinscritsanneescolairecourante(request):
     effectif_total_garcons = listeeleves.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[1][0]).count() # SEXE_ELEVE_CHOICES[1][0] correspond à M
     effectif_total_filles = listeeleves.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[2][0]).count() # SEXE_ELEVE_CHOICES[2][0] correspond à F
     
-    pagineins = Paginator(listeeleves, 10)
+    pagineins = Paginator(listeeleves, 20)
     numpageins = request.GET.get('page')
     listeeleves = pagineins.get_page(numpageins)
     
@@ -1064,7 +1081,7 @@ def filtrelisteinscrits(request):
         effectif_total_garcons = listeinsclasse.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[1][0]).count() # SEXE_ELEVE_CHOICES[1][0] correspond à M
         effectif_total_filles = listeinsclasse.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[2][0]).count() # SEXE_ELEVE_CHOICES[2][0] correspond à F
 
-        pagineinscrit = Paginator(listeinsclasse, 10)
+        pagineinscrit = Paginator(listeinsclasse, 20)
         numpageinscrit = request.GET.get('page')
         listeinsclasse = pagineinscrit.get_page(numpageinscrit)
         
@@ -1106,7 +1123,7 @@ def filtrelistereinscrits(request):
         effectif_total_garcons = listeinsclasse.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[1][0]).count() # SEXE_ELEVE_CHOICES[1][0] correspond à M
         effectif_total_filles = listeinsclasse.filter(mateleve__sexe_eleve=SEXE_ELEVE_CHOICES[2][0]).count() # SEXE_ELEVE_CHOICES[2][0] correspond à F
 
-        pagineinscrit = Paginator(listeinsclasse, 10)
+        pagineinscrit = Paginator(listeinsclasse, 20)
         numpageinscrit = request.GET.get('page')
         listeinsclasse = pagineinscrit.get_page(numpageinscrit)
         

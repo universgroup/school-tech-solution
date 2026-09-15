@@ -2,14 +2,20 @@
 <html lang="fr">
 <body style="font-family: Arial, sans-serif;">
     <div style="max-width:600px; margin:auto; padding:20px;">
-        <h2 style="color:#c0392b; font-weight: bold;">Rappel de paiement</h2>
+        <h2 style="color:#36b9ec; font-weight: bold;">Rappel de paiement</h2>
         <p>Cher parent,</p>
         <p>Nous vous informons que la date limite de paiement de la <strong>{{ nom_tranche }}</strong> pour <strong>{{ nom_eleve }}</strong> ({{ classe }}) est fixée au <strong>{{ date_limite }}</strong>.</p>
-        <p>Montant restant à payer : <strong style="color:#c0392b; font-weight: bold;">{{ reste_a_payer }} GNF</strong>.</p>
+        <p>Montant restant à payer : <strong style="color:#da5c4e; font-weight: bold;">{{ reste_a_payer }} GNF</strong>.</p>
         <p>Merci de procéder au règlement avant cette date pour éviter toute pénalité.</p>
 
         <hr style="border:none; border-top:1px solid #ddd; margin:20px 0;">
-        <p style="color:#0f0f0f; font-size:12px;">{{ nom_ecole }} — Ce message est envoyé automatiquement, merci de ne pas y répondre directement.</p>
+        <p style="color:#0f0f0f; font-size:11px;">
+            
+            {{ nom_ecole }} — {{ ire }}{% if bp %}, BP : {{ bp }}{% endif %}<br>
+            Tél : {{ contact }}{% if email_ecole %} — {{ email_ecole }}{% endif %}<br>            
+            
+            — Ce message est envoyé automatiquement, merci de ne pas y répondre directement.
+        </p>
 
     </div>
 </body>

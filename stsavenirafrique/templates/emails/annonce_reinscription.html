@@ -8,7 +8,13 @@
         <p>Nous vous invitons à vous rapprocher du service scolarité pour finaliser la réinscription dans les meilleurs délais.</p>
         
         <hr style="border:none; border-top:1px solid #ddd; margin:20px 0;">
-        <p style="color:#0f0f0f; font-size:12px;">{{ nom_ecole }} — Ce message est envoyé automatiquement, merci de ne pas y répondre directement.</p>
+        <p style="color:#0f0f0f; font-size:11px;">
+            
+            {{ nom_ecole }} — {{ ire }}{% if bp %}, BP : {{ bp }}{% endif %}<br>
+            Tél : {{ contact }}{% if email_ecole %} — {{ email_ecole }}{% endif %}<br>
+            
+            — Ce message est envoyé automatiquement, merci de ne pas y répondre directement.
+        </p>
 
     </div>
 </body>

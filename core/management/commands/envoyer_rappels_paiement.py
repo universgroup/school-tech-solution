@@ -1,6 +1,8 @@
 from django.core.management.base import BaseCommand
 from datetime import datetime, timedelta # timedelta est une classe qui permet de calculer la durée entre deux dates
 from core.emailing import envoyer_emails_masse
+# from core.sms import envoyer_sms_masse
+
 from gAdministration.models import Ecole
 from gComptabilite.models import EtatPaiementTranche
 
@@ -19,22 +21,23 @@ class Command(BaseCommand):
 
         # --- Tranche 1 ---
         if ecole.delai_tranche1 == date_seuil:
-            self.envoyer_rappel_tranche(champ_paye='premiere_tranche', champ_montant='tranche1', nom_tranche_libelle="1ère tranche", date_limite=ecole.delai_tranche1)
+            self.envoyer_rappel_tranche(ecole,champ_paye='premiere_tranche', champ_montant='tranche1', nom_tranche_libelle="1ère tranche", date_limite=ecole.delai_tranche1)
         else:
             self.stdout.write(f"Tranche 1 : pas de rappel aujourd'hui (délai configuré : {ecole.delai_tranche1}).")
 
         # --- Tranche 2 ---
         if ecole.delai_tranche2 == date_seuil:
-            self.envoyer_rappel_tranche(champ_paye='deuxieme_tranche', champ_montant='tranche2', nom_tranche_libelle="2ème tranche", date_limite=ecole.delai_tranche2)
+            self.envoyer_rappel_tranche(ecole,champ_paye='deuxieme_tranche', champ_montant='tranche2', nom_tranche_libelle="2ème tranche", date_limite=ecole.delai_tranche2)
         else:
             self.stdout.write(f"Tranche 2 : pas de rappel aujourd'hui (délai configuré : {ecole.delai_tranche2}).")
 
 
-    def envoyer_rappel_tranche(self, champ_paye, champ_montant, nom_tranche_libelle, date_limite):
+    def envoyer_rappel_tranche(self, ecole, champ_paye, champ_montant, nom_tranche_libelle, date_limite):
     # Toutes les données nécessaires en une seule requête (mateleve + idclasse pour le montant de la tranche)
         etatpaie = EtatPaiementTranche.objects.select_related('mateleve', 'idclasse')
-
+       
         destinataires = []
+        # destinataires_sms = []
         nb_concernes = 0
 
         for etat in etatpaie:
@@ -57,12 +60,27 @@ class Command(BaseCommand):
                 'nom_tranche': nom_tranche_libelle,
                 'reste_a_payer': '{:,}'.format(reste_tranche),
                 'date_limite': date_limite.strftime('%d/%m/%Y'),
+                'ire': ecole.ville_ecole,
+                'bp': ecole.bp_ecole,
+                'contact': f"{ecole.telephone1}/{ecole.telephone2}",
+                'email_ecole': ecole.email_ecole,
                 'texte_brut': f"Rappel : la date limite de paiement de la {nom_tranche_libelle} est le {date_limite.strftime('%d/%m/%Y')}.",
             }
             if eleve.email_pere:
                 destinataires.append((eleve.email_pere, contexte))
             if eleve.email_mere and eleve.email_mere != eleve.email_pere:
                 destinataires.append((eleve.email_mere, contexte))
+
+            contexte_sms = {                                                    
+                'nom_eleve': f"{eleve.prenom} {eleve.nom}",                      
+                'nom_tranche': nom_tranche_libelle,                              
+                'reste_a_payer': '{:,}'.format(reste_tranche),                   
+                'date_limite': date_limite.strftime('%d/%m/%Y'),                 
+            }                                                                    
+            # if eleve.contact_pere:                                            
+            #     destinataires_sms.append((eleve.contact_pere, contexte_sms))  
+            # if eleve.contact_mere and eleve.contact_mere != eleve.contact_pere:  
+            #     destinataires_sms.append((eleve.contact_mere, contexte_sms))
 
         self.stdout.write(f"{nb_concernes} élève(s) concerné(s) par le rappel {nom_tranche_libelle}.")
 
@@ -73,3 +91,11 @@ class Command(BaseCommand):
         )
 
         self.stdout.write(self.style.SUCCESS(f"{envoyes} email(s) envoyé(s), {echecs} échec(s) pour la {nom_tranche_libelle}."))
+
+        # template_sms = (                                                         
+        #     "{nom_ecole} : rappel, la {nom_tranche} de {nom_eleve} "       
+        #     "doit être réglée avant le {date_limite}. Reste : {reste_a_payer} GNF."  
+        # )                                 
+        # envoyes_sms, echecs_sms = envoyer_sms_masse(destinataires_sms, template_sms)
+
+        # self.stdout.write(self.style.SUCCESS(f"{envoyes_sms} SMS envoyé(s), {echecs_sms} échec(s) pour la {nom_tranche_libelle}."))                                      

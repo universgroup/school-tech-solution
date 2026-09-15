@@ -110,7 +110,7 @@ def enregistrerclasse(request):
 def listeclasse(request):
     clas = Classe.objects.all().order_by(
         'idcycle')  # Permet d'afficher la liste des Classes par ordre croissant des Cycles
-    pagineclas = Paginator(clas, 10)
+    pagineclas = Paginator(clas, 20)
     num_pageclas = request.GET.get('page')
     clas = pagineclas.get_page(num_pageclas)
     return render(request, 'gAdministration/liste_classe.html', {'clas': clas})
@@ -177,7 +177,7 @@ def ajouteranneescolaire(request):
 @action_requise('menu_administration')
 def listeanneescolaire(request):
     ansc = AnneeScolaire.objects.all().order_by('descript_annee')
-    pagineans = Paginator(ansc, 10)
+    pagineans = Paginator(ansc, 15)
     numpageans = request.GET.get('page')
     ansc = pagineans.get_page(numpageans)
     return render(request, 'gAdministration/liste_annee_scolaire.html', dict(ansc=ansc))
@@ -271,7 +271,7 @@ def listeinfosecole(request):
     infos = Ecole.objects.none()
 
     infos = Ecole.objects.all()
-    pagineecole = Paginator(infos, 10)
+    pagineecole = Paginator(infos, 5)
     numpageecole = request.GET.get('page')
     infos = pagineecole.get_page(numpageecole)
     return render(request, 'gAdministration/liste_infos_ecole.html', dict(ecole=infos))

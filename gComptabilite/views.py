@@ -127,7 +127,7 @@ def listerecette(request):
     annee = AnneeScolaire.objects.all().order_by(
         'id')  # Permet de recuperer la liste générale des années scolaires en vue de charger la dropdown liste
 
-    paginecais = Paginator(cais, 10)
+    paginecais = Paginator(cais, 20)
     numpagecais = request.GET.get('page')
     cais = paginecais.get_page(numpagecais)
     
@@ -256,7 +256,7 @@ def recherchersituationrecette(request):
             'id')  # Permet de recuperer la liste générale des années scolaires en vue de charger la dropdown liste
 
 
-    paginecais = Paginator(recette, 10)
+    paginecais = Paginator(recette, 20)
     numpagecais = request.GET.get('page')
     recette = paginecais.get_page(numpagecais)
     return render(request, 'gComptabilite/liste_recettes.html',
@@ -349,7 +349,7 @@ def listedepense(request):
     annee = AnneeScolaire.objects.all().order_by(
         'id')  # Permet de recuperer la liste générale des années scolaires en vue de charger la dropdown liste
 
-    paginecais = Paginator(cais, 10)
+    paginecais = Paginator(cais, 20)
     numpagecais = request.GET.get('page')
     cais = paginecais.get_page(numpagecais)
     return render(request, 'gComptabilite/liste_depenses.html',
@@ -445,7 +445,7 @@ def recherchersituationdepense(request):
                 'id')  # Permet de recuperer la liste générale des années scolaires en vue de charger la dropdown liste
             
 
-    paginecais = Paginator(depense, 10)
+    paginecais = Paginator(depense, 20)
     numpagecais = request.GET.get('page')
     depense = paginecais.get_page(numpagecais)
 
@@ -935,25 +935,30 @@ def recupaiementscolarite(request, idetat, nom_tranche, mont_paye):
         buffer.seek(0)
 
         # ── ENVOI EMAIL ──
-        try:
-            email = EmailMessage(
-                subject='Reçu de paiement scolarité',
-                body=f'Veuillez trouver votre reçu de paiement en pièce jointe.\n'
-                     f'Cordialement.\n La Comptabilité : \n {data_ecole[8]}',
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                to=[data[8]],
-            )
-            email.attach(f'Recu_paiement_{str(data[2])}.pdf', buffer.getvalue(), 'application/pdf')
-            email.send()
-            messages.success(request, 'Email envoyé avec succès!')
-        except SMTPException:
-            messages.warning(request, 'Erreur SMTP : impossible d\'envoyer l\'email.')
-        except socket.gaierror:
-            messages.warning(request, 'Pas de connexion internet. Email non envoyé.')
-        except TimeoutError:
-            messages.warning(request, 'Délai de connexion dépassé. Email non envoyé.')
-        except Exception as e:
-            messages.warning(request, f'Erreur inattendue : {str(e)}')
+        if not etatpaie.mail_envoye_paie:
+            try:
+                email = EmailMessage(
+                    subject='Reçu de paiement scolarité',
+                    body=f'Veuillez trouver votre reçu de paiement en pièce jointe.\n'
+                        f'Cordialement.\n La Comptabilité : \n {data_ecole[8]}',
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    to=[data[8]],
+                )
+                email.attach(f'Recu_paiement_{str(data[2])}.pdf', buffer.getvalue(), 'application/pdf')
+                email.send()
+                messages.success(request, 'Email envoyé avec succès!')
+
+                etatpaie.mail_envoye_paie = True
+                etatpaie.save(update_fields=['mail_envoye_paie'])
+                
+            except SMTPException:
+                messages.warning(request, 'Erreur SMTP : impossible d\'envoyer l\'email.')
+            except socket.gaierror:
+                messages.warning(request, 'Pas de connexion internet. Email non envoyé.')
+            except TimeoutError:
+                messages.warning(request, 'Délai de connexion dépassé. Email non envoyé.')
+            except Exception as e:
+                messages.warning(request, f'Erreur inattendue : {str(e)}')
 
         buffer.seek(0)
         return FileResponse(buffer, as_attachment=False, filename=f'Recu_paiement_{str(data[2])}.pdf', content_type='application/pdf')
@@ -984,7 +989,7 @@ def listepaiementmensuel(request):
 
     mois = date.today()
     mois_actuel = mois.strftime('%m')
-    listepaiemensuel = EtatPaiementTranche.objects.select_related('anneescolaire','mateleve','idclasse','idcycle').filter(date_paie__month=mois_actuel).order_by('-date_paie')
+    listepaiemensuel = EtatPaiementTranche.objects.select_related('anneescolaire','mateleve','idclasse','idcycle').filter(date_paie__month=mois_actuel).order_by('idclasse','-date_paie')
 
     t_premiere_tranche = EtatPaiementTranche.objects.filter(date_paie__month=mois_actuel).aggregate(pt=Sum('premiere_tranche')) # pt correspond à la clé du dictionnaire resultant de la requếte
     t_deuxieme_tranche = EtatPaiementTranche.objects.filter(date_paie__month=mois_actuel).aggregate(dt=Sum('deuxieme_tranche')) # dt de même
@@ -1015,7 +1020,7 @@ def listepaiementmensuel(request):
     anne = AnneeScolaire.objects.all().order_by('id')
     cy = CycleScolaire.objects.all().order_by('id')
 
-    paginepaie = Paginator(listepaiemensuel, 10)
+    paginepaie = Paginator(listepaiemensuel, 20)
     numpagepaie = request.GET.get('page')
     listepaiemensuel = paginepaie.get_page(numpagepaie)
 
@@ -1049,40 +1054,42 @@ def filtrelistepaiementclasse(request):
     listepaieclasse = {}
     listepaieclasse = EtatPaiementTranche.objects.none()
 
-    listepaieclasse = EtatPaiementTranche.objects.select_related('anneescolaire','mateleve','idclasse','idcycle').filter(Q(anneescolaire__exact=anne),Q(idclasse__exact=clas)).order_by('-date_paie')
+    if anne != '' and clas != '':
+        
+        listepaieclasse = EtatPaiementTranche.objects.select_related('anneescolaire','mateleve','idclasse','idcycle').filter(Q(anneescolaire__exact=anne),Q(idclasse__exact=clas)).order_by('idclasse','-date_paie')
 
-    t_premiere_tranche = EtatPaiementTranche.objects.select_related('anneescolaire','mateleve','idclasse','idcycle').filter(Q(anneescolaire__exact=anne),Q(idclasse__exact=clas)).aggregate(pt=Sum('premiere_tranche')) # pt correspond à la clé du dictionnaire resultant de la requếte
+        t_premiere_tranche = EtatPaiementTranche.objects.select_related('anneescolaire','mateleve','idclasse','idcycle').filter(Q(anneescolaire__exact=anne),Q(idclasse__exact=clas)).aggregate(pt=Sum('premiere_tranche')) # pt correspond à la clé du dictionnaire resultant de la requếte
 
-    t_deuxieme_tranche = EtatPaiementTranche.objects.select_related('anneescolaire','mateleve','idclasse','idcycle').filter(Q(anneescolaire__exact=anne),Q(idclasse__exact=clas)).aggregate(dt=Sum('deuxieme_tranche')) # dt de même
+        t_deuxieme_tranche = EtatPaiementTranche.objects.select_related('anneescolaire','mateleve','idclasse','idcycle').filter(Q(anneescolaire__exact=anne),Q(idclasse__exact=clas)).aggregate(dt=Sum('deuxieme_tranche')) # dt de même
 
-    t_reste_a_payer = EtatPaiementTranche.objects.select_related('anneescolaire','mateleve','idclasse','idcycle').filter(Q(anneescolaire__exact=anne),Q(idclasse__exact=clas)).aggregate(tr=Sum('reste_a_payer'))
+        t_reste_a_payer = EtatPaiementTranche.objects.select_related('anneescolaire','mateleve','idclasse','idcycle').filter(Q(anneescolaire__exact=anne),Q(idclasse__exact=clas)).aggregate(tr=Sum('reste_a_payer'))
 
-    t_paiement_annuel = EtatPaiementTranche.objects.select_related('anneescolaire','mateleve','idclasse','idcycle').filter(Q(anneescolaire__exact=anne),Q(idclasse__exact=clas)).aggregate(ta=Sum('fscolarite'))
+        t_paiement_annuel = EtatPaiementTranche.objects.select_related('anneescolaire','mateleve','idclasse','idcycle').filter(Q(anneescolaire__exact=anne),Q(idclasse__exact=clas)).aggregate(ta=Sum('fscolarite'))
 
-    if t_premiere_tranche['pt'] is not None:
-        total_tranche1 = t_premiere_tranche['pt']
-    else:
-        total_tranche1 = 0
-    
-    if t_deuxieme_tranche['dt'] is not None:
-        total_tranche2 = t_deuxieme_tranche['dt']
-    else:
-        total_tranche2 = 0
-    
-    if t_reste_a_payer['tr'] is not None:
-        total_reste_a_payer = t_reste_a_payer['tr']
-    else:
-        total_reste_a_payer = 0
+        if t_premiere_tranche['pt'] is not None:
+            total_tranche1 = t_premiere_tranche['pt']
+        else:
+            total_tranche1 = 0
+        
+        if t_deuxieme_tranche['dt'] is not None:
+            total_tranche2 = t_deuxieme_tranche['dt']
+        else:
+            total_tranche2 = 0
+        
+        if t_reste_a_payer['tr'] is not None:
+            total_reste_a_payer = t_reste_a_payer['tr']
+        else:
+            total_reste_a_payer = 0
 
-    if t_paiement_annuel['ta'] is not None:
-        total_paiement_annuel = t_paiement_annuel['ta']
-    else:
-        total_paiement_annuel = 0
+        if t_paiement_annuel['ta'] is not None:
+            total_paiement_annuel = t_paiement_annuel['ta']
+        else:
+            total_paiement_annuel = 0
 
     an = AnneeScolaire.objects.all().order_by('id')
     cy = CycleScolaire.objects.all().order_by('id')
 
-    paginepaie = Paginator(listepaieclasse, 10)
+    paginepaie = Paginator(listepaieclasse, 20)
     numpagepaie = request.GET.get('page')
     listepaieclasse = paginepaie.get_page(numpagepaie)
 
