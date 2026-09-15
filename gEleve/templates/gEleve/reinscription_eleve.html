@@ -189,6 +189,35 @@
                 });
     });
 
+    document.getElementById('finscription').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+            // Ouverture immédiate, dans le contexte du clic → pas bloqué par le navigateur
+            const nouvelOnglet = window.open('', '_blank');
+
+            const formData = new FormData(this);
+
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {'X-Requested-With': 'XMLHttpRequest'}
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    nouvelOnglet.location.href = data.recu_url;
+                    // Ici : rester sur la page, afficher un message, réinitialiser le formulaire, etc.
+                } else {
+                    nouvelOnglet.close();
+                    alert(data.error || "Une erreur est survenue.");
+                }
+            })
+            .catch(() => {
+                nouvelOnglet.close();
+                alert("Erreur réseau, veuillez réessayer.");
+            });
+        });
+
 </script>
 
 {% endblock %}
