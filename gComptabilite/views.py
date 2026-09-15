@@ -935,25 +935,30 @@ def recupaiementscolarite(request, idetat, nom_tranche, mont_paye):
         buffer.seek(0)
 
         # ── ENVOI EMAIL ──
-        try:
-            email = EmailMessage(
-                subject='Reçu de paiement scolarité',
-                body=f'Veuillez trouver votre reçu de paiement en pièce jointe.\n'
-                     f'Cordialement.\n La Comptabilité : \n {data_ecole[8]}',
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                to=[data[8]],
-            )
-            email.attach(f'Recu_paiement_{str(data[2])}.pdf', buffer.getvalue(), 'application/pdf')
-            email.send()
-            messages.success(request, 'Email envoyé avec succès!')
-        except SMTPException:
-            messages.warning(request, 'Erreur SMTP : impossible d\'envoyer l\'email.')
-        except socket.gaierror:
-            messages.warning(request, 'Pas de connexion internet. Email non envoyé.')
-        except TimeoutError:
-            messages.warning(request, 'Délai de connexion dépassé. Email non envoyé.')
-        except Exception as e:
-            messages.warning(request, f'Erreur inattendue : {str(e)}')
+        if not etatpaie.mail_envoye_paie:
+            try:
+                email = EmailMessage(
+                    subject='Reçu de paiement scolarité',
+                    body=f'Veuillez trouver votre reçu de paiement en pièce jointe.\n'
+                        f'Cordialement.\n La Comptabilité : \n {data_ecole[8]}',
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    to=[data[8]],
+                )
+                email.attach(f'Recu_paiement_{str(data[2])}.pdf', buffer.getvalue(), 'application/pdf')
+                email.send()
+                messages.success(request, 'Email envoyé avec succès!')
+
+                etatpaie.mail_envoye_paie = True
+                etatpaie.save(update_fields=['mail_envoye_paie'])
+                
+            except SMTPException:
+                messages.warning(request, 'Erreur SMTP : impossible d\'envoyer l\'email.')
+            except socket.gaierror:
+                messages.warning(request, 'Pas de connexion internet. Email non envoyé.')
+            except TimeoutError:
+                messages.warning(request, 'Délai de connexion dépassé. Email non envoyé.')
+            except Exception as e:
+                messages.warning(request, f'Erreur inattendue : {str(e)}')
 
         buffer.seek(0)
         return FileResponse(buffer, as_attachment=False, filename=f'Recu_paiement_{str(data[2])}.pdf', content_type='application/pdf')

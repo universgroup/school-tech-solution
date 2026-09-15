@@ -943,6 +943,7 @@ def recureinscription(request, idinsc):
         buffer.seek(0)
 
         # ── ENVOI EMAIL ──
+
         if not ins.mail_envoye_inscription:
             try:
                 email = EmailMessage(
@@ -955,6 +956,11 @@ def recureinscription(request, idinsc):
                 email.attach(f'Recu_reinscription_{str(data[2])}.pdf', buffer.getvalue(), 'application/pdf')
                 email.send()
                 messages.success(request, 'Email envoyé avec succès!')
+
+                ins.mail_envoye_inscription = True
+                ins.save(update_fields=['mail_envoye_inscription'])
+
+               
             except SMTPException:
                 messages.warning(request, 'Erreur SMTP : impossible d\'envoyer l\'email.')
             except socket.gaierror:
