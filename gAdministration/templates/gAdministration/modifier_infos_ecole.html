@@ -55,13 +55,13 @@ EDITION DES INFORMATIONS DE L'ECOLE
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="id_tel1">Contact 1</label>
-                            <input type="tel" name="tel1" id="id_tel1" value="{{ecole.telephone1}}" class="form-control" pattern="^(\\+?[0-9]{1,3}[\\s\\-]?)?[0-9\\s\\-\\(\\)]{7,15}$" title="Entrez un numéro de téléphone valide">
+                            <input type="tel" name="tel1" id="id_tel1" value="{{ecole.telephone1}}" class="form-control" pattern="^(\+?[0-9]{1,3}[\s\-]?)?[0-9\s\-\(\)]{7,15}$" title="Entrez un numéro de téléphone valide">
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="id_tel2">Contact 2</label>
-                            <input type="tel" name="tel2" id="id_tel2" value="{{ecole.telephone2}}" class="form-control" pattern="^(\\+?[0-9]{1,3}[\\s\\-]?)?[0-9\\s\\-\\(\\)]{7,15}$" title="Entrez un numéro de téléphone valide">
+                            <input type="tel" name="tel2" id="id_tel2" value="{{ecole.telephone2}}" class="form-control" pattern="^(\+?[0-9]{1,3}[\s\-]?)?[0-9\s\-\(\)]{7,15}$" title="Entrez un numéro de téléphone valide">
                         </div>
                     </div>
                 </div>
@@ -83,13 +83,13 @@ EDITION DES INFORMATIONS DE L'ECOLE
                     <div class="col-md-6">
                         <div class="form-group">
                                 <label for="id_mail">Email</label>
-                                <input type="email" name="email_ecole" id="id_mail" value="{{ecole.email_ecole}}" class="form-control" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\'.[a-zA-Z]{2,}" title="Entrez un email correct">
+                                <input type="email" name="email_ecole" id="id_mail" value="{{ecole.email_ecole}}" class="form-control" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" title="Entrez un email correct">
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="id_site_web">Site web</label>
-                            <input type="url" name="site_web" id="id_site_web" value="{{ecole.site_internet}}" class="form-control" pattern="https?://[a-zA-Z0-9.-]+\\'.[a-zA-Z]{2,}.*" title="Entrez une URL correcte du site web">
+                            <input type="url" name="site_web" id="id_site_web" value="{{ecole.site_internet}}" class="form-control" pattern="https?://[a-zA-Z0-9.-]+\'.[a-zA-Z]{2,}.*" title="Entrez une URL correcte du site web">
                         </div>
                     </div>
                 </div>
@@ -118,7 +118,7 @@ EDITION DES INFORMATIONS DE L'ECOLE
 
                     <div class="col-md-3">
                         <div class="form-group">
-                            <label for="id_coordo_maternelle">Coordinateur Maternelle</label>
+                            <label for="id_coordo_maternelle">Directeur(trice) Maternelle</label>
                             <input type="text" name="coordomat" id="id_coordo_maternelle" value="{{ecole.coordo_maternelle}}" class="form-control">
                         </div>
                     </div>
@@ -127,14 +127,14 @@ EDITION DES INFORMATIONS DE L'ECOLE
                 <div class="row g-3">
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="id_coordo_primaire">Coordinateur Primaire</label>
+                            <label for="id_coordo_primaire">Directeur(trice) Primaire</label>
                             <input type="text" name="coordop" id="id_coordo_primaire" value="{{ecole.coordo_primaire}}" class="form-control">
                         </div>
                     </div>
                             
                     <div class="col-md-3">
                         <div class="form-group">
-                            <label for="id_coordo_second">Coordinateur Secondaire</label>
+                            <label for="id_coordo_second">Principal Secondaire</label>
                             <input type="text" name="coordos" id="id_coordo_second" value="{{ecole.coordo_secondaire}}" class="form-control">
                         </div>
                     </div>

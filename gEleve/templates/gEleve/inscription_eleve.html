@@ -9,7 +9,7 @@ INSCRIPTION DES ELEVES
 
 {% block formulaire %}
 
-<form class="needs-validation" action="" method="post" enctype="multipart/form-data" autocomplete="on" id="finscription" data-classe-url="{% url 'chargerlisteclasse' %}">
+<form class="needs-validation" action="" method="post" enctype="multipart/form-data" autocomplete="on" id="finscription" data-classe-url="{% url 'chargerlisteclasse' %}" novalidate>
                     
                     {% csrf_token %}
 
@@ -201,7 +201,7 @@ INSCRIPTION DES ELEVES
                             <div class="filtres-actions">
                                 <a href="{% url 'chargeranneecourante' %}" target="_self" class="btn btn-secondary btn-md mr-2">Retour &nbsp;<i class="fas fa-circle-chevron-left"></i></a>
                                 <button type="reset" class="btn btn-warning btn-md  mr-2">Actualiser &nbsp; <i class="fas fa-refresh"></i></button>
-                                <button type="button" class="btn btn-primary btn-md"
+                                <button type="button" id="btnSuivant" class="btn btn-primary btn-md"
                                         onclick="$('#tab-inscription').tab('show')">
                                     Suivant <i class="fas fa-arrow-right ml-1"></i>
                                 </button>
@@ -298,41 +298,98 @@ INSCRIPTION DES ELEVES
         }));
     });
 
+      
     $("#finscription")[0].addEventListener("reset", function(){
         // On laisse le navigateur vider le input file lui-même,
         // mais on doit remettre l'aperçu à zéro manuellement
         setTimeout(resetPhotoZone, 0);
     });
 
+    document.getElementById('btnSuivant').addEventListener('click', function () {
+        const onglet1 = document.getElementById('perso');
+        const champs = onglet1.querySelectorAll('input, select, textarea');
+        let ok = true;
+
+        champs.forEach(function (champ) {
+            if (!champ.checkValidity()) {
+                champ.reportValidity();   // affiche le message natif (ex: "Saisissez un numéro de téléphone valide...")
+                ok = false;
+            }
+        });
+
+        if (ok) {
+            $('#tab-inscription').tab('show');
+        }
+    });
+
 
     document.getElementById('finscription').addEventListener('submit', function (e) {
     e.preventDefault();
 
-            // Ouverture immédiate, dans le contexte du clic → pas bloqué par le navigateur
-            const nouvelOnglet = window.open('', '_blank');
+        if (!this.checkValidity()) {
+            this.classList.add('was-validated');
 
-            const formData = new FormData(this);
-
-            fetch(this.action, {
-                method: 'POST',
-                body: formData,
-                headers: {'X-Requested-With': 'XMLHttpRequest'}
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    nouvelOnglet.location.href = data.recu_url;
-                    // Ici : rester sur la page, afficher un message, réinitialiser le formulaire, etc.
-                } else {
-                    nouvelOnglet.close();
-                    alert(data.error || "Une erreur est survenue.");
+            // On retrouve le premier champ invalide, même s'il est dans un onglet caché
+            const champInvalide = this.querySelector(':invalid');
+            if (champInvalide) {
+                const onglet = champInvalide.closest('.tab-pane');
+                if (onglet && !onglet.classList.contains('active')) {
+                    const lienOnglet = document.querySelector(`a[href="#${onglet.id}"]`);
+                    if (lienOnglet) $(lienOnglet).tab('show');
                 }
-            })
-            .catch(() => {
-                nouvelOnglet.close();
-                alert("Erreur réseau, veuillez réessayer.");
-            });
+                // On attend que Bootstrap affiche l'onglet avant de focus/reporter l'erreur
+                setTimeout(function () {
+                    champInvalide.focus();
+                    champInvalide.reportValidity();
+                }, 150);
+            }
+            return; // on arrête ici : pas d'ouverture d'onglet fetch, pas d'envoi
+        }
+
+        const nouvelOnglet = window.open('', '_blank');
+        window.focus(); // Maintient l'onglet d'origine, celui du formulaire ouvert pour voir les messages toast avant l'ouverture du nouvel onglet
+
+        const formData = new FormData(this);
+
+        // Toast de feedback immédiat pendant le traitement
+        afficherMessage('info', 'Chargement du reçu d\'inscription en cours...');
+
+        fetch(this.action, {
+            method: 'POST',
+            body: formData,
+            headers: {'X-Requested-With': 'XMLHttpRequest'}
+        })
+        .then(response => response.json())
+        .then(data => {
+                if (data.success) {
+                    afficherMessage('success', data.message);  // message de paiement immédiat
+
+                    // On récupère le PDF nous-même pour pouvoir lire le header de statut email
+                    return fetch(data.recu_url).then(recuResponse => {
+                        const statutBrut = recuResponse.headers.get('X-Statut-Email');
+                        if (statutBrut) {
+                            const statut = decodeURIComponent(statutBrut);
+                            const [type, ...reste] = statut.split(':');
+                            afficherMessage(type, reste.join(':'));
+                        }
+                        return recuResponse.blob();
+                    }).then(blob => {
+                        const blobUrl = URL.createObjectURL(blob);
+                        nouvelOnglet.location.href = blobUrl;
+                    });
+
+                    }
+                    else {
+                    nouvelOnglet.close();
+                    afficherMessage('error', data.error || "Une erreur est survenue.");
+                    }
+                })
+        .catch(() => {
+            nouvelOnglet.close();
+            afficherMessage('error', "Erreur réseau, veuillez réessayer.");
         });
+    });
+
     
    
  </script>

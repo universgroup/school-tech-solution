@@ -14,6 +14,8 @@ from gEleve.models import Inscription
 from datetime import datetime, date
 import re # Librairie contenant les fonctions de gestion des regex
 import socket
+import urllib.parse
+
 from smtplib import SMTPException
 
 from reportlab.pdfgen import canvas
@@ -28,6 +30,7 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.enums import TA_RIGHT # TA_CENTER, 
 
 from PIL import Image
+
 
 from django.urls import reverse
 from django.core.mail import EmailMessage
@@ -558,7 +561,6 @@ def reformater_montant(valeur):
     montant_a_reformater = montant_a_reformater.replace(',','.') # remplace la virgule par les points.
     return Decimal(montant_a_reformater)
 
-erreur = None
 
 # Fonction permettant de valider le paiement de la scolarite
 @action_requise('compta_ajouter')
@@ -572,12 +574,14 @@ def validerpaiementscolarite(request):
     d_tranche = 0
     mremise = 0
     fscol = 0
+
     annee = {}
     cycle = {}
-    global erreur
+  
 
     annee = AnneeScolaire.objects.none()
     cycle = CycleScolaire.objects.none()
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
 
     if request.method == 'POST':
         
@@ -593,115 +597,155 @@ def validerpaiementscolarite(request):
         d_tranche = reformater_montant(request.POST.get('montant_deuxieme_tranche')) # Je recupère le montant de la deuxième tranche affiché dans le template
         mremise = reformater_montant(request.POST.get('montant_remise')) # Je recupère le montant de la remise saisi
 
-
+        
         anes = AnneeScolaire.objects.get(id=ane)
-        cls = Classe.objects.get(id=clas)
+        clse = Classe.objects.get(id=clas)
         matel = Eleve.objects.get(matricule=mat)
         cy = CycleScolaire.objects.get(id=cycl)
 
+        
         # Je vais recuperer les frais de la première tranche et deuxième tranche ainsi que le frais de la scolarité dans la table Classe
-        t1 = cls.tranche1
-        t2 = cls.tranche2
-        fannuel = cls.frais_scolarite
+        t1 = clse.tranche1
+        t2 = clse.tranche2
+        fannuel = clse.frais_scolarite
 
+        def erreur_response(message):
+            """Centralise le renvoi d'erreur : JSON pour l'AJAX, message Django sinon."""
+            if not is_ajax:
+                messages.error(request, message)
+            if is_ajax:
+                return JsonResponse({'success': False, 'error': message})
+            return None # signale à l'appelant de continuer vers le render classique
+
+        def page_erreur():
+
+            annee = AnneeScolaire.objects.all().order_by('id')
+            cycle = CycleScolaire.objects.all().order_by('id')
+            
+            return render(request, 'gComptabilite/paiement_scolarite.html',
+                          dict(ans=annee, cycles=cycle, tranche_paye=DEUX_TRANCHES_CHOICES, modepaie=MODE_PAIEMENT_CHOICES))
+
+        
         try:
-            etatpaie = EtatPaiementTranche.objects.get(mateleve=matel.matricule,anneescolaire=anes,idclasse=cls) # matel.matricule car matel renvoi les données du str de la classe Eleve au lieu de matricule seulement
+            etatpaie = EtatPaiementTranche.objects.get(mateleve=matel.matricule,anneescolaire=anes,idclasse=clse) # matel.matricule car matel renvoi les données du str de la classe Eleve au lieu de matricule seulement
 
             etatpaie.anneescolaire = anes
-            etatpaie.idclasse = cls
+            etatpaie.idclasse = clse
             etatpaie.mateleve = matel
             etatpaie.idcycle = cy
             etatpaie.date_paie = request.POST['date_paiement'] 
             etatpaie.mode_paie = modepaie
-    
-            erreur = False     
-    
-                            
+                                        
             if nom_tranche == DEUX_TRANCHES_CHOICES[0][0]: # Permet de verifier la première tranche
                 
                 if p_tranche < t1: # Je verifie que le montant de la première tranche payée est inférieur au montant de la tranche 1 défini dans la table classe                                        
                     etatpaie.premiere_tranche = p_tranche + mont_paye # Le montant de la première tranche sera égal au montant initial payé + le nouveau montant payé pour cette tranche 
     
                 else:
-                    messages.error(request,'La première tranche est déjà complète. Veuillez passer à la seconde tranche !!!')
-                    erreur = True
-                    
+
+                    resp = erreur_response(
+                        "La première tranche est déjà complète. Veuillez passer à la seconde tranche !!!"
+                    )
+                    if resp is not None:
+                        return resp if resp is not None else page_erreur()
+                                    
             
             elif nom_tranche == DEUX_TRANCHES_CHOICES[1][0]: # Permet de vérifier la deuxième tranche
     
                 if p_tranche < t1: # Je verifie ici si la première tranche n'est pas bouclée alors je renvoie une alerte pour completer celle-ci
-                    messages.error(request,'Vous devez finaliser le paiement de la première tranche avant de passer à la suivante')
-                    erreur = True
+
+                    resp = erreur_response(
+                        "Vous devez finaliser le paiement de la première tranche avant de passer à la suivante"
+                    )
+                    if resp is not None:
+                        return resp if resp is not None else page_erreur()
+                    
                 else:
                     if d_tranche < t2:
                         etatpaie.deuxieme_tranche = d_tranche + mont_paye # Le montant de la deuxième tranche sera égal au montant initial payé + le nouveau montant payé pour cette tranche
     
                     else:
-                        messages.error(request,'La scolarité est déjà complète!! cet élève ne doit plus rien pour cette année scolaire')
-                        erreur = True
-    
-            if not erreur: # Si aucun message d'erreur ne s'affiche, alors on enregistre le paiement
 
-                annee = AnneeScolaire.objects.all().order_by('id') # On recharge la liste des annees a nouveau
-                cycle = CycleScolaire.objects.all().order_by('id') # on recharge la liste des cycles a nouveau
-                
-                fscol = (etatpaie.premiere_tranche + etatpaie.deuxieme_tranche) # Permet de calculer le paiement total effectué par l'élève
-                etatpaie.fscolarite = fscol
-    
-                if mremise:
-                    etatpaie.reste_a_payer = (fannuel - fscol)- mremise # Le reste à payer annuel est le montant annuel dû moins le total de ses paiements oté de la remise s'il existe
-                    etatpaie.m_rabais = mremise
-                else:
-                    etatpaie.reste_a_payer = fannuel - fscol
-    
-                etatpaie.save()
-    
-                solde_dispo= Decimal(affichersoldecaisse())
-                # Je vais enregistrer ensuite l'opération dans la table caisse
-                cais = Caisse()
-                cais.type_operation = TYPE_OPERATION_CAISSE_CHOICES[1][1]
-                cais.libelle_operation = 'Paiement des frais de scolarité de l\'élève:  {},  {} , {} '.format(
-                    matel.matricule, matel.nom, matel.prenom)
-                cais.montant_encaisse = Decimal(mont_paye)
-                cais.anscolaire = anes
-                cais.categ_depense = CATEGORIE_RECETTE_CHOICES[1][1]
-                cais.solde_actuel = Decimal(solde_dispo) + Decimal(mont_paye)
-                cais.date_operation = request.POST['date_paiement']
-                cais.save()
-    
-                messages.success(request,'Paiement validé avec succès !!!')
-    
-                # Ici je vais enregistrer l'evenement dans la table Historique
-                his = Historique()
-                his.nature_operation = CATEGORIE_RECETTE_CHOICES[1][1]
-                his.detail_operation = 'Paiement des frais de scolarité de l\'élève:  {},  {} , {} '.format(
-                    matel.matricule, matel.nom, matel.prenom)
-                his.user_login = 'contact@universtechgroup.com'
-                his.save()
-    
-                # Génération du reçu de paiement de la scolarité
-                idetat = etatpaie.id
-    
-                # Ce contrôle permet d'ouvrir le reçu de paiement dans un nouvel onglet du navigateur
-                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                                            return JsonResponse({
-                                                'success': True,
-                                                'recu_url': reverse('recupaiementscolarite', args=(idetat, nom_tranche, str(mont_paye),))
-                                                })
-                
-                return HttpResponseRedirect(reverse('recupaiementscolarite',args=(idetat, nom_tranche, str(mont_paye),)))
+                        resp = erreur_response(
+                            "La scolarité est déjà complète !! Cet élève ne doit plus rien pour cette année scolaire"
+                        )
+                        if resp is not None:
+                            return resp if resp is not None else page_erreur()
+            else:
 
-            else: # Si un message d'erreur s'affiche, on recharge les données de base
-                annee = AnneeScolaire.objects.all().order_by('id')
-                cycle = CycleScolaire.objects.all().order_by('id')
+                # Aucune tranche valide sélectionnée (cas improbable, sécurité)
+                resp = erreur_response("Veuillez sélectionner une tranche valide.")
+                return resp if resp is not None else page_erreur()
+                        
+                        
+            # Si aucun message d'erreur ne s'affiche, alors on enregistre le paiement
+            annee = AnneeScolaire.objects.all().order_by('id') # On recharge la liste des annees a nouveau
+            cycle = CycleScolaire.objects.all().order_by('id') # on recharge la liste des cycles a nouveau
             
+            fscol = (etatpaie.premiere_tranche + etatpaie.deuxieme_tranche) # Permet de calculer le paiement total effectué par l'élève
+            etatpaie.fscolarite = fscol
 
+            if mremise:
+                etatpaie.reste_a_payer = (fannuel - fscol)- mremise # Le reste à payer annuel est le montant annuel dû moins le total de ses paiements oté de la remise s'il existe
+                etatpaie.m_rabais = mremise
+            else:
+                etatpaie.reste_a_payer = fannuel - fscol
+
+            etatpaie.save()
+
+            solde_dispo= Decimal(affichersoldecaisse())
+            # Je vais enregistrer ensuite l'opération dans la table caisse
+            cais = Caisse()
+            cais.type_operation = TYPE_OPERATION_CAISSE_CHOICES[1][1]
+            cais.libelle_operation = 'Paiement des frais de scolarité de l\'élève:  {},  {} , {} '.format(
+                matel.matricule, matel.nom, matel.prenom)
+            cais.montant_encaisse = Decimal(mont_paye)
+            cais.anscolaire = anes
+            cais.categ_depense = CATEGORIE_RECETTE_CHOICES[1][1]
+            cais.solde_actuel = Decimal(solde_dispo) + Decimal(mont_paye)
+            cais.date_operation = request.POST['date_paiement']
+            cais.save()
+
+            message_succes = 'Paiement validé avec succès !!!'
+            if not is_ajax:
+                messages.success(request, message_succes)
+
+            # Ici je vais enregistrer l'evenement dans la table Historique
+            his = Historique()
+            his.nature_operation = CATEGORIE_RECETTE_CHOICES[1][1]
+            his.detail_operation = 'Paiement des frais de scolarité de l\'élève:  {},  {} , {} '.format(
+                matel.matricule, matel.nom, matel.prenom)
+            his.user_login = 'contact@universtechgroup.com'
+            his.save()
+
+            # Génération du reçu de paiement de la scolarité
+            idetat = etatpaie.id
+
+            # Ce contrôle permet d'ouvrir le reçu de paiement dans un nouvel onglet du navigateur
+            if is_ajax:
+                return JsonResponse({
+                'success': True,
+                'message': message_succes,
+                'recu_url': reverse('recupaiementscolarite', args=(idetat, nom_tranche, str(mont_paye),))
+                    })
+
+            # Celui ci est exécuté au cas ou le is_ajax est à False
+            return HttpResponseRedirect(reverse('recupaiementscolarite',args=(idetat, nom_tranche, str(mont_paye),)))
+
+            
         except EtatPaiementTranche.DoesNotExist:
-            messages.error(request, "Aucun état de paiement trouvé pour cet élève sur cette année scolaire.")
-            erreur = True
-            etatpaie = None
+            message = "Aucun état de paiement trouvé pour cet élève sur cette année scolaire."
+            if not is_ajax:
+                messages.error(request, message)
+
+            annee = AnneeScolaire.objects.all().order_by('id')
+            cycle = CycleScolaire.objects.all().order_by('id')
+
+            if is_ajax:
+                return JsonResponse({'success': False, 'error': message})
    
     else:
+
         annee = AnneeScolaire.objects.all().order_by('id')
         cycle = CycleScolaire.objects.all().order_by('id')    
     
@@ -741,7 +785,7 @@ def recupaiementscolarite(request, idetat, nom_tranche, mont_paye):
         etatpaie = EtatPaiementTranche.objects.select_related('anneescolaire', 'mateleve', 'idclasse').get(id=idetat)
         data = [etatpaie.id, etatpaie.anneescolaire.descript_annee, etatpaie.mateleve.matricule, etatpaie.idclasse, etatpaie.mateleve.nom,
                 etatpaie.mateleve.prenom,
-                etatpaie.mateleve.tuteur, etatpaie.mateleve.contact_pere,etatpaie.mateleve.email_pere
+                etatpaie.mateleve.tuteur, etatpaie.mateleve.contact_pere, etatpaie.mateleve.email_pere, etatpaie.mateleve.email_mere
                 ]
         
         if nom_tranche == DEUX_TRANCHES_CHOICES[0][0]: # Si c'est la première tranche qui a été choisie, je recupère le montant de la tranche dans la table classe
@@ -952,33 +996,53 @@ def recupaiementscolarite(request, idetat, nom_tranche, mont_paye):
         buffer.seek(0)
 
         # ── ENVOI EMAIL ──
-        if not etatpaie.mail_envoye_paie:
+        # On détermine QUEL champ concerne la tranche de ce reçu
+        est_premiere_tranche = (nom_tranche == DEUX_TRANCHES_CHOICES[0][0])
+        deja_envoye = etatpaie.mail_envoye_paie_pt if est_premiere_tranche else etatpaie.mail_envoye_paie_dt
+
+        statut_email = None  # sera lu côté JS via un header
+
+        if not deja_envoye:
             try:
                 email = EmailMessage(
                     subject='Reçu de paiement scolarité',
                     body=f'Veuillez trouver votre reçu de paiement en pièce jointe.\n'
                         f'Cordialement.\n Le Service Scolarité : \n {data_ecole[8]}',
                     from_email=settings.DEFAULT_FROM_EMAIL,
-                    to=[data[8]],
+                    to=[data[8], data[9]],
                 )
                 email.attach(f'Recu_paiement_{str(data[2])}.pdf', buffer.getvalue(), 'application/pdf')
                 email.send()
-                messages.success(request, 'Email envoyé avec succès!')
+                
+                statut_email = 'success:Email envoyé avec succès!'
 
-                etatpaie.mail_envoye_paie = True
-                etatpaie.save(update_fields=['mail_envoye_paie'])
+                # Permet de mettre à jour les deux champs booleens de la table EtatPaiementTranche après chaque envoi de mail
+                if est_premiere_tranche:
+                    etatpaie.mail_envoye_paie_pt = True
+                    etatpaie.save(update_fields=['mail_envoye_paie_pt'])
+                else:
+                    etatpaie.mail_envoye_paie_dt = True
+                    etatpaie.save(update_fields=['mail_envoye_paie_dt'])
                 
             except SMTPException:
-                messages.warning(request, 'Erreur SMTP : impossible d\'envoyer l\'email.')
+                statut_email = 'warning:Erreur SMTP : impossible d\'envoyer l\'email.'
             except socket.gaierror:
-                messages.warning(request, 'Pas de connexion internet. Email non envoyé.')
+                statut_email = 'warning:Pas de connexion internet. Email non envoyé.'
             except TimeoutError:
-                messages.warning(request, 'Délai de connexion dépassé. Email non envoyé.')
+                statut_email = 'warning:Délai de connexion dépassé. Email non envoyé.'
             except Exception as e:
-                messages.warning(request, f'Erreur inattendue : {str(e)}')
+                statut_email = f'warning:Erreur inattendue : {str(e)}'
+        else:
+            statut_email = 'info:Email déjà envoyé précédemment.'
 
         buffer.seek(0)
-        return FileResponse(buffer, as_attachment=False, filename=f'Recu_paiement_{str(data[2])}.pdf', content_type='application/pdf')
+        reponse = FileResponse(buffer, as_attachment=False, filename=f'Recu_paiement_{str(data[2])}.pdf', content_type='application/pdf')
+
+        if statut_email:
+            # Header custom lisible en JS ; on encode pour éviter les accents/caractères spéciaux
+            reponse['X-Statut-Email'] = urllib.parse.quote(statut_email)
+        return reponse
+    
 
 @action_requise('menu_comptabilite')
 def imprimerecuscolarite(request, idetat, nom_tranche, mont_paye):

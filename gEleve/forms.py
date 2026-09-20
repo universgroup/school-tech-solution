@@ -1,6 +1,10 @@
 from django import forms
 from django.forms import ModelForm
 from .models import *
+from django.core.exceptions import ValidationError
+import re
+
+EMAIL_PATTERN = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
 
 
 class FormEleve(ModelForm):
@@ -48,15 +52,13 @@ class FormEleve(ModelForm):
                                              'title': 'Saisissez le prénoms et nom du tuteur'}),
             'contact_pere': forms.TextInput(
                 attrs={'class': 'form-control', 'placeholder': 'Contact du père', 'type': 'tel',
-                       'pattern': "^(\+?[0-9]{1,3}[\s\-]?)?[0-9\s\-\(\)]{7,15}$",'title': 'Saisissez un numéro de téléphone valide avec ou sans code du pays'}),
+                       'pattern': r"^(\+?[0-9]{1,3}[\s\-]?)?[0-9\s\-\(\)]{7,15}$",'title': 'Saisissez un numéro de téléphone valide avec ou sans code du pays'}),
 
-            'contact_mere': forms.TextInput(attrs={'class': 'form-control', 'placeholder' : 'Contact de la mère', 'type': 'tel', 'pattern': '^(\\+?[0-9]{1,3}[\\s\\-]?)?[0-9\\s\\-\\(\\)]{7,15}$', 'title': 'Saisissez un numéro de téléphone valide avec ou sans code du pays'}),
+            'contact_mere': forms.TextInput(attrs={'class': 'form-control', 'placeholder' : 'Contact de la mère', 'type': 'tel', 'pattern': r'^(\+?[0-9]{1,3}[\s\-]?)?[0-9\s\-\(\)]{7,15}$', 'title': 'Saisissez un numéro de téléphone valide avec ou sans code du pays'}),
 
-            'email_pere': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Ex: contact@universtechgroup.com',
-                       'pattern': "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}", 'title': 'Saisissez un email correct!'}),
+            'email_pere': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Ex: contact@universtechgroup.com', 'title': 'Saisissez un email correct!'}),
 
-            'email_mere': forms.EmailInput(attrs={'class': 'form-control','placeholder': 'Ex: contact@universtechgroup.com',
-                       'pattern': "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}", 'title': 'Saisissez un email correct!'}),
+            'email_mere': forms.EmailInput(attrs={'class': 'form-control','placeholder': 'Ex: contact@universtechgroup.com', 'title': 'Saisissez un email correct!'}),
 
             'profes_pere': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Profession du père', 'title': 'Saisissez la profession du père'}),
 
@@ -86,6 +88,18 @@ class FormEleve(ModelForm):
             'photo_eleve'].required = False  # Permet de rendre non obligatoire la selection de la photo d'un élève
         self.fields['email_pere'].required = True
         self.fields['email_mere'].required = True
+
+    def clean_email_pere(self):
+        emailpere = self.cleaned_data.get('email_pere')
+        if emailpere and not re.match(EMAIL_PATTERN, emailpere):
+            raise ValidationError("Format d'email invalide pour le père.")
+        return emailpere
+
+    def clean_email_mere(self):
+        emailmere = self.cleaned_data.get('email_mere')
+        if emailmere and not re.match(EMAIL_PATTERN, emailmere):
+            raise ValidationError("Format d'email invalide pour la mère.")
+        return emailmere
 
 
 class FormInscription(ModelForm):

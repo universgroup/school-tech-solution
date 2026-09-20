@@ -13,7 +13,14 @@ TRIMESTRE_CHOICES = (
     ('CLGE', 'Collège/Lycée'),
     ('1er semestre', '1er semestre'),
     ('2ème semestre', '2ème semestre')
+)
 
+PERIODE_CHOICES = (
+    ('P1','Période 1'), # 0
+    ('P2','Période 2'), # 1
+    ('P3','Période 3'), # 2
+    ('P4','Période 4'), # 3
+    ('P5','Période 5'), # 4
 )
 
 
@@ -22,7 +29,7 @@ class Evaluation(models.Model):
     note1 = models.FloatField(default=0)
     note2 = models.FloatField(default=0)
     note3 = models.FloatField(default=0)
-    mois_evaluation = models.CharField(max_length=15, default='Selectionnez', choices=MOIS_CHOICES)
+    periode_evaluation = models.CharField(max_length=15, default=PERIODE_CHOICES[0][0], choices=PERIODE_CHOICES)
     anneescolaire = models.ForeignKey(AnneeScolaire, on_delete=models.CASCADE)
     trimestre = models.CharField(max_length=15, default='Selectionnez', choices=TRIMESTRE_CHOICES)
     mateleve = models.ForeignKey(Eleve, on_delete=models.CASCADE)
@@ -30,7 +37,7 @@ class Evaluation(models.Model):
     idmatiere = models.ForeignKey(Matiere, on_delete=models.CASCADE)
 
     def __str__(self):
-        return '{} {} {} {} {} '.format(self.mateleve, self.mois_evaluation, self.trimestre, str(self.note1),
+        return '{} {} {} {} {} '.format(self.mateleve, self.periode_evaluation, self.trimestre, str(self.note1),
                                         str(self.note2))
 
     @property

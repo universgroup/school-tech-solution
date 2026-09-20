@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="fr">
+<body style="font-family: Arial, sans-serif;">
+    <div style="max-width:600px; margin:auto; padding:20px;">
+        <h2 style="color:#2980b9;">{{ titre }}</h2>
+        <p>Bonjour,</p>
+        <p>{{ resume_texte }}</p>
+
+        <table style="width:100%; border-collapse:collapse; margin:15px 0;">
+            <tr style="background:#f4f4f4;">
+                <td style="padding:8px; border:1px solid #ddd;">Élèves concernés</td>
+                <td style="padding:8px; border:1px solid #ddd;"><strong>{{ nb_concernes }}</strong></td>
+            </tr>
+            <tr>
+                <td style="padding:8px; border:1px solid #ddd;">Emails envoyés</td>
+                <td style="padding:8px; border:1px solid #ddd;">{{ envoyes_email }} ({{ echecs_email }} échec(s))</td>
+            </tr>
+            <tr style="background:#f4f4f4;">
+                <td style="padding:8px; border:1px solid #ddd;">SMS envoyés</td>
+                <td style="padding:8px; border:1px solid #ddd;">{{ envoyes_sms }} ({{ echecs_sms }} échec(s))</td>
+            </tr>
+        </table>
+
+        {% if eleves_sans_contact %}
+        <p style="color:#c0392b;"><strong>{{ eleves_sans_contact|length }} élève(s) sans email ni téléphone valide — à relancer manuellement :</strong></p>
+        <ul>
+            {% for nom in eleves_sans_contact %}
+            <li>{{ nom }}</li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p style="color:#27ae60;">Tous les élèves concernés disposent d'au moins un moyen de contact valide.</p>
+        {% endif %}
+
+        <hr style="border:none; border-top:1px solid #ddd; margin:20px 0;">
+        <p style="color:#0f0f0f; font-size:11px;">{{ nom_ecole }} — Notification automatique de gestion.</p>
+    </div>
+</body>
+</html>

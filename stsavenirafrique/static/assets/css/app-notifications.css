@@ -1,0 +1,73 @@
+#toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1080;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 380px;
+}
+
+.notif-cool {
+    position: relative;
+    overflow: hidden;
+    border: none;
+    border-left: 5px solid transparent;
+    border-radius: 6px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+    padding: 14px 40px 14px 16px;
+    animation: notif-entree 0.35s ease-out;
+    background: #fff;
+    color: #212529 !important; 
+}
+
+.notif-cool.alert-success { border-left-color: #28a745; }
+.notif-cool.alert-warning { border-left-color: #ffc107; }
+.notif-cool.alert-info    { border-left-color: #17a2b8; }
+.notif-cool.alert-danger  { border-left-color: #dc3545; }
+
+.notif-cool-corps {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.notif-cool-icone {
+    font-size: 1.3rem;
+    flex-shrink: 0;
+}
+
+.notif-icone-alert-success::before { content: "\f058"; color: #28a745; font-family:"Font Awesome 5 Free"; font-weight:900; }
+.notif-icone-alert-warning::before { content: "\f071"; color: #b8860b; font-family:"Font Awesome 5 Free"; font-weight:900; }
+.notif-icone-alert-info::before    { content: "\f05a"; color: #17a2b8; font-family:"Font Awesome 5 Free"; font-weight:900; }
+.notif-icone-alert-danger::before  { content: "\f057"; color: #dc3545; font-family:"Font Awesome 5 Free"; font-weight:900; }
+
+.notif-cool-texte { font-weight: 500; 
+                    color: #212529 !important;
+}
+
+.notif-cool-barre {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    width: 100%;
+    /* background: currentColor; */
+    /* opacity: 0.35; */
+    background: #212529 !important; /* Force la barre à être foncée */
+    opacity: 0.2;
+}
+
+@keyframes notif-entree {
+    from { opacity: 0; transform: translateX(30px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+.notif-cool-sortie {
+    animation: notif-sortie 0.3s ease-in forwards;
+}
+
+@keyframes notif-sortie {
+    to { opacity: 0; transform: translateX(30px); }
+}

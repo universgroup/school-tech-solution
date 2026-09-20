@@ -1,31 +1,32 @@
 """
 Usage :
-    python manage.py resync_sequences
-    python manage.py resync_sequences --database=production
-    python manage.py resync_sequences --only AnneeScolaire Classe
+    python manage.py resync_autoincrement
+    python manage.py resync_autoincrement --database=production
+    python manage.py resync_autoincrement --only AnneeScolaire Classe
 
-Resynchronise les séquences PostgreSQL des tables dont les ID ont été
-insérés explicitement lors des imports legacy (AnneeScolaire, CycleScolaire,
-Classe, Ecole, Eleve, Inscription, EtatPaiementTranche, ...).
+Equivalent MySQL de resync_sequences.py (PostgreSQL). MySQL ne connaît pas
+les séquences : chaque table auto-incrémentée porte directement sa valeur
+courante dans AUTO_INCREMENT (visible via `SHOW TABLE STATUS` ou
+information_schema.TABLES). Cette commande recale AUTO_INCREMENT sur
+MAX(id) + 1 pour les tables dont les ID ont été insérés explicitement lors
+des imports legacy.
 
 A lancer après chaque import massif, ou ponctuellement si l'erreur
-"duplicate key value violates unique constraint ..._pkey" réapparaît.
+"Duplicate entry '...' for key '...PRIMARY'" apparaît lors d'une création
+normale via l'application (signe qu'AUTO_INCREMENT est resté à une valeur
+inférieure aux ID déjà présents).
 
-Place ce fichier dans <app_name>/management/commands/resync_sequences.py
+Place ce fichier dans <app_name>/management/commands/resync_autoincrement.py
 TODO: remplacer <app_name> par le nom réel de l'app choisie pour héberger
 cette commande utilitaire.
 
-CORRECTIF : les tables ont des noms à casse mixte (ex:
-"gAdministration_anneescolaire", avec un A majuscule, car l'app_label
-gAdministration a lui-même une majuscule). PostgreSQL replie tout
-identifiant NON entouré de guillemets doubles en minuscules avant de le
-résoudre. pg_get_serial_sequence(table, colonne) traite son premier
-argument comme un identifiant à résoudre selon ces mêmes règles : il faut
-donc lui passer le nom déjà entre guillemets doubles dans la chaîne
-elle-même (ex: '"gAdministration_anneescolaire"'), pas le nom brut. C'est
-ce qui manquait dans la version précédente et causait
-"relation ... does not exist" (avec le nom vu tout en minuscules dans le
-message d'erreur — signature caractéristique de ce piège précis).
+NOTE CASSE : contrairement à PostgreSQL, MySQL sous Linux est
+sensible à la casse des noms de table par défaut (lower_case_table_names=0),
+donc gAdministration_anneescolaire (avec le A majuscule) doit rester tel
+quel. connection.ops.quote_name() gère ça correctement pour ce backend
+(guillemets ` ` au lieu de " " utilisés par PostgreSQL) — même logique de
+prudence que pour la version PostgreSQL, appliquée ici par précaution même
+si MySQL ne replie pas la casse comme le fait pg_get_serial_sequence.
 """
 
 from django.core.management.base import BaseCommand, CommandError
@@ -51,8 +52,8 @@ MODELES_A_RESYNC = [
 
 class Command(BaseCommand):
     help = (
-        "Resynchronise les séquences PostgreSQL (nextval) sur MAX(id) pour "
-        "les tables importées avec des ID explicites (legacy)."
+        "Recale AUTO_INCREMENT sur MAX(id) + 1 (MySQL) pour les tables "
+        "importées avec des ID explicites (legacy)."
     )
 
     def add_arguments(self, parser):
@@ -75,6 +76,13 @@ class Command(BaseCommand):
         if db_alias not in connections:
             raise CommandError(f"Alias de base inconnu: {db_alias}")
 
+        vendor = connections[db_alias].vendor
+        if vendor != "mysql":
+            raise CommandError(
+                f"L'alias '{db_alias}' pointe vers un backend '{vendor}', pas MySQL. "
+                "Utilisez resync_sequences (PostgreSQL) pour cette base."
+            )
+
         modeles = MODELES_A_RESYNC
         if only:
             modeles = [m for m in modeles if m.__name__ in only]
@@ -90,40 +98,35 @@ class Command(BaseCommand):
             return
 
         for model in modeles:
-            self._resync_sequence(db_alias, model)
+            self._resync_auto_increment(db_alias, model)
 
-    def _resync_sequence(self, db_alias, model):
+    def _resync_auto_increment(self, db_alias, model):
         table_name = model._meta.db_table
         pk_column = model._meta.pk.column  # gère le cas où la PK ne s'appelle pas "id"
         quote_name = connections[db_alias].ops.quote_name
 
-        # IMPORTANT : on pré-quote nous-mêmes le nom de table/colonne avant de
-        # le passer à pg_get_serial_sequence, pour que PostgreSQL préserve la
-        # casse exacte (gAdministration_anneescolaire) au lieu de la replier
-        # en minuscules.
         table_quoted = quote_name(table_name)
         column_quoted = quote_name(pk_column)
 
         with connections[db_alias].cursor() as cursor:
-            cursor.execute(
-                "SELECT pg_get_serial_sequence(%s, %s)",
-                [table_quoted, pk_column],
-            )
-            sequence_name = cursor.fetchone()[0]
+            cursor.execute(f"SELECT MAX({column_quoted}) FROM {table_quoted}")
+            max_id = cursor.fetchone()[0]
 
-            if sequence_name is None:
+            if max_id is None:
                 self.stdout.write(self.style.WARNING(
-                    f"[{model.__name__}] Aucune séquence trouvée pour {table_name}.{pk_column} "
-                    "(PK non-serial ? déjà migré vers identity manuelle ?)"
+                    f"[{model.__name__}] Table {table_name} vide — AUTO_INCREMENT non modifié."
                 ))
                 return
 
+            nouvelle_valeur = int(max_id) + 1
+
+            # DDL : MySQL n'accepte pas de paramètre lié (%s) sur ALTER TABLE,
+            # d'où la validation explicite en int ci-dessus avant d'insérer
+            # la valeur directement dans la requête (évite toute injection).
             cursor.execute(
-                f"SELECT setval(%s, COALESCE((SELECT MAX({column_quoted}) FROM {table_quoted}), 1))",
-                [sequence_name],
+                f"ALTER TABLE {table_quoted} AUTO_INCREMENT = {nouvelle_valeur}"
             )
-            nouvelle_valeur = cursor.fetchone()[0]
 
         self.stdout.write(self.style.SUCCESS(
-            f"[{db_alias}] {model.__name__} ({table_name}) → séquence resynchronisée à {nouvelle_valeur}"
+            f"[{db_alias}] {model.__name__} ({table_name}) → AUTO_INCREMENT recalé à {nouvelle_valeur}"
         ))

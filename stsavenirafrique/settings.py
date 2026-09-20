@@ -210,7 +210,8 @@ EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = f"GS Ecole les Champions <{config('EMAIL_HOST_USER')}>"
 
 # API des SMS
-# SMS_API_KEY = os.environ.get('SMS_API_KEY')
+NIMBA_SMS_ACCOUNT_SID = config('NIMBA_SMS_ACCOUNT_SID')
+NIMBA_SMS_AUTH_TOKEN = config('NIMBA_SMS_AUTH_TOKEN')
 
 # À la fin de votre fichier settings.py
 

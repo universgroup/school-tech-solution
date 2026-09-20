@@ -1,34 +1,33 @@
-# core/sms.py
 import re
-import requests
 import logging
 from django.conf import settings
+from nimbasms import Client
 
 logger = logging.getLogger(__name__)
 
-SMS_API_URL = "https://api.smspartner.fr/v1/send"
+# Le client est instancié une seule fois au chargement du module, pas à chaque appel
+_client = Client(settings.NIMBA_SMS_ACCOUNT_SID, settings.NIMBA_SMS_AUTH_TOKEN)
+
 
 def normaliser_numero_gn(numero):
-    """Convertit un numéro guinéen local en format international +224XXXXXXXX."""
+    """Convertit un numéro guinéen local en format attendu par NimbaSMS : 224XXXXXXXXX (sans '+')."""
     if not numero:
         return None
-    chiffres = re.sub(r'\D', '', numero)  # retire espaces, tirets, etc.
+    chiffres = re.sub(r'\D', '', numero)  # retire espaces, tirets, '+', etc.
     if chiffres.startswith('224'):
-        return f"+{chiffres}"
+        return chiffres
     if chiffres.startswith('0'):
         chiffres = chiffres[1:]
     if len(chiffres) == 9:
-        return f"+224{chiffres}"
-    return None  # numéro invalide, à logger
+        return f"224{chiffres}"
+    return None  # numéro invalide
 
 
-def envoyer_sms_masse(destinataires_contexte, template_message, sender="E Champions"):
+def envoyer_sms_masse(destinataires_contexte, template_message, sender_name="EChampions"):
     """
     destinataires_contexte : liste de tuples (telephone, contexte_dict)
-    template_message : chaîne de format Python avec {placeholders}, ex:
-        "Bonjour, la reinscription pour {nom_eleve} ouvre le {date_ouverture}."
-    sender : nom d'expéditeur (max 11 caractères alphanumériques, à valider au préalable
-             auprès du fournisseur — certains opérateurs GN imposent une validation manuelle)
+    template_message : chaîne de format Python avec {placeholders}
+    sender_name : nom d'expéditeur, à valider au préalable dans votre espace NimbaSMS
     """
     envoyes, echecs = 0, 0
 
@@ -46,25 +45,19 @@ def envoyer_sms_masse(destinataires_contexte, template_message, sender="E Champi
             echecs += 1
             continue
 
-        payload = {
-            "apiKey": settings.SMS_API_KEY,
-            "phoneNumbers": numero,
-            "sender": sender,
-            "gamme": 1,
-            "message": message,
-        }
-
         try:
-            resp = requests.post(SMS_API_URL, json=payload, timeout=10)
-            resp.raise_for_status()
-            data = resp.json()
-            if data.get("success", True):
+            response = _client.messages.create(
+                to=[numero],
+                sender_name=sender_name,
+                message=message,
+            )
+            if response.ok:
                 envoyes += 1
             else:
-                logger.error(f"Échec envoi SMS à {numero} : {data}")
+                logger.error(f"Échec envoi SMS à {numero} : {response.data}")
                 echecs += 1
-        except requests.RequestException as e:
-            logger.error(f"Erreur réseau envoi SMS à {numero} : {e}")
+        except Exception as e:
+            logger.error(f"Erreur envoi SMS à {numero} : {e}")
             echecs += 1
 
     return envoyes, echecs

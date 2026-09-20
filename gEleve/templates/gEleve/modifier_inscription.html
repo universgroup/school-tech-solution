@@ -129,14 +129,14 @@ EDITION DES INFORMATIONS D'UNE INSCRIPTION
                     <div class="col-md-3">
                         <div class="form-group">
                             <label for="id_contact_pere">Contact du père</label>
-                            <input type="tel" pattern="^(\\+?[0-9]{1,3}[\\s\\-]?)?[0-9\\s\\-\\(\\)]{7,15}$" title="Saisissez un numéro de téléphone valide" name="contact_pere" id="id_contact_pere"  value="{{ins.mateleve.contact_pere}}" class="form-control">
+                            <input type="tel" pattern="^(\+?[0-9]{1,3}[\s\-]?)?[0-9\s\-\(\)]{7,15}$" title="Saisissez un numéro de téléphone valide" name="contact_pere" id="id_contact_pere"  value="{{ins.mateleve.contact_pere}}" class="form-control">
                         </div>
                     </div>
 
                     <div class="col-md-3">
                         <div class="form-group">
                             <label for="id_contact_mere">Contact de la mère</label>
-                            <input type="tel" pattern="^(\\+?[0-9]{1,3}[\\s\\-]?)?[0-9\\s\\-\\(\\)]{7,15}$" title="Saisissez un numéro de téléphone valide" name="contact_mere" id="id_contact_mere"  value="{{ins.mateleve.contact_mere}}" class="form-control">
+                            <input type="tel" pattern="^(\+?[0-9]{1,3}[\s\-]?)?[0-9\s\-\(\)]{7,15}$" title="Saisissez un numéro de téléphone valide" name="contact_mere" id="id_contact_mere"  value="{{ins.mateleve.contact_mere}}" class="form-control">
                         </div>
                     </div>
 
@@ -146,14 +146,14 @@ EDITION DES INFORMATIONS D'UNE INSCRIPTION
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="id_email_pere">Email du père</label>
-                            <input type="text" name="email_pere" id="id_email_pere" value="{{ins.mateleve.email_pere}}" class="form-control">
+                            <input type="text" name="email_pere" id="id_email_pere" value="{{ins.mateleve.email_pere}}" class="form-control" pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$">
                         </div>
                     </div>
 
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="id_email_mere">Email de la mère</label>
-                            <input type="text" name="email_mere" id="id_email_mere" value="{{ins.mateleve.email_mere}}" class="form-control">
+                            <input type="text" name="email_mere" id="id_email_mere" value="{{ins.mateleve.email_mere}}" class="form-control" pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$">
                         </div>
                     </div>
                 </div>

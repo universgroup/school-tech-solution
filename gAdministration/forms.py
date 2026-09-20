@@ -1,6 +1,11 @@
 from django import forms
 from django.forms import ModelForm
 from .models import *
+from django.core.exceptions import ValidationError
+import re
+
+EMAIL_PATTERN = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+URL_PATTERN = r"https?://[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}.*"
 
 class FormCycle(ModelForm):
     class Meta:
@@ -90,9 +95,9 @@ class FormEcole(ModelForm):
             'devise_ecole': 'Devise/Slogan',
             'dg': 'Directeur(trice) Général(e)',
             'dga': 'Directeur(trice) Général(e) Adjoint(e)',
-            'coordo_maternelle': 'Coordinateur Maternelle',
-            'coordo_primaire': 'Coordinateur Primaire',
-            'coordo_secondaire': 'Coordinateur Secondaire',
+            'coordo_maternelle': 'Directeur(trice) de la Maternelle',
+            'coordo_primaire': 'Directeur(trice) du Primaire',
+            'coordo_secondaire': 'Principal du Secondaire',
             'comptable': 'Comptable',
             'delai_tranche1': 'Date limite première tranche',
             'delai_tranche2': 'Date limite deuxième tranche',
@@ -113,10 +118,10 @@ class FormEcole(ModelForm):
             'dsee': forms.TextInput(
                 attrs={'class': 'form-control', 'placeholder': 'DSEE', 'title': 'Saisissez le nom de la DSEE'}),
             'telephone1': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Contact 1', 'type': 'tel',
-                                                 'pattern': "^(\\+?[0-9]{1,3}[\\s\\-]?)?[0-9\\s\\-\\(\\)]{7,15}$",
+                                                 'pattern': r"^(\+?[0-9]{1,3}[\s\-]?)?[0-9\s\-\(\)]{7,15}$",
                                                  'title': 'Saisissez un numéro de téléphone valide'}),
             'telephone2': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Contact 2', 'type': 'tel',
-                                                 'pattern': "^(\\+?[0-9]{1,3}[\\s\\-]?)?[0-9\\s\\-\\(\\)]{7,15}$",
+                                                 'pattern': r"^(\+?[0-9]{1,3}[\s\-]?)?[0-9\s\-\(\)]{7,15}$",
                                                  'title': 'Saisissez un numéro de téléphone valide'}),
             'agrement_ecole': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'N°agrement',
                                                      'title': 'Saisissez le numéro de l\'agrement de votre école'}),
@@ -124,10 +129,9 @@ class FormEcole(ModelForm):
                                                'title': 'Saisissez une boite postale'}),
             'email_ecole': forms.EmailInput(
                 attrs={'class': 'form-control', 'placeholder': 'Ex: contact@universtechgroup.com',
-                       'pattern': "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}", 'title': 'Saisissez un email correct!'}),
+                       'title': 'Saisissez un email correct!'}),
             'site_internet': forms.URLInput(
                 attrs={'class': 'form-control', 'placeholder': 'Ex: https://www.universtechgroup.com',
-                       'pattern': "https?://[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}.*",
                        'title': 'Saisissez un site web correct!'}),
             'devise_ecole': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Devise de l\'école',
                                                    'title': 'Saisissez la devise/slogan de l\'école'}),
@@ -136,16 +140,16 @@ class FormEcole(ModelForm):
             'dga': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Prénoms et Nom DGA',
                                          'title': 'Saisissez le prénoms et nom du/de la Directeur(trice) Général(e) Adjoint(e)'}),
             'coordo_maternelle': forms.TextInput(
-                attrs={'class': 'form-control', 'placeholder': 'Prénoms et Nom du Coordinateur Maternelle',
-                       'title': 'Saisissez le prénoms et nom du coordinateur de la maternelle'}),  
+                attrs={'class': 'form-control', 'placeholder': 'Prénoms et Nom Directeur(trice) Maternelle',
+                       'title': 'Saisissez le prénoms et nom du Directeur(trice) de la maternelle'}),  
 
             'coordo_primaire': forms.TextInput(
-                attrs={'class': 'form-control', 'placeholder': 'Prénoms et Nom du Coordinateur Primaire',
-                       'title': 'Saisissez le prénoms et nom du coordinateur du primaire'}),
+                attrs={'class': 'form-control', 'placeholder': 'Prénoms et Nom Directeur(trice) Primaire',
+                       'title': 'Saisissez le prénoms et nom du Directeur(trice) du primaire'}),
 
             'coordo_secondaire': forms.TextInput(
-                attrs={'class': 'form-control', 'placeholder': 'Prénoms et Nom du Coordinateur Secondaire',
-                       'title': 'Saisissez le prénoms et nom du coordinateur du secondaire'}),
+                attrs={'class': 'form-control', 'placeholder': 'Prénoms et Nom du Principal Secondaire',
+                       'title': 'Saisissez le prénoms et nom du Principal du secondaire'}),
                        
             'comptable': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Prénoms et Nom Comptable', 'title': 'Saisissez le prénoms et nom du/de la comptable'}),
 
@@ -180,4 +184,13 @@ class FormEcole(ModelForm):
         self.fields['coordo_maternelle'].required=False
         self.fields['coordo_secondaire'].required=False
         
-        
+    def clean_email_ecole(self):
+        email = self.cleaned_data.get('email_ecole')
+        if email and not re.match(EMAIL_PATTERN, email):
+            raise ValidationError("Format d'email invalide pour l'école.")
+        return email 
+
+    def valider_url_ecole(valeur):
+        if valeur and not re.fullmatch(URL_PATTERN, valeur):
+            raise ValidationError("Format de l'adresse du site web de l'école incorrect.")
+        return valeur
