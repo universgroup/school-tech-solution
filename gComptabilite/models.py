@@ -45,7 +45,8 @@ CATEGORIE_RECETTE_CHOICES = (
     ('Autres Extra Scolaires','Autres Extra Scolaires'), # 6
     ('Arriere Scolaire', 'Arriere scolaire'),  # 7
     ('Remboursement Prêt', 'Remboursement prêt'),  # 8
-    ('Autres Recettes', 'Autres recettes')  # 9
+    ('Autres Recettes', 'Autres recettes'),  # 9
+    ('Approvisionnement','Approvisionnement caisse'), # 10
 )
 
 TYPE_PAIEMENT_MENSUALITE_CHOICES = (

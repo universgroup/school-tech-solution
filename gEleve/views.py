@@ -8,6 +8,7 @@ from datetime import datetime, date  # Utilisé pour recuperer l'année courante
 from django.db.models import Q, Max, \
     Sum  # Permet de faire des requêtes avec les opérateurs And (,) et les opérateurs OR (|)
 import io  # Librairie contenant les methodes utilisant les péripheriques d'entrées/sorties
+import urllib.parse
 from django.http import FileResponse, HttpResponseRedirect, JsonResponse
 
 from reportlab.pdfgen import canvas
@@ -623,6 +624,7 @@ def recuinscription(request, idinsc):
         buffer.seek(0)
 
         # ── ENVOI EMAIL ──
+        statut_email = None  # sera lu côté JS via un header
 
         if not ins.mail_envoye_inscription: # Verifie si l'email n'a pas encore été envoyé alors il y procède sinon pas d'envoi de mail
             try:
@@ -636,22 +638,29 @@ def recuinscription(request, idinsc):
                 )
                 email.attach(f'Recu_inscription_{str(data[2])}.pdf', buffer.getvalue(), 'application/pdf')
                 email.send()
-                messages.success(request, 'Email envoyé avec succès!')
+
+                statut_email = 'success:Email envoyé avec succès!'
 
                 ins.mail_envoye_inscription = True # Je mets le champ mail_envoye a True pour empecher la prochaine fois d'imprimer le recu
                 ins.save(update_fields=['mail_envoye_inscription']) # Je valide enfin la mise à jour
 
             except SMTPException:
-                messages.warning(request, 'Erreur SMTP : impossible d\'envoyer l\'email.')
+                statut_email = 'warning:Erreur SMTP : impossible d\'envoyer l\'email.'
             except socket.gaierror:
-                messages.warning(request, 'Pas de connexion internet. Email non envoyé.')
+                statut_email = 'warning:Pas de connexion internet. Email non envoyé.'
             except TimeoutError:
-                messages.warning(request, 'Délai de connexion dépassé. Email non envoyé.')
+                statut_email = 'warning:Délai de connexion dépassé. Email non envoyé.'
             except Exception as e:
-                messages.warning(request, f'Erreur inattendue : {str(e)}')
+                statut_email = f'warning:Erreur inattendue : {str(e)}'
+        else:
+            statut_email = 'info:Email déjà envoyé précédemment.'
 
         buffer.seek(0)
-        return FileResponse(buffer, as_attachment=False, filename=f'Recu_inscription_{str(data[2])}.pdf', content_type='application/pdf')
+        reponse = FileResponse(buffer, as_attachment=False, filename=f'Recu_inscription_{str(data[2])}.pdf', content_type='application/pdf')
+        if statut_email:
+                    # Header custom lisible en JS ; on encode pour éviter les accents/caractères spéciaux
+                    reponse['X-Statut-Email'] = urllib.parse.quote(statut_email)
+        return reponse
 
 
 # Cette fonction permet d'imprimer les recus d'inscription de manière permanente
@@ -716,7 +725,10 @@ def chargerinfoeleveclasse(request):
 @action_requise('eleve_inscrire')
 def validerreinscription(request):
 
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+
     if request.method == 'POST':
+
         cy = request.POST['cycle']
         ans = request.POST['annee_scolaire_new']
         mat = request.POST['matricule']
@@ -763,7 +775,9 @@ def validerreinscription(request):
         his.user_login = 'contact@universtechg'
         his.save()
 
-        messages.success(request, 'Reinscription validée avec succès')
+        message_succes = 'Reinscription validée avec succès'
+        if not is_ajax:
+            messages.success(request, message_succes)
 
         # Ici je vais recuperer le dernier ID validé de l'Inscription
         idi = Inscription.objects.latest(
@@ -773,6 +787,7 @@ def validerreinscription(request):
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                             return JsonResponse({
                                 'success': True,
+                                'message': message_succes,
                                 'recu_url': reverse('recureinscription', args=(lastid,))
                                 })
         
@@ -978,6 +993,8 @@ def recureinscription(request, idinsc):
         buffer.seek(0)
 
         # ── ENVOI EMAIL ──
+        
+        statut_email = None  # sera lu côté JS via un header
 
         if not ins.mail_envoye_inscription:
             try:
@@ -990,23 +1007,30 @@ def recureinscription(request, idinsc):
                 )
                 email.attach(f'Recu_reinscription_{str(data[2])}.pdf', buffer.getvalue(), 'application/pdf')
                 email.send()
-                messages.success(request, 'Email envoyé avec succès!')
+
+                statut_email = 'success:Email envoyé avec succès!'
 
                 ins.mail_envoye_inscription = True
                 ins.save(update_fields=['mail_envoye_inscription'])
 
                
             except SMTPException:
-                messages.warning(request, 'Erreur SMTP : impossible d\'envoyer l\'email.')
+                statut_email = 'warning:Erreur SMTP : impossible d\'envoyer l\'email.'
             except socket.gaierror:
-                messages.warning(request, 'Pas de connexion internet. Email non envoyé.')
+                statut_email = 'warning:Pas de connexion internet. Email non envoyé.'
             except TimeoutError:
-                messages.warning(request, 'Délai de connexion dépassé. Email non envoyé.')
+                statut_email = 'warning:Délai de connexion dépassé. Email non envoyé.'
             except Exception as e:
-                messages.warning(request, f'Erreur inattendue : {str(e)}')
+                statut_email = f'warning:Erreur inattendue : {str(e)}'
+        else:
+            statut_email = 'info:Email déjà envoyé précédemment.'
 
         buffer.seek(0)
-        return FileResponse(buffer, as_attachment=False, filename=f'Recu_reinscription_{str(data[2])}.pdf', content_type='application/pdf')
+        reponse = FileResponse(buffer, as_attachment=False, filename=f'Recu_reinscription_{str(data[2])}.pdf', content_type='application/pdf')
+        if statut_email:
+                    # Header custom lisible en JS ; on encode pour éviter les accents/caractères spéciaux
+                    reponse['X-Statut-Email'] = urllib.parse.quote(statut_email)
+        return reponse
 
 @action_requise('menu_eleves')
 def imprimerecureinscription(request, idins):

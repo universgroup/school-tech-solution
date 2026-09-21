@@ -693,18 +693,20 @@ def validerpaiementscolarite(request):
 
             etatpaie.save()
 
-            solde_dispo= Decimal(affichersoldecaisse())
-            # Je vais enregistrer ensuite l'opération dans la table caisse
-            cais = Caisse()
-            cais.type_operation = TYPE_OPERATION_CAISSE_CHOICES[1][1]
-            cais.libelle_operation = 'Paiement des frais de scolarité de l\'élève:  {},  {} , {} '.format(
-                matel.matricule, matel.nom, matel.prenom)
-            cais.montant_encaisse = Decimal(mont_paye)
-            cais.anscolaire = anes
-            cais.categ_depense = CATEGORIE_RECETTE_CHOICES[1][1]
-            cais.solde_actuel = Decimal(solde_dispo) + Decimal(mont_paye)
-            cais.date_operation = request.POST['date_paiement']
-            cais.save()
+            if modepaie == MODE_PAIEMENT_CHOICES[0][0]: # Si le mode de paie est Espèce, alors on ajoute à la caisse
+                                    
+                solde_dispo= Decimal(affichersoldecaisse())
+                # Je vais enregistrer ensuite l'opération dans la table caisse
+                cais = Caisse()
+                cais.type_operation = TYPE_OPERATION_CAISSE_CHOICES[1][1]
+                cais.libelle_operation = 'Paiement des frais de scolarité de l\'élève:  {},  {} , {} '.format(
+                    matel.matricule, matel.nom, matel.prenom)
+                cais.montant_encaisse = Decimal(mont_paye)
+                cais.anscolaire = anes
+                cais.categ_depense = CATEGORIE_RECETTE_CHOICES[1][1]
+                cais.solde_actuel = Decimal(solde_dispo) + Decimal(mont_paye)
+                cais.date_operation = request.POST['date_paiement']
+                cais.save()
 
             message_succes = 'Paiement validé avec succès !!!'
             if not is_ajax:
@@ -761,6 +763,8 @@ def recupaiementscolarite(request, idetat, nom_tranche, mont_paye):
     montant_tranche = 0
     montant_paye = 0
     reste_a_payer = 0
+    t1 = 0
+    t2 = 0
     
     montant_tranche_formate = None
     montant_paye_formate = None
@@ -783,27 +787,34 @@ def recupaiementscolarite(request, idetat, nom_tranche, mont_paye):
         # Ici je tente de recuperer les données sur l'état de paiement de l'élève depuis la BD
 
         etatpaie = EtatPaiementTranche.objects.select_related('anneescolaire', 'mateleve', 'idclasse').get(id=idetat)
+
         data = [etatpaie.id, etatpaie.anneescolaire.descript_annee, etatpaie.mateleve.matricule, etatpaie.idclasse, etatpaie.mateleve.nom,
-                etatpaie.mateleve.prenom,
-                etatpaie.mateleve.tuteur, etatpaie.mateleve.contact_pere, etatpaie.mateleve.email_pere, etatpaie.mateleve.email_mere
+                etatpaie.mateleve.prenom, etatpaie.mateleve.tuteur, etatpaie.mateleve.contact_pere, etatpaie.mateleve.email_pere, etatpaie.mateleve.email_mere,
                 ]
+
+        # Je cherche à travers cette requête à recuperer les montants payés par l'elève pour chaque tranche en vue de calculer le reste à payer par tranche conformement à celui dans la vue
+
         
+        montant_paye     = Decimal(mont_paye)
+
+               
         if nom_tranche == DEUX_TRANCHES_CHOICES[0][0]: # Si c'est la première tranche qui a été choisie, je recupère le montant de la tranche dans la table classe
 
+            
             tranche_name = DEUX_TRANCHES_CHOICES[0][1] # i.e Première tranche
             montant_tranche = etatpaie.idclasse.tranche1
+            t1 = etatpaie.premiere_tranche # Je recupère le cumul antérieur de la tranche
+            reste_a_payer     = montant_tranche -  t1
+
 
         elif nom_tranche == DEUX_TRANCHES_CHOICES[1][0]: # Si c'est la deuxième tranche, je recupère le montant correspondant dans la table classe
 
+            
             tranche_name = DEUX_TRANCHES_CHOICES[1][1] # i.e Deuxième tranche
             montant_tranche = etatpaie.idclasse.tranche2
-
-        montant_paye     = Decimal(mont_paye)
-
-        # if etatpaie.m_rabais:
-        #     reste_a_payer     = (montant_tranche - montant_paye)-etatpaie.m_rabais
-        # else:
-        reste_a_payer     = montant_tranche - montant_paye
+            t2 = etatpaie.deuxieme_tranche # Je recupère le cumul antérieur de la tranche
+            reste_a_payer     = montant_tranche - t2
+              
 
         montant_tranche_formate   = '{:,} GNF'.format(montant_tranche)
         montant_paye_formate = '{:,} GNF'.format(montant_paye)

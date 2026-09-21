@@ -346,8 +346,7 @@
 
             const formData = new FormData(this);
 
-            // Toast de feedback immédiat pendant le traitement
-            afficherMessage('info', 'Chargement du recu de paiement en cours...');
+            
 
             fetch(this.action, {
                 method: 'POST',
@@ -357,7 +356,13 @@
             .then(response => response.json())
             .then(data => {
                     if (data.success) {
+
+                        // Toast de feedback immédiat pendant le traitement
+                        afficherMessage('info', 'Chargement du recu de paiement en cours...');
+                        
                         afficherMessage('success', data.message);  // message de paiement immédiat
+
+                        
 
                         // On récupère le PDF nous-même pour pouvoir lire le header de statut email
                         return fetch(data.recu_url).then(recuResponse => {
@@ -370,7 +375,11 @@
                             return recuResponse.blob();
                         }).then(blob => {
                             const blobUrl = URL.createObjectURL(blob);
-                            nouvelOnglet.location.href = blobUrl;
+                             // Petit délai volontaire pour laisser le temps de lire
+                            // les toasts avant que le focus ne bascule sur le PDF
+                            setTimeout(() => {
+                                nouvelOnglet.location.href = blobUrl;
+                            }, 2500);
                         });
 
                       }

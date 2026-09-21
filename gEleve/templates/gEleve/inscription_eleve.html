@@ -350,9 +350,7 @@ INSCRIPTION DES ELEVES
         window.focus(); // Maintient l'onglet d'origine, celui du formulaire ouvert pour voir les messages toast avant l'ouverture du nouvel onglet
 
         const formData = new FormData(this);
-
-        // Toast de feedback immédiat pendant le traitement
-        afficherMessage('info', 'Chargement du reçu d\'inscription en cours...');
+       
 
         fetch(this.action, {
             method: 'POST',
@@ -362,6 +360,9 @@ INSCRIPTION DES ELEVES
         .then(response => response.json())
         .then(data => {
                 if (data.success) {
+
+                     // Toast de feedback immédiat pendant le traitement
+                    afficherMessage('info', 'Chargement du reçu d\'inscription en cours...');
                     afficherMessage('success', data.message);  // message de paiement immédiat
 
                     // On récupère le PDF nous-même pour pouvoir lire le header de statut email
@@ -375,7 +376,11 @@ INSCRIPTION DES ELEVES
                         return recuResponse.blob();
                     }).then(blob => {
                         const blobUrl = URL.createObjectURL(blob);
-                        nouvelOnglet.location.href = blobUrl;
+                        // Petit délai volontaire pour laisser le temps de lire
+                        // les toasts avant que le focus ne bascule sur le PDF
+                        setTimeout(() => {
+                            nouvelOnglet.location.href = blobUrl;
+                        }, 2500);
                     });
 
                     }
