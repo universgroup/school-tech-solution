@@ -45,7 +45,8 @@ CATEGORIE_RECETTE_CHOICES = (
     ('Autres Extra Scolaires','Autres Extra Scolaires'), # 6
     ('Arriere Scolaire', 'Arriere scolaire'),  # 7
     ('Remboursement Prêt', 'Remboursement prêt'),  # 8
-    ('Autres Recettes', 'Autres recettes')  # 9
+    ('Autres Recettes', 'Autres recettes'),  # 9
+    ('Approvisionnement','Approvisionnement caisse'), # 10
 )
 
 TYPE_PAIEMENT_MENSUALITE_CHOICES = (
@@ -112,7 +113,8 @@ class EtatPaiementTranche(models.Model):
     reste_a_payer = models.DecimalField(max_digits=20, decimal_places=2, default=0, null=True)
     date_paie = models.DateField()
     mode_paie = models.CharField(max_length=50, choices=MODE_PAIEMENT_CHOICES, default=MODE_PAIEMENT_CHOICES[0][0], null=True)
-    mail_envoye_paie = models.BooleanField(default=False, null=True) # Permet de gerer l'envoi multiple des mails aux parents pour alerter de la reception du recu de paiement
+    mail_envoye_paie_pt = models.BooleanField(default=False, null=True) # Permet de gerer l'envoi multiple des mails aux parents pour alerter de la reception du recu de paiement de la première tranche
+    mail_envoye_paie_dt = models.BooleanField(default=False, null=True) # Permet de gerer l'envoi multiple des mails aux parents pour alerter de la reception du recu de paiement de la deuxième tranche
     mateleve = models.ForeignKey(Eleve, on_delete=models.CASCADE)
     idclasse = models.ForeignKey(Classe, on_delete=models.CASCADE)
     idcycle = models.ForeignKey(CycleScolaire, on_delete=models.CASCADE)

@@ -194,8 +194,10 @@
 
             // Ouverture immédiate, dans le contexte du clic → pas bloqué par le navigateur
             const nouvelOnglet = window.open('', '_blank');
+            window.focus();
 
             const formData = new FormData(this);
+            
 
             fetch(this.action, {
                 method: 'POST',
@@ -204,17 +206,41 @@
             })
             .then(response => response.json())
             .then(data => {
-                if (data.success) {
-                    nouvelOnglet.location.href = data.recu_url;
-                    // Ici : rester sur la page, afficher un message, réinitialiser le formulaire, etc.
-                } else {
-                    nouvelOnglet.close();
-                    alert(data.error || "Une erreur est survenue.");
-                }
-            })
+                    if (data.success) {
+
+                        // Toast de feedback immédiat pendant le traitement
+                        afficherMessage('info', 'Chargement du reçu de reinscription en cours...');
+                        
+                        afficherMessage('success', data.message);  // message de paiement immédiat
+                        
+
+                        // On récupère le PDF nous-même pour pouvoir lire le header de statut email
+                        return fetch(data.recu_url).then(recuResponse => {
+                            const statutBrut = recuResponse.headers.get('X-Statut-Email');
+                            if (statutBrut) {
+                                const statut = decodeURIComponent(statutBrut);
+                                const [type, ...reste] = statut.split(':');
+                                afficherMessage(type, reste.join(':'));
+                            }
+                            return recuResponse.blob();
+                        }).then(blob => {
+                            const blobUrl = URL.createObjectURL(blob);
+                            // Petit délai volontaire pour laisser le temps de lire
+                            // les toasts avant que le focus ne bascule sur le PDF
+                            setTimeout(() => {
+                                nouvelOnglet.location.href = blobUrl;
+                            }, 2500);
+                        });
+
+                        }
+                        else {
+                        nouvelOnglet.close();
+                        afficherMessage('error', data.error || "Une erreur est survenue.");
+                        }
+                    })
             .catch(() => {
                 nouvelOnglet.close();
-                alert("Erreur réseau, veuillez réessayer.");
+                afficherMessage('error', "Erreur réseau, veuillez réessayer.");
             });
         });
 

@@ -41,6 +41,9 @@
   <!-- Style du template dashboard à applique sur tous les autres templates-->
   <link rel="stylesheet" href="{% static 'assets/css/dashboard.css' %}">
 
+  <!-- Style bootstrap appliqué au message envoyé dans le navigateur pour les rendre plus conviviaux-->
+  <link rel="stylesheet" href="{% static 'assets/css/app-notifications.css' %}">
+
 </head>
 <body class="hold-transition sidebar-mini">
 <div class="wrapper">
@@ -723,7 +726,9 @@
               </div>
               <!-- /.card-header -->
               <!-- form start -->
-                  {% include 'messages.html' %}
+                  <div id="zone-messages">
+                    {% include 'messages.html' %}
+                  </div>
                   {% block formulaire %} 
                   
                   
@@ -803,6 +808,7 @@
   </div>
 </div>
 
+<div id="toast-container"></div> <!-- Permet d'afficher les messages en format toast -->
 
 <!-- jQuery -->
 <!-- jQuery 3.7.1 (dernière version stable de la branche 3.x, corrige les CVE
@@ -827,6 +833,11 @@
 
 <!-- Affichage de la photo dans les differents templates qui utilisent les photos -->
 <script src="{% static 'assets/js/zonephoto.js' %}"></script>
+
+<!-- Style bootstrap pour styliser les messages et les animer dans le navigateur-->
+ <script src="{% static 'assets/js/app-notifications.js' %}"></script>
+
+ 
 
 {% block javascript %}
 <script>

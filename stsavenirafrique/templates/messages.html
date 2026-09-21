@@ -1,37 +1,27 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>
-    </title>
+    <title></title>
     <meta charset="utf-8">
 </head>
 <body>
     {% if messages %}
-    <ul class="messages">
+    <ul class="messages" style="list-style:none; padding:0; margin:0;">
         {% for message in messages %}
         <div class="container-fluid p-0">
-            <div class="alert {{ message.tags }} alert-dismissible" role="alert" id="msg">
+            <div class="alert {{ message.tags }} alert-dismissible notif-cool" role="alert">
                 <button type="button" class="close" data-dismiss="alert" aria-label="close">
                     <span aria-hidden="true">&times;</span>
                 </button>
-                {{ message }}
+                <div class="notif-cool-corps">
+                    <i class="fas notif-cool-icone notif-icone-{{ message.tags }}"></i>
+                    <span class="notif-cool-texte">{{ message }}</span>
+                </div>
+                <div class="notif-cool-barre"></div>
             </div>
         </div>
-       {% endfor %}
+        {% endfor %}
     </ul>
     {% endif %}
-
-
-    <script>
-        // Cette fonction permet de masquer le message après un delai de 3s doit 3000ms
-        setTimeout(function(){
-
-            if ($("#msg").length>0){
-                $("#msg").remove();
-            }
-
-        }, 3000)
-    </script>
-
 </body>
 </html>

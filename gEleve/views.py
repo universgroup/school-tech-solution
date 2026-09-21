@@ -8,6 +8,7 @@ from datetime import datetime, date  # Utilisé pour recuperer l'année courante
 from django.db.models import Q, Max, \
     Sum  # Permet de faire des requêtes avec les opérateurs And (,) et les opérateurs OR (|)
 import io  # Librairie contenant les methodes utilisant les péripheriques d'entrées/sorties
+import urllib.parse
 from django.http import FileResponse, HttpResponseRedirect, JsonResponse
 
 from reportlab.pdfgen import canvas
@@ -48,11 +49,28 @@ style_totaux = ParagraphStyle('Totaux', fontName='Helvetica-Bold', fontSize=8, t
 # GESTION DES INSCRIPTIONS DES ELEVES
 @action_requise('eleve_inscrire')
 def enregistrereleve(request):
+
     mateleve = ''
     nom_eleve = ''
     pren_eleve = ''
+
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
     
     if request.method == 'POST':
+
+
+        def erreur_response(message):
+            """Centralise le renvoi d'erreur : JSON pour l'AJAX, message Django sinon."""
+            if not is_ajax:
+                messages.error(request, message)
+            if is_ajax:
+                return JsonResponse({'success': False, 'error': message})
+            return None # signale à l'appelant de continuer vers le render classique
+
+        def initialiserform():
+            formeleve = FormEleve()
+            forminscrit = FormInscription()            
+            return render(request, 'gEleve/inscription_eleve.html', dict(form=formeleve,form_inscrit=forminscrit))
 
         # 1ère Partie du formulaire (Tabpage 1) : Validation des données personnelles de l'élève
         formeleve = FormEleve(request.POST)
@@ -142,7 +160,9 @@ def enregistrereleve(request):
 
         # 2ème Partie (Tabpage 2) : Validation de l'inscription de l'élève
         forminscrip = FormInscription(request.POST)
+
         if forminscrip.is_valid():
+                
                 ansco = request.POST.get('annee_scolaire')  # Je recupère ici l'ID de l'année scolaire selectionnée
                 idclas = request.POST.get('idclasse')  # Ici l'ID de la Classe selectionnée
                 idcy = request.POST.get('idcycle')  # Ici l'ID du cycle selectionné
@@ -194,20 +214,22 @@ def enregistrereleve(request):
                 his.poste_travail = ''
                 his.save()
 
-                messages.success(request, 'Inscription validée avec succès')
+                message_succes = 'Inscription validée avec succès'
+                if not is_ajax:
+                    messages.success(request, message_succes)
 
                 # Je vide les champs après validation
-                formeleve = FormEleve()
-                forminscrit = FormInscription()
+                initialiserform()
 
                 # Ici je vais recuperer le dernier ID validé de l'Inscription
                 idi = Inscription.objects.latest(
                 'id')  # Cette instruction permet de recuperer le dernier record suivant l'id
                 lastid = idi.id  # Permet de recuperer l'ID de ce dernier record
 
-                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                if is_ajax :
                     return JsonResponse({
                         'success': True,
+                        'message': message_succes,
                         'recu_url': reverse('recuinscription', args=(lastid,))
                         })
 
@@ -429,7 +451,7 @@ def recuinscription(request, idinsc):
                 ins.mateleve.matricule, ins.idclasse,
                 ins.mateleve.nom, ins.mateleve.prenom,
                 ins.mateleve.tuteur, ins.mateleve.contact_pere,
-                ins.mateleve.email_pere, ins.date_inscription,
+                ins.mateleve.email_pere, ins.mateleve.email_mere, ins.date_inscription,
                 ins.idclasse.frais_inscription]
 
         ch  = str(data[1]).split('-')
@@ -552,12 +574,12 @@ def recuinscription(request, idinsc):
             p.setFont('Helvetica-Bold', 11)
             p.drawString(120, 600 + y_offset, 'Date inscription :')
             p.setFont('Helvetica', 11)
-            p.drawString(220, 600 + y_offset, str(data[9]))
+            p.drawString(220, 600 + y_offset, str(data[10]))
 
             p.setFont('Helvetica-Bold', 11)
             p.drawString(120, 582 + y_offset, 'Frais inscription :')
             p.setFont('Helvetica', 11)
-            p.drawString(220, 582 + y_offset, '{:,} GNF'.format(data[10]))
+            p.drawString(220, 582 + y_offset, '{:,} GNF'.format(data[11]))
 
             p.setFont('Helvetica-Bold', 11)
             p.drawString(120, 564 + y_offset, 'Classe :')
@@ -602,6 +624,7 @@ def recuinscription(request, idinsc):
         buffer.seek(0)
 
         # ── ENVOI EMAIL ──
+        statut_email = None  # sera lu côté JS via un header
 
         if not ins.mail_envoye_inscription: # Verifie si l'email n'a pas encore été envoyé alors il y procède sinon pas d'envoi de mail
             try:
@@ -611,26 +634,33 @@ def recuinscription(request, idinsc):
                     body=f'Veuillez trouver votre reçu d\'inscription en pièce jointe.\n'
                         f'Cordialement.\nLe Service Scolarité : {data_ecole[8]}',
                     from_email=settings.DEFAULT_FROM_EMAIL,
-                    to=[data[8]],
+                    to=[data[8], data[9]],
                 )
                 email.attach(f'Recu_inscription_{str(data[2])}.pdf', buffer.getvalue(), 'application/pdf')
                 email.send()
-                messages.success(request, 'Email envoyé avec succès!')
+
+                statut_email = 'success:Email envoyé avec succès!'
 
                 ins.mail_envoye_inscription = True # Je mets le champ mail_envoye a True pour empecher la prochaine fois d'imprimer le recu
                 ins.save(update_fields=['mail_envoye_inscription']) # Je valide enfin la mise à jour
 
             except SMTPException:
-                messages.warning(request, 'Erreur SMTP : impossible d\'envoyer l\'email.')
+                statut_email = 'warning:Erreur SMTP : impossible d\'envoyer l\'email.'
             except socket.gaierror:
-                messages.warning(request, 'Pas de connexion internet. Email non envoyé.')
+                statut_email = 'warning:Pas de connexion internet. Email non envoyé.'
             except TimeoutError:
-                messages.warning(request, 'Délai de connexion dépassé. Email non envoyé.')
+                statut_email = 'warning:Délai de connexion dépassé. Email non envoyé.'
             except Exception as e:
-                messages.warning(request, f'Erreur inattendue : {str(e)}')
+                statut_email = f'warning:Erreur inattendue : {str(e)}'
+        else:
+            statut_email = 'info:Email déjà envoyé précédemment.'
 
         buffer.seek(0)
-        return FileResponse(buffer, as_attachment=False, filename=f'Recu_inscription_{str(data[2])}.pdf', content_type='application/pdf')
+        reponse = FileResponse(buffer, as_attachment=False, filename=f'Recu_inscription_{str(data[2])}.pdf', content_type='application/pdf')
+        if statut_email:
+                    # Header custom lisible en JS ; on encode pour éviter les accents/caractères spéciaux
+                    reponse['X-Statut-Email'] = urllib.parse.quote(statut_email)
+        return reponse
 
 
 # Cette fonction permet d'imprimer les recus d'inscription de manière permanente
@@ -695,7 +725,10 @@ def chargerinfoeleveclasse(request):
 @action_requise('eleve_inscrire')
 def validerreinscription(request):
 
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+
     if request.method == 'POST':
+
         cy = request.POST['cycle']
         ans = request.POST['annee_scolaire_new']
         mat = request.POST['matricule']
@@ -742,7 +775,9 @@ def validerreinscription(request):
         his.user_login = 'contact@universtechg'
         his.save()
 
-        messages.success(request, 'Reinscription validée avec succès')
+        message_succes = 'Reinscription validée avec succès'
+        if not is_ajax:
+            messages.success(request, message_succes)
 
         # Ici je vais recuperer le dernier ID validé de l'Inscription
         idi = Inscription.objects.latest(
@@ -752,6 +787,7 @@ def validerreinscription(request):
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                             return JsonResponse({
                                 'success': True,
+                                'message': message_succes,
                                 'recu_url': reverse('recureinscription', args=(lastid,))
                                 })
         
@@ -784,7 +820,7 @@ def recureinscription(request, idinsc):
                 ins.mateleve.matricule, ins.idclasse,
                 ins.mateleve.nom, ins.mateleve.prenom,
                 ins.mateleve.tuteur, ins.mateleve.contact_pere,
-                ins.mateleve.email_pere, ins.date_inscription,
+                ins.mateleve.email_pere, ins.mateleve.email_mere, ins.date_inscription,
                 ins.idclasse.frais_reinscription]
 
         ch  = str(data[1]).split('-')
@@ -907,12 +943,12 @@ def recureinscription(request, idinsc):
             p.setFont('Helvetica-Bold', 11)
             p.drawString(120, 600 + y_offset, 'Date réinscription :')
             p.setFont('Helvetica', 11)
-            p.drawString(230, 600 + y_offset, str(data[9]))
+            p.drawString(230, 600 + y_offset, str(data[10]))
 
             p.setFont('Helvetica-Bold', 11)
             p.drawString(120, 582 + y_offset, 'Frais réinscription :')
             p.setFont('Helvetica', 11)
-            p.drawString(230, 582 + y_offset, '{:,} GNF'.format(data[10]))
+            p.drawString(230, 582 + y_offset, '{:,} GNF'.format(data[11]))
 
             p.setFont('Helvetica-Bold', 11)
             p.drawString(120, 564 + y_offset, 'Classe :')
@@ -957,6 +993,8 @@ def recureinscription(request, idinsc):
         buffer.seek(0)
 
         # ── ENVOI EMAIL ──
+        
+        statut_email = None  # sera lu côté JS via un header
 
         if not ins.mail_envoye_inscription:
             try:
@@ -965,27 +1003,34 @@ def recureinscription(request, idinsc):
                     body=f'Veuillez trouver votre reçu de réinscription en pièce jointe.\n'
                         f'Cordialement.\nLe Service Scolarité : {data_ecole[8]}',
                     from_email=settings.DEFAULT_FROM_EMAIL,
-                    to=[data[8]],
+                    to=[data[8], data[9]],
                 )
                 email.attach(f'Recu_reinscription_{str(data[2])}.pdf', buffer.getvalue(), 'application/pdf')
                 email.send()
-                messages.success(request, 'Email envoyé avec succès!')
+
+                statut_email = 'success:Email envoyé avec succès!'
 
                 ins.mail_envoye_inscription = True
                 ins.save(update_fields=['mail_envoye_inscription'])
 
                
             except SMTPException:
-                messages.warning(request, 'Erreur SMTP : impossible d\'envoyer l\'email.')
+                statut_email = 'warning:Erreur SMTP : impossible d\'envoyer l\'email.'
             except socket.gaierror:
-                messages.warning(request, 'Pas de connexion internet. Email non envoyé.')
+                statut_email = 'warning:Pas de connexion internet. Email non envoyé.'
             except TimeoutError:
-                messages.warning(request, 'Délai de connexion dépassé. Email non envoyé.')
+                statut_email = 'warning:Délai de connexion dépassé. Email non envoyé.'
             except Exception as e:
-                messages.warning(request, f'Erreur inattendue : {str(e)}')
+                statut_email = f'warning:Erreur inattendue : {str(e)}'
+        else:
+            statut_email = 'info:Email déjà envoyé précédemment.'
 
         buffer.seek(0)
-        return FileResponse(buffer, as_attachment=False, filename=f'Recu_reinscription_{str(data[2])}.pdf', content_type='application/pdf')
+        reponse = FileResponse(buffer, as_attachment=False, filename=f'Recu_reinscription_{str(data[2])}.pdf', content_type='application/pdf')
+        if statut_email:
+                    # Header custom lisible en JS ; on encode pour éviter les accents/caractères spéciaux
+                    reponse['X-Statut-Email'] = urllib.parse.quote(statut_email)
+        return reponse
 
 @action_requise('menu_eleves')
 def imprimerecureinscription(request, idins):

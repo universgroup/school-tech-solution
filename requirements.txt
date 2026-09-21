@@ -7,6 +7,7 @@ django-crispy-forms==1.12.0
 et_xmlfile==2.0.0
 fontawesomefree==6.6.0
 idna==3.19
+nimbasms==1.0.2
 openpyxl==3.1.5
 pillow==12.1.1
 postgres==4.0

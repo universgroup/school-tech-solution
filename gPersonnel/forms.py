@@ -6,41 +6,43 @@ class FormPersonnel(ModelForm):
     class Meta:
         model = Personnel
         # fields =__all__
-        fields = ('nom_personnel', 'prenom_personnel', 'civilite', 'date_naissance', 'niveau_etude', 'type_personnel',
-                  'adresse_personnel', 'contact_personnel', 'fonction_personnel', 'email_personnel', 'sexe_personnel',
-                  'salbase',
-                  'annee_experience', 'contrat_type', 'diplome', 'date_embauche')
+        fields = ('nom_personnel', 'prenom_personnel', 'civilite', 'date_naissance','lieu_naissance', 'niveau_etude', 'type_personnel','adresse_personnel', 'contact_personnel', 'fonction_personnel', 'email_personnel', 'sexe_personnel','salbase','annee_experience', 'contrat_type', 'diplome', 'date_embauche','etat_matrimonial','annee_scolaire','photo_employe')
         labels = {
             'nom_personnel': 'Nom Famille',
-            'prenom_personnel': 'Prénom(s) Personnel',
+            'prenom_personnel': 'Prénom(s)',
             'civilite': 'Civilité',
             'date_naissance': 'Date naissance',
+            'lieu_naissance': 'Lieu naissance',
             'niveau_etude': 'Niveau étude',
-            'type_personnel': 'Type personnel',
-            'adresse_personnel': 'Adresse',
-            'contact_personnel': 'Contact',
-            'fonction_personnel': 'Fonction',
+            'type_personnel': 'Catégorie personnel',
+            'adresse_personnel': 'Adresse/Résidence',
+            'contact_personnel': 'N°Téléphone',
+            'fonction_personnel': 'Fonction/Poste occupé',
             'email_personnel': 'Email',
             'sexe_personnel': 'Genre',
             'salbase': 'Salaire de base',
-            'annee_experience': 'Année d\'expérience',
+            'annee_experience': 'Nombre d\'année d\'expérience',
             'contrat_type': 'Type contrat',
-            'diplome': 'Diplôme',
-            'date_embauche': 'Date d\'embauche'
+            'diplome': 'Diplôme le plus elevé',
+            'date_embauche': 'Date d\'embauche',
+            'etat_matrimonial': 'Situation matrimoniale',
+            'annee_scolaire': 'Année scolaire',
+            'photo_employe': 'Photo identité',
         }
         widgets = {
             'nom_personnel': forms.TextInput(
                 attrs={'class': 'form-control', 'placeholder': 'Nom Famille', 'title': 'Saisissez le nom de famille'}),
             'prenom_personnel': forms.TextInput(
-                attrs={'class': 'form-control', 'placeholder': 'Prénom(s) du Personnel',
-                       'title': 'Saisissez le prénoms'}),
+                attrs={'class': 'form-control', 'placeholder': 'Prénom(s)',
+                       'title': 'Saisissez les prénoms du personnel'}),
             'civilite': forms.Select(attrs={'class': 'form-control', 'title': 'Sélectionnez la civilité'},
                                      choices=CIVILITE_CHOICES),
             'date_naissance': forms.DateInput(
                 attrs={'class': 'form-control', 'type': 'date', 'title': 'Sélectionnez/tapez la date de naissance'}),
+            'lieu_naissance' : forms.TextInput(attrs={'class':'form-control','placeholder':'Lieu naissance', 'title':'Saisissez le lieu de naissance du personnel'}),
             'niveau_etude': forms.TextInput(
                 attrs={'class': 'form-control', 'placeholder': 'Niveau d\'étude du personnel',
-                       'title': 'Saisissez le niveau d\'étude du personnel'}),
+                       'title': 'Saisissez le niveau d\'étude du personnel (Primaire, Secondaire, Universitaire)'}),
             'type_personnel': forms.Select(attrs={'class': 'form-control',
                                                   'title': 'Sélectionnez la catégorie/type auquel appartient le personnel'},
                                            choices=TYPE_PERSONNEL),
