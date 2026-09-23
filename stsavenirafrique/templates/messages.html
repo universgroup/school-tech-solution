@@ -3,6 +3,9 @@
 <head>
     <title></title>
     <meta charset="utf-8">
+
+    {% include "partials/pwa_meta.html" %}
+    
 </head>
 <body>
     {% if messages %}
@@ -23,5 +26,8 @@
         {% endfor %}
     </ul>
     {% endif %}
+
+    {% include "partials/pwa_sw.html" %}
+
 </body>
 </html>

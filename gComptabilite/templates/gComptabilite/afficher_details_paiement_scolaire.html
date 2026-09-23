@@ -63,9 +63,13 @@ INFORMATIONS SUR LE PAIEMENT
                     <div class="col-md-2">
                             <div class="form-group text-center">
                                 <label>Photo</label><br>
-                                <img id="photoel" src="{{paie.mateleve.photo_eleve.url}}" 
-                                    width="95" height="95" 
-                                    style="border-radius: 50%; object-fit: cover; border: 2px solid #ddd;">
+                                {% if paie.mateleve.photo_eleve %}
+                                    <img id="photoel" src="{{paie.mateleve.photo_eleve.url}}" 
+                                        width="95" height="95" 
+                                        style="border-radius: 50%; object-fit: cover; border: 2px solid #ddd;">
+                                 {% else %}
+                                 <label>Photo indisponible</label>
+                                 {% endif %}  
                             </div>
                     </div>
                 </div>

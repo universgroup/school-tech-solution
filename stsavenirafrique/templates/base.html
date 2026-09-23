@@ -6,8 +6,12 @@
 
   <meta charset="utf-8">
   <title>{% block titre_page %} {% endblock titre_page %}</title>
+
   <!-- Tell the browser to be responsive to screen width -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Liens vers l'installable de l'application (PWA)-->
+  {% include "partials/pwa_meta.html" %}
   
   {% if logo_ecole %}
     <link rel="icon" type="image/png" href="{{ logo_ecole.url }}">
@@ -675,8 +679,8 @@
             </ul>
           </li>
           
-        {% endif %}  
-
+         {% endif %}  
+      
           <!-- Bouton Déconnexion dans le Sidebar -->
           <li class="nav-item mt-4">
               <form action="{% url 'deconnexion' %}" method="post" class="d-inline w-100">
@@ -808,7 +812,9 @@
   </div>
 </div>
 
-<div id="toast-container"></div> <!-- Permet d'afficher les messages en format toast -->
+<div id="toast-container">
+
+</div> <!-- Permet d'afficher les messages en format toast -->
 
 <!-- jQuery -->
 <!-- jQuery 3.7.1 (dernière version stable de la branche 3.x, corrige les CVE
@@ -836,6 +842,10 @@
 
 <!-- Style bootstrap pour styliser les messages et les animer dans le navigateur-->
  <script src="{% static 'assets/js/app-notifications.js' %}"></script>
+
+ 
+<!-- Permet l'enregistrement du script qui déclenche dans le navigateur l'option d'installation de l'app -->
+{% include "partials/pwa_sw.html" %}
 
  
 

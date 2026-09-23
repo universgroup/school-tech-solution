@@ -683,14 +683,16 @@ def validerpaiementscolarite(request):
             cycle = CycleScolaire.objects.all().order_by('id') # on recharge la liste des cycles a nouveau
             
             fscol = (etatpaie.premiere_tranche + etatpaie.deuxieme_tranche) # Permet de calculer le paiement total effectué par l'élève
-            etatpaie.fscolarite = fscol
+            
 
             if mremise:
-                etatpaie.reste_a_payer = (fannuel - fscol)- mremise # Le reste à payer annuel est le montant annuel dû moins le total de ses paiements oté de la remise s'il existe
-                etatpaie.m_rabais = mremise
+                fscol -= mremise # fscol = fscol - mremise-- je déduit le montant de la remise du paiement total effectué par l'élève
+                etatpaie.reste_a_payer = (fannuel - fscol) - mremise # Pour le reste à payer, je fais la différence entre le montant annuel du et le cumul des paiements effectués moins le montant de la remise
+                etatpaie.m_rabais = mremise # Je stocke enfin le montant de la remise accordé
             else:
                 etatpaie.reste_a_payer = fannuel - fscol
 
+            etatpaie.fscolarite = fscol
             etatpaie.save()
 
             if modepaie == MODE_PAIEMENT_CHOICES[0][0]: # Si le mode de paie est Espèce, alors on ajoute à la caisse
@@ -701,6 +703,7 @@ def validerpaiementscolarite(request):
                 cais.type_operation = TYPE_OPERATION_CAISSE_CHOICES[1][1]
                 cais.libelle_operation = 'Paiement des frais de scolarité de l\'élève:  {},  {} , {} '.format(
                     matel.matricule, matel.nom, matel.prenom)
+                
                 cais.montant_encaisse = Decimal(mont_paye)
                 cais.anscolaire = anes
                 cais.categ_depense = CATEGORIE_RECETTE_CHOICES[1][1]
@@ -1247,12 +1250,15 @@ def modifieretatpaiement(request, idpaie):
 
 
         fscol = (etatpaie.premiere_tranche + etatpaie.deuxieme_tranche) # Permet de calculer le paiement total effectué par l'élève
-        etatpaie.fscolarite = fscol
+        
         if mremise:
+            fscol -= mremise
             etatpaie.reste_a_payer = (fannuel - fscol)- mremise # Le reste à payer annuel est le montant annuel dû moins le total de ses paiements oté de la remise
             etatpaie.m_rabais = mremise
         else:
             etatpaie.reste_a_payer = fannuel - fscol
+
+        etatpaie.fscolarite = fscol
         etatpaie.save()
         
 

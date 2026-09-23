@@ -80,9 +80,13 @@ INFORMATIONS SUR LE PAIEMENT
                     <div class="col-md-2">
                             <div class="form-group text-center">
                                 <label>Photo</label><br>
-                                <img id="photoel" src="{{paie.mateleve.photo_eleve.url}}" 
-                                    width="95" height="95" 
-                                    style="border-radius: 50%; object-fit: cover; border: 2px solid #ddd;">
+                                {% if paie.mateleve.photo_eleve %}
+                                    <img id="photoel" src="{{ paie.mateleve.photo_eleve.url }}" 
+                                        width="95" height="95" 
+                                        style="border-radius: 50%; object-fit: cover; border: 2px solid #ddd;">
+                                {% else %}
+                                <label>Photo indisponible </label>
+                                {% endif %}
                             </div>
                     </div>
                 </div>
@@ -265,12 +269,12 @@ INFORMATIONS SUR LE PAIEMENT
             // $premiere.prop("readonly", true);
             // $deuxieme.prop("readonly", true);
 
-            if (tranche === "Premiere tranche") {
+            if (tranche === "PremiereT") {
                 // 1ère tranche sélectionnée -> on active uniquement ce champ
                 $premiere.prop("readonly", false);
                 $deuxieme.prop("readonly",true); // On maintient le champ deuxième tranche en readonly
 
-            } else if (tranche === "Deuxieme tranche") {
+            } else if (tranche === "DeuxiemeT") {
                 // 2ème tranche sélectionnée -> on active uniquement ce champ
                 $deuxieme.prop("readonly", false);
                 $premiere.prop("readonly",true); // On maintient le champ première tranche en readonly

@@ -4,6 +4,8 @@
   {% load static %}
   {% load permissions_tags %}
   <meta charset="utf-8">
+
+  {% include "partials/pwa_meta.html" %}
   
   {% if nom_ecole %}
   <title>{{nom_ecole}} &nbsp; --Tableau de bord</title>
@@ -1196,6 +1198,7 @@
 
   </script>
 
+  {% include "partials/pwa_sw.html" %}
 
 </body>
 </html>
