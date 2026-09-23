@@ -7,6 +7,8 @@
     <title>LISTE GENERALE DES INSCRITS PAR CLASSE</title>
     <!-- Tell the browser to be responsive to screen width -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    {% include "partials/pwa_meta.html" %}
     
     <!--Favicon-->
     {% if logo_ecole %}
@@ -1374,6 +1376,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
 
+{% include "partials/pwa_sw.html" %}
 
 <script>
   

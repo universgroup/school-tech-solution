@@ -8,6 +8,8 @@
     <!-- Tell the browser to be responsive to screen width -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    {% include "partials/pwa_meta.html" %}
+
     <!--Favicon-->
     {% if logo_ecole %}
     <link rel="icon" type="image/png" href="{{ logo_ecole.url }}">
@@ -806,6 +808,7 @@
                                 <th>2ème tranche</th>
                                 <th>Scolarité</th>
                                 <th>Reliquat</th>
+                                <th>Remise/Rabais</th>
                                 <th>Cycle</th>
                                 <th>Classe</th>
                                 <th>Année scolaire</th>
@@ -816,6 +819,7 @@
                         </tr>
 
                         <tr class="filters">
+                                <th></th>
                                 <th></th>
                                 <th></th>
                                 <th></th>
@@ -856,6 +860,7 @@
                                               <td>{{lp.deuxieme_tranche|floatformat:'2g'}}</td>
                                               <td>{{lp.fscolarite|floatformat:'2g'}}</td>
                                               <td>{{lp.reste_a_payer|floatformat:'2g'}}</td>
+                                              <td>{{lp.m_rabais|floatformat:'2g'}}</td>
                                               <td>{{lp.idcycle}}</td>
                                               <td>{{lp.idclasse}}</td>
                                               <td>{{lp.anneescolaire}}</td>
@@ -941,6 +946,7 @@
                             <th>2ème tranche</th>
                             <th>Scolarité</th>
                             <th>Reliquat</th>
+                            <th>Remise/Rabais</th>
                             <th>Cycle</th>
                             <th>Classe</th>
                             <th>Année scolaire</th>
@@ -1057,6 +1063,7 @@
                                 <th>2ème tranche</th>
                                 <th>Scolarité</th>
                                 <th>Reliquat</th>
+                                <th>Remise/Rabais</th>
                                 <th>Cycle</th>
                                 <th>Classe</th>
                                 <th>Année scolaire</th>
@@ -1067,6 +1074,7 @@
                         </tr>
 
                         <tr class="filters">
+                                <th></th>
                                 <th></th>
                                 <th></th>
                                 <th></th>
@@ -1108,6 +1116,7 @@
                                               <td>{{lp.deuxieme_tranche|floatformat:'2g'}}</td>
                                               <td>{{lp.fscolarite|floatformat:'2g'}}</td>
                                               <td>{{lp.reste_a_payer|floatformat:'2g'}}</td>
+                                              <td>{{lp.m_rabais|floatformat:'2g'}}</td>
                                               <td>{{lp.idcycle}}</td>
                                               <td>{{lp.idclasse}}</td>
                                               <td>{{lp.anneescolaire}}</td>
@@ -1196,6 +1205,7 @@
                             <th>2ème tranche</th>
                             <th>Scolarité</th>
                             <th>Reliquat</th>
+                            <th>Remise/Rabais</th>
                             <th>Cycle</th>
                             <th>Classe</th>
                             <th>Année scolaire</th>
@@ -1479,6 +1489,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
 
+{% include "partials/pwa_sw.html" %}
 
 <script>
 

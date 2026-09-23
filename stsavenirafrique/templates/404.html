@@ -4,6 +4,9 @@
     {% load static %}
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    {% include "partials/pwa_meta.html" %}
+
     {% if nom_ecole %}
     <title>Page introuvable (404) - {{ nom_ecole }}</title>
     {% else %}
@@ -81,5 +84,7 @@
             </a>
         </div>
     </div>
+
+    {% include "partials/pwa_sw.html" %}
 </body>
 </html>

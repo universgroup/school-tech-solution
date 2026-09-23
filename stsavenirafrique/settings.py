@@ -239,6 +239,8 @@ else:
         '127.0.0.1',
         'school-tech-solution.universtechgroup.com',
         'www.school-tech-solution.universtechgroup.com',
+        'ecole-les-champions.universtechgroup.com',
+        'www.ecole-les-champions.universtechgroup.com',
     ]
     # config('ALLOWED_HOSTS',default='localhost,127.0.0.1', 
     #        cast=lambda v: [h.strip() for h in v.split(',')]

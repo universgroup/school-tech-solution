@@ -4,6 +4,8 @@
     {% load static %}
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+    {% include "partials/pwa_meta.html" %}
     
     {% if nom_ecole %}
     <title>Connexion--{{nom_ecole}}</title>
@@ -115,5 +117,8 @@
         });
 
     </script>
+
+    {% include "partials/pwa_sw.html" %}
+    
 </body>
 </html>

@@ -24,6 +24,7 @@ from django.views.static import serve
 from django.conf import settings
 from django.conf.urls.static import static
 from gUsers.views import home
+from core.views import ServiceWorkerView
 
 urlpatterns = [   # Racine du site "/" redirige vers la page de connexion
                   path('', RedirectView.as_view(pattern_name='connexion', permanent=False), name='connexion'),
@@ -36,7 +37,9 @@ urlpatterns = [   # Racine du site "/" redirige vers la page de connexion
                   # path('notes/', include('gNotes.urls'), name='notes'),
                   # path('personnel/', include('gPersonnel.urls'), name='personnel'),
                   
-                  path('utilisateurs/', include('gUsers.urls'), name='utilisateurs'),  # l'attribut name devant chaque url contenant le include n'a pas d'effet, donc facultatif    
+                  path('utilisateurs/', include('gUsers.urls'), name='utilisateurs'),  # l'attribut name devant chaque url contenant le include n'a pas d'effet, donc facultatif   
+                  path('sw.js', ServiceWorkerView.as_view(), name='sw.js'), # Url de l'installable de l'app (PWA)
+
 
                   # Sert /media/ en permanence (dev et prod), car static() ignore MEDIA en prod
                   re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),          
