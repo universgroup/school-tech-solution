@@ -159,7 +159,11 @@ INFORMATIONS SUR LE PAIEMENT
                     <div class="col-md-3">
                         <div class="form-group">
                             <label for="id_montant_remise">Montant de la remise</label>
+                            {% if paie.m_rabais %}
                             <input type="number" id="id_montant_remise" name="montant_remise" class="form-control" value="{{paie.m_rabais|floatformat:'2g'}}" title="Saisissez le montant de la remise accordée s'il y en a">
+                            {% else %}
+                            <input type="number" id="id_montant_remise" name="montant_remise" class="form-control" value="0" title="Saisissez le montant de la remise accordée s'il y en a">
+                            {% endif %}
                         </div>
                     </div>
 

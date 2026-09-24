@@ -234,7 +234,7 @@
     </form>
 
     <!-- Année scolaire / session -->
-    <div class="navbar-text mx-3 d-none d-md-inline-block" style="color: #1a8eec; font-weight: bold; font-size: 0.85rem;">
+    <div class="navbar-text mx-3 d-none d-md-inline-block" style="color: #4f46e5; font-weight: bold; font-size: 0.85rem;">
         ANNEE SCOLAIRE : {{ annee_scolaire }} &nbsp;&nbsp; SESSION : {{ session_scolaire }}
     </div>
 
@@ -322,7 +322,7 @@
 
                <!--Debut du menu Administration -->
           <li class="nav-item has-treeview">
-            <a href="#" class="nav-link active" title="Permet de parametrer les données de base de l'application">
+            <a href="#" class="nav-link" title="Permet de parametrer les données de base de l'application">
               <i class="nav-icon fas fa-wrench"></i>
               <p>
                 Administration
@@ -1004,6 +1004,9 @@
 <!-- AdminLTE App -->
 <script src="{% static 'assets/dist/js/adminlte.min.js' %}"></script>
 <script src="{% static 'fontawesomefree/js/all.min.js' %}"></script>
+
+ <!--Permet de définir l'onglet actif de manière dynamique selon les menus dans lequels l'utilisateur est entrain de naviguer-->
+ <script src="{% static 'assets/js/onglet-actif.js' %}"></script>
 
 <!-- DataTables & Plugins -->
 <script src="{% static 'assets/plugins/datatables/jquery.dataTables.min.js' %}"></script>

@@ -277,10 +277,12 @@ def registrematricule(request):
                   dict(listegenerale=liste, ansc=ansc, cycles=cycles, effectif_total=effectif_total,
                        effectif_total_garcons=effectif_total_garcons, effectif_total_filles=effectif_total_filles))
 
+
 @action_requise('eleve_modifier')
 def detailsinscription(request, pkins):
     ins = Inscription.objects.select_related('annee_scolaire', 'mateleve', 'idcycle', 'idclasse').get(id=pkins)
     return render(request, 'gEleve/afficher_details_inscription.html', dict(ins=ins))
+
 
 @action_requise('eleve_modifier')
 def editerinscription(request, pk):
@@ -291,8 +293,10 @@ def editerinscription(request, pk):
 
     return render(request, 'gEleve/modifier_inscription.html', dict(ins=ins, annee=ans, cycle=cy, clas=cl))
 
+
 @action_requise('eleve_modifier')
 def modifierinscription(request, idins, mat):
+
     if request.method == 'POST':
         inscri = Inscription.objects.get(id=idins)
         inscri.date_inscription = request.POST.get('date_inscription')
@@ -312,7 +316,19 @@ def modifierinscription(request, idins, mat):
         inscri.annee_scolaire = an
         inscri.idclasse = cl
         inscri.idcycle = cy
-        inscri.save()
+        
+        # Je modifie ensuite l'année scolaire, le cycle et la classe de la même façon dans la table EtatPaiement
+        etatpaie = EtatPaiementTranche.objects.select_related('anneescolaire','mateleve').get(mateleve=mat,anneescolaire=an)
+        etatpaie.idclasse = cl
+        etatpaie.idcycle = cy
+
+        if inscri.etat_inscription == ETAT_INSCRIPTION[0][0]: # Inscrit
+            etatpaie.inscription = cl.frais_inscription
+        else:
+            etatpaie.inscription = cl.frais_reinscription
+
+        inscri.save() # Je valide ici son inscription
+        etatpaie.save() # Je valide ensuite son etat de paiement
 
         dnais = request.POST.get('datenaiss')
         dentree = request.POST.get('date_entree')
@@ -345,6 +361,7 @@ def modifierinscription(request, idins, mat):
         return redirect('chargeranneecourante')
     else:
         return redirect('chargeranneecourante')
+
 
 @action_requise('eleve_supprimer')
 def supprimerinscription(request, pkins):

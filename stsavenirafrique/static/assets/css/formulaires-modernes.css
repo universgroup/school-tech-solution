@@ -167,3 +167,182 @@ input[type="date"].form-control::-webkit-calendar-picker-indicator:hover {
 .form-group {
     margin-bottom: 1.1rem;
 }
+
+
+/* =====================================================================
+   SELECT2 — aligné sur le langage visuel des .form-control du projet
+   (coins 0.6rem, bordure #e2e8f0, fond #fafbfc, halo violet au focus)
+   ===================================================================== */
+
+/* ----- Conteneur principal (champ fermé) ----- */
+.select2-container--default .select2-selection--single {
+    height: auto;                          /* on laisse le padding définir la hauteur */
+    min-height: calc(1.5em + 1.1rem + 3px);/* ~ même hauteur que .form-control */
+    padding: 0.55rem 2.2rem 0.55rem 0.85rem;
+    font-size: 0.92rem;
+    line-height: 1.5;
+    color: #0f172a;
+    background-color: #fafbfc;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 0.6rem;
+    display: flex;
+    align-items: center;
+    transition: border-color .2s ease-in-out, box-shadow .2s ease-in-out, background-color .2s ease-in-out;
+}
+
+/* Chevron identique à celui des selects natifs */
+.select2-container--default .select2-selection--single .select2-selection__arrow b {
+    border: none;                          /* on tue la flèche CSS de Select2 */
+    width: 10px;
+    height: 7px;
+    margin-left: -5px;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%234f46e5' d='M6 8 0 0h12z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 100%;
+    top: 0;
+    right: 0.85rem;                        /* aligné sur padding-right des selects */
+    width: 12px;
+}
+
+/* Texte sélectionné */
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    color: #0f172a;
+    line-height: 1.5;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+/* Placeholder grisé (comme ::placeholder) */
+.select2-container--default .select2-selection--single .select2-selection__placeholder {
+    color: #94a3b8;
+}
+
+/* Hover = même comportement que select.form-control:hover */
+.select2-container--default:hover .select2-selection--single {
+    border-color: #cbd5e1;
+}
+
+/* Focus / ouvert = halo violet */
+.select2-container--default.select2-container--focus .select2-selection--single,
+.select2-container--default.select2-container--open .select2-selection--single {
+    border-color: var(--primary, #4f46e5);
+    background-color: #fff;
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.12);
+    outline: none;
+}
+
+/* ----- Croix "allowClear" ----- */
+.select2-container--default .select2-selection--single {
+    position: relative;                    /* nécessaire pour le positionnement absolu */
+}
+
+.select2-container--default .select2-selection--single .select2-selection__clear {
+    position: absolute;
+    top: 50%;
+    right: 2rem;                           /* espace libre avant la flèche (0.85rem + 12px) */
+    transform: translateY(-50%);
+    float: none !important;                /* on neutralise le float natif de Select2 */
+    width: 1.35rem;
+    height: 1.35rem;
+    line-height: 1.35rem;                  /* centrage vertical du glyphe × */
+    text-align: center;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #94a3b8;                        /* gris visible, pas celui du texte */
+    background-color: #f1f5f9;             /* pastille de fond => toujours lisible */
+    border-radius: 50%;
+    opacity: 1;                            /* Select2 met parfois une opacité faible */
+    cursor: pointer;
+    transition: background-color .15s, color .15s, transform .15s;
+    z-index: 2;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__clear:hover {
+    color: #fff;
+    background-color: #ef4444;
+    transform: translateY(-50%) scale(1.08);
+}
+
+/* Le texte ne doit jamais passer sous la croix */
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    padding-right: 3.6rem;                 /* place réservée = croix + flèche */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;               /* tronque proprement au lieu de chevaucher */
+}
+
+
+/* Invalid */
+.is-invalid + .select2-container .select2-selection--single {
+    border-color: #ef4444;
+}
+
+/* ----- DROPDOWN (liste ouverte) ----- */
+.select2-dropdown {
+    border: 1.5px solid #e2e8f0;
+    border-radius: 0.6rem;
+    background-color: #fff;
+    font-family: inherit;
+    font-size: 0.92rem;
+    box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.12),
+                0 8px 10px -6px rgba(15, 23, 42, 0.08);
+    overflow: hidden;                      /* pour que le radius coupe les options */
+    z-index: 1055;
+}
+
+/* Ouverture vers le haut : arrondis inversés */
+.select2-dropdown--above {
+    border-bottom: 1.5px solid #e2e8f0;
+}
+
+/* Champ de recherche interne */
+.select2-search--dropdown {
+    padding: 0.5rem;
+}
+.select2-search--dropdown .select2-search__field {
+    padding: 0.55rem 0.85rem;
+    font-size: 0.92rem;
+    color: #0f172a;
+    background-color: #fafbfc;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 0.6rem;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+}
+.select2-search--dropdown .select2-search__field:focus {
+    border-color: var(--primary, #4f46e5);
+    background-color: #fff;
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.12);
+}
+
+/* Options */
+.select2-results__option {
+    padding: 0.5rem 0.85rem;
+    color: #334155;
+    cursor: pointer;
+    transition: background-color .12s, color .12s;
+}
+
+/* Option survolée (au lieu du vert Select2) */
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+    background-color: rgba(79, 70, 229, 0.10);
+    color: var(--primary, #4f46e5);
+}
+
+/* Option déjà sélectionnée */
+.select2-container--default .select2-results__option[aria-selected="true"] {
+    background-color: #f1f5f9;
+    color: var(--primary, #4f46e5);
+    font-weight: 600;
+}
+
+/* Message "Aucun élève trouvé" */
+.select2-results__message {
+    color: #94a3b8;
+    font-style: italic;
+    padding: 0.5rem 0.85rem;
+}

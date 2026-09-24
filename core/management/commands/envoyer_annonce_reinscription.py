@@ -40,6 +40,7 @@ class Command(BaseCommand):
                 'contact': f"{ecole.telephone1}/{ecole.telephone2}",
                 'email_ecole': ecole.email_ecole,
                 'texte_brut': f"Les réinscriptions ouvrent aujourd'hui, {ecole.delai_reinscription.strftime('%d/%m/%Y')}.",
+                'nom_ecole': ecole.nom_ecole,
             }
             if eleve.email_pere:
                 destinataires.append((eleve.email_pere, contexte))
@@ -73,22 +74,24 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(f"{envoyes} email(s) envoyé(s), {echecs} échec(s)."))
 
         # --- VÉRIFICATION DU SOLDE SMS ---
+        sms_ok = True
         nb_sms_prevus = len(destinataires_sms)
         response = _client.accounts.get()
         if response.ok and response.data['balance'] < nb_sms_prevus:
             self.stdout.write(self.style.WARNING(
                 f"Solde SMS insuffisant : {response.data['balance']} restant(s), {nb_sms_prevus} nécessaire(s)."
             ))
-            return  # on arrête ici, pas d'envoi partiel
-        # --- FIN VÉRIFICATION ---
+            sms_ok = False
 
-        template_sms = (                                                        
+        # --- FIN VÉRIFICATION ---
+        if sms_ok:
+            template_sms = (                                                        
             "Ecole {nom_ecole} : les reinscriptions pour {nom_eleve} ouvrent "  
             "le {date_ouverture}. Merci de vous rapprocher du service scolarite."  
-        )                                                                       
-        envoyes_sms, echecs_sms = envoyer_sms_masse(destinataires_sms, template_sms)  
+                )                                                                       
+            envoyes_sms, echecs_sms = envoyer_sms_masse(destinataires_sms, template_sms)  
 
-        self.stdout.write(self.style.SUCCESS(f"{envoyes_sms} SMS envoyé(s), {echecs_sms} échec(s)."))
+            self.stdout.write(self.style.SUCCESS(f"{envoyes_sms} SMS envoyé(s), {echecs_sms} échec(s)."))
 
         # notification envoyée au gestionnaire comptable---
         if ecole.email_ecole:
@@ -101,11 +104,18 @@ class Command(BaseCommand):
                 'envoyes_sms': envoyes_sms,
                 'echecs_sms': echecs_sms,
                 'eleves_sans_contact': eleves_sans_contact,
+                'ire': ecole.ville_ecole,
+                'bp': ecole.bp_ecole,
+                'contact': f"{ecole.telephone1}/{ecole.telephone2}",
+                'email_ecole': ecole.email_ecole,
                 'nom_ecole': ecole.nom_ecole,
             }
-            envoyer_emails_masse(
+            envoyes_notif, echecs_notif = envoyer_emails_masse(
                 [(ecole.email_ecole, contexte_notif)],
                 'emails/notification_gestionnaire.html',
                 sujet="Rapport — Ouverture des réinscriptions"
             )
+            self.stdout.write(f"Notification gestionnaire : {envoyes_notif} envoyé(s), {echecs_notif} échec(s).")
+        else:
+            self.stdout.write(self.style.WARNING("Aucun email configuré pour l'école — notification gestionnaire non envoyée."))     
 
