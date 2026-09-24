@@ -1,6 +1,11 @@
 from django import forms
 from django.forms import ModelForm
 from .models import *
+from django.core.exceptions import ValidationError
+
+import re
+
+EMAIL_PATTERN = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
 
 class FormPersonnel(ModelForm):
     class Meta:
@@ -50,15 +55,15 @@ class FormPersonnel(ModelForm):
                 attrs={'class': 'form-control', 'placeholder': 'Adresse du Personnel',
                        'title': 'Saisissez l\'adresse du personnel'}),
             'contact_personnel': forms.TextInput(
-                attrs={'class': 'form-control', 'placeholder': 'N°Téléphone du Personnel', 'type': 'tel',
-                       'pattern': '^6(1|2|5|6|3|)[0-9]{7}', 'min': '600000000', 'max': '699999999',
-                       'title': 'Saisissez un numéro de téléphone guinéen'}),
+                attrs={'class': 'form-control', 'placeholder': 'N°Téléphone', 'type': 'tel',
+                       'pattern': r"^(\+?[0-9]{1,3}[\s\-]?)?[0-9\s\-\(\)]{7,15}$",
+                       'title': 'Saisissez un numéro de téléphone valide avec ou sans code du pays'}),
             'fonction_personnel': forms.TextInput(
-                attrs={'class': 'form-control', 'placeholder': 'Fonction du Personnel',
-                       'title': 'Saisissez la fonction du personnel'}),
+                attrs={'class': 'form-control', 'placeholder': 'Fonction/Poste du Personnel',
+                       'title': 'Saisissez la fonction/poste du personnel'}),
             'email_personnel': forms.EmailInput(
-                attrs={'class': 'form-control', 'placeholder': 'contact@universtechgroup.com',
-                       'pattern': '[a-z0-9._%+-]+@[a-z0-9.-]+\\".[a-z]{2,4}$', 'title': 'Saisissez un email correct!'}),
+                attrs={'class': 'form-control', 'placeholder': 'Ex : contact@universtechgroup.com',
+                       'title': 'Saisissez un email correct!'}),
             'sexe_personnel': forms.Select(
                 attrs={'class': 'form-control', 'title': 'Sélectionnez le genre du personnel'}, choices=SEXE_PERSONNEL),
             'salbase': forms.NumberInput(
@@ -67,8 +72,7 @@ class FormPersonnel(ModelForm):
             'annee_experience': forms.TextInput(
                 attrs={'class': 'form-control', 'placeholder': 'Nombre d\'année d\'expérience',
                        'title': 'Saisissez le nombre d\'année d\'expérience'}),
-            'contrat_type': forms.Select(attrs={'class': 'form-control', 'title': 'Sélectionnez le type de contrat'},
-                                         choices=CONTRAT_CHOICES),
+            'contrat_type': forms.Select(attrs={'class': 'form-control', 'title': 'Sélectionnez le type de contrat'}, choices=CONTRAT_CHOICES),
             'diplome': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Diplôme d\'étude',
                                               'title': 'Saisissez le diplôme obtenu par le personnel'}),
             'date_embauche': forms.DateInput(attrs={'class': 'form-control', 'type': 'date',
@@ -78,6 +82,12 @@ class FormPersonnel(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(FormPersonnel, self).__init__(*args, **kwargs)
+
+        def clean_email_personnel(self):
+            emailpersonnel = self.cleaned_data.get('email_personnel')
+            if emailpersonnel and not re.match(EMAIL_PATTERN, emailpersonnel):
+                raise ValidationError("Format d'email invalide pour le personnel.")
+            return emailpersonnel
 
 
 class FormSalaire(ModelForm):

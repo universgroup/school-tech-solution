@@ -36,6 +36,7 @@ from gComptabilite.models import *
 from gComptabilite.views import affichersoldecaisse
 from gAdministration.models import AnneeScolaire, CycleScolaire, Classe, Ecole
 from gUsers.decorators import action_requise
+from core.sms import envoyer_sms_masse  
 
 # --- Styles réutilisables pour les rapports PDF ---
 
@@ -469,7 +470,7 @@ def recuinscription(request, idinsc):
                 ins.mateleve.nom, ins.mateleve.prenom,
                 ins.mateleve.tuteur, ins.mateleve.contact_pere,
                 ins.mateleve.email_pere, ins.mateleve.email_mere, ins.date_inscription,
-                ins.idclasse.frais_inscription]
+                ins.idclasse.frais_inscription, ins.mateleve.contact_mere]
 
         ch  = str(data[1]).split('-')
         ane = ch[1]
@@ -642,41 +643,92 @@ def recuinscription(request, idinsc):
 
         # ── ENVOI EMAIL ──
         statut_email = None  # sera lu côté JS via un header
+        statut_sms = None 
+        parents = [
+                    {'email': data[8], 'tel': data[7]},   # père
+                    {'email': data[9], 'tel': data[12]},  # mère
+                    ]
+        emails_valides = [p['email'] for p in parents if p['email']]
+        tel_sans_email = [p['tel'] for p in parents if not p['email'] and p['tel']]
 
         if not ins.mail_envoye_inscription: # Verifie si l'email n'a pas encore été envoyé alors il y procède sinon pas d'envoi de mail
-            try:
-            
-                email = EmailMessage(
-                    subject='Reçu d\'inscription',
-                    body=f'Veuillez trouver votre reçu d\'inscription en pièce jointe.\n'
-                        f'Cordialement.\nLe Service Scolarité : {data_ecole[8]}',
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    to=[data[8], data[9]],
-                )
-                email.attach(f'Recu_inscription_{str(data[2])}.pdf', buffer.getvalue(), 'application/pdf')
-                email.send()
+            if emails_valides:
 
-                statut_email = 'success:Email envoyé avec succès!'
+                try:
+                
+                    email = EmailMessage(
+                        subject='Reçu d\'inscription',
+                        body=f'Veuillez trouver votre reçu d\'inscription en pièce jointe.\n'
+                            f'Cordialement.\nLe Service Scolarité : {data_ecole[8]}',
+                        from_email=settings.DEFAULT_FROM_EMAIL,
+                        to=emails_valides,
+                    )
+                    email.attach(f'Recu_inscription_{str(data[2])}.pdf', buffer.getvalue(), 'application/pdf')
+                    email.send()
 
-                ins.mail_envoye_inscription = True # Je mets le champ mail_envoye a True pour empecher la prochaine fois d'imprimer le recu
-                ins.save(update_fields=['mail_envoye_inscription']) # Je valide enfin la mise à jour
+                    statut_email = 'success:Email envoyé avec succès!'
 
-            except SMTPException:
-                statut_email = 'warning:Erreur SMTP : impossible d\'envoyer l\'email.'
-            except socket.gaierror:
-                statut_email = 'warning:Pas de connexion internet. Email non envoyé.'
-            except TimeoutError:
-                statut_email = 'warning:Délai de connexion dépassé. Email non envoyé.'
-            except Exception as e:
-                statut_email = f'warning:Erreur inattendue : {str(e)}'
+                    ins.mail_envoye_inscription = True # Je mets le champ mail_envoye a True pour empecher la prochaine fois d'imprimer le recu
+                    ins.save(update_fields=['mail_envoye_inscription']) # Je valide enfin la mise à jour
+
+                except SMTPException:
+                    statut_email = 'warning:Erreur SMTP : impossible d\'envoyer l\'email.'
+                except socket.gaierror:
+                    statut_email = 'warning:Pas de connexion internet. Email non envoyé.'
+                except TimeoutError:
+                    statut_email = 'warning:Délai de connexion dépassé. Email non envoyé.'
+                except Exception as e:
+                    statut_email = f'warning:Erreur inattendue : {str(e)}'
+            else:
+                statut_email = 'info:Aucune adresse email renseignée.' # Au cas où il n'existe aucune adresse email valide
         else:
             statut_email = 'info:Email déjà envoyé précédemment.'
 
+        # ── ENVOI SMS (parents sans email) ──
+        if not ins.sms_envoye_inscription:
+            if tel_sans_email:
+                try:
+                    destinataires_contexte = [
+                        (tel, {
+                            'matricule':ins.mateleve.matricule,
+                            'nom': ins.mateleve.nom,
+                            'prenom': ins.mateleve.prenom,
+                            'classe': ins.idclasse,
+                            'ecole': data_ecole[8],
+                        })
+                        for tel in tel_sans_email
+                    ]
+                    template_message = (
+                        "Inscription confirmée pour  {prenom} {nom} matricule {matricule} classe {classe}. "
+                        "Service Scolarité : {ecole}."
+                    )
+                    envoyes, echecs = envoyer_sms_masse(
+                        destinataires_contexte,
+                        template_message,
+                        sender_name="E CHAMPIONS"
+                    )
+                    if envoyes > 0:
+                        statut_sms = f'success:{envoyes} SMS envoyé(s) avec succès!'
+                        ins.sms_envoye_inscription = True
+                        ins.save(update_fields=['sms_envoye_inscription'])
+                    else:
+                        statut_sms = 'warning:Échec de l\'envoi des SMS.'
+                except Exception as e:
+                    statut_sms = f'warning:Erreur inattendue SMS : {str(e)}'
+            else:
+                statut_sms = 'info:Aucun SMS à envoyer, tous les parents ont un email.'
+        else:
+            statut_sms = 'info:SMS déjà envoyé précédemment.'
+
         buffer.seek(0)
         reponse = FileResponse(buffer, as_attachment=False, filename=f'Recu_inscription_{str(data[2])}.pdf', content_type='application/pdf')
+        
+        # Header custom lisible en JS ; on encode pour éviter les accents/caractères spéciaux
         if statut_email:
-                    # Header custom lisible en JS ; on encode pour éviter les accents/caractères spéciaux
-                    reponse['X-Statut-Email'] = urllib.parse.quote(statut_email)
+            reponse['X-Statut-Email'] = urllib.parse.quote(statut_email)
+        if statut_sms:
+            reponse['X-Statut-Sms'] = urllib.parse.quote(statut_sms)
+
         return reponse
 
 
@@ -838,7 +890,7 @@ def recureinscription(request, idinsc):
                 ins.mateleve.nom, ins.mateleve.prenom,
                 ins.mateleve.tuteur, ins.mateleve.contact_pere,
                 ins.mateleve.email_pere, ins.mateleve.email_mere, ins.date_inscription,
-                ins.idclasse.frais_reinscription]
+                ins.idclasse.frais_reinscription, ins.mateleve.contact_mere]
 
         ch  = str(data[1]).split('-')
         ane = ch[1]
@@ -1012,41 +1064,92 @@ def recureinscription(request, idinsc):
         # ── ENVOI EMAIL ──
         
         statut_email = None  # sera lu côté JS via un header
+        statut_sms = None 
+        parents = [
+                    {'email': data[8], 'tel': data[7]},   # père
+                    {'email': data[9], 'tel': data[12]},  # mère
+                    ]
+        emails_valides = [p['email'] for p in parents if p['email']]
+        tel_sans_email = [p['tel'] for p in parents if not p['email'] and p['tel']]
 
-        if not ins.mail_envoye_inscription:
-            try:
-                email = EmailMessage(
-                    subject='Reçu de réinscription',
-                    body=f'Veuillez trouver votre reçu de réinscription en pièce jointe.\n'
-                        f'Cordialement.\nLe Service Scolarité : {data_ecole[8]}',
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    to=[data[8], data[9]],
-                )
-                email.attach(f'Recu_reinscription_{str(data[2])}.pdf', buffer.getvalue(), 'application/pdf')
-                email.send()
+        if not ins.mail_envoye_inscription: # Verifie si l'email n'a pas encore été envoyé alors il y procède sinon pas d'envoi de mail
+            if emails_valides:
 
-                statut_email = 'success:Email envoyé avec succès!'
+                try:
+                
+                    email = EmailMessage(
+                        subject='Reçu de reinscription',
+                        body=f'Veuillez trouver votre reçu de reinscription en pièce jointe.\n'
+                            f'Cordialement.\nLe Service Scolarité : {data_ecole[8]}',
+                        from_email=settings.DEFAULT_FROM_EMAIL,
+                        to=emails_valides,
+                    )
+                    email.attach(f'Recu_reinscription_{str(data[2])}.pdf', buffer.getvalue(), 'application/pdf')
+                    email.send()
 
-                ins.mail_envoye_inscription = True
-                ins.save(update_fields=['mail_envoye_inscription'])
+                    statut_email = 'success:Email envoyé avec succès!'
 
-               
-            except SMTPException:
-                statut_email = 'warning:Erreur SMTP : impossible d\'envoyer l\'email.'
-            except socket.gaierror:
-                statut_email = 'warning:Pas de connexion internet. Email non envoyé.'
-            except TimeoutError:
-                statut_email = 'warning:Délai de connexion dépassé. Email non envoyé.'
-            except Exception as e:
-                statut_email = f'warning:Erreur inattendue : {str(e)}'
+                    ins.mail_envoye_inscription = True # Je mets le champ mail_envoye a True pour empecher la prochaine fois d'imprimer le recu
+                    ins.save(update_fields=['mail_envoye_inscription']) # Je valide enfin la mise à jour
+
+                except SMTPException:
+                    statut_email = 'warning:Erreur SMTP : impossible d\'envoyer l\'email.'
+                except socket.gaierror:
+                    statut_email = 'warning:Pas de connexion internet. Email non envoyé.'
+                except TimeoutError:
+                    statut_email = 'warning:Délai de connexion dépassé. Email non envoyé.'
+                except Exception as e:
+                    statut_email = f'warning:Erreur inattendue : {str(e)}'
+            else:
+                statut_email = 'info:Aucune adresse email renseignée.' # Au cas où il n'existe aucune adresse email valide
         else:
             statut_email = 'info:Email déjà envoyé précédemment.'
 
+        # ── ENVOI SMS (parents sans email) ──
+        if not ins.sms_envoye_inscription:
+            if tel_sans_email:
+                try:
+                    destinataires_contexte = [
+                        (tel, {
+                            'matricule':ins.mateleve.matricule,
+                            'nom': ins.mateleve.nom,
+                            'prenom': ins.mateleve.prenom,
+                            'classe': ins.idclasse,
+                            'ecole': data_ecole[8],
+                        })
+                        for tel in tel_sans_email
+                    ]
+                    template_message = (
+                        "Reinscription confirmée pour  {prenom} {nom} matricule {matricule} classe {classe}. "
+                        "Service Scolarité : {ecole}."
+                    )
+                    envoyes, echecs = envoyer_sms_masse(
+                        destinataires_contexte,
+                        template_message,
+                        sender_name="E CHAMPIONS"
+                    )
+                    if envoyes > 0:
+                        statut_sms = f'success:{envoyes} SMS envoyé(s) avec succès!'
+                        ins.sms_envoye_inscription = True
+                        ins.save(update_fields=['sms_envoye_inscription'])
+                    else:
+                        statut_sms = 'warning:Échec de l\'envoi des SMS.'
+                except Exception as e:
+                    statut_sms = f'warning:Erreur inattendue SMS : {str(e)}'
+            else:
+                statut_sms = 'info:Aucun SMS à envoyer, tous les parents ont un email.'
+        else:
+            statut_sms = 'info:SMS déjà envoyé précédemment.'
+
         buffer.seek(0)
         reponse = FileResponse(buffer, as_attachment=False, filename=f'Recu_reinscription_{str(data[2])}.pdf', content_type='application/pdf')
+        
+        # Header custom lisible en JS ; on encode pour éviter les accents/caractères spéciaux
         if statut_email:
-                    # Header custom lisible en JS ; on encode pour éviter les accents/caractères spéciaux
-                    reponse['X-Statut-Email'] = urllib.parse.quote(statut_email)
+            reponse['X-Statut-Email'] = urllib.parse.quote(statut_email)
+        if statut_sms:
+            reponse['X-Statut-Sms'] = urllib.parse.quote(statut_sms)
+        
         return reponse
 
 @action_requise('menu_eleves')
