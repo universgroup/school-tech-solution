@@ -33,7 +33,8 @@
         {% endif %}
 
         <hr style="border:none; border-top:1px solid #ddd; margin:20px 0;">
-        <p style="color:#0f0f0f; font-size:11px;">{{ nom_ecole }} — Notification automatique de gestion.</p>
+        <p style="color:#0f0f0f; font-size:11px;">{{ nom_ecole }} — {{ ire }}{% if bp %}, BP : {{ bp }}{% endif %}<br>
+            Tél : {{ contact }}{% if email_ecole %} — {{ email_ecole }}{% endif %}— Notification automatique de gestion.</p>
     </div>
 </body>
 </html>

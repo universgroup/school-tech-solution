@@ -57,7 +57,7 @@
                             <div class="form-group">
                                   <label for="cbomateleve">Elève<strong style="color:red">*</strong></label>
                                   <select class="form-control" name="matricule" id="cbomateleve" required>
-                                    <option value="" selected>Selectionnez</option>
+                                    <option value="" selected>Sélectionnez</option>
                                   </select>
                             </div>
                         </div>
@@ -242,6 +242,24 @@
                 nouvelOnglet.close();
                 afficherMessage('error', "Erreur réseau, veuillez réessayer.");
             });
+        });
+
+
+        // Permet de filtrer les elèves chargés dans la dropdownlist
+
+        $("#cbomateleve").select2({
+            placeholder: "Sélectionnez",
+            allowClear: true,
+            width: 'resolve',
+            language: {
+                noResults: function () {
+                    return "Aucun élève trouvé";
+                },
+                searching: function () {
+                    return "Recherche en cours...";
+                }
+            },
+            width: '100%'
         });
 
 </script>

@@ -28,10 +28,14 @@
 
   <!--begin::Third Party Plugin(OverlayScrollbars)-->
   <link rel="stylesheet" href="{% static 'assets/plugins/overlayScrollbars/css/OverlayScrollbars.min.css' %}"/>
+  
   <link href="{% static 'fontawesomefree/css/all.min.css' %}" rel="stylesheet" type="text/css">
 
   <!--begin::Third Party Plugin(Bootstrap Icons)-->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"/>
+
+  <!-- Cette librairie permet de filtrer les elèves dans les templates Reinscriptions et Paiement scolaires -->
+  <link rel="stylesheet" href="{% static 'assets/plugins/select2/css/select2.min.css' %}">
 
   <!-- Affichage de la photo sous forme de zone dans tous les templates utilisant la photo-->
   <link rel="stylesheet" href="{% static 'assets/css/zonephoto.css' %}">
@@ -238,7 +242,7 @@
     </form>
 
     <!-- Année scolaire / session -->
-    <div class="navbar-text mx-3 d-none d-md-inline-block" style="color: #1a8eec; font-weight: bold; font-size: 0.85rem;">
+    <div class="navbar-text mx-3 d-none d-md-inline-block" style="color: #4f46e5; font-weight: bold; font-size: 0.85rem;">
         ANNEE SCOLAIRE : {{ annee_scolaire }} &nbsp;&nbsp; SESSION : {{ session_scolaire }}
     </div>
 
@@ -326,7 +330,7 @@
 
                <!--Debut du menu Administration -->
           <li class="nav-item has-treeview">
-            <a href="#" class="nav-link active" title="Permet de parametrer les données de base de l'application">
+            <a href="#" class="nav-link" title="Permet de parametrer les données de base de l'application">
               <i class="nav-icon fas fa-wrench"></i>
               <p>
                 Administration
@@ -834,6 +838,13 @@
 <script src="{% static 'assets/plugins/jquery-validation/additional-methods.min.js' %}"></script>
 <!-- AdminLTE App -->
 <script src="{% static 'assets/dist/js/adminlte.min.js' %}"></script>
+
+ <!--Permet de définir l'onglet actif de manière dynamique selon les menus dans lequels l'utilisateur est entrain de naviguer-->
+ <script src="{% static 'assets/js/onglet-actif.js' %}"></script>
+
+<!-- Cette librairie est utilisee pour le filtre des eleves dans les templates Reinscription et Paiement scolaire -->
+<script src="{% static 'assets/plugins/select2/js/select2.full.min.js' %}"></script>
+
 <!-- AdminLTE for demo purposes -->
 <script src="{% static 'assets/dist/js/demo.js' %}"></script>
 
@@ -843,15 +854,21 @@
 <!-- Style bootstrap pour styliser les messages et les animer dans le navigateur-->
  <script src="{% static 'assets/js/app-notifications.js' %}"></script>
 
+
+
+
  
-<!-- Permet l'enregistrement du script qui déclenche dans le navigateur l'option d'installation de l'app -->
+<!-- Permet l'enregistrement du script qui déclenche dans le navigateur l'option d'installation de l'app (Service Worker)-->
 {% include "partials/pwa_sw.html" %}
+
+
 
  
 
 {% block javascript %}
 <script>
   
+ 
 </script>
 {% endblock javascript %}
 
