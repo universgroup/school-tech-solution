@@ -1,19 +1,23 @@
 {% extends "base.html" %}
 {% block titre_page %} GESTION DU PERSONNEL {% endblock %}
 {% load crispy_forms_tags %}
-
+{% block titre_formulaire %} FICHE INDIVIDUELLE D'UN EMPLOYE {% endblock %}
+{% block fil_ariane %}Personnel / Nouveau {% endblock %}
  {% block titre_cadre %}
-ENREGISTRER UN EMPLOYE
+  ENREGISTRER UN EMPLOYE
  {% endblock %}
+
+
  {% block formulaire %}
-    <div class="row">
-        <div class="col-lg-6">
-            <div class="card m-b-30">
-                <form action="" method="POST">
+   
+        <form action="" method="post" class="needs-validation" enctype="multipart/form-data" autocomplete="on" id="femploye">
 
                     {% csrf_token %}
 
-                    <div class="row">
+                <div class="card-body">  
+
+                    <div class="row g-3">
+                    
                         <div class="col-md-6">
                             <div class="form-group">
                                 {{form.nom_personnel|as_crispy_field}}
@@ -28,20 +32,25 @@ ENREGISTRER UN EMPLOYE
 
                     </div>
 
-                    <div class="row">
-                        <div class="col-md-6">
+                    <div class="row g-3">
+                        <div class="col-md-4">
                             <div class="form-group">
                                 {{form.civilite|as_crispy_field}}
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-group">
                                 {{form.date_naissance|as_crispy_field}}
                             </div>
                         </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                {{form.lieu_naissance|as_crispy_field}}
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="row">
+                    <div class="row g-3">
                         <div class="col-md-6">
                             <div class="form-group">
                                 {{form.niveau_etude|as_crispy_field}}
@@ -54,7 +63,7 @@ ENREGISTRER UN EMPLOYE
                         </div>
                     </div>
 
-                    <div class="row">
+                    <div class="row g-3">
                         <div class="col-md-6">
                             <div class="form-group">
                                 {{form.adresse_personnel|as_crispy_field}}
@@ -67,7 +76,7 @@ ENREGISTRER UN EMPLOYE
                         </div>
                     </div>
 
-                    <div class="row">
+                    <div class="row g-3">
                         <div class="col-md-6">
                             <div class="form-group">
                                 {{form.fonction_personnel|as_crispy_field}}
@@ -80,7 +89,7 @@ ENREGISTRER UN EMPLOYE
                         </div>
                     </div>
 
-                    <div class="row">
+                    <div class="row g-3">
                         <div class="col-md-6">
                             <div class="form-group">
                                 {{form.sexe_personnel|as_crispy_field}}
@@ -93,7 +102,7 @@ ENREGISTRER UN EMPLOYE
                         </div>
                     </div>
 
-                    <div class="row">
+                    <div class="row g-3">
                         <div class="col-md-6">
                             <div class="form-group">
                                 {{form.annee_experience|as_crispy_field}}
@@ -106,7 +115,7 @@ ENREGISTRER UN EMPLOYE
                         </div>
                     </div>
 
-                    <div class="row">
+                    <div class="row g-3">
                         <div class="col-md-6">
                             <div class="form-group">
                                 {{form.diplome|as_crispy_field}}
@@ -119,20 +128,79 @@ ENREGISTRER UN EMPLOYE
                         </div>
                     </div>
 
-                    <div class="row">
-                        <div class="col-lg-12">
+                    <div class="row g-3">
+                        <div class="col-md-6">
                             <div class="form-group">
-                                <button type="submit" class="btn btn-success btn-lg"><span class="glyphicon glyphicon-plus"></span>Enregistrer</button>
-                                <button type="reset" class="btn btn-warning btn-lg"><span class="glyphicon glyphicon-refresh"></span>Annuler</button>
-                                <a href="/listegeneralepersonnel/" target="_blank" class="btn btn-secondary btn-lg"><span class="glyphicon glyphicon-arrow-right"></span>Liste Générale Personnel</a>
-                           </div>
+                                {{form.etat_matrimonial|as_crispy_field}}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{form.annee_scolaire|as_crispy_field}}
+                            </div>
                         </div>
                     </div>
-                </form>
 
-            </div>
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <div class="form-group text-center">
+                                {{form.photo_employe|as_crispy_field}}
 
-        </div>
-    </div>
+                                <label for="idphotoemp" class="photo-zone" id="photoEmpZone">
+                                    <img id="EmpPreview" src="" alt="" style="display:none;">
+                                    <div id="EmpPlaceholder">
+                                            <div class="placeholder-icon">
+                                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#adb5bd" stroke-width="1.5">
+                                                        <path d="M4 7h3l2-2h6l2 2h3a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z"/>
+                                                        <circle cx="12" cy="13" r="4"/>
+                                                </svg>
+                                            </div>
+                                            <div class="placeholder-text">Cliquer pour ajouter la photo de l'employé</div>
+                                    </div>
+                                </label>
+
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                </div>
+
+                <div class="card-footer text-center">
+                    <button type="submit" class="btn btn-success btn-md" title="Enregistrer les infos du personnel ici">Enregistrer &nbsp; <i class="fas fa-save"></i></button>
+                    <button type="reset" class="btn btn-warning btn-md">Actualiser &nbsp; <i class="fas fa-refresh"></i></button>
+                    <a href="{% url 'listegeneralepersonnel' %}" target="_self" class="btn btn-primary btn-md" title="Afficher la liste générale des employés">Retour &nbsp; <i class="fas fa-arrow-circle-left"></i></a>
+                </div>
+        </form>
+            
+ {% endblock %}
+
+ {% block javascript %}
+
+    <script>
+
+
+        // Mettre le nom en majuscule pendant la saisie
+        $("#id_nom_emp").on('input', function(){
+            $(this).val($(this).val().toUpperCase());
+        });
+
+        // Mettre la première lettre de chaque mot du prénom en majuscule
+        $("#id_prenom_emp").on('input', function(){
+            var val = $(this).val();
+            $(this).val(val.replace(/\b\w/g, function(l){
+                return l.toUpperCase();
+            }));
+        });
+
+        $("#femploye")[0].addEventListener("reset", function(){
+            // On laisse le navigateur vider le input file lui-même,
+            // mais on doit remettre l'aperçu à zéro manuellement
+            setTimeout(resetPhotoEmpZone, 0);
+        });
+
+
+    </script>
 
  {% endblock %}

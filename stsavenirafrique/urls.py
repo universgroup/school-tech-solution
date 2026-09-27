@@ -35,7 +35,7 @@ urlpatterns = [   # Racine du site "/" redirige vers la page de connexion
                   #path('cours/', include('gCours.urls'), name='cours'),
                   path('eleves/', include('gEleve.urls'), name='eleves'),
                   # path('notes/', include('gNotes.urls'), name='notes'),
-                  # path('personnel/', include('gPersonnel.urls'), name='personnel'),
+                  path('personnel/', include('gPersonnel.urls'), name='personnel'),
                   
                   path('utilisateurs/', include('gUsers.urls'), name='utilisateurs'),  # l'attribut name devant chaque url contenant le include n'a pas d'effet, donc facultatif   
                   path('sw.js', ServiceWorkerView.as_view(), name='sw.js'), # Url de l'installable de l'app (PWA)

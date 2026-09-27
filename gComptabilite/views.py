@@ -558,8 +558,21 @@ def chargerinfoeleveclasse(request):
 
 # Fonction me permettant de convertir le montant recupéré depuis le template Paiement_scolarite
 def reformater_montant(valeur):
-    montant_a_reformater = re.sub(r'[\s\u00a0\u202f]','',valeur) # Supprime tous types d'espace dans le montant
-    montant_a_reformater = montant_a_reformater.replace(',','.') # remplace la virgule par les points.
+    montant_a_reformater = re.sub(r'[\s\u00a0\u202f]', '', valeur)  # Supprime tous types d'espace dans le montant
+
+    if ',' in montant_a_reformater and '.' in montant_a_reformater:
+        # Les deux séparateurs présents : celui qui apparaît en dernier est le séparateur décimal
+        if montant_a_reformater.rfind(',') > montant_a_reformater.rfind('.'):
+            # format français : 1.300.000,00
+            montant_a_reformater = montant_a_reformater.replace('.', '').replace(',', '.')
+        else:
+            # format anglo-saxon : 1,300,000.00
+            montant_a_reformater = montant_a_reformater.replace(',', '')
+    elif ',' in montant_a_reformater:
+        # Uniquement une virgule -> séparateur décimal français (ex: 1300000,00)
+        montant_a_reformater = montant_a_reformater.replace(',', '.')
+    # sinon : uniquement un point ou aucun séparateur -> déjà correct
+
     return Decimal(montant_a_reformater)
 
 
@@ -1270,6 +1283,7 @@ def modifieretatpaiement(request, idpaie):
     d_tranche = 0
     mremise = 0
     fscol = 0
+    m_inscription = 0
 
     if request.method == 'POST':
         etatpaie = EtatPaiementTranche.objects.get(id=idpaie)
@@ -1281,6 +1295,7 @@ def modifieretatpaiement(request, idpaie):
         datepaie = request.POST.get('date_paiement')
         mremise = reformater_montant(request.POST.get('montant_remise'))
         modepaie = request.POST.get('mode_paiement')
+        m_inscription = reformater_montant(request.POST.get('montant_inscription'))
         
 
         ane = AnneeScolaire.objects.get(id=ans)
@@ -1319,6 +1334,7 @@ def modifieretatpaiement(request, idpaie):
         else:
             etatpaie.reste_a_payer = fannuel - fscol
 
+        etatpaie.inscription = m_inscription # Je mets à jour le montant de l'inscription
         etatpaie.fscolarite = fscol
         etatpaie.save()
         

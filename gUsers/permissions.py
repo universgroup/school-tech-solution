@@ -9,6 +9,7 @@ from datetime import datetime
 
 from .models import (
     DIRECTEUR_GENERAL as DG,
+    DIRECTEUR_ETUDE as DE,
     SERVICE_SCOLARITE as SCOL,
     COMPTABLE as COMPTA,
     ENSEIGNANT as ENS,
@@ -22,7 +23,7 @@ PERMISSIONS = {
     "menu_administration": [DG],
     "menu_eleves": [DG, SCOL, COMPTA],
     "menu_comptabilite": [DG, SCOL ,COMPTA],
-    "menu_personnel": [],
+    "menu_personnel": [DG, SCOL, COMPTA],
     "menu_evaluation": [],
     "menu_services": [],
 
@@ -40,10 +41,10 @@ PERMISSIONS = {
     "compta_cloturer_mois": [DG, COMPTA],
 
     # Personnel
-    "personnel_gerer": [],
+    "personnel_gerer": [DG, SCOL, COMPTA],
 
     # Évaluation
-    "matiere_gerer": [],
+    "matiere_gerer": [DE],
     "periode_gerer": [],
     "bulletin_generer": [],
     "note_modifier": [],      # ENS : voir peut_modifier_note() ci-dessous

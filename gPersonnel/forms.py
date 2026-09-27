@@ -24,10 +24,10 @@ class FormPersonnel(ModelForm):
             'contact_personnel': 'N°Téléphone',
             'fonction_personnel': 'Fonction/Poste occupé',
             'email_personnel': 'Email',
-            'sexe_personnel': 'Genre',
+            'sexe_personnel': 'Genre(Sexe)',
             'salbase': 'Salaire de base',
             'annee_experience': 'Nombre d\'année d\'expérience',
-            'contrat_type': 'Type contrat',
+            'contrat_type': 'Type de contrat',
             'diplome': 'Diplôme le plus elevé',
             'date_embauche': 'Date d\'embauche',
             'etat_matrimonial': 'Situation matrimoniale',
@@ -36,10 +36,10 @@ class FormPersonnel(ModelForm):
         }
         widgets = {
             'nom_personnel': forms.TextInput(
-                attrs={'class': 'form-control', 'placeholder': 'Nom Famille', 'title': 'Saisissez le nom de famille'}),
+                attrs={'class': 'form-control', 'placeholder': 'Nom Famille', 'title': 'Saisissez le nom de famille','id':'id_nom_emp'}),
             'prenom_personnel': forms.TextInput(
                 attrs={'class': 'form-control', 'placeholder': 'Prénom(s)',
-                       'title': 'Saisissez les prénoms du personnel'}),
+                       'title': 'Saisissez les prénoms du personnel','id':'id_prenom_emp'}),
             'civilite': forms.Select(attrs={'class': 'form-control', 'title': 'Sélectionnez la civilité'},
                                      choices=CIVILITE_CHOICES),
             'date_naissance': forms.DateInput(
@@ -76,12 +76,18 @@ class FormPersonnel(ModelForm):
             'diplome': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Diplôme d\'étude',
                                               'title': 'Saisissez le diplôme obtenu par le personnel'}),
             'date_embauche': forms.DateInput(attrs={'class': 'form-control', 'type': 'date',
-                                                    'title': 'Sélectionnez/tapez la date d\'embauche du personnel'})
+                                                    'title': 'Sélectionnez/tapez la date d\'embauche du personnel'}),
+            'etat_matrimonial' : forms.Select(attrs={'class':'form-control', 'title':'Sélectionnez le statut matrimonial'}, choices=STATUT_MATRIMONIAL),
+            'annee_scolaire' : forms.Select(attrs={'class': 'form-control', 'title': 'Sélectionnez l\'année scolaire relative à son engagement'}),
+            'photo_employe': forms.FileInput(attrs={'id':'idphotoemp', 'class': 'd-none', 'title': 'Importez la photo de l\'employé', 'accept': 'image/*', 'onchange' : 'previewPhotoEmploye(this)'}),
+
 
         }
 
     def __init__(self, *args, **kwargs):
         super(FormPersonnel, self).__init__(*args, **kwargs)
+        self.fields['photo_employe'].required = False
+        self.fields['annee_scolaire'].empty_label = 'Sélectionnez'
 
         def clean_email_personnel(self):
             emailpersonnel = self.cleaned_data.get('email_personnel')
@@ -105,7 +111,7 @@ class FormSalaire(ModelForm):
             'primes': 'Montant des primes',
             'nb_hsupp': 'Nombre d\'heures supplementaires',
             'mont_hsupp': 'Montant des heures supplementaires',
-            'detail_paiement': 'Detail Paiement'
+            'detail_paiement': 'Detail du paiement'
         }
         widgets = {
             'anneescolaire': forms.Select(
@@ -119,8 +125,7 @@ class FormSalaire(ModelForm):
                        'title': 'Saisissez le nombre d\'heures enseignées'}),
             'taux_horaire': forms.NumberInput(
                 attrs={'class': 'form-control', 'placeholder': 'Taux horaire', 'title': 'Saisissez le taux horaire'}),
-            'primes': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Montant des Primes',
-                                               'title': 'Saisissez le montant des primes perçues'}),
+            'primes': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Montant des Primes','title': 'Saisissez le montant des primes perçues'}),
             'nb_hsupp': forms.NumberInput(
                 attrs={'class': 'form-control', 'placeholder': 'Nombre d\'heures supplementaires',
                        'title': 'Saisissez le nombre d\'heures supp'}),
@@ -128,8 +133,7 @@ class FormSalaire(ModelForm):
                 attrs={'class': 'form-control', 'placeholder': 'Montant des heures supplementaires',
                        'title': 'Saisissez le montant des heures supplementaires'}),
             'detail_paiement': forms.Textarea(
-                attrs={'class': 'form-control', 'placeholder': 'Detail du Paiement', 'cols': '10', 'rows': '5',
-                       'title': 'Saisissez un intitulé pour le paiement'})
+                attrs={'class': 'form-control', 'placeholder': 'Detail du Paiement', 'cols': '10', 'rows': '5','title': 'Saisissez un intitulé pour le paiement'})
         }
 
     def __init__(self, *args, **kwargs):
@@ -153,14 +157,12 @@ class FormAvanceSalaire(ModelForm):
         widgets = {
             'anscolaire': forms.Select(
                 attrs={'class': 'form-control', 'title': 'Sélectionnez l\'année scolaire courante'}),
-            'mois_avance': forms.Select(attrs={'class': 'form-control', 'title': 'Sélectionnez le mois de l\'avance'},
-                                        choices=MOIS_CHOICES),
+            'mois_avance': forms.Select(attrs={'class': 'form-control', 'title': 'Sélectionnez le mois de l\'avance'},choices=MOIS_CHOICES),
             'idpersonnel': forms.Select(attrs={'class': 'form-control', 'title': 'Sélectionnez un employé'}),
             'intitule': forms.Textarea(
                 attrs={'class': 'form-control', 'placeholder': 'Description de l\'opération', 'cols': '10',
                        'rows': '5', 'title': 'Saisissez une description pour l\'opération'}),
-            'montant_avance': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Montant avancé',
-                                                       'title': 'Saisissez le montant de l\'avance'}),
+            'montant_avance': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Montant avancé','title': 'Saisissez le montant de l\'avance'}),
         }
 
     def __init__(self, *args, **kwargs):

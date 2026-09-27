@@ -3,13 +3,15 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 DIRECTEUR_GENERAL = 'DG'
+DIRECTEUR_ETUDE = 'DE'
 SERVICE_SCOLARITE = 'SCOL'
 COMPTABLE = 'COMPTA'
 ENSEIGNANT = 'ENS'
 
 NIVEAU_ACCES_CHOICES = (
     (DIRECTEUR_GENERAL, 'Directeur Général'), # 0 Accès à toutes les fonctionnalités
-    (SERVICE_SCOLARITE, 'Service Scolarité'), # 1 Accès à la saisie des matières, la saisie des notes, les bulletins de notes, les resultats par classe
+    (DIRECTEUR_ETUDE,'Directeur des Etudes'), # 1 Accès à la gestion des matières, la saisie des notes, l'edition des bulletins et des résultats
+    (SERVICE_SCOLARITE, 'Service Scolarité'), # 2 Accès à l'inscription, la reinscription, la caisse, la cantine, les dépenses,
     (COMPTABLE, 'Comptable'), # 2 Accès à l'inscription, la reinscription, la caisse, la cantine, les dépenses, les paiements de scolarité
     (ENSEIGNANT, 'Enseignant'), # 3 Accès seulement à la saisie des notes, les bulletins de notes, les resultats, ne peut rien modifier
 )

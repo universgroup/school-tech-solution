@@ -10,7 +10,7 @@ from reportlab.lib import colors  # Contient les méthodes/fonctions de gestion 
 from django.urls import reverse
 from datetime import datetime  # Utilisé pour recuperer l'année courante dans la generation des matricules des élèves
 
-from django.db.models import Sum
+from django.db.models import Sum, Q
 from .models import *
 from .forms import *
 from gComptabilite.models import *
@@ -25,21 +25,114 @@ def ajouterpersonnel(request):
     if request.method == 'POST':
         formpersonnel = FormPersonnel(request.POST)
         if formpersonnel.is_valid():
-            formpersonnel.save()
+            p = Personnel()
+            p.nom_personnel = request.POST['nom_personnel']
+            p.prenom_personnel = request.POST['prenom_personnel']
+            p.civilite = request.POST['civilite']
+            p.date_naissance = request.POST['date_naissance']
+            p.lieu_naissance = request.POST['lieu_naissance']
+            p.niveau_etude = request.POST['niveau_etude']
+            p.type_personnel = request.POST['type_personnel']
+            p.adresse_personnel = request.POST['adresse_personnel']
+            p.contact_personnel = request.POST['contact_personnel']
+            p.fonction_personnel = request.POST['fonction_personnel']
+            p.email_personnel = request.POST['email_personnel']
+            p.sexe_personnel = request.POST['sexe_personnel']
+            p.salbase = Decimal(request.POST['salbase'])
+            p.annee_experience = request.POST['annee_experience']
+            p.contrat_type = request.POST['contrat_type']
+            p.diplome = request.POST['diplome']
+            p.date_embauche = request.POST['date_embauche']
+            p.etat_matrimonial = request.POST['etat_matrimonial']
+
+            if request.FILES.get('photo_employe'):
+                p.photo_employe = request.FILES.get('photo_employe')
+
+            an = request.POST['annee_scolaire']
+            ans = AnneeScolaire.objects.get(id=an)
+            p.annee_scolaire = ans
+            p.save()
+            
             formpersonnel = FormPersonnel()
             messages.success(request, 'Employé enregistré avec succès')
+        else:
+            messages.error(request,'Les données soumises sont invalides ou ne respectent pas les critères de validation du formulaire.')
     else:
         formpersonnel = FormPersonnel()
+
     context = {'form': formpersonnel}
     return render(request, 'gPersonnel/enregistrer_personnel.html', context)
 
 
 def listepersonnel(request):
-    pers = Personnel.objects.all().order_by('nom_personnel')
-    paginepers = Paginator(pers, 10)
+
+    eff_total = 0
+    eff_homme = 0
+    eff_femme = 0
+
+    pers = Personnel.objects.select_related('annee_scolaire').all().order_by('nom_personnel')
+    ane = AnneeScolaire.objects.all().order_by('id')
+
+    eff_total = pers.count() # C'est l'effectif total du personnel de l'école toute année confondue
+    eff_homme = pers.filter(sexe_personnel__exact=SEXE_PERSONNEL[0][0]).count() # Nombre d'hommes engagés dans l'établissement
+    eff_femme = pers.filter(sexe_personnel__exact=SEXE_PERSONNEL[1][0]).count() # Nombre de femmes engagées dans l'établissement
+
+
+    paginepers = Paginator(pers, 20)
     numpagepers = request.GET.get('page')
     pers = paginepers.get_page(numpagepers)
-    return render(request, 'gPersonnel/liste_generale_personnel.html', dict(pers=pers))
+
+    return render(request, 'gPersonnel/liste_generale_personnel.html', dict(employe=pers, ansc=ane, categorie_emp=TYPE_PERSONNEL, effectif_total=eff_total, effectif_total_homme=eff_homme, effectif_total_femme=eff_femme))
+
+def listepersonnelcategorie(request):
+
+    eff_total = 0
+    eff_homme = 0
+    eff_femme = 0
+     
+    an = request.GET.get('annee_scolaire')
+    categ = request.GET.get('categorie_employe')
+
+    ans = AnneeScolaire.objects.get(id=an) # Permet de recuperer l'ID de l'année scolaire sélectionnée
+
+    liste_emp_annee = {}
+    liste_emp_categorie = {}
+
+    liste_emp_annee = Personnel.objects.none()
+    liste_emp_categorie = Personnel.objects.none()
+
+    # Construction de la query string SANS le paramètre 'page'
+    querydict = request.GET.copy()
+    querydict.pop('page', None)
+    query_string = querydict.urlencode()
+
+    if an not in (None,''):
+
+        liste_emp_annee = Personnel.objects.select_related('annee_scolaire').filter(annee_scolaire__exact=ans)
+
+        eff_total = liste_emp_annee.count()
+        eff_homme = liste_emp_annee.filter(sexe_personnel__exact=SEXE_PERSONNEL[0][0]).count()
+        eff_femme = liste_emp_annee.filter(sexe_personnel__exact=SEXE_PERSONNEL[1][0]).count()
+
+        paginepers = Paginator(liste_emp_annee, 20)
+        numpagepers = request.GET.get('page')
+        liste_emp_annee = paginepers.get_page(numpagepers)
+
+    elif an not in (None, '') and categ not in (None, ''):
+
+        liste_emp_categorie = Personnel.objects.select_related('annee_scolaire').filter(Q(annee_scolaire__exact=ans),Q(type_personnel__exact=categ))
+
+        eff_total = liste_emp_categorie.count()
+        eff_homme = liste_emp_categorie.filter(sexe_personnel__exact=SEXE_PERSONNEL[0][0]).count()
+        eff_femme = liste_emp_categorie.filter(sexe_personnel__exact=SEXE_PERSONNEL[1][0]).count()
+
+        paginepers = Paginator(liste_emp_categorie, 20)
+        numpagepers = request.GET.get('page')
+        liste_emp_categorie = paginepers.get_page(numpagepers)
+
+    anesc = AnneeScolaire.objects.all().order_by('id') # Permet de recharger la liste des années dans le dropdown du filtre
+
+    return render(request, 'gPersonnel/liste_generale_personnel.html', dict(ansc=anesc, categorie_emp=TYPE_PERSONNEL, employecategorie=liste_emp_categorie, employeannee=liste_emp_annee, effectif_total=eff_total, effectif_total_homme=eff_homme, effectif_total_femme=eff_femme, query_string=query_string))
 
 
 def editerpersonnel(request, idpers):
@@ -73,16 +166,16 @@ def modifierpersonnel(request, idpers):
         pers.diplome = request.POST['diplome']
         pers.date_embauche = request.POST['date_embauche']
         pers.save()
-        return redirect('/listegeneralepersonnel/')
+
+        return redirect('../listegeneralepersonnel/')
     else:
-        return redirect('/listegeneralepersonnel/')
+        return redirect('../listegeneralepersonnel/')
 
 
 def supprimerpersonnel(request, pk):
     pers = Personnel.objects.get(id=pk)
     pers.delete()
-    messages.success(request, 'Employé supprimé avec succès')
-    return redirect('/ajouterpersonnel/')
+    return redirect('../listegeneralepersonnel/')
 
 
 # Gestion des Salaires
