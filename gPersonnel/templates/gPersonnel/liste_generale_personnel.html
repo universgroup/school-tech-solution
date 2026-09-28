@@ -28,6 +28,7 @@
     <link rel="stylesheet" href="{% static 'assets/plugins/overlayScrollbars/css/OverlayScrollbars.min.css' %}"/>
     <link href="{% static 'fontawesomefree/css/all.min.css' %}" rel="stylesheet" type="text/css">
 
+  
     <!-- DataTables -->
     <link rel="stylesheet" href="{% static 'assets/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
     <link rel="stylesheet" href="{% static 'assets/plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
@@ -150,7 +151,7 @@
       <li class="nav-item dropdown d-none d-lg-block">
             <a id="dropdownSubMenu6" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle">Personnel</a>
             <ul aria-labelledby="dropdownSubMenu6" class="dropdown-menu border-0 shadow">
-              <li><a href="#" class="dropdown-item">Enregistrer un employé</a></li>
+              <li><a href="{% url 'listegeneralepersonnel' %}" class="dropdown-item">Enregistrer un employé</a></li>
               <li><a href="#" class="dropdown-item">Enregistrer une avance sur salaire</a></li>
               <li><a href="#" class="dropdown-item">Paiement des salaires</a></li>
               <li><a href="#" class="dropdown-item">Suivi des absences</a></li>
@@ -226,7 +227,7 @@
       <div class="input-group input-group-sm">
         <input class="form-control form-control-navbar" type="search" placeholder="Rechercher..." aria-label="Search">
         <div class="input-group-append">
-          <button class="btn btn-navbar" type="submit">
+          <button class="btn btn-navbar" type="button">
             <i class="fas fa-search"></i>
           </button>
         </div>
@@ -534,7 +535,7 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="#" class="nav-link" title="Permet d'enregistrer les informations de chaque employé de l'école">
+                <a href="{% url 'listegeneralepersonnel' %}" class="nav-link" title="Permet d'enregistrer les informations de chaque employé de l'école">
                   <i class="fas fa-user-check">&nbsp;</i>
                   <p>Ajouter un employé</p>                  
                 </a>
@@ -725,15 +726,15 @@
                                     
                         <h2 class="card-title mb-0 filtres-titre">Filtrez la liste du personnel</h2>
                                                     
-                        <form class="filtres-form" action="{% url 'filtrerlistegenerale' %}" method="GET" id="frecherche" data-personnel-url="{% url 'chargerlisteclasse' %}">
+                        <form class="filtres-form" action="{% url 'listepersonnelcategorie' %}" method="GET" id="frecherche">
 
                               <div class="filtres-champs">
                                   
-                                  <div class="filtres-selects"> 
+                                 <div class="filtres-selects"> 
                                     
                                     <div class="filtre-group">
                                         <label for="idannee" class="mr-2 mb-0">Année scolaire</label>
-                                        <select class="form-control form-control-sm select-modern" name="annee_scolaire" id="idannee" title="Sélectionnez une année scolaire pour afficher la liste des élèves inscrits">
+                                        <select class="form-control form-control-sm select-modern" name="annee_scolaire" id="idannee" title="Sélectionnez une année scolaire pour afficher la liste du personnel employé">
                                             <option value="" selected>Sélectionnez</option>
                                             {% for an in ansc %}
                                             <option value="{{an.id}}">{{an.descript_annee}}</option>
@@ -742,38 +743,31 @@
                                     </div>
 
                                     <div class="filtre-group">
-                                        <label for="cbocycle" class="mr-2 mb-0">Cycle</label>
-                                        <select class="form-control form-control-sm select-modern" name="cycle" id="cbocycle">
-                                              <option value="" selected>Selectionnez</option>
-                                              {% for cl in cycles %}
-                                                <option value="{{cl.id}}">{{cl.cycle}}</option>
-                                              {% endfor %}
-                                        </select>
-                                    </div>
-
-                                    <div class="filtre-group">
-                                        <label for="cboclasse" class="mr-2 mb-0">Classe</label>
-                                        <select class="form-control form-control-sm select-modern" name="classe" id="cboclasse">
-                                          <option value="" selected>Selectionnez</option>
-                                        </select>
+                                      <label for="id_categorie" class="mr-2 mb-0">Catégorie</label>
+                                      <select class="form-control form-control-sm select-modern" name="categorie_employe" id="id_categorie_emp" title="Sélectionnez la catégorie d'employé à charger">
+                                          <option value="" selected>Sélectionnez</option>
+                                          {% for categ in categorie_emp %}
+                                          <option value="{{categ.0}}">{{categ.1}}</option>
+                                          {% endfor %}                                      
+                                      </select>
                                     </div>
 
                                   </div>
 
                                   <div class="filtres-actions">
 
-                                      <button type="submit" id="btn_rechercher" class="btn btn-secondary btn-md mr-2" title="Filtrer la liste des élèves par année scolaire et cycle">Rechercher &nbsp;<i class="fas fa-search"></i></button>
+                                      <button type="submit" id="btn_rechercher" class="btn btn-secondary btn-md mr-2" title="Filtrer la liste du personnel par année scolaire">Rechercher &nbsp;<i class="fas fa-search"></i></button>
 
-                                      <a href="{% url  'registrematricule' %}" target="_self" class="btn btn-warning btn-md mr-3" title="Actualiser la liste générale des élèves">Actualiser &nbsp;<i class="fas fa-refresh"></i></a>
+                                      <a href="{% url  'listegeneralepersonnel' %}" target="_self" class="btn btn-warning btn-md mr-3" title="Actualiser la liste générale du personnel">Actualiser &nbsp;<i class="fas fa-refresh"></i></a>
                                       
                                       <button type="button" class="btn btn-danger btn-md mr-2"
-                                            title="Imprimer la liste des inscrits/reinscrits par classe et année scolaire"
+                                            title="Imprimer la liste générale du personnel par année scolaire"
                                             data-toggle="modal"
-                                            data-target="#modalRapportInscrits">
-                                        Rapport inscription &nbsp;<i class="fas fa-print"></i>
+                                            data-target="#modalRapportPersonnel">
+                                        Rapport Personnel &nbsp;<i class="fas fa-print"></i>
                                     </button>
 
-                                    <a href="{% url 'enregistrereleve' %}" class="btn btn-success btn-md" target="_self" title="Cliquez ici pour inscrire un élève">Nouvelle inscription &nbsp;<i class="fas fa-graduation-cap"></i></a>
+                                    <a href="{% url 'ajouterpersonnel' %}" class="btn btn-success btn-md" target="_self" title="Cliquez ici pour ajouter un nouvel employé">Nouveau personnel &nbsp; <i class="fas fa-user-tie"></i></a>
 
                                   </div>  
 
@@ -786,48 +780,36 @@
 
         <div class="card-body">
 
-        {% if listegenerale %}
+        {% if employe %}
              <table id="listegenerale" class="dt-school">
                     <thead>
                 
                         <tr>
-                                <th>Statut</th>
-                                <th>Matricule</th>
+                                <th>ID Employé</th>
+                                <th class="no-export">Photo employé</th>
                                 <th>Nom Famille</th>
                                 <th>Prénom(s)</th>
-                                <th>Sexe</th>
-                                <th>Prénom(s) Père</th>
-                                <th>Prénom(s) & Nom Mère</th>
-                                <th>Prénom(s) & Nom Tuteur</th>
-                                <th>Contact père</th>
-                                <th>Contact mère</th>
-                                <th>Email père</th>
-                                <th class="no-export">Email mère</th>
-                                <th>Profession père</th>
-                                <th class="no-export">Profession mère</th>
-                                <th>Personne contact</th>
-                                <th>Adresse</th>
-                                <th>Ecole d'origine</th>
-                                <th class="no-export">Photo ID</th>
+                                <th>Civilité</th>
                                 <th>Date naissance</th>
                                 <th>Lieu naissance</th>
-                                <th>Date entrée</th>
-                                <th>Pays naissance</th>
-                                <th>Classe</th>
-                                <th>Cycle</th>
+                                <th>Niveau étude</th>
+                                <th>Catégorie</th>
+                                <th>Adresse/Résidence</th>
+                                <th>Contact</th>
+                                <th>Fonction/Poste occupé</th>
+                                <th>Email</th>
+                                <th>Genre(Sexe)</th>
+                                <th>Salaire de base</th>
+                                <th>Année d'experience</th>
+                                <th>Type contrat</th>
+                                <th>Diplôme obtenu</th>
+                                <th>Date embauche</th>
+                                <th>Statut matrimonial</th>
                                 <th>Année scolaire</th>
-                                <th>Date inscription</th>
-                                <th>ID Inscription</th>
                                 <th class="no-export">Actions</th>
                         </tr>
 
                         <tr class="filters">
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
                                 <th></th>
                                 <th></th>
                                 <th></th>
@@ -855,58 +837,49 @@
                     </thead>
                     <tbody>
                     
-                        {% for le in listegenerale %}
+                        {% for emp in employe %}
                                           <tr>
-                                              <td>{{le.etat_inscription}}</td>
-                                              <td>{{le.mateleve.matricule}}</td>
-                                              <td>{{le.mateleve.nom}}</td>
-                                              <td>{{le.mateleve.prenom}}</td>
-                                              <td>{{le.mateleve.sexe_eleve}}</td>
-                                              <td>{{le.mateleve.pere}}</td>
-                                              <td>{{le.mateleve.mere}}</td>
-                                              <td>{{le.mateleve.tuteur}}</td>
-                                              <td>{{le.mateleve.contact_pere}}</td>
-                                              <td>{{le.mateleve.contact_mere}}</td>
-                                              <td>{{le.mateleve.email_pere}}</td>
-                                              <td class="no-export">{{le.mateleve.email_mere}}</td>
-                                              <td>{{le.mateleve.profes_pere}}</td>
-                                              <td class="no-export">{{le.mateleve.profes_mere}}</td>
-                                              <td>{{le.mateleve.personne_contact}}</td>
-                                              <td>{{le.mateleve.adresse}}</td>
-                                              <td>{{le.mateleve.ecole_origine}}</td>
-
-                                              {% if le.mateleve.photo_eleve %}
+                                              <td>{{emp.id}}</td>
+                                              {% if emp.photo_employe %}
                                               <td class="no-export">
-                                                    <a href="{{ le.mateleve.photo_eleve.url }}" target="_blank" title="Agrandir la photo de l'élève">
-                                                        <img src="{{le.mateleve.photo_eleve.url}}" width="40px">
+                                                    <a href="{{ emp.photo_employe.url }}" target="_blank" title="Afficher la photo de l'employé">
+                                                        <img src="{{ emp.photo_employe.url }}" width="40px" id="photo_employe">
                                                     </a>
                                               </td>
                                               {% else %}
-                                              <td class="no-export">Photo indisponible</td>
+                                              <td>Photo indisponible</td>
                                               {% endif %}
 
-                                              <td>{{le.mateleve.datenaissance|date:'j-n-Y'}}</td>
-                                              <td>{{le.mateleve.lieu_naissance}}</td>
-                                              <td>{{le.mateleve.date_arrivee|date:'j-n-Y'}}</td>
-                                              <td>{{le.mateleve.pays_naissance}}</td>
-                                              <td>{{le.idclasse}}</td>
-                                              <td>{{le.idcycle}}</td>
-                                              <td>{{le.annee_scolaire}}</td>
-                                              <td>{{le.date_inscription|date:'j-n-Y'}}</td>
-                                              <td>{{le.id}}</td>
+                                              <td>{{emp.nom_personnel}}</td>
+                                              <td>{{emp.prenom_personnel}}</td>
+                                              <td>{{emp.civilite}}</td>
+                                              <td>{{emp.date_naissance|date:'j-n-Y'}}</td>
+                                              <td>{{emp.lieu_naissance}}</td>
+                                              <td>{{emp.niveau_etude}}</td>
+                                              <td>{{emp.type_personnel}}</td>
+                                              <td>{{emp.adresse_personnel}}</td>
+                                              <td>{{emp.contact_personnel}}</td>
+                                              <td>{{emp.fonction_personnel}}</td>
+                                              <td>{{emp.email_personnel}}</td>
+                                              <td>{{emp.sexe_personnel}}</td>
+                                              <td>{{emp.salbase|floatformat:'2g'}}</td>
+                                              <td>{{emp.annee_experience}}</td>
+                                              <td>{{emp.contrat_type}}</td>
+                                              <td>{{emp.diplome}}</td>
+                                              <td>{{emp.date_embauche|date:'j-n-Y'}}</td>
+                                              <td>{{emp.etat_matrimonial}}</td>
+                                              <td>{{emp.annee_scolaire}}</td>
+                                         
                                               <td class="no-export">
-                                                  <a class="btn btn-primary" href="{% url 'afficherdetailsinscription' le.id %}" title="Voir/Afficher"><i class="fa fa-eye fa-sm"></i></a>
-                                                  <a class="btn btn-info" href="{% url 'editioninscription' le.id %}" title="Modifier/Editer"><i class="fa fa-edit fa-sm"></i></a>
+                                                  <a class="btn btn-primary" href="{% url 'afficherdetailspersonnel' emp.id %}" title="Voir/Afficher"><i class="fa fa-eye fa-sm"></i></a>
+                                                  <a class="btn btn-info" href="{% url 'editionpersonnel' emp.id %}" title="Modifier/Editer"><i class="fa fa-edit fa-sm"></i></a>
 
                                                   {% peut request.user 'menu_administration' as ok_admin %}
 
                                                   {% if ok_admin %}
-                                                  <a class="btn btn-danger" href=" {% url 'suppinscription' le.id %}" title="Supprimer"><i class="fa fa-remove fa-sm"></i></a>
+                                                  <a class="btn btn-danger" href=" {% url 'supppersonnel' emp.id %}" title="Supprimer"><i class="fa fa-remove fa-sm"></i></a>
                                                   {% endif %}
-                                                  <a class="btn btn-secondary" target="_blank" href="{% url 'imprimerecuinscription' le.id %}" title="Imprimer le recu d'inscription"><i class="fa fa-print fa-sm"></i></a>
-
-                                                  <a class="btn btn-dark" target="_blank" href="{% url 'imprimerbadgeeleve' le.id %}" title="Imprimer le badge de l'élève"><i class="fas fa-id-card fa-sm"></i></a>
-
+                                                  
                                               </td>
 
                                           </tr>
@@ -916,33 +889,27 @@
                     </tbody>
                     <tfoot>
                         <tr>
-                            <th>Statut</th>
-                            <th>Matricule</th>
+                            <th>ID Employé</th>
+                            <th class="no-export">Photo employé</th>
                             <th>Nom Famille</th>
                             <th>Prénom(s)</th>
-                            <th>Sexe</th>
-                            <th>Prénom(s) Père</th>
-                            <th>Prénom(s) & Nom Mère</th>
-                            <th>Prénom(s) & Nom Tuteur</th>
-                            <th>Contact père</th>
-                            <th>Contact mère</th>
-                            <th>Email père</th>
-                            <th class="no-export">Email mère</th>
-                            <th>Profession père</th>
-                            <th class="no-export">Profession mère</th>
-                            <th>Personne contact</th>
-                            <th>Adresse</th>
-                            <th>Ecole d'origine</th>
-                            <th class="no-export">Photo ID</th>
+                            <th>Civilité</th>
                             <th>Date naissance</th>
                             <th>Lieu naissance</th>
-                            <th>Date entrée</th>
-                            <th>Pays naissance</th>
-                            <th>Classe</th>
-                            <th>Cycle</th>
+                            <th>Niveau étude</th>
+                            <th>Catégorie</th>
+                            <th>Adresse/Résidence</th>
+                            <th>Contact</th>
+                            <th>Fonction/Poste occupé</th>
+                            <th>Email</th>
+                            <th>Genre(Sexe)</th>
+                            <th>Salaire de base</th>
+                            <th>Année d'experience</th>
+                            <th>Type contrat</th>
+                            <th>Diplôme obtenu</th>
+                            <th>Date embauche</th>
+                            <th>Statut matrimonial</th>
                             <th>Année scolaire</th>
-                            <th>Date inscription</th>
-                            <th>ID Inscription</th>
                             <th class="no-export">Actions</th>
                         </tr>
                    </tfoot>
@@ -951,11 +918,11 @@
             <div class="row mt-3 mb-2">
                 <div class="col-md-4">
                     <div class="form-group">
-                        <label for="effgarcons">Effectif total garçons</label>
-                        {% if effectif_total_garcons %}
-                        <input type="text" id="effgarcons" name="effectif_total_garcons" value="{{ effectif_total_garcons }}" class="form-control" readonly style="color:red; font-weight: bold; font-size: 12pt;">
+                        <label for="effhomme">Effectif total homme</label>
+                        {% if effectif_total_homme %}
+                        <input type="text" id="effhomme" name="effectif_total_homme" value="{{ effectif_total_homme }}" class="form-control" readonly style="color:red; font-weight: bold; font-size: 12pt;">
                         {% else %}
-                        <input type="text" name="effectif_total_garcons" value="0" class="form-control" readonly style="color:red; font-weight: bold; font-size: 12pt;">
+                        <input type="text" name="effectif_total_homme" value="0" class="form-control" readonly style="color:red; font-weight: bold; font-size: 12pt;">
                         {% endif %}
                     </div>
                 </div>
@@ -963,11 +930,11 @@
 
                 <div class="col-md-4">
                     <div class="form-group">
-                        <label for="eff_filles">Effectif total filles</label>
-                        {% if effectif_total_filles %}
-                        <input type="text" id="eff_filles" name="effectif_total_filles" value="{{ effectif_total_filles }}" class="form-control" readonly style="color:red; font-weight: bold; font-size: 12pt;">
+                        <label for="eff_femme">Effectif total femme</label>
+                        {% if effectif_total_femme %}
+                        <input type="text" id="eff_femme" name="effectif_total_femme" value="{{ effectif_total_femme }}" class="form-control" readonly style="color:red; font-weight: bold; font-size: 12pt;">
                         {% else %}
-                        <input type="text" name="effectif_total_filles" value="0" class="form-control" readonly style="color:red; font-weight: bold; font-size: 12pt;">
+                        <input type="text" name="effectif_total_femme" value="0" class="form-control" readonly style="color:red; font-weight: bold; font-size: 12pt;">
                         {% endif %}
                     </div>
                 </div>
@@ -989,31 +956,31 @@
                       <nav aria-label="">
                           <ul class="pagination">
 
-                              {% if listegenerale.has_previous %}
+                              {% if employe.has_previous %}
 
                               <li class="page-item">
                                   <a class="page-link" href="?page=1">1</a>
                               </li>
                               <li class="page-item">
-                                  <a class="page-link" href="?page={{ listegenerale.previous_page_number }}"><i class="fa-solid fa-backward fa-sm"></i>&nbsp; Précédent</a>
+                                  <a class="page-link" href="?page={{ employe.previous_page_number }}"><i class="fa-solid fa-backward fa-sm"></i>&nbsp; Précédent</a>
                               </li>
 
                               {% endif %}
 
                               <li class="page-item active" aria-current="page">
                                   <a class="page-link" href="#">
-                                      Page {{ listegenerale.number }} sur {{ listegenerale.paginator.num_pages }}
+                                      Page {{ employe.number }} sur {{ employe.paginator.num_pages }}
                                   </a>
                               </li>
 
-                              {% if listegenerale.has_next %}
+                              {% if employe.has_next %}
 
                               <li class="page-item">
-                                  <a class="page-link" href="?page={{ listegenerale.next_page_number }}"><i class="fa-solid fa-forward fa-sm"></i>&nbsp; Suivant</a>
+                                  <a class="page-link" href="?page={{ employe.next_page_number }}"><i class="fa-solid fa-forward fa-sm"></i>&nbsp; Suivant</a>
                               </li>
 
                               <li class="page-item">
-                                  <a class="page-link" href="?page={{ listegenerale.paginator.num_pages }}"><i class="fa-solid fa-step-forward fa-sm"></i>&nbsp; Dernier</a>
+                                  <a class="page-link" href="?page={{ employe.paginator.num_pages }}"><i class="fa-solid fa-step-forward fa-sm"></i>&nbsp; Dernier</a>
                               </li>
 
                               {% endif %}
@@ -1023,49 +990,37 @@
               </div>
           </div>
 
-        {% elif listeinsclasse %}
+        {% elif employecategorie %}
 
-          <table id="listeinscrit" class="dt-school">
+          <table id="listecategorie" class="dt-school">
                     <thead>
                 
                         <tr>
-                                <th>Statut</th>
-                                <th>Matricule</th>
-                                <th>Nom Famille</th>
-                                <th>Prénom(s)</th>
-                                <th>Sexe</th>
-                                <th>Prénom(s) Père</th>
-                                <th>Prénom(s) & Nom Mère</th>
-                                <th>Prénom(s) & Nom Tuteur</th>
-                                <th>Contact père</th>
-                                <th>Contact mère</th>
-                                <th>Email père</th>
-                                <th class="no-export">Email mère</th>
-                                <th>Profession père</th>
-                                <th class="no-export">Profession mère</th>
-                                <th>Personne contact</th>
-                                <th>Adresse</th>
-                                <th>Ecole d'origine</th>
-                                <th class="no-export">Photo ID</th>
-                                <th>Date naissance</th>
-                                <th>Lieu naissance</th>
-                                <th>Date entrée</th>
-                                <th>Pays naissance</th>
-                                <th>Classe</th>
-                                <th>Cycle</th>
-                                <th>Année scolaire</th>
-                                <th>Date inscription</th>
-                                <th>ID Inscription</th>
-                                <th class="no-export">Actions</th>
+                            <th>ID Employé</th>
+                            <th class="no-export">Photo employé</th>
+                            <th>Nom Famille</th>
+                            <th>Prénom(s)</th>
+                            <th>Civilité</th>
+                            <th>Date naissance</th>
+                            <th>Lieu naissance</th>
+                            <th>Niveau étude</th>
+                            <th>Catégorie</th>
+                            <th>Adresse/Résidence</th>
+                            <th>Contact</th>
+                            <th>Fonction/Poste occupé</th>
+                            <th>Email</th>
+                            <th>Genre(Sexe)</th>
+                            <th>Salaire de base</th>
+                            <th>Année d'experience</th>
+                            <th>Type contrat</th>
+                            <th>Diplôme obtenu</th>
+                            <th>Date embauche</th>
+                            <th>Statut matrimonial</th>
+                            <th>Année scolaire</th>
+                            <th class="no-export">Actions</th>
                         </tr>
 
                         <tr class="filters">
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
                                 <th></th>
                                 <th></th>
                                 <th></th>
@@ -1093,58 +1048,49 @@
                     </thead>
                     <tbody>
                     
-                        {% for le in listeinsclasse %}
+                        {% for emp in employecategorie %}
                                           <tr>
-                                              <td>{{le.etat_inscription}}</td>
-                                              <td>{{le.mateleve.matricule}}</td>
-                                              <td>{{le.mateleve.nom}}</td>
-                                              <td>{{le.mateleve.prenom}}</td>
-                                              <td>{{le.mateleve.sexe_eleve}}</td>
-                                              <td>{{le.mateleve.pere}}</td>
-                                              <td>{{le.mateleve.mere}}</td>
-                                              <td>{{le.mateleve.tuteur}}</td>
-                                              <td>{{le.mateleve.contact_pere}}</td>
-                                              <td>{{le.mateleve.contact_mere}}</td>
-                                              <td>{{le.mateleve.email_pere}}</td>
-                                              <td class="no-export">{{le.mateleve.email_mere}}</td>
-                                              <td>{{le.mateleve.profes_pere}}</td>
-                                              <td class="no-export">{{le.mateleve.profes_mere}}</td>
-                                              <td>{{le.mateleve.personne_contact}}</td>
-                                              <td>{{le.mateleve.adresse}}</td>
-                                              <td>{{le.mateleve.ecole_origine}}</td>
-
-                                              {% if le.mateleve.photo_eleve %}
+                                              <td>{{emp.id}}</td>
+                                              {% if emp.photo_employe %}
                                               <td class="no-export">
-                                                    <a href="{{ le.mateleve.photo_eleve.url }}" target="_blank" title="Agrandir la photo de l'élève">
-                                                        <img src="{{le.mateleve.photo_eleve.url}}" width="40px">
+                                                    <a href="{{ emp.photo_employe.url }}" target="_blank" title="Afficher la photo de l'employé">
+                                                        <img src="{{ emp.photo_employe.url }}" width="40px" id="photo_employe">
                                                     </a>
                                               </td>
                                               {% else %}
-                                              <td class="no-export">Photo indisponible</td>
+                                              <td>Photo indisponible</td>
                                               {% endif %}
 
-                                              <td>{{le.mateleve.datenaissance|date:'j-n-Y'}}</td>
-                                              <td>{{le.mateleve.lieu_naissance}}</td>
-                                              <td>{{le.mateleve.date_arrivee|date:'j-n-Y'}}</td>
-                                              <td>{{le.mateleve.pays_naissance}}</td>
-                                              <td>{{le.idclasse}}</td>
-                                              <td>{{le.idcycle}}</td>
-                                              <td>{{le.annee_scolaire}}</td>
-                                              <td>{{le.date_inscription|date:'j-n-Y'}}</td>
-                                              <td>{{le.id}}</td>
+                                              <td>{{emp.nom_personnel}}</td>
+                                              <td>{{emp.prenom_personnel}}</td>
+                                              <td>{{emp.civilite}}</td>
+                                              <td>{{emp.date_naissance|date:'j-n-Y'}}</td>
+                                              <td>{{emp.lieu_naissance}}</td>
+                                              <td>{{emp.niveau_etude}}</td>
+                                              <td>{{emp.type_personnel}}</td>
+                                              <td>{{emp.adresse_personnel}}</td>
+                                              <td>{{emp.contact_personnel}}</td>
+                                              <td>{{emp.fonction_personnel}}</td>
+                                              <td>{{emp.email_personnel}}</td>
+                                              <td>{{emp.sexe_personnel}}</td>
+                                              <td>{{emp.salbase|floatformat:'2g'}}</td>
+                                              <td>{{emp.annee_experience}}</td>
+                                              <td>{{emp.contrat_type}}</td>
+                                              <td>{{emp.diplome}}</td>
+                                              <td>{{emp.date_embauche|date:'j-n-Y'}}</td>
+                                              <td>{{emp.etat_matrimonial}}</td>
+                                              <td>{{emp.annee_scolaire}}</td>
+                                         
                                               <td class="no-export">
-                                                  <a class="btn btn-primary" href="{% url 'afficherdetailsinscription' le.id %}" title="Voir/Afficher"><i class="fa fa-eye fa-sm"></i></a>
-                                                  <a class="btn btn-info" href="{% url 'editioninscription' le.id %}" title="Modifier/Editer"><i class="fa fa-edit fa-sm"></i></a>
+                                                  <a class="btn btn-primary" href="{% url 'afficherdetailspersonnel' emp.id %}" title="Voir/Afficher"><i class="fa fa-eye fa-sm"></i></a>
+                                                  <a class="btn btn-info" href="{% url 'editionpersonnel' emp.id %}" title="Modifier/Editer"><i class="fa fa-edit fa-sm"></i></a>
 
                                                   {% peut request.user 'menu_administration' as ok_admin %}
 
                                                   {% if ok_admin %}
-                                                  <a class="btn btn-danger" href=" {% url 'suppinscription' le.id %}" title="Supprimer"><i class="fa fa-remove fa-sm"></i></a>
+                                                  <a class="btn btn-danger" href=" {% url 'supppersonnel' emp.id %}" title="Supprimer"><i class="fa fa-remove fa-sm"></i></a>
                                                   {% endif %}
-                                                  <a class="btn btn-secondary" target="_blank" href="{% url 'imprimerecuinscription' le.id %}" title="Imprimer le recu d'inscription"><i class="fa fa-print fa-sm"></i></a>
-
-                                                  <a class="btn btn-dark" target="_blank" href="{% url 'imprimerbadgeeleve' le.id %}" title="Imprimer le badge de l'élève"><i class="fas fa-id-card fa-sm"></i></a>
-
+                                                  
                                               </td>
 
                                           </tr>
@@ -1154,33 +1100,27 @@
                     </tbody>
                     <tfoot>
                         <tr>
-                            <th>Statut</th>
-                            <th>Matricule</th>
+                            <th>ID Employé</th>
+                            <th class="no-export">Photo employé</th>
                             <th>Nom Famille</th>
                             <th>Prénom(s)</th>
-                            <th>Sexe</th>
-                            <th>Prénom(s) Père</th>
-                            <th>Prénom(s) & Nom Mère</th>
-                            <th>Prénom(s) & Nom Tuteur</th>
-                            <th>Contact père</th>
-                            <th>Contact mère</th>
-                            <th>Email père</th>
-                            <th class="no-export">Email mère</th>
-                            <th>Profession père</th>
-                            <th class="no-export">Profession mère</th>
-                            <th>Personne contact</th>
-                            <th>Adresse</th>
-                            <th>Ecole d'origine</th>
-                            <th class="no-export">Photo ID</th>
+                            <th>Civilité</th>
                             <th>Date naissance</th>
                             <th>Lieu naissance</th>
-                            <th>Date entrée</th>
-                            <th>Pays naissance</th>
-                            <th>Classe</th>
-                            <th>Cycle</th>
+                            <th>Niveau étude</th>
+                            <th>Catégorie</th>
+                            <th>Adresse/Résidence</th>
+                            <th>Contact</th>
+                            <th>Fonction/Poste occupé</th>
+                            <th>Email</th>
+                            <th>Genre(Sexe)</th>
+                            <th>Salaire de base</th>
+                            <th>Année d'experience</th>
+                            <th>Type contrat</th>
+                            <th>Diplôme obtenu</th>
+                            <th>Date embauche</th>
+                            <th>Statut matrimonial</th>
                             <th>Année scolaire</th>
-                            <th>Date inscription</th>
-                            <th>ID Inscription</th>
                             <th class="no-export">Actions</th>
                         </tr>
                    </tfoot>
@@ -1189,11 +1129,11 @@
             <div class="row mt-3 mb-2">
                 <div class="col-md-4">
                     <div class="form-group">
-                        <label for="effgarcons">Effectif total garçons</label>
-                        {% if effectif_total_garcons %}
-                        <input type="text" id="effgarcons" name="effectif_total_garcons" value="{{ effectif_total_garcons }}" class="form-control" readonly style="color:red; font-size: 12pt; font-weight: bold;">
+                        <label for="effhomme">Effectif total homme</label>
+                        {% if effectif_total_homme %}
+                        <input type="text" id="effhomme" name="effectif_total_homme" value="{{ effectif_total_homme }}" class="form-control" readonly style="color:red; font-weight: bold; font-size: 12pt;">
                         {% else %}
-                        <input type="text" name="effectif_total_garcons" value="0" class="form-control" readonly style="color:red; font-size: 12pt; font-weight: bold;">
+                        <input type="text" name="effectif_total_homme" value="0" class="form-control" readonly style="color:red; font-weight: bold; font-size: 12pt;">
                         {% endif %}
                     </div>
                 </div>
@@ -1201,11 +1141,11 @@
 
                 <div class="col-md-4">
                     <div class="form-group">
-                        <label for="eff_filles">Effectif total filles</label>
-                        {% if effectif_total_filles %}
-                        <input type="text" id="eff_filles" name="effectif_total_filles" value="{{ effectif_total_filles }}" class="form-control" readonly style="color:red; font-size: 12pt; font-weight: bold;">
+                        <label for="eff_femme">Effectif total femme</label>
+                        {% if effectif_total_femme %}
+                        <input type="text" id="eff_femme" name="effectif_total_femme" value="{{ effectif_total_femme }}" class="form-control" readonly style="color:red; font-weight: bold; font-size: 12pt;">
                         {% else %}
-                        <input type="text" name="effectif_total_filles" value="0" class="form-control" readonly style="color:red; font-size: 12pt; font-weight: bold;">
+                        <input type="text" name="effectif_total_femme" value="0" class="form-control" readonly style="color:red; font-weight: bold; font-size: 12pt;">
                         {% endif %}
                     </div>
                 </div>
@@ -1214,9 +1154,9 @@
                     <div class="form-group">
                         <label for="efftotal">Effectif total</label>
                         {% if effectif_total %}
-                        <input type="text" id="efftotal" name="effectif_total" value="{{ effectif_total }}" class="form-control" readonly style="color:red; font-size: 12pt; font-weight: bold;">
+                        <input type="text" id="efftotal" name="effectif_total" value="{{ effectif_total }}" class="form-control" readonly style="color:red; font-weight: bold; font-size: 12pt;">
                         {% else %}
-                        <input type="text" name="effectif_total" value="0" class="form-control" readonly style="color:red; font-size: 12pt; font-weight: bold;">
+                        <input type="text" name="effectif_total" value="0" class="form-control" readonly style="color:red; font-weight: bold; font-size: 12pt;">
                         {% endif %}
                     </div>
                 </div>
@@ -1227,31 +1167,242 @@
                       <nav aria-label="">
                           <ul class="pagination">
 
-                              {% if listeinsclasse.has_previous %}
+                              {% if employecategorie.has_previous %}
 
                               <li class="page-item">
                                   <a class="page-link" href="?page=1&{{ query_string }}">1</a>
                               </li>
                               <li class="page-item">
-                                  <a class="page-link" href="?page={{ listeinsclasse.previous_page_number }}&{{ query_string }}"><i class="fa-solid fa-backward fa-sm"></i>&nbsp; Précédent</a>
+                                  <a class="page-link" href="?page={{ employecategorie.previous_page_number }}&{{ query_string }}"><i class="fa-solid fa-backward fa-sm"></i>&nbsp; Précédent</a>
                               </li>
 
                               {% endif %}
 
                               <li class="page-item active" aria-current="page">
                                   <a class="page-link" href="#">
-                                      Page {{ listeinsclasse.number }} sur {{ listeinsclasse.paginator.num_pages }}
+                                      Page {{ employecategorie.number }} sur {{ employecategorie.paginator.num_pages }}
                                   </a>
                               </li>
 
-                              {% if listeinsclasse.has_next %}
+                              {% if employecategorie.has_next %}
 
                               <li class="page-item">
-                                  <a class="page-link" href="?page={{ listeinsclasse.next_page_number }}&{{ query_string }}"><i class="fa-solid fa-forward fa-sm"></i>&nbsp; Suivant</a>
+                                  <a class="page-link" href="?page={{ employecategorie.next_page_number }}&{{ query_string }}"><i class="fa-solid fa-forward fa-sm"></i>&nbsp; Suivant</a>
                               </li>
 
                               <li class="page-item">
-                                  <a class="page-link" href="?page={{ listeinsclasse.paginator.num_pages }}&{{ query_string }}"><i class="fa-solid fa-step-forward fa-sm"></i>&nbsp; Dernier</a>
+                                  <a class="page-link" href="?page={{ employecategorie.paginator.num_pages }}&{{ query_string }}"><i class="fa-solid fa-step-forward fa-sm"></i>&nbsp; Dernier</a>
+                              </li>
+
+                              {% endif %}
+
+                          </ul>
+                      </nav>
+              </div>
+          </div>
+
+        {% elif employeannee %}  
+
+          <table id="listeempannee" class="dt-school">
+                    <thead>
+                
+                        <tr>
+                            <th>ID Employé</th>
+                            <th class="no-export">Photo employé</th>
+                            <th>Nom Famille</th>
+                            <th>Prénom(s)</th>
+                            <th>Civilité</th>
+                            <th>Date naissance</th>
+                            <th>Lieu naissance</th>
+                            <th>Niveau étude</th>
+                            <th>Catégorie</th>
+                            <th>Adresse/Résidence</th>
+                            <th>Contact</th>
+                            <th>Fonction/Poste occupé</th>
+                            <th>Email</th>
+                            <th>Genre(Sexe)</th>
+                            <th>Salaire de base</th>
+                            <th>Année d'experience</th>
+                            <th>Type contrat</th>
+                            <th>Diplôme obtenu</th>
+                            <th>Date embauche</th>
+                            <th>Statut matrimonial</th>
+                            <th>Année scolaire</th>
+                            <th class="no-export">Actions</th>
+                        </tr>
+
+                        <tr class="filters">
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                        </tr>
+
+                    </thead>
+                    <tbody>
+                    
+                        {% for emp in employeannee %}
+                                          <tr>
+                                              <td>{{emp.id}}</td>
+                                              {% if emp.photo_employe %}
+                                              <td class="no-export">
+                                                    <a href="{{ emp.photo_employe.url }}" target="_blank" title="Afficher la photo de l'employé">
+                                                        <img src="{{ emp.photo_employe.url }}" width="40px" id="photo_employe">
+                                                    </a>
+                                              </td>
+                                              {% else %}
+                                              <td>Photo indisponible</td>
+                                              {% endif %}
+
+                                              <td>{{emp.nom_personnel}}</td>
+                                              <td>{{emp.prenom_personnel}}</td>
+                                              <td>{{emp.civilite}}</td>
+                                              <td>{{emp.date_naissance|date:'j-n-Y'}}</td>
+                                              <td>{{emp.lieu_naissance}}</td>
+                                              <td>{{emp.niveau_etude}}</td>
+                                              <td>{{emp.type_personnel}}</td>
+                                              <td>{{emp.adresse_personnel}}</td>
+                                              <td>{{emp.contact_personnel}}</td>
+                                              <td>{{emp.fonction_personnel}}</td>
+                                              <td>{{emp.email_personnel}}</td>
+                                              <td>{{emp.sexe_personnel}}</td>
+                                              <td>{{emp.salbase|floatformat:'2g'}}</td>
+                                              <td>{{emp.annee_experience}}</td>
+                                              <td>{{emp.contrat_type}}</td>
+                                              <td>{{emp.diplome}}</td>
+                                              <td>{{emp.date_embauche|date:'j-n-Y'}}</td>
+                                              <td>{{emp.etat_matrimonial}}</td>
+                                              <td>{{emp.annee_scolaire}}</td>
+                                         
+                                              <td class="no-export">
+                                                  <a class="btn btn-primary" href="{% url 'afficherdetailspersonnel' emp.id %}" title="Voir/Afficher"><i class="fa fa-eye fa-sm"></i></a>
+                                                  <a class="btn btn-info" href="{% url 'editionpersonnel' emp.id %}" title="Modifier/Editer"><i class="fa fa-edit fa-sm"></i></a>
+
+                                                  {% peut request.user 'menu_administration' as ok_admin %}
+
+                                                  {% if ok_admin %}
+                                                  <a class="btn btn-danger" href=" {% url 'supppersonnel' emp.id %}" title="Supprimer"><i class="fa fa-remove fa-sm"></i></a>
+                                                  {% endif %}
+                                                  
+                                              </td>
+
+                                          </tr>
+
+                                      {% endfor %}
+
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th>ID Employé</th>
+                            <th class="no-export">Photo employé</th>
+                            <th>Nom Famille</th>
+                            <th>Prénom(s)</th>
+                            <th>Civilité</th>
+                            <th>Date naissance</th>
+                            <th>Lieu naissance</th>
+                            <th>Niveau étude</th>
+                            <th>Catégorie</th>
+                            <th>Adresse/Résidence</th>
+                            <th>Contact</th>
+                            <th>Fonction/Poste occupé</th>
+                            <th>Email</th>
+                            <th>Genre(Sexe)</th>
+                            <th>Salaire de base</th>
+                            <th>Année d'experience</th>
+                            <th>Type contrat</th>
+                            <th>Diplôme obtenu</th>
+                            <th>Date embauche</th>
+                            <th>Statut matrimonial</th>
+                            <th>Année scolaire</th>
+                            <th class="no-export">Actions</th>
+                        </tr>
+                   </tfoot>
+            </table>
+
+            <div class="row mt-3 mb-2">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="effhomme">Effectif total homme</label>
+                        {% if effectif_total_homme %}
+                        <input type="text" id="effhomme" name="effectif_total_homme" value="{{ effectif_total_homme }}" class="form-control" readonly style="color:red; font-weight: bold; font-size: 12pt;">
+                        {% else %}
+                        <input type="text" name="effectif_total_homme" value="0" class="form-control" readonly style="color:red; font-weight: bold; font-size: 12pt;">
+                        {% endif %}
+                    </div>
+                </div>
+           
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="eff_femme">Effectif total femme</label>
+                        {% if effectif_total_femme %}
+                        <input type="text" id="eff_femme" name="effectif_total_femme" value="{{ effectif_total_femme }}" class="form-control" readonly style="color:red; font-weight: bold; font-size: 12pt;">
+                        {% else %}
+                        <input type="text" name="effectif_total_femme" value="0" class="form-control" readonly style="color:red; font-weight: bold; font-size: 12pt;">
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="efftotal">Effectif total</label>
+                        {% if effectif_total %}
+                        <input type="text" id="efftotal" name="effectif_total" value="{{ effectif_total }}" class="form-control" readonly style="color:red; font-weight: bold; font-size: 12pt;">
+                        {% else %}
+                        <input type="text" name="effectif_total" value="0" class="form-control" readonly style="color:red; font-weight: bold; font-size: 12pt;">
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-8">
+                      <nav aria-label="">
+                          <ul class="pagination">
+
+                              {% if employeannee.has_previous %}
+
+                              <li class="page-item">
+                                  <a class="page-link" href="?page=1&{{ query_string }}">1</a>
+                              </li>
+                              <li class="page-item">
+                                  <a class="page-link" href="?page={{ employeannee.previous_page_number }}&{{ query_string }}"><i class="fa-solid fa-backward fa-sm"></i>&nbsp; Précédent</a>
+                              </li>
+
+                              {% endif %}
+
+                              <li class="page-item active" aria-current="page">
+                                  <a class="page-link" href="#">
+                                      Page {{ employeannee.number }} sur {{ employeannee.paginator.num_pages }}
+                                  </a>
+                              </li>
+
+                              {% if employeannee.has_next %}
+
+                              <li class="page-item">
+                                  <a class="page-link" href="?page={{ employeannee.next_page_number }}&{{ query_string }}"><i class="fa-solid fa-forward fa-sm"></i>&nbsp; Suivant</a>
+                              </li>
+
+                              <li class="page-item">
+                                  <a class="page-link" href="?page={{ employeannee.paginator.num_pages }}&{{ query_string }}"><i class="fa-solid fa-step-forward fa-sm"></i>&nbsp; Dernier</a>
                               </li>
 
                               {% endif %}
@@ -1282,12 +1433,12 @@
 
     
     <!-- Pop up permettant d'imprimer la liste des élèves inscrits par classe-->
-    <div class="modal fade" id="modalRapportInscrits" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal fade" id="modalRapportPersonnel" tabindex="-1" role="dialog" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
 
           <div class="modal-header bg-primary">
-            <h5 class="modal-title text-white">Assistant impression des élèves inscrits/reinscrits</h5>
+            <h5 class="modal-title text-white">Assistant impression des employés</h5>
             <button type="button" class="close text-white" data-dismiss="modal" aria-label="Fermer">
               <span aria-hidden="true">&times;</span>
             </button>
@@ -1299,15 +1450,14 @@
               <label for="modal_type_liste">Type de liste<strong style="color:red">*</strong></label>
               <select id="modal_type_liste" class="form-control">
                 <option value="" selected>Sélectionnez</option>
-                <option value="1">Inscription</option>
-                <option value="2">Reinscription</option>
-                <option value="3">Générale</option>
+                <option value="1">Générale</option>
+                <option value="2">Catégorie</option>
               </select>
             </div>
 
             <div class="form-group">
-              <label for="modal_annee_inscrits">Année scolaire<strong style="color:red">*</strong></label>
-              <select id="modal_annee_inscrits" class="form-control">
+              <label for="modal_annee_scolaire">Année scolaire<strong style="color:red">*</strong></label>
+              <select id="modal_annee_scolaire" class="form-control">
                 <option value="" selected>Sélectionnez</option>
                 {% for annee in ansc %}
                 <option value="{{annee.id}}">{{annee.descript_annee}}</option>
@@ -1316,29 +1466,21 @@
             </div>
 
             <div class="form-group">
-              <label for="modal_cycle_inscrits">Cycle<strong style="color:red">*</strong></label>
-              <select id="modal_cycle_inscrits" class="form-control">
+              <label for="modal_categorie">Catégorie<strong style="color:red">*</strong></label>
+              <select id="modal_categorie" class="form-control">
                 <option value="" selected>Sélectionnez</option>
-                {% for cycle in cycles %}
-                <option value="{{cycle.id}}">{{cycle.cycle}}</option>
+                {% for categ in categorie_emp %}
+                <option value="{{categ.0}}">{{categ.1}}</option>
                 {% endfor %}
               </select>
             </div>
 
-            <div class="form-group">
-              <label for="modal_classe_inscrits">Classe<strong style="color:red">*</strong></label>
-              <select id="modal_classe_inscrits" class="form-control">
-                <option value="" selected>Sélectionnez</option>
-                <!-- rempli dynamiquement en JS selon le cycle choisi -->
-              </select>
-            </div>
-
-            <div id="modal_inscrits_erreur" class="text-danger" style="display:none;"></div>
+            <div id="modal_emp_erreur" class="text-danger" style="display:none;"></div>
           </div>
 
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
-            <button type="button" class="btn btn-primary" id="btnGenererRapportInscrits">
+            <button type="button" class="btn btn-primary" id="btnGenererRapportPersonnel">
                 Aperçu <i class="fas fa-print"></i>
             </button>
           </div>
@@ -1420,6 +1562,7 @@
 <script src="{% static 'assets/dist/js/adminlte.min.js' %}"></script>
 <script src="{% static 'fontawesomefree/js/all.min.js' %}"></script>
 
+
  <!--Permet de définir l'onglet actif de manière dynamique selon les menus dans lequels l'utilisateur est entrain de naviguer-->
  <script src="{% static 'assets/js/onglet-actif.js' %}"></script>
 
@@ -1486,9 +1629,9 @@
               {
                 extend: 'excelHtml5',
                 text: '<i class="fa fa-file-excel"></i> Export Excel',
-                titleAttr: 'Télécharger la liste des élèves au format Excel',
+                titleAttr: 'Télécharger la liste des employés au format Excel',
                 className: 'btn btn-success btn-sm mr-1',
-                title: 'Registre de matriculation',
+                title: 'Registre du personnel',
                 exportOptions: {
                         columns: ':not(.no-export)',
                     }
@@ -1496,9 +1639,9 @@
               {
                 extend: 'pdfHtml5',
                 text: '<i class="fa fa-file-pdf"></i> Export PDF',
-                titleAttr: 'Télécharger la liste des élèves au format PDF',
+                titleAttr: 'Télécharger la liste des employés au format PDF',
                 className: 'btn btn-danger btn-sm',
-                title: 'Registre de matriculation',
+                title: 'Registre du personnel',
                 orientation: 'landscape',
                 pageSize: 'A4',
                 exportOptions: {
@@ -1543,78 +1686,38 @@
       }
 
       initDataTableAvecFiltres('#listegenerale');
-      initDataTableAvecFiltres('#listeinscrit');
+      initDataTableAvecFiltres('#listecategorie');
+      initDataTableAvecFiltres('#listeempannee');
     });
 
-    // Cette fonction javascript (JQuery) m'a permis de filtrer les classes selon le cycle choisi
-    $("#cbocycle").change(function(){
-        var url = $("#frecherche").attr("data-classe-url");
-        var idcycle = $(this).val();
+    
+    $("#btnGenererRapportPersonnel").click(function(){
+        var typeListe = $("#modal_type_liste").val();
+        var annee = $("#modal_annee_scolaire").val();
+        var categ = $("#modal_categorie").val();
+        
 
-        $.ajax({
-            url:url,
-            data:{
-                'idcycle':idcycle
-            },
-            success:function(data){
-                $("#cboclasse").html(data);
-            }
+        if (!typeListe || !annee || !categ ) {
+            $("#modal_emp_erreur").text("Veuillez sélectionner tous les critères.").show();
+            return;
+        }
+        $("#modal_emp_erreur").hide();
 
+        // Le type de liste détermine uniquement quelle URL appeler, jamais transmis au backend
+        var nomUrl;
+        if (typeListe === "1") {
+            nomUrl = "{% url 'rapportlistereinscrits' %}";
+        } else if (typeListe === "2") {
+            nomUrl = "{% url 'rapportmatriculation' %}";
+        } 
 
-        });
+        var url = nomUrl +
+            "?annee=" + encodeURIComponent(annee) +
+            "&categorie=" + encodeURIComponent(categ);
+
+        window.open(url, "_blank");
+        $("#modalRapportPersonnel").modal("hide");
     });
-
-
-    $(function() {
-        $("#modal_cycle_inscrits").change(function(){
-            var urlClasses = $("#frecherche").attr("data-classe-url");
-            var idcycle = $(this).val();
-
-            if (!idcycle) {
-                $("#modal_classe_inscrits").html('<option value="" selected>Sélectionnez</option>');
-                return;
-            }
-
-            $.ajax({
-                url: urlClasses,
-                data: { 'idcycle': idcycle },
-                success: function(data){
-                    $("#modal_classe_inscrits").html(data);
-                }
-            });
-        });
-
-        $("#btnGenererRapportInscrits").click(function(){
-            var typeListe = $("#modal_type_liste").val();
-            var annee = $("#modal_annee_inscrits").val();
-            var cycle = $("#modal_cycle_inscrits").val();
-            var classe = $("#modal_classe_inscrits").val();
-
-            if (!typeListe || !annee || !cycle || !classe) {
-                $("#modal_inscrits_erreur").text("Veuillez sélectionner tous les critères.").show();
-                return;
-            }
-            $("#modal_inscrits_erreur").hide();
-
-            // Le type de liste détermine uniquement quelle URL appeler, jamais transmis au backend
-            var nomUrl;
-            if (typeListe === "2") {
-                nomUrl = "{% url 'rapportlistereinscrits' %}";
-            } else if (typeListe === "3") {
-                nomUrl = "{% url 'rapportmatriculation' %}";
-            } else {
-                nomUrl = "{% url 'rapportlisteinscrits' %}";
-            }
-
-            var url = nomUrl +
-                "?annee=" + encodeURIComponent(annee) +
-                "&cycle=" + encodeURIComponent(cycle) +
-                "&classe=" + encodeURIComponent(classe);
-
-            window.open(url, "_blank");
-            $("#modalRapportInscrits").modal("hide");
-        });
-      })
 
 
  </script>

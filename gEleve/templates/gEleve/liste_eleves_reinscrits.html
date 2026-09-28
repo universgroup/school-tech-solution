@@ -150,7 +150,7 @@
       <li class="nav-item dropdown d-none d-lg-block">
             <a id="dropdownSubMenu6" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle">Personnel</a>
             <ul aria-labelledby="dropdownSubMenu6" class="dropdown-menu border-0 shadow">
-              <li><a href="#" class="dropdown-item">Enregistrer un employé</a></li>
+              <li><a href="{% url 'listegeneralepersonnel' %}" class="dropdown-item">Enregistrer un employé</a></li>
               <li><a href="#" class="dropdown-item">Enregistrer une avance sur salaire</a></li>
               <li><a href="#" class="dropdown-item">Paiement des salaires</a></li>
               <li><a href="#" class="dropdown-item">Suivi des absences</a></li>
@@ -226,7 +226,7 @@
       <div class="input-group input-group-sm">
         <input class="form-control form-control-navbar" type="search" placeholder="Rechercher..." aria-label="Search">
         <div class="input-group-append">
-          <button class="btn btn-navbar" type="submit">
+          <button class="btn btn-navbar" type="button">
             <i class="fas fa-search"></i>
           </button>
         </div>
@@ -534,7 +534,7 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="#" class="nav-link" title="Permet d'enregistrer les informations de chaque employé de l'école">
+                <a href="{% url 'listegeneralepersonnel' %}" class="nav-link" title="Permet d'enregistrer les informations de chaque employé de l'école">
                   <i class="fas fa-user-check">&nbsp;</i>
                   <p>Ajouter un employé</p>                  
                 </a>

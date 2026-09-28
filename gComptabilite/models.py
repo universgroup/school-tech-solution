@@ -115,6 +115,8 @@ class EtatPaiementTranche(models.Model):
     mode_paie = models.CharField(max_length=50, choices=MODE_PAIEMENT_CHOICES, default=MODE_PAIEMENT_CHOICES[0][0], null=True)
     mail_envoye_paie_pt = models.BooleanField(default=False, null=True) # Permet de gerer l'envoi multiple des mails aux parents pour alerter de la reception du recu de paiement de la première tranche
     mail_envoye_paie_dt = models.BooleanField(default=False, null=True) # Permet de gerer l'envoi multiple des mails aux parents pour alerter de la reception du recu de paiement de la deuxième tranche
+    sms_envoye_paie_pt = models.BooleanField(default=False, null=True) # Si oui ou non le SMS pour la première tranche a été envoyé
+    sms_envoye_paie_dt = models.BooleanField(default=False, null=True) # Si oui ou non le SMS pour la deuxième tranche a été envoyé
     mateleve = models.ForeignKey(Eleve, on_delete=models.CASCADE)
     idclasse = models.ForeignKey(Classe, on_delete=models.CASCADE)
     idcycle = models.ForeignKey(CycleScolaire, on_delete=models.CASCADE)

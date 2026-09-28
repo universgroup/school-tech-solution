@@ -23,7 +23,7 @@ def normaliser_numero_gn(numero):
     return None  # numéro invalide
 
 
-def envoyer_sms_masse(destinataires_contexte, template_message, sender_name="EChampions"):
+def envoyer_sms_masse(destinataires_contexte, template_message, sender_name="E CHAMPIONS"):
     """
     destinataires_contexte : liste de tuples (telephone, contexte_dict)
     template_message : chaîne de format Python avec {placeholders}

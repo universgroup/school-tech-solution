@@ -38,6 +38,7 @@ from django.conf import settings
 import io  # Librairie contenant les methodes utilisant les péripheriques d'entrées/sorties
 from gUsers.decorators import action_requise
 from django.contrib.auth.decorators import login_required
+from core.sms import envoyer_sms_masse
 
 # Create your views here.
 
@@ -557,8 +558,21 @@ def chargerinfoeleveclasse(request):
 
 # Fonction me permettant de convertir le montant recupéré depuis le template Paiement_scolarite
 def reformater_montant(valeur):
-    montant_a_reformater = re.sub(r'[\s\u00a0\u202f]','',valeur) # Supprime tous types d'espace dans le montant
-    montant_a_reformater = montant_a_reformater.replace(',','.') # remplace la virgule par les points.
+    montant_a_reformater = re.sub(r'[\s\u00a0\u202f]', '', valeur)  # Supprime tous types d'espace dans le montant
+
+    if ',' in montant_a_reformater and '.' in montant_a_reformater:
+        # Les deux séparateurs présents : celui qui apparaît en dernier est le séparateur décimal
+        if montant_a_reformater.rfind(',') > montant_a_reformater.rfind('.'):
+            # format français : 1.300.000,00
+            montant_a_reformater = montant_a_reformater.replace('.', '').replace(',', '.')
+        else:
+            # format anglo-saxon : 1,300,000.00
+            montant_a_reformater = montant_a_reformater.replace(',', '')
+    elif ',' in montant_a_reformater:
+        # Uniquement une virgule -> séparateur décimal français (ex: 1300000,00)
+        montant_a_reformater = montant_a_reformater.replace(',', '.')
+    # sinon : uniquement un point ou aucun séparateur -> déjà correct
+
     return Decimal(montant_a_reformater)
 
 
@@ -792,7 +806,7 @@ def recupaiementscolarite(request, idetat, nom_tranche, mont_paye):
         etatpaie = EtatPaiementTranche.objects.select_related('anneescolaire', 'mateleve', 'idclasse').get(id=idetat)
 
         data = [etatpaie.id, etatpaie.anneescolaire.descript_annee, etatpaie.mateleve.matricule, etatpaie.idclasse, etatpaie.mateleve.nom,
-                etatpaie.mateleve.prenom, etatpaie.mateleve.tuteur, etatpaie.mateleve.contact_pere, etatpaie.mateleve.email_pere, etatpaie.mateleve.email_mere,
+                etatpaie.mateleve.prenom, etatpaie.mateleve.tuteur, etatpaie.mateleve.contact_pere, etatpaie.mateleve.email_pere, etatpaie.mateleve.email_mere, etatpaie.mateleve.contact_mere,
                 ]
 
         # Je cherche à travers cette requête à recuperer les montants payés par l'elève pour chaque tranche en vue de calculer le reste à payer par tranche conformement à celui dans la vue
@@ -1013,48 +1027,108 @@ def recupaiementscolarite(request, idetat, nom_tranche, mont_paye):
         # On détermine QUEL champ concerne la tranche de ce reçu
         est_premiere_tranche = (nom_tranche == DEUX_TRANCHES_CHOICES[0][0])
         deja_envoye = etatpaie.mail_envoye_paie_pt if est_premiere_tranche else etatpaie.mail_envoye_paie_dt
+        deja_envoye_sms = etatpaie.sms_envoye_paie_pt if est_premiere_tranche else etatpaie.sms_envoye_paie_dt
 
         statut_email = None  # sera lu côté JS via un header
+        statut_sms = None
+
+        parents = [
+                    {'email': data[8], 'tel': data[7]},   # père
+                    {'email': data[9], 'tel': data[10]},  # mère
+                ]
+        emails_valides = [p['email'] for p in parents if p['email']]
+        tel_sans_email = [p['tel'] for p in parents if not p['email'] and p['tel']]
+
+        libelle_tranche = "1ère tranche" if est_premiere_tranche else "2ème tranche"
 
         if not deja_envoye:
-            try:
-                email = EmailMessage(
-                    subject='Reçu de paiement scolarité',
-                    body=f'Veuillez trouver votre reçu de paiement en pièce jointe.\n'
-                        f'Cordialement.\n Le Service Scolarité : \n {data_ecole[8]}',
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    to=[data[8], data[9]],
-                )
-                email.attach(f'Recu_paiement_{str(data[2])}.pdf', buffer.getvalue(), 'application/pdf')
-                email.send()
-                
-                statut_email = 'success:Email envoyé avec succès!'
+            if emails_valides:
 
-                # Permet de mettre à jour les deux champs booleens de la table EtatPaiementTranche après chaque envoi de mail
-                if est_premiere_tranche:
-                    etatpaie.mail_envoye_paie_pt = True
-                    etatpaie.save(update_fields=['mail_envoye_paie_pt'])
-                else:
-                    etatpaie.mail_envoye_paie_dt = True
-                    etatpaie.save(update_fields=['mail_envoye_paie_dt'])
-                
-            except SMTPException:
-                statut_email = 'warning:Erreur SMTP : impossible d\'envoyer l\'email.'
-            except socket.gaierror:
-                statut_email = 'warning:Pas de connexion internet. Email non envoyé.'
-            except TimeoutError:
-                statut_email = 'warning:Délai de connexion dépassé. Email non envoyé.'
-            except Exception as e:
-                statut_email = f'warning:Erreur inattendue : {str(e)}'
+                try:
+                    email = EmailMessage(
+                        subject=f'Reçu de paiement scolarité- {libelle_tranche}',
+                        body=f'Veuillez trouver votre reçu de paiement ({libelle_tranche}) en pièce jointe.\n'
+                            f'Cordialement.\n Le Service Scolarité : \n {data_ecole[8]}',
+                        from_email=settings.DEFAULT_FROM_EMAIL,
+                        to=emails_valides,
+                    )
+                    email.attach(f'Recu_paiement_{str(data[2])}.pdf', buffer.getvalue(), 'application/pdf')
+                    email.send()
+                    
+                    statut_email = 'success:Email envoyé avec succès!'
+
+                    # Permet de mettre à jour les deux champs booleens de la table EtatPaiementTranche après chaque envoi de mail
+                    if est_premiere_tranche:
+                        etatpaie.mail_envoye_paie_pt = True
+                        etatpaie.save(update_fields=['mail_envoye_paie_pt'])
+                    else:
+                        etatpaie.mail_envoye_paie_dt = True
+                        etatpaie.save(update_fields=['mail_envoye_paie_dt'])
+                    
+                except SMTPException:
+                    statut_email = 'warning:Erreur SMTP : impossible d\'envoyer l\'email.'
+                except socket.gaierror:
+                    statut_email = 'warning:Pas de connexion internet. Email non envoyé.'
+                except TimeoutError:
+                    statut_email = 'warning:Délai de connexion dépassé. Email non envoyé.'
+                except Exception as e:
+                    statut_email = f'warning:Erreur inattendue : {str(e)}'
+            else:
+                statut_email = 'info:Aucune adresse email renseignée.'
         else:
             statut_email = 'info:Email déjà envoyé précédemment.'
+
+
+        # ── ENVOI SMS (parents sans email) ──
+        
+        if not deja_envoye_sms:
+            if tel_sans_email:
+                try:
+                    destinataires_contexte = [
+                        (tel, {
+                            'matricule': etatpaie.mateleve.matricule,
+                            'nom': etatpaie.mateleve.nom,
+                            'prenom': etatpaie.mateleve.prenom,
+                            'classe':etatpaie.mateleve.idclasse,
+                            'ecole': data_ecole[8],
+                            'tranche': libelle_tranche,
+                        })
+                        for tel in tel_sans_email
+                    ]
+                    template_message = (
+                        "Reçu de paiement ({tranche}) disponible pour {prenom} {nom} matricule {matricule} classe {classe}. "
+                        "Service Scolarité : {ecole}."
+                    )
+                    envoyes, echecs = envoyer_sms_masse(
+                        destinataires_contexte,
+                        template_message,
+                        sender_name="E CHAMPIONS"
+                    )
+                    if envoyes > 0:
+                        statut_sms = f'success:{envoyes} SMS envoyé(s) avec succès!'
+                        if est_premiere_tranche:
+                            etatpaie.sms_envoye_paie_pt = True
+                            etatpaie.save(update_fields=['sms_envoye_paie_pt'])
+                        else:
+                            etatpaie.sms_envoye_paie_dt = True
+                            etatpaie.save(update_fields=['sms_envoye_paie_dt'])
+                    else:
+                        statut_sms = 'warning:Échec de l\'envoi des SMS.'
+                except Exception as e:
+                    statut_sms = f'warning:Erreur inattendue SMS : {str(e)}'
+            else:
+                statut_sms = 'info:Aucun SMS à envoyer, tous les parents ont un email.'
+        else:
+            statut_sms = 'info:SMS déjà envoyé précédemment.'
 
         buffer.seek(0)
         reponse = FileResponse(buffer, as_attachment=False, filename=f'Recu_paiement_{str(data[2])}.pdf', content_type='application/pdf')
 
         if statut_email:
-            # Header custom lisible en JS ; on encode pour éviter les accents/caractères spéciaux
             reponse['X-Statut-Email'] = urllib.parse.quote(statut_email)
+        if statut_sms:
+            reponse['X-Statut-Sms'] = urllib.parse.quote(statut_sms)
+
         return reponse
     
 
@@ -1209,6 +1283,7 @@ def modifieretatpaiement(request, idpaie):
     d_tranche = 0
     mremise = 0
     fscol = 0
+    m_inscription = 0
 
     if request.method == 'POST':
         etatpaie = EtatPaiementTranche.objects.get(id=idpaie)
@@ -1220,6 +1295,7 @@ def modifieretatpaiement(request, idpaie):
         datepaie = request.POST.get('date_paiement')
         mremise = reformater_montant(request.POST.get('montant_remise'))
         modepaie = request.POST.get('mode_paiement')
+        m_inscription = reformater_montant(request.POST.get('montant_inscription'))
         
 
         ane = AnneeScolaire.objects.get(id=ans)
@@ -1258,6 +1334,7 @@ def modifieretatpaiement(request, idpaie):
         else:
             etatpaie.reste_a_payer = fannuel - fscol
 
+        etatpaie.inscription = m_inscription # Je mets à jour le montant de l'inscription
         etatpaie.fscolarite = fscol
         etatpaie.save()
         

@@ -160,9 +160,9 @@ INFORMATIONS SUR LE PAIEMENT
                         <div class="form-group">
                             <label for="id_montant_remise">Montant de la remise</label>
                             {% if paie.m_rabais %}
-                            <input type="number" id="id_montant_remise" name="montant_remise" class="form-control" value="{{paie.m_rabais|floatformat:'2g'}}" title="Saisissez le montant de la remise accordée s'il y en a">
+                            <input type="number" id="id_montant_remise" name="montant_remise" class="form-control" value="{{paie.m_rabais|floatformat:'2g'}}" title="Modifier le montant de la remise accordée s'il y en a" style="color:red; font-weight:bold; font-size:12pt;">
                             {% else %}
-                            <input type="number" id="id_montant_remise" name="montant_remise" class="form-control" value="0" title="Saisissez le montant de la remise accordée s'il y en a">
+                            <input type="number" id="id_montant_remise" name="montant_remise" class="form-control" value="0" title="Saisissez le montant de la remise accordée s'il y en a" style="color:red; font-weight:bold; font-size:12pt;">
                             {% endif %}
                         </div>
                     </div>
@@ -268,6 +268,7 @@ INFORMATIONS SUR LE PAIEMENT
             var tranche = $(this).val();
             var $premiere = $("#id_montant_premiere_tranche");
             var $deuxieme = $("#id_montant_deuxieme_tranche");
+            var $mont_ins = $("#id_montant_inscription"); 
 
             // Par défaut, les deux champs restent en lecture seule
             // $premiere.prop("readonly", true);
@@ -277,16 +278,19 @@ INFORMATIONS SUR LE PAIEMENT
                 // 1ère tranche sélectionnée -> on active uniquement ce champ
                 $premiere.prop("readonly", false);
                 $deuxieme.prop("readonly",true); // On maintient le champ deuxième tranche en readonly
+                $mont_ins.prop("readonly", false); // Je rend actif le champ inscription pour permettre de modifier les frais d'inscription
 
             } else if (tranche === "DeuxiemeT") {
                 // 2ème tranche sélectionnée -> on active uniquement ce champ
                 $deuxieme.prop("readonly", false);
                 $premiere.prop("readonly",true); // On maintient le champ première tranche en readonly
+                $mont_ins.prop("readonly", false); // Je rend actif le champ inscription pour permettre de modifier les frais d'inscription
             }
             else if(tranche === "Sélectionnez"){
                  // Si tranche === "" (Sélectionnez), les deux restent en readonly
                  $premiere.prop("readonly",true);
                  $deuxieme.prop("readonly", true);
+                 $mont_ins.prop("readonly", true); // Le champ reste à readonly
             }
            
     });
@@ -327,13 +331,14 @@ INFORMATIONS SUR LE PAIEMENT
 
     function calculerScolarite() {
             // Récupération des valeurs, en gérant les champs vides ou non numériques
-            var inscription = nettoyerMontant($("#id_montant_inscription").val());
+            //var inscription = nettoyerMontant($("#id_montant_inscription").val());
             var premiereTranche = nettoyerMontant($("#id_montant_premiere_tranche").val());
             var deuxiemeTranche = nettoyerMontant($("#id_montant_deuxieme_tranche").val());
 
-            var total = inscription + premiereTranche + deuxiemeTranche;
+            var total = premiereTranche + deuxiemeTranche;
 
             $("#id_montant_annuel").val(total.toFixed(2));
+            $("#id_montant_remise").val("0.00") // Au chargement le champ montant remise prend la valeur 0 pour eviter le bug lié à la conversion d'un champ vide
         }
 
         // Recalcul à chaque saisie (au fur et à mesure que l'utilisateur tape)
@@ -342,6 +347,12 @@ INFORMATIONS SUR LE PAIEMENT
         // Recalcul aussi au chargement, si des valeurs sont déjà pré-remplies (modification d'un paiement existant)
         $(document).ready(function(){
             calculerScolarite();
+        });
+
+    $("#fscolarite").on("submit", function() {
+            $("#id_montant_inscription").val(nettoyerMontant($("#id_montant_inscription").val()).toFixed(2));
+            $("#id_montant_premiere_tranche").val(nettoyerMontant($("#id_montant_premiere_tranche").val()).toFixed(2));
+            $("#id_montant_deuxieme_tranche").val(nettoyerMontant($("#id_montant_deuxieme_tranche").val()).toFixed(2));
         });
 
 </script>

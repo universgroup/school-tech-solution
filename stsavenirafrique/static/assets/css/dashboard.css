@@ -533,6 +533,22 @@ html, body {
     box-shadow: 0 0 0 3px rgba(255,255,255,0.45);
 }
 
+
+/* Variante de .filtres-header pour un simple titre + bouton d'action
+   (ex: page "Informations de l'école"), qui doit revenir en ligne
+   (titre à gauche, bouton à droite) sur PC/tablette large, contrairement
+   à .filtres-header seul qui reste empilé sur tous les écrans (page
+   Reinscriptions, où le formulaire de filtres doit rester sous le titre) */
+@media (min-width: 768px) {
+    .filtres-header-simple {
+        flex-direction: row;
+        align-items: center;
+    }
+    .filtres-header-simple .filtres-actions {
+        margin-left: auto;
+    }
+}
+
 /* Sous 500px : les boutons repassent en pleine largeur empilée (plus
    confortable au doigt qu'une rangée de petits boutons compressés) */
 @media (max-width: 500px) {
@@ -1030,3 +1046,4 @@ html, body {
     .table-paiements-wrapper { overflow-x: auto; }
     .table-paiements { min-width: 700px; }
 }
+
