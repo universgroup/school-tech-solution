@@ -28,14 +28,14 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="id_nompers">Nom famille</label>
-                                <input type="text" name="nom_personnel" id="id_nompers" value="{{pers.nom_personnel}}" class="form-control" required readonly>
+                                <input type="text" name="nom_personnel" id="id_nompers" value="{{pers.nom_personnel}}" class="form-control">
                             </div>
                         </div>
 
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="id_prenompers">Prénom(s) personnel</label>
-                                <input type="text" name="prenom_personnel" id="id_prenompers" value="{{pers.prenom_personnel}}" class="form-control" required readonly>
+                                <input type="text" name="prenom_personnel" id="id_prenompers" value="{{pers.prenom_personnel}}" class="form-control">
                             </div>
                         </div>
                     </div>
@@ -44,21 +44,27 @@
                         <div class="col-md-4">
                             <div class="fom-group">                 
                                 <label for="id_civilite">Civilité</label>
-                                <input type="text" name="civilite" id="id_civilite" value="{{pers.civilite}}" class="form-control" required readonly>
+                                <select id="id_civilite" class="form-control" name="civilite">
+                                    <option value="{{pers.civilite}}" selected>{{pers.civilite}}</option>
+                                    {% for c in civilite %}
+                                    <option value="{{c.0}}">{{c.1}}</option>
+                                    {% endfor %}
+                                </select>
+                                
                             </div>
                         </div>
 
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label for="id_date_naissance">Date de naissance</label>
-                                <input type="text" name="date_naissance" id="id_date_naissance" value="{{pers.date_naissance|date:'Y-n-j'}}" class="form-control" required readonly>
+                                <input type="text" name="date_naissance" id="id_date_naissance" value="{{pers.date_naissance|date:'Y-n-j'}}" class="form-control">
                             </div>
                         </div>
 
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label for="id_lieu_naissance">Lieu de naissance</label>
-                                <input type="text" name="lieu_naissance" id="id_lieu_naissance" value="{{pers.lieu_naissance}}" class="form-control" required readonly>
+                                <input type="text" name="lieu_naissance" id="id_lieu_naissance" value="{{pers.lieu_naissance}}" class="form-control">
                             </div>
                         </div>
                     </div>
@@ -67,14 +73,19 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="id_niveau_etude">Niveau étude</label>
-                                <input type="text" name="niveau_etude" id="id_niveau_etude" value="{{pers.niveau_etude}}" class="form-control" required readonly>
+                                <input type="text" name="niveau_etude" id="id_niveau_etude" value="{{pers.niveau_etude}}" class="form-control">
                             </div>
                         </div>
 
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="id_type_pers">Type Personnel</label>
-                                <input type="text" name="type_personnel" id="id_type_pers" value="{{pers.type_personnel}}" class="form-control" required readonly>
+                                <select id="id_type_pers" class="form-control" name="type_personnel">
+                                        <option value="{{pers.type_personnel}}" selected>{{pers.type_personnel}}</option>
+                                    {% for t in categorie %}
+                                        <option value="{{t.0}}">{{t.1}}</option>
+                                    {% endfor %}
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -83,14 +94,14 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="id_adrpers">Adresse/Résidence</label>
-                                <input type="text" name="adresse_personnel" id="id_adrpers" value="{{pers.adresse_personnel}}" class="form-control" required readonly>
+                                <input type="text" name="adresse_personnel" id="id_adrpers" value="{{pers.adresse_personnel}}" class="form-control">
                             </div>
                         </div>
 
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="id_contactpers">Contact</label>
-                                <input type="text" name="contact_personnel" id="id_contactpers" value="{{pers.contact_personnel}}" class="form-control" required readonly>
+                                <input type="tel" name="contact_personnel" id="id_contactpers" value="{{pers.contact_personnel}}" class="form-control" pattern="^(\+?[0-9]{1,3}[\s\-]?)?[0-9\s\-\(\)]{7,15}$">
                             </div>
                         </div>
                     </div>
@@ -99,14 +110,14 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="id_fonctpers">Fonction/Poste occupé</label>
-                                <input type="text" name="fonction_personnel" id="id_fonctpers" value="{{pers.fonction_personnel}}" class="form-control" required readonly>
+                                <input type="text" name="fonction_personnel" id="id_fonctpers" value="{{pers.fonction_personnel}}" class="form-control">
                             </div>
                         </div>
 
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="id_emailpers">Email</label>
-                                <input type="text" name="email_personnel" id="id_emailpers" value="{{pers.email_personnel}}" class="form-control" required readonly>
+                                <input type="email" name="email_personnel" id="id_emailpers" value="{{pers.email_personnel}}" class="form-control" pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" title="Ex: contact@universtechgroup.com">
                             </div>
                         </div>
                     </div>
@@ -115,14 +126,20 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="id_sexe">Genre(Sexe)</label>
-                                <input type="text" name="sexe_personnel" id="id_sexe" value="{{pers.sexe_personnel}}" class="form-control" required readonly>
+                                <select id="id_sexe" class="form-control" name="sexe_personnel">
+                                    <option value="{{pers.sexe_personnel}}" selected>{{pers.sexe_personnel}}</option>
+                                {% for sexe in sexep %}
+                                    <option value="{{sexe.0}}">{{sexe.1}}</option>
+                                {% endfor %}
+
+                                </select>
                             </div>
                         </div>
 
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="id_salbaspers">Salaire de base</label>
-                                <input type="text" name="salaire_base" id="id_salbaspers" value="{{pers.salbase|floatformat:'2g'}}" class="form-control" required readonly>
+                                <input type="text" name="salaire_base" id="id_salbaspers" value="{{pers.salbase|floatformat:'2g'}}" class="form-control">
                             </div>
                         </div>
                     </div>
@@ -131,14 +148,19 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="id_anne_exp">Nb. année d'experience</label>
-                                <input type="text" name="annee_experience" id="id_anne_exp" value="{{pers.annee_experience}}" class="form-control" required readonly>
+                                <input type="text" name="annee_experience" id="id_anne_exp" value="{{pers.annee_experience}}" class="form-control">
                             </div>
                         </div>
 
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="id_type_contrat">Type de contrat</label>
-                                <input type="text" name="type_contrat" id="id_type_contrat" value="{{pers.contrat_type}}" class="form-control" required readonly>
+                                <select id="id_type_contrat" class="form-control" name="type_contrat">
+                                    <option value="{{pers.contrat_type}}" selected>{{pers.contrat_type}}</option>
+                                    {% for tp in typecontrat %}
+                                    <option value="{{tp.0}}">{{tp.1}}</option>
+                                    {% endfor %}
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -147,14 +169,14 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="id_diplome">Diplôme obtenu</label>
-                                <input type="text" name="diplome_personnel" id="id_diplome" value="{{pers.diplome}}" class="form-control" required readonly>
+                                <input type="text" name="diplome_personnel" id="id_diplome" value="{{pers.diplome}}" class="form-control">
                             </div>
                         </div>
 
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="id_date_emb">Date d'embauche</label>
-                                <input type="text" name="date_embauche" id="id_date_emb" value="{{pers.date_embauche|date:'Y-n-j'}}" class="form-control" required readonly>
+                                <input type="text" name="date_embauche" id="id_date_emb" value="{{pers.date_embauche|date:'Y-n-j'}}" class="form-control">
                             </div>
                         </div>
                     </div>
@@ -163,14 +185,27 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="id_statut_matrimonial">Etat matrimonial</label>
-                                <input type="text" name="etat_matrimonial" id="id_statut_matrimonial" value="{{pers.etat_matrimonial}}" class="form-control" required readonly>
+                                <select id="id_statut_matrimonial" class="form-control" name="etat_matrimonial">
+                                    <option value="{{pers.etat_matrimonial}}" selected>{{pers.etat_matrimonial}}</option>
+
+                                    {% for stat in statut %}
+                                     <option value="{{stat.0}}">{{stat.1}}</option>
+                                    {% endfor %}
+
+                                </select>
+                                
                             </div>
                         </div>
 
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="id_annee_scolaire">Annee scolaire</label>
-                                <input type="text" name="annee_scolaire" id="id_annee_scolaire" value="{{pers.annee_scolaire}}" class="form-control" required readonly>
+                                <select id="id_annee_scolaire" class="form-control" name="annee_scolaire">
+                                    <option value="{{pers.annee_scolaire.id}}" selected>{{pers.annee_scolaire}}</option>
+                                    {% for an in ansc %}
+                                    <option value="{{an.id}}">{{an.descript_annee}}</option>
+                                    {% endfor %}
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -179,10 +214,12 @@
                         <div class="col-md-12">
                             <div class="form-group text-center">
                                 {% if pers.photo_employe %}
-                                <img src="{{pers.photo_employe.url}}" alt="Photo employe" width="100px">
+                                <img src="{{pers.photo_employe.url}}" alt="Photo employe" width="100px"> 
                                 {% else %}
                                 <label>Photo indisponible</label>
                                 {% endif %}
+                                <br>
+                                 <input type="file" id="id_photo_emp" class="form-control" name="photo_employe">
                             </div>
                         </div>
                     </div>
@@ -190,9 +227,60 @@
                 </div>
 
                 <div class="card-footer text-center">
+                    <button type="submit" class="btn btn-success btn-md">Modifier &nbsp;<i class="fas fa-edit"></i></button>
                     <a href="{% url 'listegeneralepersonnel'%}" target="_self" class="btn btn-primary btn-md" title="Afficher la liste générale des employés">Retour &nbsp;<i class="fas fa-arrow-circle-left"></i></a>
                 </div>
 
         </form>
+
+{% endblock %}
+
+{% block javascript %}
+
+    <script>  
+        $(document).ready(function () {
+                    // Au clic sur le champ date, changer le type en "date" pour permettre la modification
+                    $('#id_date_naissance').on('click', function () {
+                        $(this).attr('type', 'date');
+                        $(this).focus();
+                    });
+
+                    // Quand on quitte le champ, reformater en texte lisible
+                    $('#id_date_naissance').on('blur', function () {
+                        if ($(this).val() !== '') {
+                            //let date = new Date($(this).val());
+                            //let formatted = date.toLocaleDateString('fr-FR');
+                            $(this).attr('type', 'text');
+                            $(this).val(formatted);
+                        }
+                    });
+                });    
+            
+            $(document).ready(function () {
+                    // Au clic sur le champ date, changer le type en "date" pour permettre la modification
+                    $('#id_date_emb').on('click', function () {
+                        $(this).attr('type', 'date');
+                        $(this).focus();
+                    });
+
+                    // Quand on quitte le champ, reformater en texte lisible
+                    $('#id_date_emb').on('blur', function () {
+                        if ($(this).val() !== '') {
+                            //let date = new Date($(this).val());
+                            //let formatted = date.toLocaleDateString('fr-FR');
+                            $(this).attr('type', 'text');
+                            $(this).val(formatted);
+                        }
+                    });
+                });
+            
+            $(document).ready(function() {
+                $('#id_salbaspers').on('click', function() {
+                    $(this).attr('type', 'number');
+                });
+            });    
+
+    </script>
+
 
 {% endblock %}

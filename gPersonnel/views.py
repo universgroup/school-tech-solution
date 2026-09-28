@@ -120,8 +120,10 @@ def listepersonnelcategorie(request):
 
     elif an not in (None, '') and categ not in (None, ''):
 
+        
         liste_emp_categorie = Personnel.objects.select_related('annee_scolaire').filter(Q(annee_scolaire__exact=ans),Q(type_personnel__exact=categ))
 
+        
         eff_total = liste_emp_categorie.count()
         eff_homme = liste_emp_categorie.filter(sexe_personnel__exact=SEXE_PERSONNEL[0][0]).count()
         eff_femme = liste_emp_categorie.filter(sexe_personnel__exact=SEXE_PERSONNEL[1][0]).count()
@@ -137,7 +139,10 @@ def listepersonnelcategorie(request):
 
 def editerpersonnel(request, idpers):
     pers = Personnel.objects.get(id=idpers)
-    context = {'pers': pers}
+    ans = AnneeScolaire.objects.all().order_by('id')
+
+    context = {'pers': pers, 'civilite': CIVILITE_CHOICES, 'categorie': TYPE_PERSONNEL, 'sexep':SEXE_PERSONNEL, 'typecontrat': CONTRAT_CHOICES, 'statut': STATUT_MATRIMONIAL, 'ansc':ans}
+
     return render(request, 'gPersonnel/modifier_personnel.html', context)
 
 
@@ -147,12 +152,14 @@ def detailspersonnel(request, idpers):
 
 
 def modifierpersonnel(request, idpers):
+
     if request.method == 'POST':
         pers = Personnel.objects.get(id=idpers)
         pers.nom_personnel = request.POST['nom_personnel']
         pers.prenom_personnel = request.POST['prenom_personnel']
         pers.civilite = request.POST['civilite']
         pers.date_naissance = request.POST['date_naissance']
+        pers.lieu_naissance = request.POST['lieu_naissance']
         pers.niveau_etude = request.POST['niveau_etude']
         pers.type_personnel = request.POST['type_personnel']
         pers.adresse_personnel = request.POST['adresse_personnel']
@@ -160,11 +167,19 @@ def modifierpersonnel(request, idpers):
         pers.fonction_personnel = request.POST['fonction_personnel']
         pers.email_personnel = request.POST['email_personnel']
         pers.sexe_personnel = request.POST['sexe_personnel']
-        pers.salbase = request.POST['salbase']
+        pers.salbase = Decimal(request.POST['salaire_base'])
         pers.annee_experience = request.POST['annee_experience']
         pers.contrat_type = request.POST['type_contrat']
-        pers.diplome = request.POST['diplome']
+        pers.diplome = request.POST['diplome_personnel']
         pers.date_embauche = request.POST['date_embauche']
+        pers.etat_matrimonial = request.POST['etat_matrimonial']
+
+        if request.FILES.get('photo_employe'):
+            pers.photo_employe = request.FILES.get('photo_employe')
+
+        an = request.POST.get('annee_scolaire')
+        ans = AnneeScolaire.objects.get(id=an)
+        pers.annee_scolaire = ans
         pers.save()
 
         return redirect('../listegeneralepersonnel/')
