@@ -446,3 +446,66 @@
         $("#photoProfilPlaceholder").show();               // réaffiche l'icône + le texte par défaut
     }
 
+
+    // Fonction commune : affiche l'aperçu de la photo de profil dans la fenetre modale
+    function afficherApercuPhotoEmploye(file) {
+        if (!file || !file.type.startsWith("image/")) return;
+        var reader = new FileReader();
+        reader.onload = function(e) {
+        $("#EmpPreview").attr("src", e.target.result).show();
+        $("#EmpPlaceholder").hide();
+        };
+        reader.readAsDataURL(file);
+    }
+
+    
+    // Cas de la Photo de profil de l'utilisateur dans la navbar
+    function previewPhotoEmploye(input) {
+        if (input.files && input.files[0]) {
+        afficherApercuPhotoEmploye(input.files[0]);
+        }
+    }
+
+    // Cas du template Modifier la photo de l'utilisateur dans le navbar des différents templates
+    var PhotoEmpZone = document.getElementById("photoEmpZone");
+    var PhotoEmpinputFile = document.getElementById("idphotoemp");
+
+    if(PhotoEmpZone){
+            // Empêcher le navigateur d'ouvrir l'image dans un nouvel onglet
+            ["dragenter", "dragover", "dragleave", "drop"].forEach(function(evt){
+                        PhotoEmpZone.addEventListener(evt, function(e){
+                        e.preventDefault();
+                        e.stopPropagation();
+                        });
+            });
+
+            // Effet visuel pendant le survol avec un fichier
+            ["dragenter", "dragover"].forEach(function(evt){
+                        PhotoEmpZone.addEventListener(evt, function(){
+                        PhotoEmpZone.classList.add("drag-over");
+                        });
+            });
+            
+            ["dragleave", "drop"].forEach(function(evt){
+                        PhotoEmpZone.addEventListener(evt, function(){
+                        PhotoEmpZone.classList.remove("drag-over");
+                        });
+            });
+        
+            // Cas 2 : dépôt du fichier (drag & drop)
+            PhotoEmpZone.addEventListener("drop", function(e){
+                    var files = e.dataTransfer.files;
+                    if (files.length > 0) {
+                    deinputFile.files = files;
+                    // injecte le fichier dans l'input Django
+                    afficherApercuPhotoEmploye(files[0]);
+                    }
+            });
+    } // fin de if(PhotoProfilZone)
+
+    // Reinitialisation de la zone PhotoUserZone
+    function resetPhotoEmpZone() {
+        $("#idphotoemp").val("");            // vide le contenu du input file
+        $("#EmpPreview").attr("src", "").hide();  // masque et vide l'aperçu
+        $("#EmpPlaceholder").show();               // réaffiche l'icône + le texte par défaut
+    }

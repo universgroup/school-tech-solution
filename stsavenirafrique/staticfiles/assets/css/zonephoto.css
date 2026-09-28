@@ -53,3 +53,26 @@ display: none;
 border-color: #2563eb;
 background-color: #eff6ff;
 }
+
+/* ===================================================================
+   RESPONSIVE OVERRIDES (fusionnés)
+   ===================================================================
+   Règle GLOBALE (non scopée à un template précis) puisque zonephoto.css
+   est partagé par plusieurs templates. Sur très petit écran (≤ 400px),
+   le carré de 160px peut dépasser la largeur utile disponible selon le
+   conteneur où .photo-zone est placé (modale, formulaire d'inscription,
+   fiche employé, etc.) : on le réduit à 130px partout, et on adapte la
+   taille du texte/icône en conséquence pour rester lisible.
+   =================================================================== */
+@media (max-width: 400px) {
+    .photo-zone {
+        width: 130px;
+        height: 130px;
+    }
+    .photo-zone .placeholder-text {
+        font-size: 0.68rem;
+    }
+    .photo-zone .placeholder-icon {
+        font-size: 1.6rem;
+    }
+}
