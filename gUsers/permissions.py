@@ -42,6 +42,8 @@ PERMISSIONS = {
 
     # Personnel
     "personnel_gerer": [DG, SCOL, COMPTA],
+    "personnel_salaire": [DG, SCOL, COMPTA],
+    "personnel_avance_salaire": [DG, SCOL, COMPTA],
 
     # Évaluation
     "matiere_gerer": [DE],

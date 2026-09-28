@@ -15,12 +15,12 @@ from .models import *
 from .forms import *
 from gComptabilite.models import *
 from gComptabilite.views import affichersoldecaisse
-from gAdministration.models import Ecole
-
+from gAdministration.models import Ecole, Historique
+from gUsers.decorators import action_requise
 
 # Create your views here.
 # Gestion du personnel
-
+@action_requise('personnel_gerer')
 def ajouterpersonnel(request):
     if request.method == 'POST':
         formpersonnel = FormPersonnel(request.POST)
@@ -63,7 +63,7 @@ def ajouterpersonnel(request):
     context = {'form': formpersonnel}
     return render(request, 'gPersonnel/enregistrer_personnel.html', context)
 
-
+@action_requise('personnel_gerer')
 def listepersonnel(request):
 
     eff_total = 0
@@ -84,6 +84,8 @@ def listepersonnel(request):
 
     return render(request, 'gPersonnel/liste_generale_personnel.html', dict(employe=pers, ansc=ane, categorie_emp=TYPE_PERSONNEL, effectif_total=eff_total, effectif_total_homme=eff_homme, effectif_total_femme=eff_femme))
 
+
+@action_requise('personnel_gerer')
 def listepersonnelcategorie(request):
 
     eff_total = 0
@@ -136,7 +138,7 @@ def listepersonnelcategorie(request):
 
     return render(request, 'gPersonnel/liste_generale_personnel.html', dict(ansc=anesc, categorie_emp=TYPE_PERSONNEL, employecategorie=liste_emp_categorie, employeannee=liste_emp_annee, effectif_total=eff_total, effectif_total_homme=eff_homme, effectif_total_femme=eff_femme, query_string=query_string))
 
-
+@action_requise('personnel_gerer')
 def editerpersonnel(request, idpers):
     pers = Personnel.objects.get(id=idpers)
     ans = AnneeScolaire.objects.all().order_by('id')
@@ -146,11 +148,13 @@ def editerpersonnel(request, idpers):
     return render(request, 'gPersonnel/modifier_personnel.html', context)
 
 
+@action_requise('personnel_gerer')
 def detailspersonnel(request, idpers):
     pers = Personnel.objects.get(id=idpers)
     return render(request, 'gPersonnel/afficher_details_personnel.html', dict(pers=pers))
 
 
+@action_requise('personnel_gerer')
 def modifierpersonnel(request, idpers):
 
     if request.method == 'POST':
@@ -186,7 +190,7 @@ def modifierpersonnel(request, idpers):
     else:
         return redirect('../listegeneralepersonnel/')
 
-
+@action_requise('personnel_gerer')
 def supprimerpersonnel(request, pk):
     pers = Personnel.objects.get(id=pk)
     pers.delete()
@@ -194,6 +198,7 @@ def supprimerpersonnel(request, pk):
 
 
 # Gestion des Salaires
+@action_requise('personnel_salaire')
 def enregistrersalaire(request):
     if request.method == 'POST':
         formsalaire = FormSalaire(request.POST)
@@ -301,23 +306,28 @@ def enregistrersalaire(request):
     paginesalaire = Paginator(salaire, 10)
     numpagesalaire = request.GET.get('page')
     salaire = paginesalaire.get_page(numpagesalaire)
+
     context = {'form': formsalaire, 'sal': salaire, 'total_salbase': total_salbase, 'total_primes': total_primes,
                'total_salbrut': total_salbrut, 'total_avance': total_avance, 'total_salnet': total_salnet,
                'soldec': soldec}
+    
     return render(request, 'gPersonnel/enregistrer_salaire.html', context)
 
 
+@action_requise('personnel_salaire')
 def editersalaire(request, idsal):
     sal = Salaire.objects.get(id=idsal)
     context = {'sal': sal}
     return render(request, 'gPersonnel/modifier_salaire.html', context)
 
 
+@action_requise('personnel_salaire')
 def detailssalaire(request, idsal):
     sal = Salaire.objects.get(id=idsal)
     return render(request, 'gPersonnel/afficher_details_salaire.html', dict(sal=sal))
 
 
+@action_requise('personnel_salaire')
 def modifiersalaire(request, idsal):
     if request.method == 'POST':
         sal = Salaire.objects.get(id=idsal)
@@ -331,20 +341,20 @@ def modifiersalaire(request, idsal):
         sal.mont_hsupp = request.POST['mont_hsupp']
 
         sal.save()
-        return redirect('/ajoutersalaire/')
+        return redirect('../ajoutersalaire/')
     else:
-        return redirect('/ajoutersalaire/')
+        return redirect('../ajoutersalaire/')
 
 
+@action_requise('personnel_salaire')
 def supprimersalaire(request, pk):
     sal = Salaire.objects.get(id=pk)
     sal.delete()
-    messages.success(request, 'Ligne de salaire supprimée avec succès')
-    return redirect('/ajoutersalaire/')
+    return redirect('../ajoutersalaire/')
 
 
 # Gestion des Avances sur Salaire
-
+@action_requise('personnel_avance_salaire')
 def ajouteravancesalaire(request):
     if request.method == 'POST':
         formavancesalaire = FormAvanceSalaire(request.POST)
@@ -411,18 +421,18 @@ def ajouteravancesalaire(request):
     context = {'form': formavancesalaire, 'avsal': avsal, 'total_avance': total_avance, 'soldec': soldec}
     return render(request, 'gPersonnel/enregistrer_avance_salaire.html', context)
 
-
+@action_requise('personnel_avance_salaire')
 def editeravancesalaire(request, idavsal):
     avsal = AvanceSalaire.objects.get(id=idavsal)
     context = {'avsal': avsal}
     return render(request, 'gPersonnel/modifier_avance_salaire.html', context)
 
-
+@action_requise('personnel_avance_salaire')
 def detailsavancesalaire(request, idavsal):
     avsal = AvanceSalaire.objects.get(id=idavsal)
     return render(request, 'gPersonnel/afficher_details_avance_salaire.html', dict(avsal=avsal))
 
-
+@action_requise('personnel_avance_salaire')
 def modifieravancesalaire(request, idavsal):
     if request.method == 'POST':
         avsal = AvanceSalaire.objects.get(id=idavsal)
@@ -434,15 +444,19 @@ def modifieravancesalaire(request, idavsal):
     else:
         return redirect('/ajouteravancesalaire/')
 
-
+@action_requise('personnel_avance_salaire')
 def supprimeravancesalaire(request, pk):
     avsal = AvanceSalaire.objects.get(id=pk)
     avsal.delete()
-    messages.success(request, 'Avance sur salaire supprimée')
     return redirect('/ajouteravancesalaire/')
 
 
+# Impression de la liste des employés : Liste générale et par catégorie/type personnel (Vacataire ou Permanent)
+
+
+
 # Impression du bon d'avance sur salaire
+@action_requise('personnel_avance_salaire')
 def recubonavancesalaire(request, idavance):
 
     mont_avance = ''
@@ -659,6 +673,7 @@ def recubonavancesalaire(request, idavance):
                         content_type='application/pdf')
 
 
+@action_requise('personnel_salaire')
 def recubulletinsalaire(request, idsal):
     # Et là je tente de recuperer les données d'identification de l'école
     ecole = Ecole.objects.get(id=1)
@@ -857,13 +872,13 @@ def recubulletinsalaire(request, idsal):
     return FileResponse(buffer, as_attachment=False, filename='Bulletin_Salaire ' + str(id_emp) + '.pdf',
                         content_type='application/pdf')
 
-
+@action_requise('personnel_avance_salaire')
 def imprimerecuavancesalaire(request, idavce):
     return HttpResponseRedirect(reverse('recuavancesalaire',
                                         args=(
                                             idavce,)))
 
-
+@action_requise('personnel_salaire')
 def imprimebulletinsalaire(request, idsal):
     return HttpResponseRedirect(reverse('recubulletinsalaire',
                                         args=(

@@ -1,4 +1,115 @@
 .export-buttons-row .dt-buttons {
-                  float: none !important;
-                  display: inline-flex;
-              }
+    float: none !important;
+    display: inline-flex;
+}
+
+/* ==== DataTables — habillage cohérent avec .table-paiements ==== */
+.dt-school.dataTable {
+    width: 100% !important;
+    border-collapse: separate !important;
+    border-spacing: 0;
+    font-size: 0.85rem;
+    white-space: nowrap;   /* empêche le texte de se compresser colonne par colonne */
+}
+
+.dt-school.dataTable thead th {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark)) !important;
+    color: #fff !important;
+    font-weight: 600;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 0.75rem 0.6rem !important;
+    border: none !important;
+}
+
+/* Icônes de tri DataTables (natives) recolorées en blanc pour rester lisibles sur fond violet */
+.dt-school.dataTable thead .sorting:before,
+.dt-school.dataTable thead .sorting:after,
+.dt-school.dataTable thead .sorting_asc:before,
+.dt-school.dataTable thead .sorting_desc:after {
+    color: rgba(255,255,255,0.6) !important;
+}
+.dt-school.dataTable thead .sorting_asc:after,
+.dt-school.dataTable thead .sorting_desc:before {
+    color: #fff !important;
+}
+
+/* Ligne de filtres sous l'en-tête */
+.dt-school.dataTable thead tr.filters th {
+    background: #eef1fb !important;
+    padding: 0.4rem !important;
+}
+.dt-school.dataTable thead tr.filters input {
+    width: 100%;
+    padding: 0.3rem 0.5rem;
+    font-size: 0.75rem;
+    border: 1px solid #d8dcf0;
+    border-radius: 0.4rem;
+    background: #fff;
+}
+.dt-school.dataTable thead tr.filters input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(79,70,229,0.15);
+}
+
+/* Corps du tableau : alternance + survol, comme table-paiements */
+.dt-school.dataTable tbody td {
+    padding: 0.6rem !important;
+    color: var(--secondary);
+    border-bottom: 1px solid #eef1f6 !important;
+    vertical-align: middle;
+}
+.dt-school.dataTable tbody tr:nth-child(odd)  { background-color: #ffffff; }
+.dt-school.dataTable tbody tr:nth-child(even) { background-color: #f8f9ff; }
+.dt-school.dataTable tbody tr {
+    transition: background-color 0.2s ease;
+}
+.dt-school.dataTable tbody tr:hover {
+    background-color: #ede9fe !important;
+}
+
+/* Pied de tableau (répétition des entêtes) */
+.dt-school.dataTable tfoot th {
+    background: var(--secondary) !important;
+    color: #fff !important;
+    font-size: 0.72rem;
+    padding: 0.6rem !important;
+}
+
+/* Barre de recherche globale + boutons export : alignement propre */
+.dataTables_wrapper .dataTables_filter input {
+    border-radius: 0.5rem;
+    border: 1px solid #d8dcf0;
+    padding: 0.35rem 0.6rem;
+    margin-left: 0.5rem;
+}
+
+.dt-school.dataTable th,
+.dt-school.dataTable td {
+    min-width: 120px;      /* ajustable selon vos colonnes les plus courtes (Sexe, Statut...) */
+}
+
+/* DataTables enveloppe automatiquement le tableau dans .dataTables_scroll quand scrollX est actif */
+.dataTables_scrollBody {
+    border-bottom: 1px solid #eef1f6;
+}
+
+@media (max-width: 576px) {
+    .dataTables_wrapper .dataTables_filter {
+        width: 100%;
+        text-align: left !important;
+        margin-top: 0.5rem;
+    }
+    .dataTables_wrapper .dataTables_filter input {
+        width: 100%;
+        max-width: 100%;
+        margin-left: 0 !important;
+        box-sizing: border-box;
+    }
+    .dataTables_wrapper .dataTables_filter label {
+        display: block;
+        width: 100%;
+    }
+}
