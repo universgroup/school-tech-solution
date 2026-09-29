@@ -3,10 +3,21 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.core.paginator import Paginator
 import io
-from django.http import FileResponse, HttpResponseRedirect
+from django.http import FileResponse, HttpResponseRedirect, HttpResponse
 from reportlab.pdfgen import canvas
-from reportlab.platypus.tables import Table, TableStyle  # Permet de generer des tableaux (matrices) de données
+
+from reportlab.lib.pagesizes import A4, landscape
+from reportlab.lib.units import cm
 from reportlab.lib import colors  # Contient les méthodes/fonctions de gestion des couleurs
+from reportlab.platypus import (BaseDocTemplate, PageTemplate, Frame, NextPageTemplate,
+    Table, TableStyle, Paragraph, Spacer)
+from reportlab.platypus import Table as RLTable  # évite le conflit de nom avec votre "Table" du tableau principal
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.enums import TA_RIGHT # TA_CENTER, 
+from reportlab.lib.utils import ImageReader
+
+from PIL import Image
+
 from django.urls import reverse
 from datetime import datetime  # Utilisé pour recuperer l'année courante dans la generation des matricules des élèves
 
@@ -17,6 +28,9 @@ from gComptabilite.models import *
 from gComptabilite.views import affichersoldecaisse
 from gAdministration.models import Ecole, Historique
 from gUsers.decorators import action_requise
+
+# Importation des styles de tableaux définis dans le module views de l'app gEleve
+from gEleve.views import style_cellule, style_totaux
 
 # Create your views here.
 # Gestion du personnel
@@ -195,6 +209,336 @@ def supprimerpersonnel(request, pk):
     pers = Personnel.objects.get(id=pk)
     pers.delete()
     return redirect('../listegeneralepersonnel/')
+
+
+"""
+Rapport « Liste du personnel » (générale ou par catégorie) — ReportLab, A4 paysage.
+
+À COLLER dans le même module que `generer_rapport_matriculation`, dont il réutilise
+les imports et les styles (style_entete_col, style_cellule, style_totaux).
+
+Les colonnes reprennent exactement celles de ton tableau HTML (listegeneralepersonnel),
+en enlevant Photo et Actions — comme ton propre export Excel/PDF datatable le fait déjà
+avec exportOptions: { columns: ':not(.no-export)' }.
+"""
+
+
+def generer_rapport_personnel(request, data_ecole, annee, titre_rapport, categorie=None):
+    """
+    categorie=None  -> liste générale (tous les employés de l'année scolaire)
+    categorie='...' -> uniquement les employés dont type_personnel == categorie
+    """
+    marge_gauche_droite = 1.5*cm
+    marge_bas = 1.5*cm
+    largeur_frame = landscape(A4)[0] - 2*marge_gauche_droite
+
+    an = AnneeScolaire.objects.get(id=annee)
+
+    # --- 1. Récupération des données ---
+    requete = Personnel.objects.select_related('annee_scolaire').filter(annee_scolaire__exact=an)
+    if categorie is not None:
+        requete = requete.filter(type_personnel__exact=categorie)
+    requete = requete.order_by('type_personnel', 'nom_personnel', 'prenom_personnel')
+
+    listgenerale = list(requete)  # une seule requête SQL, réutilisée pour le tableau ET les totaux
+    effectif_total = len(listgenerale)
+
+    if effectif_total == 0:
+        messages.error(request, "Aucun employé trouvé pour les critères donnés.")
+        return None
+
+    # --- 2. Construction du tableau (mêmes colonnes que la liste générale du personnel) ---
+
+    style_entete_perso = ParagraphStyle(
+        'EnteteListePersonnel', parent=getSampleStyleSheet()['Normal'],
+        fontName='Helvetica-Bold', fontSize=6.5, leading=7.5, textColor=colors.white,
+    )
+
+    entetes = ['ID', 'Nom & Prénom(s)', 'Date naiss', 'Lieu naiss',
+               'Catégorie', 'Résidence', 'Contact', 'Poste occupé',
+               'Email', 'Genre', 'Salbase','Contrat','Diplôme', 'Date emb', 'Statut Mat', 'Année scolaire']
+    table_data = [[Paragraph(e, style_entete_perso) for e in entetes]]
+
+    # Compteurs pour la ligne de totaux, remplis au fil de la même boucle que le tableau
+    total_par_sexe = {}       # ex. {'H': 24, 'F': 12}
+    total_par_categorie = {}  # ex. {'Vacataire': 24, 'Permanent': 12} — utile seulement en liste générale
+
+    for emp in listgenerale:
+
+        total_par_sexe[emp.sexe_personnel] = total_par_sexe.get(emp.sexe_personnel, 0) + 1
+        total_par_categorie[emp.type_personnel] = total_par_categorie.get(emp.type_personnel, 0) + 1
+
+        ligne_brute = [
+            emp.id,
+            f"{emp.nom_personnel} {emp.prenom_personnel}",
+            emp.date_naissance.strftime('%d/%m/%Y') if emp.date_naissance else '',
+            emp.lieu_naissance,
+            emp.type_personnel,
+            emp.adresse_personnel,
+            emp.contact_personnel,
+            emp.fonction_personnel,
+            emp.email_personnel,
+            emp.sexe_personnel,
+            f"{emp.salbase:.2f}" if emp.salbase is not None else '',
+            emp.contrat_type,
+            emp.diplome,
+            emp.date_embauche.strftime('%d/%m/%Y') if emp.date_embauche else '',
+            emp.etat_matrimonial,
+            str(emp.annee_scolaire),
+        ]
+        ligne = [Paragraph(str(v) if v else '', style_cellule) for v in ligne_brute]
+        table_data.append(ligne)
+
+    # --- Ligne des totaux : "Effectif de l'école" (colonnes 0-9) + détail (colonnes 10-19) ---
+    texte_totaux = f"Total : {effectif_total}"
+    for libelle, n in total_par_sexe.items():
+        texte_totaux += f"    —    {libelle} : {n}"
+
+    if categorie is None:
+        detail_categ = "    —    ".join(f"{libelle} : {n}" for libelle, n in total_par_categorie.items())
+        texte_totaux += f"<br/>{detail_categ}"
+    else:
+        texte_totaux += f"<br/>Catégorie : {list(total_par_categorie.keys())[0]}"
+
+    table_data.append([
+        Paragraph('Effectif du personnel', style_totaux), '', '', '', '', '', '', '',
+        Paragraph(texte_totaux, style_totaux), '', '', '', '', '', '', '',
+    ])
+
+    # Largeurs proportionnelles : ID très étroit, Nom & Prénom(s) large, et chaque colonne
+    # au moins assez large pour que son en-tête tienne sur une seule ligne (calculé pour
+    # style_entete_perso, taille 6.5 pt). Largeur d'"Exp." reversée sur Salaire.
+    poids = [20.5, 89.8, 45.5, 45.8, 44.0, 52.5, 43.2, 63.2, 35.3, 40.3, 62.0, 45.1, 42.1, 44.5, 50.7, 50.5]
+    somme_poids = sum(poids)
+    col_widths = [(p / somme_poids) * largeur_frame for p in poids]
+
+    table = Table(table_data, repeatRows=1, colWidths=col_widths)
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#2980b9')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('ALIGN', (0, 0), (-1, 0), 'LEFT'),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+        ('ROWBACKGROUNDS', (0, 1), (-1, -2), [colors.white, colors.HexColor('#f5f5f5')]),
+        ('BACKGROUND', (0, -1), (-1, -1), colors.HexColor('#27ae60')),
+        ('ALIGN', (0, -1), (-1, -1), 'CENTER'),
+        ('SPAN', (0, -1), (7, -1)),
+        ('SPAN', (8, -1), (15, -1)),
+        ('TOPPADDING', (0, 0), (-1, -1), 3),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
+    ]))
+
+    # --- 3. Éléments du flux ---
+    elements = [NextPageTemplate('Suivantes'), Spacer(1, 0.3*cm)]
+    elements.append(table)
+    elements.append(Spacer(1, 0.3*cm))
+
+    style_signature = ParagraphStyle('Signature', parent=getSampleStyleSheet()['Normal'], alignment=TA_RIGHT, fontName='Helvetica-Bold')
+    date_str = datetime.now().strftime('%d/%m/%Y')
+
+    bloc_signature = [
+        [Paragraph(f"Conakry, le {date_str}", style_signature)],
+        [Spacer(1, 0.1*cm)],
+        [Paragraph("Le Service Scolarité", style_signature)],
+        [Spacer(1, 0.6*cm)],
+        [Paragraph(str(data_ecole[8]) if len(data_ecole) > 8 and data_ecole[8] else '', style_signature)],
+    ]
+    table_signature = Table(bloc_signature, colWidths=[largeur_frame])
+    table_signature.setStyle(TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'RIGHT'),
+        ('LEFTPADDING', (0, 0), (-1, -1), 0),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 0),
+        ('TOPPADDING', (0, 0), (-1, -1), 0),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 0),
+    ]))
+    elements.append(table_signature)
+
+    # --- 4. En-tête (page 1 uniquement) — identique au registre de matriculation ---
+    def draw_entete(canvas_obj, doc):
+        width, height = landscape(A4)
+        marge = marge_gauche_droite
+        largeur_utile = largeur_frame
+
+        nom_ecole = data_ecole[0] if len(data_ecole) > 0 else ''
+        ville = data_ecole[1] if len(data_ecole) > 1 else ''
+        commune = data_ecole[2] if len(data_ecole) > 2 else ''
+        tel1 = data_ecole[3] if len(data_ecole) > 3 else ''
+        tel2 = data_ecole[4] if len(data_ecole) > 4 else ''
+        logo_chemin = data_ecole[5] if len(data_ecole) > 5 else ''
+        devise = data_ecole[6] if len(data_ecole) > 6 else ''
+        dsee = data_ecole[7] if len(data_ecole) > 7 else ''
+
+        y = height - 20
+
+        canvas_obj.setFillColor(colors.black)
+        canvas_obj.setFont('Helvetica-Bold', 9)
+        canvas_obj.drawString(marge, y, 'MEPU-A')
+        y -= 12
+        canvas_obj.drawString(marge, y, 'IRE : ')
+        canvas_obj.setFont('Helvetica', 9)
+        canvas_obj.drawString(marge + 30, y, str(ville))
+        y -= 12
+        canvas_obj.setFont('Helvetica-Bold', 9)
+        canvas_obj.drawString(marge, y, 'DCE : ')
+        canvas_obj.setFont('Helvetica', 9)
+        canvas_obj.drawString(marge + 30, y, str(commune))
+        y -= 12
+        canvas_obj.setFont('Helvetica-Bold', 9)
+        canvas_obj.drawString(marge, y, 'DSEE : ')
+        canvas_obj.setFont('Helvetica', 9)
+        canvas_obj.drawString(marge + 30, y, str(dsee))
+        y -= 12
+        canvas_obj.setFont('Helvetica-Bold', 9)
+        canvas_obj.drawString(marge, y, 'TEL : ')
+        canvas_obj.setFont('Helvetica', 9)
+        canvas_obj.drawString(marge + 30, y, f"{tel1} / {tel2}")
+
+        if logo_chemin and logo_chemin != 'Logo':
+            try:
+                img = Image.open(logo_chemin)
+                img = img.resize((60, 40), Image.LANCZOS)
+                if img.mode in ('RGBA', 'P'):
+                    img = img.convert('RGB')
+                elif img.mode != 'RGB':
+                    img = img.convert('RGB')
+                logo_buffer = io.BytesIO()
+                img.save(logo_buffer, format='PNG')
+                logo_buffer.seek(0)
+                canvas_obj.drawImage(ImageReader(logo_buffer), width/2 - 30, height - 55, 60, 40)
+            except Exception:
+                pass
+
+        y_drapeau = height - 20
+        canvas_obj.setFillColor('Red')
+        canvas_obj.rect(width - marge - 90, y_drapeau, 30, 8, stroke=False, fill=True)
+        canvas_obj.setFillColor('yellow')
+        canvas_obj.rect(width - marge - 60, y_drapeau, 30, 8, stroke=False, fill=True)
+        canvas_obj.setFillColor('green')
+        canvas_obj.rect(width - marge - 30, y_drapeau, 30, 8, stroke=False, fill=True)
+        canvas_obj.setFillColor(colors.black)
+
+        canvas_obj.setFont('Helvetica-Bold', 9)
+        canvas_obj.drawRightString(width - marge, y_drapeau - 12, 'République de Guinée')
+        canvas_obj.setFont('Helvetica-Oblique', 8)
+        canvas_obj.drawRightString(width - marge, y_drapeau - 24, 'Travail-Justice-Solidarité')
+
+        y = height - 70
+        canvas_obj.setFont('Helvetica-Bold', 12)
+        nom_x = (width - canvas_obj.stringWidth(str(nom_ecole), 'Helvetica-Bold', 12)) / 2
+        canvas_obj.drawString(nom_x, y, str(nom_ecole))
+
+        if devise:
+            y -= 13
+            canvas_obj.setFont('Helvetica-Oblique', 8)
+            devise_x = (width - canvas_obj.stringWidth(str(devise), 'Helvetica-Oblique', 8)) / 2
+            canvas_obj.drawString(devise_x, y, str(devise))
+
+        y -= 10
+        canvas_obj.line(marge, y, marge + largeur_utile, y)
+
+        y -= 15
+        titre = titre_rapport.upper()
+        canvas_obj.setFont('Helvetica-Bold', 11)
+        titre_x = (width - canvas_obj.stringWidth(titre, 'Helvetica-Bold', 11)) / 2
+        canvas_obj.drawString(titre_x, y, titre)
+
+        y -= 6
+        canvas_obj.line(marge + 60, y, marge + largeur_utile - 60, y)
+
+        y -= 16
+        annee_str = an.descript_annee if an else ''
+        session = annee_str.split('-')[-1] if '-' in annee_str else annee_str
+        canvas_obj.setFont('Helvetica-Bold', 10)
+        canvas_obj.drawString(marge + 160, y, 'Année Scolaire : ')
+        canvas_obj.setFont('Helvetica', 10)
+        canvas_obj.drawString(marge + 270, y, annee_str)
+        canvas_obj.setFont('Helvetica-Bold', 10)
+        canvas_obj.drawString(marge + 370, y, 'Session : ')
+        canvas_obj.setFont('Helvetica', 10)
+        canvas_obj.drawString(marge + 420, y, session)
+
+        return y
+
+    def draw_page_number(canvas_obj, doc):
+        canvas_obj.saveState()
+        canvas_obj.setFont('Helvetica', 8)
+        canvas_obj.drawRightString(landscape(A4)[0] - 1.5*cm, 1.0*cm, f"Page {doc.page}")
+        canvas_obj.restoreState()
+
+    def on_first_page(canvas_obj, doc):
+        draw_entete(canvas_obj, doc)
+        draw_page_number(canvas_obj, doc)
+
+    def on_later_pages(canvas_obj, doc):
+        draw_page_number(canvas_obj, doc)
+
+    # --- 5. Construction avec deux PageTemplate ---
+    buffer = io.BytesIO()
+
+    y_fin_entete = 450
+    hauteur_frame_page1 = y_fin_entete - marge_bas
+
+    frame_page1 = Frame(marge_gauche_droite, marge_bas, largeur_frame, hauteur_frame_page1, id='page1', showBoundary=0, topPadding=0, bottomPadding=0, leftPadding=0, rightPadding=0)
+
+    frame_suivantes = Frame(marge_gauche_droite, marge_bas, largeur_frame, landscape(A4)[1] - marge_bas - 1.5*cm, id='suivantes', showBoundary=0, topPadding=0, bottomPadding=0, leftPadding=0, rightPadding=0)
+
+    doc = BaseDocTemplate(buffer, pagesize=landscape(A4), title=titre_rapport)
+    doc.addPageTemplates([
+        PageTemplate(id='Premiere', frames=frame_page1, onPage=on_first_page),
+        PageTemplate(id='Suivantes', frames=frame_suivantes, onPage=on_later_pages),
+    ])
+
+    doc.build(elements)
+    buffer.seek(0)
+    return buffer
+
+
+# ----------------------------------------------------------------------
+# Vues Django — même principe que ta vue existante pour le registre de matriculation
+# ----------------------------------------------------------------------
+def _generer_rapport_personnel(request, nom_fichier, titre, categorie=None):
+    annee = request.GET.get('annee')
+    if not annee:
+        messages.error(request, "Veuillez sélectionner une année scolaire.")
+        return redirect('listegeneralepersonnel')
+
+    # Tuple data_ecole (indices 0 à 8) attendu par l'en-tête — même contrat que
+    # pour le registre de matriculation. Si ton wrapper le construit déjà,
+    # reprends cette partie telle quelle.
+    ecole = Ecole.objects.first()
+    data_ecole = (
+        ecole.nom_ecole, ecole.ville_ecole, ecole.prefect_commune,
+        ecole.telephone1, ecole.telephone2 if ecole.telephone2 else '',
+        ecole.logo_ecole.path if ecole.logo_ecole else '',
+        ecole.devise_ecole, ecole.dsee, ecole.dg,
+    )
+
+    buffer = generer_rapport_personnel(request, data_ecole, annee, titre, categorie)
+    if buffer is None:
+        return redirect('listegeneralepersonnel')
+
+    response = HttpResponse(buffer.getvalue(), content_type='application/pdf')
+    response['Content-Disposition'] = f'inline; filename="{nom_fichier}.pdf"'
+    return response
+
+
+@action_requise('personnel_gerer')
+def rapportgeneralpersonnel(request):
+    """Liste générale du personnel (tous les employés de l'année scolaire choisie)."""
+    return _generer_rapport_personnel(
+        request, nom_fichier='Liste_generale_personnel', titre="REGISTRE ANNUEL DU PERSONNEL")
+
+
+@action_requise('personnel_gerer')
+def rapportpersonnelcategorie(request):
+    """Liste du personnel filtrée sur une catégorie (type_personnel)."""
+    categorie = request.GET.get('categorie')
+    if not categorie:
+        messages.error(request, "Veuillez sélectionner une catégorie.")
+        return redirect('listegeneralepersonnel')
+    return _generer_rapport_personnel(
+        request, nom_fichier='Liste_personnel_par_categorie',
+        titre="REGISTRE DU PERSONNEL PAR CATEGORIE", categorie=categorie)
 
 
 # Gestion des Salaires

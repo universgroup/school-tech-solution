@@ -298,9 +298,14 @@ def editerinscription(request, pk):
 @action_requise('eleve_modifier')
 def modifierinscription(request, idins, mat):
 
+    etatins = None
+
     if request.method == 'POST':
+
         inscri = Inscription.objects.get(id=idins)
         inscri.date_inscription = request.POST.get('date_inscription')
+
+        etatins = inscri.etat_inscription # Je recupère son etat d'inscription pour pouvoir mieux rerouter après validation de la MAJ
 
         
         ansco = request.POST.get('ansco')  # Je recupère ici l'ID de l'année scolaire selectionnée
@@ -359,17 +364,30 @@ def modifierinscription(request, idins, mat):
             el.photo_eleve = request.FILES.get('photoel')
  
         el.save()
-        return redirect('chargeranneecourante')
+
+        if etatins == ETAT_INSCRIPTION[0][0]:
+            return redirect('chargeranneecourante') # Il est routé vers la liste des inscrits de l'année scolaire courante
+        else:
+            return redirect('listereinscritsanneecourante') # Il est routé vers la liste des reinscrits de l'année scolaire courante dans le cas contraire
     else:
-        return redirect('chargeranneecourante')
+
+        if etatins == ETAT_INSCRIPTION[0][0]:
+            return redirect('chargeranneecourante')
+        else:
+            return redirect('listereinscritsanneecourante')
 
 
 @action_requise('eleve_supprimer')
 def supprimerinscription(request, pkins):
+    etatins = None
     insc = Inscription.objects.get(id=pkins)
+    etatins = insc.etat_inscription
     insc.delete()
-    messages.success(request, 'Inscription supprimée avec succès')
-    return redirect('../chargeranneecourante/')
+
+    if etatins == ETAT_INSCRIPTION[0][0]:
+        return redirect('../chargeranneecourante/')
+    else:
+        return redirect('../listereinscritsanneecourante/')
 
 
 # Fonctions me permettant de filtrer la liste des inscrits par matricule, par classe, par nom de famille

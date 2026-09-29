@@ -17,6 +17,7 @@ urlpatterns = [
     path('imprimerecuinscription/<int:idins>', imprimerecuinscription, name='imprimerecuinscription'),
     path('reinscriptioneleve/', chargeranneecycle, name='reinscriptioneleve'),
     path('chargerlisteeleveclasse/', chargerlisteeleveclasse, name='chargerlisteeleveclasse'),
+    
     path('validerreinscription/', validerreinscription, name='validerreinscription'),
     path('recureinscription/<int:idinsc>', recureinscription, name='recureinscription'),
     path('imprimerecureinscription/<int:idins>', imprimerecureinscription,
@@ -27,6 +28,7 @@ urlpatterns = [
     path('rapportlisteinscrits/', rapportlisteinscrits, name='rapportlisteinscrits'),
     path('rapportlistereinscrits/', rapportlistereinscrits, name='rapportlistereinscrits'),
     path('rapportmatriculation/',rapportlistegenerale, name='rapportmatriculation'),
+
     path('listebadgeseleves/',afficher_listebadge_eleves, name='listebadgeseleves'),
     path('chargerlisteelevebadge',chargerlisteelevebadge,name='chargerlisteelevebadge'),
     path('imprimerbadgesclasse/', imprimerbadgesclasse, name='imprimerbadgesclasse'),
