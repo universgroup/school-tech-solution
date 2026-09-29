@@ -9,6 +9,8 @@ urlpatterns = [
     path('supppersonnel/<int:pk>', supprimerpersonnel, name='supppersonnel'),
     path('listegeneralepersonnel/', listepersonnel, name='listegeneralepersonnel'),
     path('listepersonnelcategorie/',listepersonnelcategorie, name='listepersonnelcategorie'),
+    path('rapport/personnel/general/', rapportgeneralpersonnel, name='rapportgeneral'),
+    path('rapport/personnel/categorie/', rapportpersonnelcategorie, name='rapportcategorie'),
 
     path('enregistrersalaire/', enregistrersalaire, name='enregistrersalaire'),
     path('editionsalaire/<int:idsal>', editersalaire, name='editionsalaire'),

@@ -1695,28 +1695,23 @@
         var typeListe = $("#modal_type_liste").val();
         var annee = $("#modal_annee_scolaire").val();
         var categ = $("#modal_categorie").val();
-        
 
-        if (!typeListe || !annee || !categ ) {
+        if (!typeListe || !annee || (typeListe === "2" && !categ)) {
             $("#modal_emp_erreur").text("Veuillez sélectionner tous les critères.").show();
             return;
         }
         $("#modal_emp_erreur").hide();
 
-        // Le type de liste détermine uniquement quelle URL appeler, jamais transmis au backend
-        var nomUrl;
+        var url;
         if (typeListe === "1") {
-            nomUrl = "{% url 'rapportlistereinscrits' %}";
-        } else if (typeListe === "2") {
-            nomUrl = "{% url 'rapportmatriculation' %}";
-        } 
-
-        var url = nomUrl +
-            "?annee=" + encodeURIComponent(annee) +
-            "&categorie=" + encodeURIComponent(categ);
-
+            url = "{% url 'rapportgeneral' %}?annee=" + encodeURIComponent(annee);
+        } else {
+            url = "{% url 'rapportcategorie' %}?annee=" + encodeURIComponent(annee) +
+                  "&categorie=" + encodeURIComponent(categ);
+        }
         window.open(url, "_blank");
         $("#modalRapportPersonnel").modal("hide");
+
     });
 
 

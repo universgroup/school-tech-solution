@@ -18,8 +18,8 @@ SEXE_PERSONNEL = (
 )
 
 CONTRAT_CHOICES = (
-    ('CDD', 'Contrat Durée Déterminée-CDD'),  # 0
-    ('CDI', 'Contrat Durée Indéterminée-CDI')  # 1
+    ('CDD', 'CDD'),  # 0
+    ('CDI', 'CDI')  # 1
 )
 
 MOIS_CHOICES = (
@@ -79,13 +79,13 @@ class Personnel(models.Model):
 class AvanceSalaire(models.Model):
     montant_avance = models.DecimalField(max_digits=15, decimal_places=2, default=0)
     intitule = models.TextField()
-    date_avance = models.DateField(auto_now=True)
+    date_avance = models.DateField()
     mois_avance = models.CharField(max_length=15, default=MOIS_CHOICES[1][0], choices=MOIS_CHOICES)
     anscolaire = models.ForeignKey(AnneeScolaire, on_delete=models.CASCADE)
     idpersonnel = models.ForeignKey(Personnel, on_delete=models.CASCADE)
 
     def __str__(self):
-        return '{} {} {} {} '.format(self.idpersonnel, self.intitule, str(self.montant_avance), self.mois_avance)
+        return '{} {} {} {} {}'.format(self.idpersonnel, self.intitule, str(self.montant_avance), self.mois_avance, self.anscolaire)
 
     @property
     def personnel(self):
@@ -137,7 +137,7 @@ class Salaire(models.Model):
     anneescolaire = models.ForeignKey(AnneeScolaire, on_delete=models.CASCADE)
 
     def __str__(self):
-        return '{} {} {}'.format(self.idpersonnel, self.detail_paiement, self.mois_paie)
+        return '{} {} {} {}'.format(self.idpersonnel, self.detail_paiement, self.mois_paie, self.anneescolaire)
 
     @property
     def personnel(self):

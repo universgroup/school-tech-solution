@@ -99,16 +99,19 @@ class FormPersonnel(ModelForm):
 class FormSalaire(ModelForm):
     class Meta:
         model = Salaire
-        fields = (
-            'anneescolaire', 'mois_paie', 'idpersonnel', 'nbre_heure', 'taux_horaire', 'primes', 'nb_hsupp',
-            'mont_hsupp', 'detail_paiement')
+        fields = ('anneescolaire','date_paiement', 'mois_paie', 'idpersonnel', 'nbre_heure', 'taux_horaire', 'primes', 'nb_hsupp','mont_hsupp', 'detail_paiement')
         labels = {
             'anneescolaire': 'Année scolaire',
+            'date_paiement' : 'Date paiement',
             'mois_paie': 'Mois paiement',
             'idpersonnel': 'Employé',
             'nbre_heure': 'Nombre d\'heures enseignées',
             'taux_horaire': 'Taux horaire',
+            'avance_paie': 'Montant des avances',
             'primes': 'Montant des primes',
+            'salbrut': 'Salaire brut',
+            'cotis_social': 'Cotisation sociale',
+            'salnet': 'Salaire net',
             'nb_hsupp': 'Nombre d\'heures supplementaires',
             'mont_hsupp': 'Montant des heures supplementaires',
             'detail_paiement': 'Detail du paiement'
@@ -116,8 +119,9 @@ class FormSalaire(ModelForm):
         widgets = {
             'anneescolaire': forms.Select(
                 attrs={'class': 'form-control', 'title': 'Sélectionnez l\'année scolaire courante'}),
+            'date_paiement' : forms.DateInput(attrs={'type':'date', 'class':'form-control', 'title': 'Saisissez la date de paiement du salaire'}),
             'mois_paie': forms.Select(
-                attrs={'class': 'form-control', 'placeholder': 'Mois Paiement', 'title': 'Sélectionnez le mois payé'},
+                attrs={'class': 'form-control', 'title': 'Sélectionnez le mois payé'},
                 choices=MOIS_CHOICES),
             'idpersonnel': forms.Select(attrs={'class': 'form-control', 'title': 'Sélectionnez l\'employé à payer'}),
             'nbre_heure': forms.NumberInput(
