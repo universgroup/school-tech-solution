@@ -4,7 +4,7 @@
     {% load static %}
     {% load permissions_tags %}
   <meta charset="utf-8">
-  <title>SITUATION GLOBALE DES RECETTES ANNUELLES</title>
+  <title>SITUATION GLOBALE DES SALAIRES</title>
   <!-- Tell the browser to be responsive to screen width -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -35,7 +35,7 @@
 
   <!--begin::Third Party Plugin(Bootstrap Icons)-->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"/>
-  
+
   <!-- Ce style est mis pour les boutons d'exportation en excel et PDF de la datatable-->
   <link rel="stylesheet" href="{% static 'assets/css/datatablesbuttons.css' %}">
 
@@ -45,9 +45,10 @@
 </head>
 <body class="hold-transition sidebar-mini">
     
-<div class="wrapper">
+  <div class="wrapper">
   <!-- Navbar -->
-      <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+    
+    <nav class="main-header navbar navbar-expand navbar-white navbar-light">
     <!-- Left navbar links -->
     <ul class="navbar-nav">
       <li class="nav-item">
@@ -57,7 +58,7 @@
         <a href="{% url 'accueil' %}" class="nav-link" title="Acceder au tableau de bord">Accueil</a>
       </li>
       
-      <!-- Les menus ci-dessous sont dupliqués à l'identique (en version
+        <!-- Les menus ci-dessous sont dupliqués à l'identique (en version
            plate, tactile) dans la sidebar accessible via le bouton ☰.
            On les masque en dessous de 992px (lg) car :
            1) ils n'ont pas la place de s'afficher proprement sur mobile/tablette
@@ -150,7 +151,7 @@
             <a id="dropdownSubMenu6" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle">Personnel</a>
             <ul aria-labelledby="dropdownSubMenu6" class="dropdown-menu border-0 shadow">
               <li><a href="{% url 'listegeneralepersonnel' %}" class="dropdown-item">Enregistrer un employé</a></li>
-              <li><a href="#" class="dropdown-item">Enregistrer une avance sur salaire</a></li>
+              <li><a href="{% url 'listeavancemensuelle' %}" class="dropdown-item">Enregistrer une avance sur salaire</a></li>
               <li><a href="#" class="dropdown-item">Paiement des salaires</a></li>
               <li><a href="#" class="dropdown-item">Suivi des absences</a></li>
               <li><a href="#" class="dropdown-item">Liste des employés</a></li>
@@ -539,7 +540,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="#" class="nav-link" title="Permet de saisir les avances sur salaire accordées aux employés">
+                <a href="{% url 'listeavancemensuelle' %}" class="nav-link" title="Permet de saisir les avances sur salaire accordées aux employés">
                   <i class="fas fa-sack-dollar">&nbsp;</i>
                   <p>Ajouter bon paiement</p>                  
                 </a>
@@ -687,6 +688,7 @@
           </li>
      
         </ul>
+        
       </nav>
       <!-- /.sidebar-menu -->
     </div>
@@ -700,12 +702,12 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1>SITUATION DES RECETTES DISPONIBLES</h1>
+            <h1>SITUATION DES SALAIRES MENSUELS</h1>
           </div>
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="{% url 'accueil' %}" title="Tableau de bord">Accueil</a></li>
-              <li class="breadcrumb-item active">Situation des recettes</li>
+              <li class="breadcrumb-item active">Paiement des salaires</li>
             </ol>
           </div>
         </div>
@@ -722,15 +724,16 @@
             <div class="card card-primary">
               <div class="card-header filtres-header">
                                     
-                        <h2 class="card-title mb-0 filtres-titre">Filtrez la situation des recettes générées à la scolarité</h2>
-                       
-                          <form class="filtres-form" action="{% url 'rechercherrecette' %}" method="GET">
+                        <h2 class="card-title mb-0 filtres-titre">Filtrez la situation des salaires</h2>
+                            
+                        
+                        <form class="filtres-form" action="{% url 'filtreavancesalaire' %}" method="GET">
 
                               <div class="filtres-champs">
 
                                   <div class="filtres-selects">
 
-                                    <div class="filtre-group">                                    
+                                    <div class="filtre-group">                                      
                                         <label for="idannee" class="mr-2 mb-0">Année scolaire</label>
                                         <select class="form-control form-control-sm select-modern" name="nom_annee" id="idannee" title="Sélectionnez une année scolaire pour afficher les opérations effectuées">
                                             <option value="" selected>Sélectionnez</option>
@@ -745,64 +748,89 @@
                                         <input type="date" id="datedebut" name="ddebut" class="form-control form-control-sm input-modern">
                                     </div>
 
+
                                     <div class="filtre-group">
                                         <label for="datefin" class="mr-2 mb-0">au : </label>
                                         <input type="date" id="datefin" name="dfin" class="form-control form-control-sm input-modern">
                                     </div>
 
                                   </div>
-
+                                  
                                   <div class="filtres-actions">
  
-                                        <button type="submit" class="btn btn-secondary btn-md mr-2" title="Filtrer la liste des recettes par année scolaire et/ou période">Rechercher &nbsp; <i class="fas fa-search"></i></button>
+                                        <button type="submit" class="btn btn-secondary btn-md mr-2" title="Filtrer la liste des avances de salaire par année scolaire et/ou période">Rechercher &nbsp; <i class="fas fa-search"></i></button>
 
-                                        <a href="{% url 'listerecette' %}" target="_self" title="Actualiser la liste des recettes" class="btn btn-warning btn-md mr-3">Actualiser &nbsp;<i class="fas fa-refresh"></i></a>
+                                        <a href="{% url 'listeavancemensuelle' %}" target="_self" title="Actualiser la liste des avances sur salaire" class="btn btn-warning btn-md mr-3">Actualiser &nbsp;<i class="fas fa-refresh"></i></a>
 
-                                        <a href="{% url 'enregistrercaisserecette' %}" class="btn btn-success btn-md" target="_self" title="Cliquez ici pour enregistrer une recette">Enregistrer une entrée &nbsp;<i class="fa fa-solid fa-save"></i></a>
+                                        <a href="{% url 'valideravancesalaire' %}" class="btn btn-success btn-md" target="_self" title="Cliquez ici pour enregistrer un bulletin de salaire">Enregistrer un salaire &nbsp; <i class="fas fa-money-bill-trend-up"></i></a>
+
                                   </div>
 
                                   <div class="filtres-situation">
 
-                                        {% if cais %}
-                                            <h5 class="situation-titre">
-                                                Situation globale du mois de &nbsp;: &nbsp;{{ mois_actuel }}
-                                            </h5>
-                                        {% elif recette %}
-                                            <h5 class="situation-titre">
-                                                Situation globale de la période du &nbsp;: &nbsp;
-                                                {{ ddebut|date:'j-n-Y' }} &nbsp; au &nbsp;: &nbsp; {{ dfin|date:'j-n-Y' }}
-                                            </h5>
-                                        {% endif %}
+                                    {% if salaire_mensuel %}
+                                      <h5 class="situation-titre">
+                                          Situation globale des salaires du mois de &nbsp;: &nbsp;{{ mois_actuel }}
+                                      </h5>
+                                    {% elif salaire_periode %}
+                                      <h5 class="situation-titre">
+                                          Situation globale des salaires de la période du &nbsp;: &nbsp;
+                                          {{ ddebut|date:'Y-n-j' }} &nbsp; au &nbsp;: &nbsp; {{ dfin|date:'Y-n-j' }}
+                                      </h5>
+                                    {% endif %}
 
                                   </div>
-                              
-                              </div>
-                              
 
-                            </form>                                    
 
+                               </div>
+
+                            </form>
+                
             </div>
               <!-- /.card-header -->
 
         <div class="card-body">
-        {% if cais %}
-             <table id="recette_derniere_annee" class="dt-school">
+        {% if salaire_periode %}
+             <table id="liste_salaire_periode" class="dt-school">
                     <thead>
                 
                         <tr>
-                                <th>Catégorie recette</th>
-                                <th>Date opération</th>
-                                <th>Désignation</th>
-                                <th>Montant</th>
-                                <th>Type opération</th>
-                                <th>Solde progressif</th>
-                                <th>Observation/Mémo</th>
+                                <th>ID Personnel</th>
+                                <th>Nom famille</th>
+                                <th>Prénoms</th>
+                                <th>Contact</th>
+                                <th>Catégorie</th>
+                                <th>Détail paiement</th>
+                                <th>Mois payé</th>
+                                <th>Date paiement</th>
+                                <th>Nbre heures travaillé</th>
+                                <th>Taux horaire</th>
+                                <th>Salaire base</th>
+                                <th>Montant avancé</th>
+                                <th>Montant des primes</th>
+                                <th>Salaire brut</th>
+                                <th>Cotisation sociale</th>
+                                <th>Salaire net payé</th>
+                                <th>Heures supp</th>
+                                <th>Montant heures supp</th>
                                 <th>Année scolaire</th>
                                 <th>ID</th>
                                 <th class="no-export">Actions</th>
                         </tr>
 
                         <tr class="filters">
+
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
                                 <th></th>
                                 <th></th>
                                 <th></th>
@@ -818,40 +846,63 @@
                     </thead>
                     <tbody>
                     
-                        {% for c in cais %}
-                            <tr>
-                                <td>{{c.categ_depense}}</td>
-                                <td>{{c.date_operation | date:'j-n-Y' }}</td>
-                                <td>{{c.libelle_operation }}</td>
-                                <td>{{c.montant_encaisse | floatformat:'2g' }}</td>
-                                <td>{{c.type_operation }}</td>
-                                <td>{{c.solde_actuel|floatformat:'2g' }}</td>
-                                <td>{{c.observ }}</td>
-                                <td>{{c.anscolaire }}</td>
-                                <td>{{c.id}}</td>
-                                <td class="no-export">
-                                    <a class="btn btn-primary" href="{% url 'afficherdetailscaisserecette' c.id %}" title="Voir/Afficher" target="_self"><i class="fa-solid fa-eye fa-sm"></i></a>
-                                    <a class="btn btn-info" href="{% url 'editioncaisserecette' c.id %}" title="Modifier/Editer" target="_self"><i class="fa-solid fa-edit fa-sm"></i></a>
+                        {% for sal in salaire_periode %}
+                                <tr>
+                                    <td>{{sal.idpersonnel.id}}</td>
+                                    <td>{{sal.idpersonnel.nom_personnel}}</td>
+                                    <td>{{sal.idpersonnel.prenom_personnel}}</td>
+                                    <td>{{sal.idpersonnel.contact_personnel}}</td>
+                                    <td>{{sal.idpersonnel.type_personnel}}</td>
+                                    <td>{{sal.detail_paiement}}</td>
+                                    <td>{{sal.get_mois_avance_display|capfirst}}</td>
+                                    <td>{{sal.date_paiement|date:'j-n-Y'}}</td>
+                                    <td>{{sal.nbre_heure}}</td>
+                                    <td>{{sal.taux_horaire|floatformat:'2g'}}</td>
+                                    <td>{{sal.salbase|floatformat:'2g'}}</td>
+                                    <td>{{sal.avance_paie|floatformat:'2g'}}</td>
+                                    <td>{{sal.primes|floatformat:'2g'}}</td>
+                                    <td>{{sal.salbrut|floatformat:'2g'}}</td>
+                                    <td>{{sal.cotis_sociale|floatformat:'2g'}}</td>
+                                    <td>{{sal.salnet|floatformat:'2g'}}</td>
+                                    <td>{{sal.nb_hsupp}}</td>
+                                    <td>{{sal.mont_hsupp|floatformat:'2g'}}</td>
+                                    <td>{{sal.anscolaire }}</td>
+                                    <td>{{sal.id}}</td>
+                                    <td class="no-export">
+                                        <a class="btn btn-primary" href="{% url 'afficherdetailavancesalaire' sal.id %}" title="Voir/Afficher" target="_self"><i class="fa-solid fa-eye fa-sm"></i></a>
+                                        <a class="btn btn-info" href="{% url 'editionavancesalaire' sal.id %}" title="Modifier/Editer" target="_self"><i class="fa-solid fa-edit fa-sm"></i></a>
 
-                                    {% peut request.user 'menu_administration' as ok_admin %}
+                                        {% peut request.user 'menu_administration' as ok_admin %}
 
-                                    {% if ok_admin %}
-                                    <a class="btn btn-danger" href="{% url 'supprimecaisserecette' c.id %}" title="Supprimer" target="_self"><i class="fa-solid fa-remove fa-sm"></i></a>
-                                    {% endif %}
-                                  </td>
-                            </tr>
-                        {% endfor %}
+                                        {% if ok_admin %}
+                                        <a class="btn btn-danger" href="{% url 'supprimeravancesalaire' sal.id %}" title="Supprimer" target="_self"><i class="fa-solid fa-remove fa-sm"></i></a>
+                                        {% endif %}
+                                        <a class="btn btn-secondary" href="{% url 'imprimerecuavancesalaire' sal.id %}" title="Imprimer le bulletin de paie de l'employé" target="_blank"><i class="fa-solid fa-print fa-sm"></i></a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
 
                     </tbody>
                     <tfoot>
                         <tr>
-                            <th>Catégorie recette</th>
-                            <th>Date opération</th>
-                            <th>Désignation</th>
-                            <th>Montant</th>
-                            <th>Type opération</th>
-                            <th>Solde progressif</th>
-                            <th>Observation/Mémo</th>
+                            <th>ID Personnel</th>
+                            <th>Nom famille</th>
+                            <th>Prénoms</th>
+                            <th>Contact</th>
+                            <th>Catégorie</th>
+                            <th>Détail paiement</th>
+                            <th>Mois payé</th>
+                            <th>Date paiement</th>
+                            <th>Nbre heures travaillé</th>
+                            <th>Taux horaire</th>
+                            <th>Salaire base</th>
+                            <th>Montant avancé</th>
+                            <th>Montant des primes</th>
+                            <th>Salaire brut</th>
+                            <th>Cotisation sociale</th>
+                            <th>Salaire net payé</th>
+                            <th>Heures supp</th>
+                            <th>Montant heures supp</th>
                             <th>Année scolaire</th>
                             <th>ID</th>
                             <th class="no-export">Actions</th>
@@ -862,31 +913,30 @@
             <div class="row mt-3 mb-2">
                 <div class="col-md-4">
                     <div class="form-group">
-                        <label for="totalrecu">Total entrée</label>
-                        {% if total_entree %}
-                        <input type="text" id="totalrecu" name="total_recette"
-                            value="{{ total_entree|floatformat:'2g' }}"
+                        <label for="totalsalbase">Totat Salaire Base</label>
+                        {% if total_salbase %}
+                        <input type="text" id="totalsalbase" name="total_salbase"
+                            value="{{ total_salbase|floatformat:'2g' }}"
                             class="form-control form-control-sm input-modern" readonly
                             style="color:red; font-weight:bold; font-size:12pt;">
                         {% else %}
-                        <input type="text" name="total_recette" value="0"
+                        <input type="text" name="total_salbase" value="0"
                             class="form-control form-control-sm input-modern" readonly
                             style="color:red; font-weight:bold; font-size:12pt;">
                         {% endif %}
                     </div>
                 </div>
            
-
                 <div class="col-md-4">
                     <div class="form-group">
-                        <label for="totaldep">Total sortie</label>
-                        {% if total_sortie %}
-                        <input type="text" id="totaldep" name="total_depense"
-                            value="{{ total_sortie|floatformat:'2g' }}"
+                        <label for="totalsalbrut">Total Salaire Brut</label>
+                        {% if total_salbrut %}
+                        <input type="text" id="totalsalbrut" name="total_salbrut"
+                            value="{{ total_salbrut|floatformat:'2g' }}"
                             class="form-control form-control-sm input-modern" readonly
                             style="color:red; font-weight:bold; font-size:12pt;">
                         {% else %}
-                        <input type="text" name="total_depense" value="0"
+                        <input type="text" name="total_salbrut" value="0"
                             class="form-control form-control-sm input-modern" readonly
                             style="color:red; font-weight:bold; font-size:12pt;">
                         {% endif %}
@@ -895,14 +945,14 @@
 
                 <div class="col-md-4">
                     <div class="form-group">
-                        <label for="totalsolde">Solde disponible</label>
-                        {% if solde_dispo %}
-                        <input type="text" id="totalsolde" name="total_solde"
-                            value="{{ solde_dispo|floatformat:'2g' }}"
+                        <label for="totalsalnet">Total Salaire Net</label>
+                        {% if total_salnet %}
+                        <input type="text" id="totalsalnet" name="total_salnet"
+                            value="{{ total_salnet|floatformat:'2g' }}"
                             class="form-control form-control-sm input-modern" readonly
                             style="color:red; font-weight:bold; font-size:12pt;">
                         {% else %}
-                        <input type="text" name="total_solde" value="0"
+                        <input type="text" name="total_salnet" value="0"
                             class="form-control form-control-sm input-modern" readonly
                             style="color:red; font-weight:bold; font-size:12pt;">
                         {% endif %}
@@ -917,31 +967,31 @@
                         <nav aria-label="">
                             <ul class="pagination">
 
-                                {% if cais.has_previous %}
+                                {% if salaire_periode.has_previous %}
 
                                 <li class="page-item">
-                                    <a class="page-link" href="?page=1">1</a>
+                                    <a class="page-link" href="?page=1&{{ query_string }}">1</a>
                                 </li>
                                 <li class="page-item">
-                                    <a class="page-link" href="?page={{ cais.previous_page_number }}"><i class="fa-solid fa-backward fa-sm"></i>&nbsp; Précédent</a>
+                                    <a class="page-link" href="?page={{ salaire_periode.previous_page_number }}&{{ query_string }}"><i class="fa-solid fa-backward fa-sm"></i>&nbsp; Précédent</a>
                                 </li>
 
                                 {% endif %}
 
                                 <li class="page-item active" aria-current="page">
                                     <a class="page-link" href="#">
-                                        Page {{ cais.number }} sur {{ cais.paginator.num_pages }}
+                                        Page {{ salaire_periode.number }} sur {{ salaire_periode.paginator.num_pages }}
                                     </a>
                                 </li>
 
-                                {% if cais.has_next %}
+                                {% if salaire_periode.has_next %}
 
                                 <li class="page-item">
-                                    <a class="page-link" href="?page={{ cais.next_page_number }}"><i class="fa-solid fa-forward fa-sm"></i>&nbsp; Suivant</a>
+                                    <a class="page-link" href="?page={{ salaire_periode.next_page_number }}&{{ query_string }}"><i class="fa-solid fa-forward fa-sm"></i>&nbsp; Suivant</a>
                                 </li>
 
                                 <li class="page-item">
-                                    <a class="page-link" href="?page={{ cais.paginator.num_pages }}"><i class="fa-solid fa-step-forward fa-sm"></i>&nbsp; Dernier</a>
+                                    <a class="page-link" href="?page={{ salaire_periode.paginator.num_pages }}&{{ query_string }}"><i class="fa-solid fa-step-forward fa-sm"></i>&nbsp; Dernier</a>
                                 </li>
 
                                 {% endif %}
@@ -952,105 +1002,149 @@
                 </div>
             </div>
 
-        {% elif recette %}
+        {% elif salaire_mensuel %}
 
-            <table id="recette_annee_select" class="dt-school">
+            <table id="liste_salaire_mensuel" class="dt-school">
                     <thead>
                         <tr>
-                            <th>Catégorie recette</th>
-                            <th>Date opération</th>
-                            <th>Désignation</th>
-                            <th>Montant</th>
-                            <th>Type opération</th>
-                            <th>Solde progressif</th>
-                            <th>Observation/Mémo</th>
+                            <th>ID Personnel</th>
+                            <th>Nom famille</th>
+                            <th>Prénoms</th>
+                            <th>Contact</th>
+                            <th>Catégorie</th>
+                            <th>Détail paiement</th>
+                            <th>Mois payé</th>
+                            <th>Date paiement</th>
+                            <th>Nbre heures travaillé</th>
+                            <th>Taux horaire</th>
+                            <th>Salaire base</th>
+                            <th>Montant avancé</th>
+                            <th>Montant des primes</th>
+                            <th>Salaire brut</th>
+                            <th>Cotisation sociale</th>
+                            <th>Salaire net payé</th>
+                            <th>Heures supp</th>
+                            <th>Montant heures supp</th>
                             <th>Année scolaire</th>
                             <th>ID</th>
                             <th class="no-export">Actions</th>
                         </tr>
 
                         <tr class="filters">
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for r in recette %}
-                            <tr>
-                                <td>{{r.categ_depense}}</td>
-                                <td>{{r.date_operation | date:'j-n-Y' }}</td>
-                                <td>{{r.libelle_operation }}</td>
-                                <td>{{r.montant_encaisse | floatformat:'2g' }}</td>
-                                <td>{{r.type_operation }}</td>
-                                <td>{{r.solde_actuel|floatformat:'2g' }}</td>
-                                <td>{{r.observ }}</td>
-                                <td>{{r.anscolaire }}</td>
-                                <td>{{r.id}}</td>
-                                <td class="no-export">
-                                    <a class="btn btn-primary" href="{% url 'afficherdetailscaisserecette' r.id %}" title="Voir/Afficher" target="_self"><i class="fa-solid fa-eye fa-sm"></i></a>
-                                    <a class="btn btn-info" href="{% url 'editioncaisserecette' r.id %}" title="Modifier/Editer" target="_self"><i class="fa-solid fa-edit fa-sm"></i></a>
-                                    
-                                    {% peut request.user 'menu_administration' as ok_admin %}
+                        {% for sal in salaire_mensuel %}
+                                <tr>
+                                    <td>{{sal.idpersonnel.id}}</td>
+                                    <td>{{sal.idpersonnel.nom_personnel}}</td>
+                                    <td>{{sal.idpersonnel.prenom_personnel}}</td>
+                                    <td>{{sal.idpersonnel.contact_personnel}}</td>
+                                    <td>{{sal.idpersonnel.type_personnel}}</td>
+                                    <td>{{sal.detail_paiement}}</td>
+                                    <td>{{sal.get_mois_avance_display|capfirst}}</td>
+                                    <td>{{sal.date_paiement|date:'j-n-Y'}}</td>
+                                    <td>{{sal.nbre_heure}}</td>
+                                    <td>{{sal.taux_horaire|floatformat:'2g'}}</td>
+                                    <td>{{sal.salbase|floatformat:'2g'}}</td>
+                                    <td>{{sal.avance_paie|floatformat:'2g'}}</td>
+                                    <td>{{sal.primes|floatformat:'2g'}}</td>
+                                    <td>{{sal.salbrut|floatformat:'2g'}}</td>
+                                    <td>{{sal.cotis_sociale|floatformat:'2g'}}</td>
+                                    <td>{{sal.salnet|floatformat:'2g'}}</td>
+                                    <td>{{sal.nb_hsupp}}</td>
+                                    <td>{{sal.mont_hsupp|floatformat:'2g'}}</td>
+                                    <td>{{sal.anscolaire }}</td>
+                                    <td>{{sal.id}}</td>
+                                    <td class="no-export">
+                                        <a class="btn btn-primary" href="{% url 'afficherdetailavancesalaire' sal.id %}" title="Voir/Afficher" target="_self"><i class="fa-solid fa-eye fa-sm"></i></a>
+                                        <a class="btn btn-info" href="{% url 'editionavancesalaire' sal.id %}" title="Modifier/Editer" target="_self"><i class="fa-solid fa-edit fa-sm"></i></a>
 
-                                    {% if ok_admin %}                                    
-                                    <a class="btn btn-danger" href="{% url 'supprimecaisserecette' r.id %}" title="Supprimer" target="_self"><i class="fa-solid fa-remove fa-sm"></i></a>
-                                    {% endif %}
-                                  </td>
-                            </tr>
-                        {% endfor %}
+                                        {% peut request.user 'menu_administration' as ok_admin %}
+
+                                        {% if ok_admin %}
+                                        <a class="btn btn-danger" href="{% url 'supprimeravancesalaire' sal.id %}" title="Supprimer" target="_self"><i class="fa-solid fa-remove fa-sm"></i></a>
+                                        {% endif %}
+                                        <a class="btn btn-secondary" href="{% url 'imprimerecuavancesalaire' sal.id %}" title="Imprimer le bulletin de paie de l'employé" target="_blank"><i class="fa-solid fa-print fa-sm"></i></a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
                     </tbody>
                     <tfoot>
-                            <tr>
-                                <th>Catégorie recette</th>
-                                <th>Date opération</th>
-                                <th>Désignation</th>
-                                <th>Montant</th>
-                                <th>Type opération</th>
-                                <th>Solde progressif</th>
-                                <th>Observation/Mémo</th>
-                                <th>Année scolaire</th>
-                                <th>ID</th>
-                                <th class="no-export">Actions</th>
-                            </tr>
+                        <tr>
+                            <th>ID Personnel</th>
+                            <th>Nom famille</th>
+                            <th>Prénoms</th>
+                            <th>Contact</th>
+                            <th>Catégorie</th>
+                            <th>Détail paiement</th>
+                            <th>Mois payé</th>
+                            <th>Date paiement</th>
+                            <th>Nbre heures travaillé</th>
+                            <th>Taux horaire</th>
+                            <th>Salaire base</th>
+                            <th>Montant avancé</th>
+                            <th>Montant des primes</th>
+                            <th>Salaire brut</th>
+                            <th>Cotisation sociale</th>
+                            <th>Salaire net payé</th>
+                            <th>Heures supp</th>
+                            <th>Montant heures supp</th>
+                            <th>Année scolaire</th>
+                            <th>ID</th>
+                            <th class="no-export">Actions</th>
+                        </tr>
                     </tfoot>
             </table>
 
             <div class="row mt-3 mb-2">
                 <div class="col-md-4">
                     <div class="form-group">
-                        <label for="totalrecu">Total entrée</label>
-                        {% if total_entree %}
-                        <input type="text" id="totalrecu" name="total_recette"
-                            value="{{ total_entree|floatformat:'2g' }}"
+                        <label for="totalsalbase">Totat Salaire Base</label>
+                        {% if total_salbase %}
+                        <input type="text" id="totalsalbase" name="total_salbase"
+                            value="{{ total_salbase|floatformat:'2g' }}"
                             class="form-control form-control-sm input-modern" readonly
                             style="color:red; font-weight:bold; font-size:12pt;">
                         {% else %}
-                        <input type="text" name="total_recette" value="0"
+                        <input type="text" name="total_salbase" value="0"
                             class="form-control form-control-sm input-modern" readonly
                             style="color:red; font-weight:bold; font-size:12pt;">
                         {% endif %}
                     </div>
                 </div>
            
-
                 <div class="col-md-4">
                     <div class="form-group">
-                        <label for="totaldep">Total sortie</label>
-                        {% if total_sortie %}
-                        <input type="text" id="totaldep" name="total_depense"
-                            value="{{ total_sortie|floatformat:'2g' }}"
+                        <label for="totalsalbrut">Total Salaire Brut</label>
+                        {% if total_salbrut %}
+                        <input type="text" id="totalsalbrut" name="total_salbrut"
+                            value="{{ total_salbrut|floatformat:'2g' }}"
                             class="form-control form-control-sm input-modern" readonly
                             style="color:red; font-weight:bold; font-size:12pt;">
                         {% else %}
-                        <input type="text" name="total_depense" value="0"
+                        <input type="text" name="total_salbrut" value="0"
                             class="form-control form-control-sm input-modern" readonly
                             style="color:red; font-weight:bold; font-size:12pt;">
                         {% endif %}
@@ -1059,21 +1153,21 @@
 
                 <div class="col-md-4">
                     <div class="form-group">
-                        <label for="totalsolde">Solde disponible</label>
-                        {% if solde_dispo %}
-                        <input type="text" id="totalsolde" name="total_solde"
-                            value="{{ solde_dispo|floatformat:'2g' }}"
+                        <label for="totalsalnet">Total Salaire Net</label>
+                        {% if total_salnet %}
+                        <input type="text" id="totalsalnet" name="total_salnet"
+                            value="{{ total_salnet|floatformat:'2g' }}"
                             class="form-control form-control-sm input-modern" readonly
                             style="color:red; font-weight:bold; font-size:12pt;">
                         {% else %}
-                        <input type="text" name="total_solde" value="0"
+                        <input type="text" name="total_salnet" value="0"
                             class="form-control form-control-sm input-modern" readonly
                             style="color:red; font-weight:bold; font-size:12pt;">
                         {% endif %}
                     </div>
                 </div>
             </div>
-
+            
 
             <div class="row">
                 <div class="col-md-8">
@@ -1081,31 +1175,31 @@
                         <nav aria-label="">
                             <ul class="pagination">
 
-                                {% if recette.has_previous %}
+                                {% if salaire_mensuel.has_previous %}
 
                                 <li class="page-item">
-                                    <a class="page-link" href="?page=1&{{ query_string }}">1</a>
+                                    <a class="page-link" href="?page=1">1</a>
                                 </li>
                                 <li class="page-item">
-                                    <a class="page-link" href="?page={{ recette.previous_page_number }}&{{ query_string }}"><i class="fa-solid fa-backward fa-sm"></i>&nbsp; Précédent</a>
+                                    <a class="page-link" href="?page={{ salaire_mensuel.previous_page_number }}"><i class="fa-solid fa-backward fa-sm"></i>&nbsp; Précédent</a>
                                 </li>
 
                                 {% endif %}
 
                                 <li class="page-item active" aria-current="page">
                                     <a class="page-link" href="#">
-                                        Page {{ recette.number }} sur {{ recette.paginator.num_pages }}
+                                        Page {{ salaire_mensuel.number }} sur {{ salaire_mensuel.paginator.num_pages }}
                                     </a>
                                 </li>
 
-                                {% if recette.has_next %}
+                                {% if salaire_mensuel.has_next %}
 
                                 <li class="page-item">
-                                    <a class="page-link" href="?page={{ recette.next_page_number }}&{{ query_string }}"><i class="fa-solid fa-forward fa-sm"></i>&nbsp; Suivant</a>
+                                    <a class="page-link" href="?page={{ salaire_mensuel.next_page_number }}"><i class="fa-solid fa-forward fa-sm"></i>&nbsp; Suivant</a>
                                 </li>
 
                                 <li class="page-item">
-                                    <a class="page-link" href="?page={{ recette.paginator.num_pages }}&{{ query_string }}"><i class="fa-solid fa-step-forward fa-sm"></i>&nbsp; Dernier</a>
+                                    <a class="page-link" href="?page={{ salaire_mensuel.paginator.num_pages }}"><i class="fa-solid fa-step-forward fa-sm"></i>&nbsp; Dernier</a>
                                 </li>
 
                                 {% endif %}
@@ -1115,6 +1209,7 @@
                     </div>
                 </div>
             </div>
+            
 
         {% endif %}
         
@@ -1240,7 +1335,6 @@
 
 <script>
 
-
   $(function () {
       function initDataTableAvecFiltres(selector) {
           var table = $(selector).DataTable({
@@ -1274,9 +1368,9 @@
               {
                 extend: 'excelHtml5',
                 text: '<i class="fa fa-file-excel"></i> Export Excel',
-                titleAttr: 'Télécharger la situation des recettes au format Excel',
+                titleAttr: 'Télécharger la situation des salaires au format Excel',
                 className: 'btn btn-success btn-sm mr-1',
-                title: 'Situation des recettes de l\'année scolaire',
+                title: 'Situation des salaires de l\'année scolaire',
                 exportOptions: {
                         columns: ':not(.no-export)',
                     }
@@ -1284,9 +1378,9 @@
               {
                 extend: 'pdfHtml5',
                 text: '<i class="fa fa-file-pdf"></i> Export PDF',
-                titleAttr: 'Télécharger la situation des recettes au format PDF',
+                titleAttr: 'Télécharger la situation des salaires au format PDF',
                 className: 'btn btn-danger btn-sm',
-                title: 'Situation des recettes de l\'année scolaire',
+                title: 'Situation des salaires de l\'année scolaire',
                 orientation: 'landscape',
                 pageSize: 'A4',
                 exportOptions: {
@@ -1330,11 +1424,13 @@
           return table;
       }
 
-      initDataTableAvecFiltres('#recette_derniere_annee');
-      initDataTableAvecFiltres('#recette_annee_select');
+      initDataTableAvecFiltres('#liste_salaire_periode');
+      initDataTableAvecFiltres('#liste_salaire_mensuel');
     });
 
-</script>    
-        
+</script>   
+
+
 </body>
 </html>
+

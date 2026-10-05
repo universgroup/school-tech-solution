@@ -725,7 +725,7 @@ def validerpaiementscolarite(request):
                 cais.date_operation = request.POST['date_paiement']
                 cais.save()
 
-            message_succes = 'Paiement validé avec succès !!!'
+            message_succes = 'Paiement validé avec succès.'
             if not is_ajax:
                 messages.success(request, message_succes)
 
@@ -1037,7 +1037,7 @@ def recupaiementscolarite(request, idetat, nom_tranche, mont_paye):
                     {'email': data[9], 'tel': data[10]},  # mère
                 ]
         emails_valides = [p['email'] for p in parents if p['email']]
-        tel_sans_email = [p['tel'] for p in parents if not p['email'] and p['tel']]
+        tel_valides = [p['tel'] for p in parents if p['tel']]
 
         libelle_tranche = "1ère tranche" if est_premiere_tranche else "2ème tranche"
 
@@ -1082,7 +1082,7 @@ def recupaiementscolarite(request, idetat, nom_tranche, mont_paye):
         # ── ENVOI SMS (parents sans email) ──
         
         if not deja_envoye_sms:
-            if tel_sans_email:
+            if tel_valides:
                 try:
                     destinataires_contexte = [
                         (tel, {
@@ -1092,12 +1092,13 @@ def recupaiementscolarite(request, idetat, nom_tranche, mont_paye):
                             'classe':etatpaie.mateleve.idclasse,
                             'ecole': data_ecole[8],
                             'tranche': libelle_tranche,
+                            'mont_paye': montant_paye,
                         })
-                        for tel in tel_sans_email
+                        for tel in tel_valides
                     ]
                     template_message = (
-                        "Reçu de paiement ({tranche}) disponible pour {prenom} {nom} matricule {matricule} classe {classe}. "
-                        "Service Scolarité : {ecole}."
+                        "Reçu de paiement ({tranche}) disponible pour {prenom} {nom} matricule {matricule} classe {classe} montant payé {mont_paye}. \n"
+                        "Service Scolarité : \n {ecole}."
                     )
                     envoyes, echecs = envoyer_sms_masse(
                         destinataires_contexte,

@@ -1,70 +1,324 @@
 {% extends "base.html" %}
-{% block titre_page %} EDITION DES SALAIRES {% endblock %}
-{% block titre_cadre %}
-EDITION DU SALAIRE D'UN EMPLOYE
-{% endblock %}
+{% block titre_page %} MIS A JOUR {% endblock %}
+{% load crispy_forms_tags %}
+{% block titre_formulaire %} FICHE INDIVIDUELLE DE SALAIRE {% endblock %}
+{% block fil_ariane %}Personnel / Salaires / Mis à jour {% endblock %}
+ {% block titre_cadre %}
+  EDITION D'UN BULLETIN DE SALAIRE
+ {% endblock %}
+
 
 {% block formulaire %}
 
-<div class="row">
-    <div class="col-lg-6">
-        <div class="card m-b-30">
-            <form class="post-form" action="/modifiersalaire/{{sal.id}}" method="POST">
+        <form class="needs-validation" action="{% url 'modifiersalaire' sal.id %}" method="post">
 
                 {% csrf_token %}
 
-                <div class="row">
-                    <div class="col-lg-6">
-                        <div class="card m-b-30">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="IDsal">ID salaire</label>
+                            <input type="text" id="IDsal" value="{{sal.id}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>
 
-                            <label for="IDsal">ID Salaire</label>
-                            <input type="text" id="IDsal" maxlength="10" value="{{sal.id}}" class="form-control" required readonly>
-
-                            <label for="id_nbre_heure">Nombre heure</label>
-                            <input type="number" name="nbre_heure" id="id_nbre_heure" maxlength="10"  value="{{sal.nbre_heure}}" class="form-control" required>
-
-                            <label for="id_taux_horaire">Taux horaire</label>
-                            <input type="number" name="taux_horaire" id="id_taux_horaire" maxlength="10"  value="{{sal.taux_horaire}}" class="form-control" required>
-
-                            <label for="id_mois_paie">Mois Payé</label>
-                            <input type="text" name="mois_paie" id="id_mois_paie" maxlength="10"  value="{{sal.mois_paie}}" class="form-control" required>
-
-                            <label for="id_detail_paie">Details paiement</label>
-                            <input type="text" name="detail_paiement" id="id_detail_paie" maxlength="50"  value="{{sal.detail_paiement}}" class="form-control" required>
-
-                            <label for="id_avance_paie">Montant des avances</label>
-                            <input type="number" name="avance_paie" id="id_avance_paie" maxlength="15"  value="{{sal.avance_paie}}" class="form-control" required>
-
-                            <label for="id_prime">Montant des primes</label>
-                            <input type="number" name="primes" id="id_prime" maxlength="15"  value="{{sal.primes}}" class="form-control" required>
-
-                            <label for="id_nb_hsupp">Nbre heure supp</label>
-                            <input type="text" name="nb_hsupp" id="id_nb_hsupp" maxlength="15"  value="{{sal.nb_hsupp}}" class="form-control" required>
-
-                            <label for="id_mnt_hsupp">Montant heure supp</label>
-                            <input type="text" name="mont_hsupp" id="id_mnt_hsupp" maxlength="15"  value="{{sal.mont_hsupp}}" class="form-control" required>
-
-
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_idpersonnel">Employé</label>
+                            <select id="id_idpersonnel" name="idpersonnel" class="form-control">
+                                <option value="{{sal.idpersonnel.id}}" selected>{{sal.idpersonnel}}</option>
+                                {% for emp in liste_emp %}
+                                <option value="{{emp.id}}">{{emp.nom_personnel}}|{{emp.prenom_personnel}}|{{emp.contact_personnel}}|{{emp.type_personnel}}</option>
+                                {% endfor %}
+                            </select>
                         </div>
                     </div>
 
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_nom_emp">Nom famille</label>
+                            <input type="text" name="nom_emp" id="id_nom_emp" value="{{sal.idpersonnel.nom_personnel}}" class="form-control" readonly>
+                        </div>
+                    </div>
                 </div>
 
-
-
-                <div class="row">
-                    <div class="col-lg-6">
-                        <button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-pencil">Modifier</span></button>
-                        <a href="/ajoutersalaire/" target="_self" class="btn btn-secondary"><span class="glyphicon glyphicon-arrow-left">Retour</span></a>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="id_prenom_emp">Prénoms</label>
+                            <input type="text" name="prenom_emp" id="id_prenom_emp" value="{{sal.idpersonnel.prenom_personnel}}" class="form-control" readonly>
+                        </div>
                     </div>
 
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="id_contact">Contact</label>
+                            <input type="text" name="contact_personnel" id="id_contact" value="{{sal.idpersonnel.contact_personnel}}" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="id_type_emp">Catégorie</label>
+                            <input type="text" name="type_personnel" id="id_type_emp" value="{{sal.idpersonnel.type_personnel}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>  
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="form-group">                            
+                            <label for="id_datepaie">Date Paiement</label>
+                            <input type="text" name="date_paiement" id="id_datepaie" value="{{sal.date_paiement}}" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="id_anscol">Année scolaire</label>
+                            <select id="id_anscol" name="anneescolaire" class="form-control">
+                                <option value="{{sal.anneescolaire.id}}" selected>{{sal.anneescolaire}}</option>
+                                {% for an in ansc %}
+                                <option value="{{an.id}}">{{an.descript_annee}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="id_mois_paie">Mois payé</label>
+                            <select id="id_mois_paie" name="mois_paie" class="form-control">
+                                <option value="{{sal.mois_paie}}" selected>{{sal.mois_paie}}</option>
+                                {% for mois in mois_paye %}
+                                <option value="{{mois.0}}">{{mois.1}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
                 </div>
 
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="id_nbr_heure">Nombre heure enseignée</label>
+                            <input type="text" name="nbre_heure" id="id_nbr_heure" value="{{sal.nbre_heure}}" class="form-control" readonly>
+                        </div>
+                    </div>
 
-            </form>
-        </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="id_taux_horaire">Taux horaire</label>
+                            <input type="text" name="taux_horaire" id="id_taux_horaire" value="{{sal.taux_horaire}}" class="form-control" readonly>
+                        </div>
+                    </div>
 
-    </div>
-</div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="id_salbase">Salaire de base</label>
+                            <input type="text" name="salbase" id="id_salbase" value="{{sal.salbase}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="id_avance_paie">Montant des avances</label>
+                            <input type="text" name="avance_paie" id="id_avance_paie" value="{{sal.avance_paie}}" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="id_prime">Montant des primes</label>
+                            <input type="text" name="primes" id="id_prime" value="{{sal.primes}}" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="id_salb">Salaire brut</label>
+                            <input type="text" name="salbrut" id="id_salb" value="{{sal.salbrut}}" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="id_coti_social">Cotisation sociale</label>
+                            <input type="text" name="cotis_sociale" id="id_coti_social" value="{{sal.cotis_sociale}}" class="form-control">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_detail_paie">Détails paiement</label>
+                            <input type="text" name="detail_paiement" id="id_detail_paie" value="{{sal.detail_paiement}}" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_salnet">Salaire net</label>
+                            <input type="text" name="salnet" id="id_salnet" value="{{sal.salnet}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_nb_hsupp">Heures supp</label>
+                            <input type="text" name="nb_hsupp" id="id_nb_hsupp" value="{{sal.nb_hsupp}}" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_mnt_hsupp">Montant heure supp</label>
+                            <input type="text" name="mont_hsupp" id="id_mnt_hsupp" value="{{sal.mont_hsupp}}" class="form-control">
+                        </div>
+                    </div>
+                </div>                    
+
+            </div>
+
+            <div class="card-footer text-center">
+                <button type="submit" class="btn btn-success btn-md">Modifier &nbsp;<i class="fas fa-edit"></i></button>
+                <a href="{% url 'listesalairemensuel' %}" target="_self" class="btn btn-md btn-primary">Retour &nbsp; <i class="fas fa-arrow-circle-left"></i></a>
+            </div>
+
+
+        </form>
+
+{% endblock %}
+
+{% block javascript %}
+
+<script>
+            $(document).ready(function () {
+                    // Au clic sur le champ date, changer le type en "date" pour permettre la modification
+                    $('#id_datepaie').on('click', function () {
+                        $(this).attr('type', 'date');
+                        $(this).focus();
+                    });
+
+                    // Quand on quitte le champ, reformater en texte lisible
+                    $('#id_datepaie').on('blur', function () {
+                        if ($(this).val() !== '') {
+                            //let date = new Date($(this).val());
+                            //let formatted = date.toLocaleDateString('fr-FR');
+                            $(this).attr('type', 'text');
+                            $(this).val(formatted);
+                        }
+                    });
+                }); 
+
+            
+            $(function () {
+                const $emp   = $('#id_idpersonnel');
+                const $mois  = $('#id_mois_paie');
+                const $annee = $('#id_anscol');
+                const $type  = $('#id_type_emp');
+                const $nbh   = $('#id_nbr_heure');
+                const $th    = $('#id_taux_horaire');
+                const $base  = $('#id_salbase');
+                const $av    = $('#id_avance_paie');
+                const $prime = $('#id_prime');
+                const $brut  = $('#id_salb');
+                const $coti  = $('#id_coti_social');
+                const $net   = $('#id_salnet');
+                const $mhs = $('#id_mnt_hsupp');   
+
+                function num(v) {
+                    const n = parseFloat(String(v).replace(/\s/g, '').replace(',', '.'));
+                    return isNaN(n) ? 0 : n;
+                }
+
+                function majStatutChamps() {
+                    const estVacataire = $type.val() === 'Vacataire';
+                    $nbh.prop('readonly', !estVacataire);
+                    $th.prop('readonly', !estVacataire);
+                }
+
+                
+                function calculer() {
+                    let base;
+                    if ($type.val() === 'Vacataire') {
+                        base = num($nbh.val()) * num($th.val());
+                        $base.val(base.toFixed(2));
+                    } else {
+                        base = num($base.val());
+                    }
+                    const brut = (base + num($prime.val()) + num($mhs.val())) - num($av.val());
+                    $brut.val(brut.toFixed(2));
+                    $net.val((brut - num($coti.val())).toFixed(2));
+                }
+
+                
+                function chargerInfos(resetHeures) {
+                    if (!$emp.val()) { return; }
+                    $.ajax({
+                        url: "{% url 'chargerinfospersonnel' %}",
+                        data: {
+                            idemploye: $emp.val(),
+                            mois: $mois.val(),
+                            idannee: $annee.val()
+                        },
+                        success: function (data) {
+                            $("#id_nom_emp").val(data.nom);
+                            $("#id_prenom_emp").val(data.prenom);
+                            $("#id_contact").val(data.contact);
+                            $type.val(data.type_employe);
+                            $av.val(data.avances.toFixed(2));
+                            $("#id_detail_paie").val(
+                                'Paiement du salaire de ' + data.nom + ' ' + data.prenom +
+                                ', Contact : ' + data.contact + ', Catégorie : ' + data.type_employe
+                            );
+
+
+                            if (resetHeures) {
+                                $base.val(data.salbase.toFixed(2));
+                                $nbh.val(0);
+                                $th.val(0);
+                            }
+                            majStatutChamps();
+                            calculer();
+                        },
+
+                        error: function (xhr) {
+                                let msg = 'Impossible de charger les informations de l\'employé.';
+                                if (xhr.status === 404 && xhr.responseJSON && xhr.responseJSON.erreur) {
+                                    msg = xhr.responseJSON.erreur;
+                                }
+                                afficherMessage('danger', msg);
+                            }
+
+
+                    });
+                }
+
+                // Changement d'employé : on recharge tout et on remet heures/taux à 0
+                $emp.on('change', function () { chargerInfos(true); });
+
+                // Changement de mois ou d'année : seules les avances changent
+                $mois.on('change', function () { chargerInfos(false); });
+                $annee.on('change', function () { chargerInfos(false); });
+
+                // Recalcul en direct
+                // et dans l'écoute des champs :
+                $nbh.add($th).add($prime).add($coti).add($mhs).on('input', calculer);
+
+                // État initial de la page (sans écraser les valeurs enregistrées)
+                majStatutChamps();
+            });    
+
+                
+</script>
 
 {% endblock %}

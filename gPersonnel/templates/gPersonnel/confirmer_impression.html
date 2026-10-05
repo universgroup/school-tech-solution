@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block titre_page %} GESTION DES SALAIRES {% endblock %}
+{% load l10n %}
+{% block titre_formulaire %} CONFIRMATION D'IMPRESSION {% endblock %}
+{% block fil_ariane %}Personnel / Salaires / Impression {% endblock %}
+{% block titre_cadre %}
+  IMPRIMER LE BULLETIN DE PAIE ?
+{% endblock %}
+
+{% block formulaire %}
+
+<div class="card-body">
+
+    <div class="alert alert-success" role="alert">
+        <i class="fas fa-check-circle"></i>
+        Le bulletin de salaire a été enregistré avec succès.
+    </div>
+
+    <p class="text-center fs-5 mb-4">
+        Voulez-vous imprimer le bulletin de paie de
+        <strong>{{ sal.idpersonnel.nom_personnel }} {{ sal.idpersonnel.prenom_personnel }}</strong> ?
+    </p>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <table class="table table-bordered table-sm">
+                <tbody>
+                    <tr>
+                        <th class="w-50">Employé</th>
+                        <td>{{ sal.idpersonnel.nom_personnel }} {{ sal.idpersonnel.prenom_personnel }}</td>
+                    </tr>
+                    <tr>
+                        <th>Catégorie</th>
+                        <td>{{ sal.idpersonnel.type_personnel }}</td>
+                    </tr>
+                    <tr>
+                        <th>Période</th>
+                        <td>{{ sal.mois_paie }} / {{ sal.anneescolaire }}</td>
+                    </tr>
+                    <tr>
+                        <th>Date de paiement</th>
+                        <td>{{ sal.date_paiement|date:"d/m/Y" }}</td>
+                    </tr>
+                    <tr>
+                        <th>Salaire brut</th>
+                        <td class="text-end">{{ sal.salbrut|floatformat:"2g" }}</td>
+                    </tr>
+                    <tr>
+                        <th>Cotisation sociale</th>
+                        <td class="text-end">{{ sal.cotis_sociale|floatformat:"2g" }}</td>
+                    </tr>
+                    <tr class="table-success">
+                        <th>Salaire net</th>
+                        <td class="text-end"><strong>{{ sal.salnet|floatformat:"2g" }}</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<div class="card-footer text-center">
+    <a href="{% url 'imprimerbulletin' sal.id %}" target="_blank" rel="noopener"
+       class="btn btn-success btn-md" title="Ouvre le bulletin dans un nouvel onglet pour l'imprimer">
+        Oui, imprimer &nbsp; <i class="fas fa-print"></i>
+    </a>
+    <a href="{% url 'listesalairemensuel' %}" target="_self"
+       class="btn btn-secondary btn-md" title="Retourne à la liste sans imprimer">
+        Non, plus tard &nbsp; <i class="fas fa-times"></i>
+    </a>
+    <a href="{% url 'modifiersalaire' sal.id %}" target="_self"
+       class="btn btn-primary btn-md" title="Revenir modifier le bulletin">
+        Modifier &nbsp; <i class="fas fa-edit"></i>
+    </a>
+</div>
+
+{% endblock %}

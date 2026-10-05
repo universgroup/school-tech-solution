@@ -99,7 +99,7 @@ class FormPersonnel(ModelForm):
 class FormSalaire(ModelForm):
     class Meta:
         model = Salaire
-        fields = ('anneescolaire','date_paiement', 'mois_paie', 'idpersonnel', 'nbre_heure', 'taux_horaire', 'primes', 'nb_hsupp','mont_hsupp', 'detail_paiement')
+        fields = ('anneescolaire','date_paiement', 'mois_paie', 'idpersonnel', 'nbre_heure', 'taux_horaire', 'avance_paie', 'primes', 'salbrut', 'cotis_sociale', 'salnet', 'nb_hsupp','mont_hsupp', 'detail_paiement')
         labels = {
             'anneescolaire': 'Année scolaire',
             'date_paiement' : 'Date paiement',
@@ -110,39 +110,60 @@ class FormSalaire(ModelForm):
             'avance_paie': 'Montant des avances',
             'primes': 'Montant des primes',
             'salbrut': 'Salaire brut',
-            'cotis_social': 'Cotisation sociale',
+            'cotis_sociale': 'Montant cotisation sociale',
             'salnet': 'Salaire net',
             'nb_hsupp': 'Nombre d\'heures supplementaires',
             'mont_hsupp': 'Montant des heures supplementaires',
-            'detail_paiement': 'Detail du paiement'
+            'detail_paiement': 'Libellé du paiement',
         }
         widgets = {
             'anneescolaire': forms.Select(
-                attrs={'class': 'form-control', 'title': 'Sélectionnez l\'année scolaire courante'}),
+                attrs={'class': 'form-control', 'title': 'Sélectionnez l\'année scolaire courante','id':'id_anscol'}),
+
             'date_paiement' : forms.DateInput(attrs={'type':'date', 'class':'form-control', 'title': 'Saisissez la date de paiement du salaire'}),
+
             'mois_paie': forms.Select(
-                attrs={'class': 'form-control', 'title': 'Sélectionnez le mois payé'},
+                attrs={'class': 'form-control', 'title': 'Sélectionnez le mois payé','id':'id_mois_paie'},
                 choices=MOIS_CHOICES),
-            'idpersonnel': forms.Select(attrs={'class': 'form-control', 'title': 'Sélectionnez l\'employé à payer'}),
-            'nbre_heure': forms.NumberInput(
-                attrs={'class': 'form-control', 'placeholder': 'Nombre d\'heures enseignées',
-                       'title': 'Saisissez le nombre d\'heures enseignées'}),
-            'taux_horaire': forms.NumberInput(
-                attrs={'class': 'form-control', 'placeholder': 'Taux horaire', 'title': 'Saisissez le taux horaire'}),
-            'primes': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Montant des Primes','title': 'Saisissez le montant des primes perçues'}),
+
+            'idpersonnel': forms.Select(attrs={'class': 'form-control', 'title': 'Sélectionnez l\'employé à payer', 'id':'idemploye'}),
+
+            'nbre_heure': forms.NumberInput(attrs={'class': 'form-control', 'title': 'Saisissez le nombre d\'heures enseignées', 'value': '0', 'id': 'id_nbr_heure'}),
+
+            'taux_horaire': forms.NumberInput(attrs={'class': 'form-control', 'title': 'Saisissez le taux horaire', 'value': '0', 'id': 'id_taux_horaire'}),
+
+            'avance_paie': forms.TextInput(attrs={'class': 'form-control', 'readonly':True, 'title': 'Affiche le montant des avances perçues par l\'employé', 'placeholder': 'Montant des avances', 'id': 'id_avance_paie'}),
+
+            'primes': forms.NumberInput(attrs={'class': 'form-control','title': 'Saisissez le montant des primes perçues', 'value': '0', 'id': 'id_prime'}),
+
+            'salbrut': forms.TextInput(attrs={'class': 'form-control', 'readonly': True, 'title': 'Affiche le salaire brut obtenu après calcul', 'placeholder': 'Salaire brut', 'id': 'id_salb'}),
+
+            'cotis_sociale' : forms.NumberInput(attrs={'class': 'form-control', 'title': 'Saisissez le montant de la cotisation sociale si existe', 'value': '0', 'id': 'id_coti_social'}),
+
+            'salnet': forms.TextInput(attrs={'class': 'form-control', 'title': 'Affiche le salaire net obtenu après calcul', 'readonly': True, 'placeholder': 'Salaire net', 'id': 'id_salnet'}),
+
             'nb_hsupp': forms.NumberInput(
-                attrs={'class': 'form-control', 'placeholder': 'Nombre d\'heures supplementaires',
-                       'title': 'Saisissez le nombre d\'heures supp'}),
+                attrs={'class': 'form-control','title': 'Saisissez le nombre d\'heures supp', 'value': '0'}),
+
             'mont_hsupp': forms.NumberInput(
-                attrs={'class': 'form-control', 'placeholder': 'Montant des heures supplementaires',
-                       'title': 'Saisissez le montant des heures supplementaires'}),
+                attrs={'class': 'form-control', 'title': 'Saisissez le montant des heures supplementaires', 'value': '0', 'id': 'id_mnt_hsupp'}),
+
             'detail_paiement': forms.Textarea(
-                attrs={'class': 'form-control', 'placeholder': 'Detail du Paiement', 'cols': '10', 'rows': '5','title': 'Saisissez un intitulé pour le paiement'})
+                attrs={'class': 'form-control', 'placeholder': 'Detail du Paiement', 'cols': '5', 'rows': '5','title': 'Affiche le libellé du paiement', 'readonly': True, 'id': 'id_detail_paie'}),
         }
 
     def __init__(self, *args, **kwargs):
         super(FormSalaire, self).__init__(*args, **kwargs)
         self.fields['detail_paiement'].required = False
+        self.fields['avance_paie'].required = False
+        self.fields['primes'].required = False
+        self.fields['salbrut'].required = False
+        self.fields['cotis_sociale'].required = False
+        self.fields['salnet'].required = False
+        self.fields['nb_hsupp'].required = False
+        self.fields['mont_hsupp'].required = False
+
+
         self.fields['idpersonnel'].empty_label = 'Sélectionnez'
         self.fields['anneescolaire'].empty_label = 'Sélectionnez'
 
@@ -150,23 +171,29 @@ class FormSalaire(ModelForm):
 class FormAvanceSalaire(ModelForm):
     class Meta:
         model = AvanceSalaire
-        fields = ('anscolaire', 'mois_avance', 'idpersonnel', 'intitule', 'montant_avance')
+        fields = ('anscolaire', 'mois_avance', 'idpersonnel', 'intitule', 'montant_avance', 'date_avance')
         labels = {
             'anscolaire': 'Année scolaire',
             'mois_avance': 'Mois',
             'idpersonnel': 'Employé',
-            'intitule': 'Description',
+            'intitule': 'Libellé du bon/avance de paiement',
             'montant_avance': 'Montant avancé',
+            'date_avance': 'Date paiement',
         }
         widgets = {
             'anscolaire': forms.Select(
                 attrs={'class': 'form-control', 'title': 'Sélectionnez l\'année scolaire courante'}),
+
             'mois_avance': forms.Select(attrs={'class': 'form-control', 'title': 'Sélectionnez le mois de l\'avance'},choices=MOIS_CHOICES),
-            'idpersonnel': forms.Select(attrs={'class': 'form-control', 'title': 'Sélectionnez un employé'}),
+
+            'idpersonnel': forms.Select(attrs={'class': 'form-control', 'title': 'Sélectionnez un employé', 'id': 'id_employe'}),
+
             'intitule': forms.Textarea(
-                attrs={'class': 'form-control', 'placeholder': 'Description de l\'opération', 'cols': '10',
-                       'rows': '5', 'title': 'Saisissez une description pour l\'opération'}),
-            'montant_avance': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Montant avancé','title': 'Saisissez le montant de l\'avance'}),
+                attrs={'class': 'form-control', 'placeholder': 'Description du bon de paiement', 'cols': '5','rows': '5', 'title': 'Affiche le libellé du paiement', 'readonly': True}),
+
+            'montant_avance': forms.NumberInput(attrs={'class': 'form-control', 'title': 'Saisissez le montant de l\'avance ou du bon de paiement', 'value': '0'}),
+
+            'date_avance': forms.DateInput(attrs={'class': 'form-control', 'type': 'date', 'title': 'Saisissez la date de paiement de l\'avance'}),
         }
 
     def __init__(self, *args, **kwargs):

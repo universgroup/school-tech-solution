@@ -1,59 +1,99 @@
 {% extends "base.html" %}
-{% block titre_page %} EDITION D'UNE AVANCE SUR SALAIRE {% endblock %}
-{% block titre_cadre %}
-DETAILS D'UNE AVANCE SUR SALAIRE
-{% endblock %}
+{% block titre_page %} CONSULTATION DES AVANCES SUR SALAIRE {% endblock %}
+{% load crispy_forms_tags %}
+{% block titre_formulaire %} FICHE DE BON DE PAIEMENT {% endblock %}
+{% block fil_ariane %}Personnel / Avance salaire / Consultation {% endblock %}
+ {% block titre_cadre %}
+  DETAILS D'UN BON DE PAIEMENT
+ {% endblock %}
 
 {% block formulaire %}
 
-<div class="row">
-    <div class="col-lg-6">
-        <div class="card m-b-30">
-            <form class="post-form" action="" method="POST">
+        <form class="needs-validation" action="" method="get">
 
                 {% csrf_token %}
 
-                <div class="row">
-                    <div class="col-lg-6">
-                        <div class="card m-b-30">
-                            <label for="Idavsal">ID Avance</label>
-                            <input type="text" id="Idavsal" maxlength="10" value="{{avsal.id}}" class="form-control" readonly>
-                            
+            <div class="card-body">   
+                 <div class="row g-3">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="Idavsal">ID</label>
+                            <input type="text" id="Idavsal" value="{{avsal.id}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                 </div>
+
+                 <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="form-group">                            
                             <label for="id_intitule">Intitulé</label>
-                            <input type="text" name="intitule" id="id_intitule" maxlength="30"  value="{{avsal.intitule}}" class="form-control" readonly>
+                            <input type="text" name="intitule" id="id_intitule" value="{{avsal.intitule}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_montavance">Montant avance</label>
+                            <input type="text" name="montant_avance" id="id_montavance" value="{{avsal.montant_avance|floatformat:'2g'}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                 </div>
 
-                            <label for="id_mntavance">Montant Avance</label>
-                            <input type="text" name="montant_avance" id="id_mntavance" maxlength="30"  value="{{avsal.montant_avance|floatformat:'2g'}}" class="form-control" readonly>
-                                                     
-                            <label for="id_moisavance">Mois Avance</label>
-                            <input type="text" name="mois_avance" id="id_moisavance" maxlength="15"  value="{{avsal.mois_avance}}" class="form-control" readonly>
-                          
-                            <label for="id_dateavance">Date Avance</label>
-                            <input type="text" name="date_avance" id="id_dateavance" maxlength="10"  value="{{avsal.date_avance|date:'j-n-Y'}}" class="form-control" readonly>
-                            
-                            <label for="id_anneescolaire">Année Scolaire</label>
-                            <input type="text" name="annee_scolaire" id="id_type_pers" maxlength="15"  value="{{avsal.anscolaire}}" class="form-control" readonly>
-                            
-                            <label for="id_pers">Employé</label>
-                            <input type="text" name="idpersonnel" id="id_pers" maxlength="15"  value="{{avsal.idpersonnel}}" class="form-control" readonly>
-
+                 <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="form-group">                                                     
+                            <label for="id_moisavance">Mois</label>
+                            <input type="text" name="mois_avance" id="id_moisavance" value="{{avsal.get_mois_avance_display|capfirst}}" class="form-control" readonly>
                         </div>
                     </div>
 
-                </div>
+                    <div class="col-md-6">
+                        <div class="form-group">                          
+                            <label for="id_dateavance">Date avance</label>
+                            <input type="text" name="date_avance" id="id_dateavance" value="{{avsal.date_avance|date:'Y-n-j'}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                 </div>
 
-                <div class="row">
-                    <div class="col-lg-6">
-                        <a href="/ajouteravancesalaire/" target="_self" class="btn btn-secondary"><span class="glyphicon glyphicon-arrow-left">Retour</span></a>
+                 <div class="row g-3">
+                    <div class="col-md-3">
+                        <div class="form-group">                            
+                            <label for="id_anneescolaire">Année scolaire</label>
+                            <input type="text" name="annee_scolaire" id="id_type_pers" value="{{avsal.anscolaire}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="id_employe">ID Employé</label>
+                            <input type="text" name="idpersonnel" id="id_employe" value="{{avsal.idpersonnel.id}}" class="form-control" readonly>
+                        </div>
                     </div>
 
-                </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="id_nom">Nom famille</label>
+                            <input type="text" name="nom_personnel" id="id_nom" value="{{avsal.idpersonnel.nom_personnel}}" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="id_prenom">Prénoms</label>
+                            <input type="text" name="prenom_personnel" id="id_prenom" value="{{avsal.idpersonnel.prenom_personnel}}" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                 </div>
+
+            </div>
+            
+
+            <div class="card-footer text-center">
+                <a href="{% url 'listeavancemensuelle' %}" target="_self" class="btn btn-primary btn-md" title="Affiche la liste des avances mensuelles">Retour &nbsp; <i class="fa fa-arrow-circle-left"></i></a>
+            </div>
 
 
-            </form>
-        </div>
-
-    </div>
-</div>
+      </form>
 
 {% endblock %}
