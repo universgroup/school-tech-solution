@@ -268,6 +268,33 @@
             });  
 
 
+            // Permet de filtrer les employes chargés dans la dropdownlist
+
+            $("#idemploye").select2({
+                placeholder: "Sélectionnez",
+                allowClear: true,
+                width: 'resolve',
+                language: {
+                    noResults: function () {
+                        return "Aucun employé trouvé";
+                    },
+                    searching: function () {
+                        return "Recherche en cours...";
+                    }
+                },
+                width: '100%'
+            });
+
+            $('#fsalaire').on('reset', function () {
+                // setTimeout : l'événement "reset" est déclenché AVANT que le navigateur
+                // ne remette les champs à zéro, il faut donc attendre la fin du reset natif.
+                setTimeout(function () {
+                    $('#idemploye').val(null).trigger('change');
+                }, 0);
+            });
+
+
+
 
         </script>
 

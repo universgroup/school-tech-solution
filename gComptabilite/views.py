@@ -1089,7 +1089,7 @@ def recupaiementscolarite(request, idetat, nom_tranche, mont_paye):
                             'matricule': etatpaie.mateleve.matricule,
                             'nom': etatpaie.mateleve.nom,
                             'prenom': etatpaie.mateleve.prenom,
-                            'classe':etatpaie.mateleve.idclasse,
+                            'classe': etatpaie.idclasse,
                             'ecole': data_ecole[8],
                             'tranche': libelle_tranche,
                             'mont_paye': montant_paye,

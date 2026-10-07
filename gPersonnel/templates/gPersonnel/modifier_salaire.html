@@ -10,7 +10,7 @@
 
 {% block formulaire %}
 
-        <form class="needs-validation" action="{% url 'modifiersalaire' sal.id %}" method="post">
+        <form class="needs-validation" action="{% url 'modifiersalaire' sal.id %}" method="post" id="feditsalaire">
 
                 {% csrf_token %}
 
@@ -31,7 +31,7 @@
                             <select id="id_idpersonnel" name="idpersonnel" class="form-control">
                                 <option value="{{sal.idpersonnel.id}}" selected>{{sal.idpersonnel}}</option>
                                 {% for emp in liste_emp %}
-                                <option value="{{emp.id}}">{{emp.nom_personnel}}|{{emp.prenom_personnel}}|{{emp.contact_personnel}}|{{emp.type_personnel}}</option>
+                                <option value="{{emp.id}}">{{emp.nom_personnel}} | {{emp.prenom_personnel}} | {{emp.contact_personnel}} | {{emp.type_personnel}}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -72,7 +72,7 @@
                     <div class="col-md-4">
                         <div class="form-group">                            
                             <label for="id_datepaie">Date Paiement</label>
-                            <input type="text" name="date_paiement" id="id_datepaie" value="{{sal.date_paiement}}" class="form-control">
+                            <input type="text" name="date_paiement" id="id_datepaie" value="{{sal.date_paiement|date:'j-n-Y'}}" class="form-control">
                         </div>
                     </div>
 
@@ -92,7 +92,7 @@
                         <div class="form-group">
                             <label for="id_mois_paie">Mois payé</label>
                             <select id="id_mois_paie" name="mois_paie" class="form-control">
-                                <option value="{{sal.mois_paie}}" selected>{{sal.mois_paie}}</option>
+                                <option value="{{sal.mois_paie}}" selected>{{sal.get_mois_paie_display|capfirst}}</option>
                                 {% for mois in mois_paye %}
                                 <option value="{{mois.0}}">{{mois.1}}</option>
                                 {% endfor %}
@@ -112,14 +112,14 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="id_taux_horaire">Taux horaire</label>
-                            <input type="text" name="taux_horaire" id="id_taux_horaire" value="{{sal.taux_horaire}}" class="form-control" readonly>
+                            <input type="text" name="taux_horaire" id="id_taux_horaire" value="{{sal.taux_horaire|floatformat:'2g'}}" class="form-control" readonly>
                         </div>
                     </div>
 
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="id_salbase">Salaire de base</label>
-                            <input type="text" name="salbase" id="id_salbase" value="{{sal.salbase}}" class="form-control" readonly>
+                            <input type="text" name="salbase" id="id_salbase" value="{{sal.idpersonnel.salbase|floatformat:'2g'}}" class="form-control" readonly>
                         </div>
                     </div>
                 </div>
@@ -128,28 +128,28 @@
                     <div class="col-md-3">
                         <div class="form-group">
                             <label for="id_avance_paie">Montant des avances</label>
-                            <input type="text" name="avance_paie" id="id_avance_paie" value="{{sal.avance_paie}}" class="form-control" readonly>
+                            <input type="text" name="avance_paie" id="id_avance_paie" value="{{sal.avance_paie|floatformat:'2g'}}" class="form-control" readonly>
                         </div>
                     </div>
 
                     <div class="col-md-3">
                         <div class="form-group">
                             <label for="id_prime">Montant des primes</label>
-                            <input type="text" name="primes" id="id_prime" value="{{sal.primes}}" class="form-control">
+                            <input type="text" name="primes" id="id_prime" value="{{sal.primes|floatformat:'2g'}}" class="form-control">
                         </div>
                     </div>
 
                     <div class="col-md-3">
                         <div class="form-group">
                             <label for="id_salb">Salaire brut</label>
-                            <input type="text" name="salbrut" id="id_salb" value="{{sal.salbrut}}" class="form-control" readonly>
+                            <input type="text" name="salbrut" id="id_salb" value="{{sal.salbrut|floatformat:'2g'}}" class="form-control" readonly>
                         </div>
                     </div>
 
                     <div class="col-md-3">
                         <div class="form-group">
                             <label for="id_coti_social">Cotisation sociale</label>
-                            <input type="text" name="cotis_sociale" id="id_coti_social" value="{{sal.cotis_sociale}}" class="form-control">
+                            <input type="text" name="cotis_sociale" id="id_coti_social" value="{{sal.cotis_sociale|floatformat:'2g'}}" class="form-control">
                         </div>
                     </div>
                 </div>
@@ -165,7 +165,7 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="id_salnet">Salaire net</label>
-                            <input type="text" name="salnet" id="id_salnet" value="{{sal.salnet}}" class="form-control" readonly>
+                            <input type="text" name="salnet" id="id_salnet" value="{{sal.salnet|floatformat:'2g'}}" class="form-control" readonly>
                         </div>
                     </div>
                 </div>
@@ -181,7 +181,7 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="id_mnt_hsupp">Montant heure supp</label>
-                            <input type="text" name="mont_hsupp" id="id_mnt_hsupp" value="{{sal.mont_hsupp}}" class="form-control">
+                            <input type="text" name="mont_hsupp" id="id_mnt_hsupp" value="{{sal.mont_hsupp|floatformat:'2g'}}" class="form-control">
                         </div>
                     </div>
                 </div>                    
@@ -247,18 +247,38 @@
                 }
 
                 
+                // function calculer() {
+                //     let base;
+                //     if ($type.val() === 'Vacataire') {
+                //         base = num($nbh.val()) * num($th.val());
+                //         $base.val(base.toFixed(2));
+                //     } else {
+                //         base = num($base.val());
+                //     }
+                //     const brut = (base + num($prime.val()) + num($mhs.val())) - num($av.val());
+                //     $brut.val(brut.toFixed(2));
+                //     $net.val((brut - num($coti.val())).toFixed(2));
+                // }
+
                 function calculer() {
-                    let base;
-                    if ($type.val() === 'Vacataire') {
-                        base = num($nbh.val()) * num($th.val());
-                        $base.val(base.toFixed(2));
-                    } else {
-                        base = num($base.val());
+                        let base;
+
+                        // 1️⃣  Base : idem que Python
+                        if ($type.val() === 'Vacataire') {
+                            base = num($nbh.val()) * num($th.val());
+                            $base.val(base.toFixed(2));
+                        } else {
+                            base = num($base.val());
+                        }
+
+                        // 2️⃣  Brut  = base + primes + heures supp   (⚠️  PAS les avances)
+                        const brut = base + num($prime.val()) + num($mhs.val());
+                        $brut.val(brut.toFixed(2));
+
+                        // 3️⃣  Net   = brut - avances - cotisations
+                        const net = brut - num($av.val()) - num($coti.val());
+                        $net.val(net.toFixed(2));
                     }
-                    const brut = (base + num($prime.val()) + num($mhs.val())) - num($av.val());
-                    $brut.val(brut.toFixed(2));
-                    $net.val((brut - num($coti.val())).toFixed(2));
-                }
 
                 
                 function chargerInfos(resetHeures) {
@@ -317,6 +337,33 @@
                 // État initial de la page (sans écraser les valeurs enregistrées)
                 majStatutChamps();
             });    
+
+
+            $("#id_idpersonnel").select2({
+                placeholder: "Sélectionnez",
+                allowClear: true,
+                width: 'resolve',
+                language: {
+                    noResults: function () {
+                        return "Aucun employé trouvé";
+                    },
+                    searching: function () {
+                        return "Recherche en cours...";
+                    }
+                },
+                width: '100%'
+            });
+
+            $('#feditsalaire').on('reset', function () {
+                // setTimeout : l'événement "reset" est déclenché AVANT que le navigateur
+                // ne remette les champs à zéro, il faut donc attendre la fin du reset natif.
+                setTimeout(function () {
+                    $('#id_idpersonnel').val(null).trigger('change');
+                }, 0);
+            });
+
+
+
 
                 
 </script>

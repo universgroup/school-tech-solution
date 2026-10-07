@@ -28,7 +28,7 @@
                     <div class="col-md-4">
                         <div class="form-group">                            
                             <label for="id_datepaie">Date Paiement</label>
-                            <input type="text" name="date_paiement" id="id_datepaie" value="{{sal.date_paiement}}" class="form-control" readonly>
+                            <input type="text" name="date_paiement" id="id_datepaie" value="{{sal.date_paiement|date:'j-n-Y'}}" class="form-control" readonly>
                         </div>
                     </div>
 
@@ -42,7 +42,7 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="id_mois_paie">Mois payé</label>
-                            <input type="text" name="mois_paie" id="id_mois_paie" value="{{sal.mois_paie}}" class="form-control" readonly>
+                            <input type="text" name="mois_paie" id="id_mois_paie" value="{{sal.get_mois_paie_display|capfirst}}" class="form-control" readonly>
                         </div>
                     </div>
                 </div>
@@ -58,14 +58,14 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="id_taux_horaire">Taux horaire</label>
-                            <input type="text" name="taux_horaire" id="id_taux_horaire" value="{{sal.taux_horaire}}" class="form-control" readonly>
+                            <input type="text" name="taux_horaire" id="id_taux_horaire" value="{{sal.taux_horaire|floatformat:'2g'}}" class="form-control" readonly>
                         </div>
                     </div>
 
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="id_salbase">Salaire de base</label>
-                            <input type="text" name="salbase" id="id_salbase" value="{{sal.salbase}}" class="form-control" readonly>
+                            <input type="text" name="salbase" id="id_salbase" value="{{sal.idpersonnel.salbase|floatformat:'2g'}}" class="form-control" readonly>
                         </div>
                     </div>
                 </div>
@@ -74,28 +74,28 @@
                     <div class="col-md-3">
                         <div class="form-group">
                             <label for="id_avance_paie">Montant des avances</label>
-                            <input type="text" name="avance_paie" id="id_avance_paie" value="{{sal.avance_paie}}" class="form-control" readonly>
+                            <input type="text" name="avance_paie" id="id_avance_paie" value="{{sal.avance_paie|floatformat:'2g'}}" class="form-control" readonly>
                         </div>
                     </div>
 
                     <div class="col-md-3">
                         <div class="form-group">
                             <label for="id_prime">Montant des primes</label>
-                            <input type="text" name="primes" id="id_prime" value="{{sal.primes}}" class="form-control" readonly>
+                            <input type="text" name="primes" id="id_prime" value="{{sal.primes|floatformat:'2g'}}" class="form-control" readonly>
                         </div>
                     </div>
 
                     <div class="col-md-3">
                         <div class="form-group">
                             <label for="id_salb ">Salaire brut</label>
-                            <input type="text" name="salbrut" id="id_salb" value="{{sal.salbrut}}" class="form-control" readonly>
+                            <input type="text" name="salbrut" id="id_salb" value="{{sal.salbrut|floatformat:'2g'}}" class="form-control" readonly>
                         </div>
                     </div>
 
                     <div class="col-md-3">
                         <div class="form-group">
                             <label for="id_coti_social">Cotisation sociale</label>
-                            <input type="text" name="cotis_sociale" id="id_coti_social" value="{{sal.cotis_sociale}}" class="form-control" readonly>
+                            <input type="text" name="cotis_sociale" id="id_coti_social" value="{{sal.cotis_sociale|floatformat:'2g'}}" class="form-control" readonly>
                         </div>
                     </div>
                 </div>
@@ -111,7 +111,7 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="id_salnet">Salaire net</label>
-                            <input type="text" name="salnet" id="id_salnet" value="{{sal.salnet}}" class="form-control" readonly>
+                            <input type="text" name="salnet" id="id_salnet" value="{{sal.salnet|floatformat:'2g'}}" class="form-control" readonly>
                         </div>
                     </div>
                 </div>
@@ -127,7 +127,7 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="id_mnt_hsupp">Montant heure supp</label>
-                            <input type="text" name="mont_hsupp" id="id_mnt_hsupp" value="{{sal.mont_hsupp}}" class="form-control" readonly>
+                            <input type="text" name="mont_hsupp" id="id_mnt_hsupp" value="{{sal.mont_hsupp|floatformat:'2g'}}" class="form-control" readonly>
                         </div>
                     </div>
                 </div>

@@ -158,7 +158,7 @@
             <ul aria-labelledby="dropdownSubMenu6" class="dropdown-menu border-0 shadow">
               <li><a href="{% url 'listegeneralepersonnel' %}" class="dropdown-item">Enregistrer un employé</a></li>
               <li><a href="{% url 'listeavancemensuelle' %}" class="dropdown-item">Enregistrer une avance sur salaire</a></li>
-              <li><a href="#" class="dropdown-item">Paiement des salaires</a></li>
+              <li><a href="{% url 'listesalairemensuel' %}" class="dropdown-item">Paiement des salaires</a></li>
               <li><a href="#" class="dropdown-item">Suivi des absences</a></li>
               <li><a href="#" class="dropdown-item">Liste des employés</a></li>
             </ul>
@@ -552,7 +552,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="#" class="nav-link" title="Permet de saisir les salaires mensuels versés aux employés">
+                <a href="{% url 'listesalairemensuel' %}" class="nav-link" title="Permet de saisir les salaires mensuels versés aux employés">
                   <i class="fas fa-hand-holding-dollar">&nbsp;</i>
                   <p>Paiement salaires </p>                  
                 </a>

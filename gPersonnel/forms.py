@@ -162,6 +162,8 @@ class FormSalaire(ModelForm):
         self.fields['salnet'].required = False
         self.fields['nb_hsupp'].required = False
         self.fields['mont_hsupp'].required = False
+        self.fields['nbre_heure'].required = False
+        self.fields['taux_horaire'].required = False
 
 
         self.fields['idpersonnel'].empty_label = 'Sélectionnez'

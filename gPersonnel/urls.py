@@ -14,7 +14,7 @@ urlpatterns = [
     path('chargerinfosemploye/', chargerinfoemploye, name='chargerinfosemploye'),
 
     path('enregistrersalaire/', enregistrersalaire, name='enregistrersalaire'),
-    path('listesalairemensuel/',enregistrersalaire,name='listesalairemensuel'),
+    path('listesalairemensuel/',listemensuellesalaire,name='listesalairemensuel'),
     path('editionsalaire/<int:idsal>', editersalaire, name='editionsalaire'),
     path('afficherdetailsalaire/<int:idsal>', detailssalaire, name='afficherdetailsalaire'),
     path('modifiersalaire/<int:idsal>', modifiersalaire, name='modifiersalaire'),
@@ -22,6 +22,7 @@ urlpatterns = [
     path('recubulletinsalaire/<int:idsal>', recubulletinsalaire, name='recubulletinsalaire'),
     path('imprimerbulletinsalaire/<int:idsal>', imprimebulletinsalaire, name='imprimerbulletinsalaire'),
     path('chargerinfospersonnel/', charger_infospersonnel, name='chargerinfospersonnel'),
+    path('confirmerimpression/<int:id>', confirmerimpression, name='confirmerimpression'),
 
     path('valideravancesalaire/', valideravancesalaire, name='valideravancesalaire'),
     path('listeavancemensuelle/', listeavancesalaire, name='listeavancemensuelle'),

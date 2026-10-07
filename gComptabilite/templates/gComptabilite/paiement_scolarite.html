@@ -418,6 +418,14 @@
             width: '100%'
         });
 
+        $('#fscolarite').on('reset', function () {
+            // setTimeout : l'événement "reset" est déclenché AVANT que le navigateur
+            // ne remette les champs à zéro, il faut donc attendre la fin du reset natif.
+            setTimeout(function () {
+                $('#cbomateleve').val(null).trigger('change');
+            }, 0);
+        });
+
 
 
 

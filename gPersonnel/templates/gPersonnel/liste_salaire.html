@@ -152,7 +152,7 @@
             <ul aria-labelledby="dropdownSubMenu6" class="dropdown-menu border-0 shadow">
               <li><a href="{% url 'listegeneralepersonnel' %}" class="dropdown-item">Enregistrer un employé</a></li>
               <li><a href="{% url 'listeavancemensuelle' %}" class="dropdown-item">Enregistrer une avance sur salaire</a></li>
-              <li><a href="#" class="dropdown-item">Paiement des salaires</a></li>
+              <li><a href="{% url 'listesalairemensuel' %}" class="dropdown-item">Paiement des salaires</a></li>
               <li><a href="#" class="dropdown-item">Suivi des absences</a></li>
               <li><a href="#" class="dropdown-item">Liste des employés</a></li>
             </ul>
@@ -546,7 +546,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="#" class="nav-link" title="Permet de saisir les salaires mensuels versés aux employés">
+                <a href="{% url 'listesalairemensuel' %}" class="nav-link" title="Permet de saisir les salaires mensuels versés aux employés">
                   <i class="fas fa-hand-holding-dollar">&nbsp;</i>
                   <p>Paiement salaires </p>                  
                 </a>
@@ -760,9 +760,9 @@
  
                                         <button type="submit" class="btn btn-secondary btn-md mr-2" title="Filtrer la liste des avances de salaire par année scolaire et/ou période">Rechercher &nbsp; <i class="fas fa-search"></i></button>
 
-                                        <a href="{% url 'listeavancemensuelle' %}" target="_self" title="Actualiser la liste des avances sur salaire" class="btn btn-warning btn-md mr-3">Actualiser &nbsp;<i class="fas fa-refresh"></i></a>
+                                        <a href="{% url 'listesalairemensuel' %}" target="_self" title="Actualiser la liste des avances sur salaire" class="btn btn-warning btn-md mr-3">Actualiser &nbsp;<i class="fas fa-refresh"></i></a>
 
-                                        <a href="{% url 'valideravancesalaire' %}" class="btn btn-success btn-md" target="_self" title="Cliquez ici pour enregistrer un bulletin de salaire">Enregistrer un salaire &nbsp; <i class="fas fa-money-bill-trend-up"></i></a>
+                                        <a href="{% url 'enregistrersalaire' %}" class="btn btn-success btn-md" target="_self" title="Cliquez ici pour enregistrer un bulletin de salaire">Enregistrer un salaire &nbsp; <i class="fas fa-money-bill-trend-up"></i></a>
 
                                   </div>
 
@@ -854,11 +854,11 @@
                                     <td>{{sal.idpersonnel.contact_personnel}}</td>
                                     <td>{{sal.idpersonnel.type_personnel}}</td>
                                     <td>{{sal.detail_paiement}}</td>
-                                    <td>{{sal.get_mois_avance_display|capfirst}}</td>
+                                    <td>{{sal.get_mois_paie_display|capfirst}}</td>
                                     <td>{{sal.date_paiement|date:'j-n-Y'}}</td>
                                     <td>{{sal.nbre_heure}}</td>
                                     <td>{{sal.taux_horaire|floatformat:'2g'}}</td>
-                                    <td>{{sal.salbase|floatformat:'2g'}}</td>
+                                    <td>{{sal.idpersonnel.salbase|floatformat:'2g'}}</td>
                                     <td>{{sal.avance_paie|floatformat:'2g'}}</td>
                                     <td>{{sal.primes|floatformat:'2g'}}</td>
                                     <td>{{sal.salbrut|floatformat:'2g'}}</td>
@@ -866,18 +866,18 @@
                                     <td>{{sal.salnet|floatformat:'2g'}}</td>
                                     <td>{{sal.nb_hsupp}}</td>
                                     <td>{{sal.mont_hsupp|floatformat:'2g'}}</td>
-                                    <td>{{sal.anscolaire }}</td>
+                                    <td>{{sal.anneescolaire }}</td>
                                     <td>{{sal.id}}</td>
                                     <td class="no-export">
-                                        <a class="btn btn-primary" href="{% url 'afficherdetailavancesalaire' sal.id %}" title="Voir/Afficher" target="_self"><i class="fa-solid fa-eye fa-sm"></i></a>
-                                        <a class="btn btn-info" href="{% url 'editionavancesalaire' sal.id %}" title="Modifier/Editer" target="_self"><i class="fa-solid fa-edit fa-sm"></i></a>
+                                        <a class="btn btn-primary" href="{% url 'afficherdetailsalaire' sal.id %}" title="Voir/Afficher" target="_self"><i class="fa-solid fa-eye fa-sm"></i></a>
+                                        <a class="btn btn-info" href="{% url 'editionsalaire' sal.id %}" title="Modifier/Editer" target="_self"><i class="fa-solid fa-edit fa-sm"></i></a>
 
                                         {% peut request.user 'menu_administration' as ok_admin %}
 
                                         {% if ok_admin %}
-                                        <a class="btn btn-danger" href="{% url 'supprimeravancesalaire' sal.id %}" title="Supprimer" target="_self"><i class="fa-solid fa-remove fa-sm"></i></a>
+                                        <a class="btn btn-danger" href="{% url 'supprimersalaire' sal.id %}" title="Supprimer" target="_self"><i class="fa-solid fa-remove fa-sm"></i></a>
                                         {% endif %}
-                                        <a class="btn btn-secondary" href="{% url 'imprimerecuavancesalaire' sal.id %}" title="Imprimer le bulletin de paie de l'employé" target="_blank"><i class="fa-solid fa-print fa-sm"></i></a>
+                                        <a class="btn btn-secondary" href="{% url 'imprimerbulletinsalaire' sal.id %}" title="Imprimer le bulletin de paie de l'employé" target="_blank"><i class="fa-solid fa-print fa-sm"></i></a>
                                     </td>
                                 </tr>
                             {% endfor %}
@@ -911,7 +911,7 @@
             </table>
 
             <div class="row mt-3 mb-2">
-                <div class="col-md-4">
+                <div class="col-md-2">
                     <div class="form-group">
                         <label for="totalsalbase">Totat Salaire Base</label>
                         {% if total_salbase %}
@@ -926,8 +926,24 @@
                         {% endif %}
                     </div>
                 </div>
+
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="totalprimes">Totat Primes</label>
+                        {% if total_primes %}
+                        <input type="text" id="totalprimes" name="total_primes"
+                            value="{{ total_primes|floatformat:'2g' }}"
+                            class="form-control form-control-sm input-modern" readonly
+                            style="color:red; font-weight:bold; font-size:12pt;">
+                        {% else %}
+                        <input type="text" name="total_primes" value="0"
+                            class="form-control form-control-sm input-modern" readonly
+                            style="color:red; font-weight:bold; font-size:12pt;">
+                        {% endif %}
+                    </div>
+                </div>
            
-                <div class="col-md-4">
+                <div class="col-md-2">
                     <div class="form-group">
                         <label for="totalsalbrut">Total Salaire Brut</label>
                         {% if total_salbrut %}
@@ -943,7 +959,23 @@
                     </div>
                 </div>
 
-                <div class="col-md-4">
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="totalavance">Total Avances</label>
+                        {% if total_avance %}
+                        <input type="text" id="totalavance" name="total_avance"
+                            value="{{ total_avance|floatformat:'2g' }}"
+                            class="form-control form-control-sm input-modern" readonly
+                            style="color:red; font-weight:bold; font-size:12pt;">
+                        {% else %}
+                        <input type="text" name="total_avance" value="0"
+                            class="form-control form-control-sm input-modern" readonly
+                            style="color:red; font-weight:bold; font-size:12pt;">
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="col-md-2">
                     <div class="form-group">
                         <label for="totalsalnet">Total Salaire Net</label>
                         {% if total_salnet %}
@@ -958,6 +990,23 @@
                         {% endif %}
                     </div>
                 </div>
+
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="soldecaisse">Solde caisse disponible</label>
+                        {% if solde_caisse %}
+                        <input type="text" id="soldecaisse" name="solde_caisse"
+                            value="{{ solde_caisse|floatformat:'2g' }}"
+                            class="form-control form-control-sm input-modern" readonly
+                            style="color:red; font-weight:bold; font-size:12pt;">
+                        {% else %}
+                        <input type="text" name="solde_caisse" value="0"
+                            class="form-control form-control-sm input-modern" readonly
+                            style="color:red; font-weight:bold; font-size:12pt;">
+                        {% endif %}
+                    </div>
+                </div>
+
             </div>
 
             <div class="row">
@@ -1063,11 +1112,11 @@
                                     <td>{{sal.idpersonnel.contact_personnel}}</td>
                                     <td>{{sal.idpersonnel.type_personnel}}</td>
                                     <td>{{sal.detail_paiement}}</td>
-                                    <td>{{sal.get_mois_avance_display|capfirst}}</td>
+                                    <td>{{sal.get_mois_paie_display|capfirst}}</td>
                                     <td>{{sal.date_paiement|date:'j-n-Y'}}</td>
                                     <td>{{sal.nbre_heure}}</td>
                                     <td>{{sal.taux_horaire|floatformat:'2g'}}</td>
-                                    <td>{{sal.salbase|floatformat:'2g'}}</td>
+                                    <td>{{sal.idpersonnel.salbase|floatformat:'2g'}}</td>
                                     <td>{{sal.avance_paie|floatformat:'2g'}}</td>
                                     <td>{{sal.primes|floatformat:'2g'}}</td>
                                     <td>{{sal.salbrut|floatformat:'2g'}}</td>
@@ -1075,18 +1124,18 @@
                                     <td>{{sal.salnet|floatformat:'2g'}}</td>
                                     <td>{{sal.nb_hsupp}}</td>
                                     <td>{{sal.mont_hsupp|floatformat:'2g'}}</td>
-                                    <td>{{sal.anscolaire }}</td>
+                                    <td>{{sal.anneescolaire }}</td>
                                     <td>{{sal.id}}</td>
                                     <td class="no-export">
-                                        <a class="btn btn-primary" href="{% url 'afficherdetailavancesalaire' sal.id %}" title="Voir/Afficher" target="_self"><i class="fa-solid fa-eye fa-sm"></i></a>
-                                        <a class="btn btn-info" href="{% url 'editionavancesalaire' sal.id %}" title="Modifier/Editer" target="_self"><i class="fa-solid fa-edit fa-sm"></i></a>
+                                        <a class="btn btn-primary" href="{% url 'afficherdetailsalaire' sal.id %}" title="Voir/Afficher" target="_self"><i class="fa-solid fa-eye fa-sm"></i></a>
+                                        <a class="btn btn-info" href="{% url 'editionsalaire' sal.id %}" title="Modifier/Editer" target="_self"><i class="fa-solid fa-edit fa-sm"></i></a>
 
                                         {% peut request.user 'menu_administration' as ok_admin %}
 
                                         {% if ok_admin %}
-                                        <a class="btn btn-danger" href="{% url 'supprimeravancesalaire' sal.id %}" title="Supprimer" target="_self"><i class="fa-solid fa-remove fa-sm"></i></a>
+                                        <a class="btn btn-danger" href="{% url 'supprimersalaire' sal.id %}" title="Supprimer" target="_self"><i class="fa-solid fa-remove fa-sm"></i></a>
                                         {% endif %}
-                                        <a class="btn btn-secondary" href="{% url 'imprimerecuavancesalaire' sal.id %}" title="Imprimer le bulletin de paie de l'employé" target="_blank"><i class="fa-solid fa-print fa-sm"></i></a>
+                                        <a class="btn btn-secondary" href="{% url 'imprimerbulletinsalaire' sal.id %}" title="Imprimer le bulletin de paie de l'employé" target="_blank"><i class="fa-solid fa-print fa-sm"></i></a>
                                     </td>
                                 </tr>
                             {% endfor %}
@@ -1119,7 +1168,7 @@
             </table>
 
             <div class="row mt-3 mb-2">
-                <div class="col-md-4">
+                <div class="col-md-2">
                     <div class="form-group">
                         <label for="totalsalbase">Totat Salaire Base</label>
                         {% if total_salbase %}
@@ -1134,8 +1183,24 @@
                         {% endif %}
                     </div>
                 </div>
+
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="totalprimes">Totat Primes</label>
+                        {% if total_primes %}
+                        <input type="text" id="totalprimes" name="total_primes"
+                            value="{{ total_primes|floatformat:'2g' }}"
+                            class="form-control form-control-sm input-modern" readonly
+                            style="color:red; font-weight:bold; font-size:12pt;">
+                        {% else %}
+                        <input type="text" name="total_primes" value="0"
+                            class="form-control form-control-sm input-modern" readonly
+                            style="color:red; font-weight:bold; font-size:12pt;">
+                        {% endif %}
+                    </div>
+                </div>
            
-                <div class="col-md-4">
+                <div class="col-md-2">
                     <div class="form-group">
                         <label for="totalsalbrut">Total Salaire Brut</label>
                         {% if total_salbrut %}
@@ -1151,7 +1216,23 @@
                     </div>
                 </div>
 
-                <div class="col-md-4">
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="totalavance">Total Avances</label>
+                        {% if total_avance %}
+                        <input type="text" id="totalavance" name="total_avance"
+                            value="{{ total_avance|floatformat:'2g' }}"
+                            class="form-control form-control-sm input-modern" readonly
+                            style="color:red; font-weight:bold; font-size:12pt;">
+                        {% else %}
+                        <input type="text" name="total_avance" value="0"
+                            class="form-control form-control-sm input-modern" readonly
+                            style="color:red; font-weight:bold; font-size:12pt;">
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="col-md-2">
                     <div class="form-group">
                         <label for="totalsalnet">Total Salaire Net</label>
                         {% if total_salnet %}
@@ -1166,8 +1247,23 @@
                         {% endif %}
                     </div>
                 </div>
-            </div>
-            
+
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="soldecaisse">Solde caisse disponible</label>
+                        {% if solde_caisse %}
+                        <input type="text" id="soldecaisse" name="solde_caisse"
+                            value="{{ solde_caisse|floatformat:'2g' }}"
+                            class="form-control form-control-sm input-modern" readonly
+                            style="color:red; font-weight:bold; font-size:12pt;">
+                        {% else %}
+                        <input type="text" name="solde_caisse" value="0"
+                            class="form-control form-control-sm input-modern" readonly
+                            style="color:red; font-weight:bold; font-size:12pt;">
+                        {% endif %}
+                    </div>
+                </div>
+            </div>            
 
             <div class="row">
                 <div class="col-md-8">
