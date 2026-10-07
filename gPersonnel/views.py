@@ -584,7 +584,7 @@ def charger_infospersonnel(request):
     avances = total if total is not None else 0
 
     # salbase n'est pas nullable (default=0), donc pas de test None nécessaire
-    base = emp.salbase if emp.type_personnel == 'Permanent' else 0
+    base = emp.salbase if emp.type_personnel == TYPE_PERSONNEL[1][0] else 0
 
     return JsonResponse({
         'nom': emp.nom_personnel,
@@ -595,16 +595,29 @@ def charger_infospersonnel(request):
         'avances': float(avances),
     })
 
-# Fonction permettant de convertir les valeurs numériques recupérées depuis le formulaire en Decimal
+# Fonction permettant de convertir les valeurs numériques recupérées depuis le formulaire gestion des salaires et mis à jour des salaires en Decimal
 def to_decimal(valeur):
-    """Convertit une valeur de formulaire en Decimal ('1 000,50' -> Decimal('1000.50'))."""
+    """Convertit '3,500,000.00', '1 000,50' ou '1.234.567,89' en Decimal."""
     if valeur is None:
         return Decimal('0')
-    texte = str(valeur).replace('\xa0', '').replace(' ', '').replace(',', '.').strip()
-    if texte == '':
+    s = str(valeur).replace('\xa0', '').replace('\u202f', '').replace(' ', '').strip()
+    if s == '':
         return Decimal('0')
+
+    last_dot, last_comma = s.rfind('.'), s.rfind(',')
+    if last_dot != -1 and last_comma != -1:
+        s = s.replace(',', '') if last_dot > last_comma else s.replace('.', '').replace(',', '.')
+    elif last_comma != -1:
+        parts = s.split(',')
+        if len(parts) == 2 and len(parts[1]) <= 2:
+            s = parts[0] + '.' + parts[1]
+        else:
+            s = s.replace(',', '')
+    elif s.count('.') > 1:
+        s = s.replace('.', '')
+
     try:
-        return Decimal(texte)
+        return Decimal(s)
     except InvalidOperation:
         raise ValueError("Valeur numérique invalide : {}".format(valeur))
 
@@ -664,10 +677,10 @@ def enregistrersalaire(request):
                     sal.taux_horaire = Decimal(thoraire)
                     salb = Decimal(thoraire) * Decimal(nbheure)
 
-                sb = salb + Decimal(sal.primes) + Decimal(sal.mont_hsupp)
+                sb = (salb + Decimal(sal.primes) + Decimal(sal.mont_hsupp)) - Decimal(total_avance)
                 sal.salbrut = sb
                 sal.cotis_sociale = cotis
-                snet = sb - Decimal(total_avance) - cotis
+                snet = sb  - cotis
                 sal.salnet = snet
 
                 # Enregistrement du salaire dans la caisse
@@ -776,6 +789,79 @@ def listemensuellesalaire(request):
     context = {'salaire_mensuel': liste_mensuelle, 'total_salbase': total_salbase, 'total_primes': total_primes, 'total_salbrut': total_salbrut, 'total_avance': total_avance, 'total_salnet': total_salnet, 'solde_caisse': soldec, 'mois_actuel': nom_mois, 'annee': an}
 
     return render(request, 'gPersonnel/liste_salaire.html', context)
+
+
+@action_requise('personnel_salaire')
+def listeperiodiquesalaire(request):
+
+    ane = request.GET.get('nom_annee')
+    debut = request.GET.get('ddebut')
+    fin = request.GET.get('dfin')
+
+    listeperiode = {}
+    listeperiode = Salaire.objects.none()
+        
+    querydict = request.GET.copy()
+    querydict.pop('page', None)
+    query_string = querydict.urlencode()
+    
+    if ane not in (None, '') and debut not in (None, '') and fin not in (None, ''):
+    
+        debut = datetime.strptime(debut,'%Y-%m-%d')
+        fin = datetime.strptime(fin,'%Y-%m-%d')
+
+        listeperiode = Salaire.objects.select_related('anneescolaire', 'idpersonnel').filter(Q(anneescolaire__exact=ane),Q(date_paiement__range=(debut,fin))).order_by('idpersonnel')
+        
+        mont_base = listeperiode.aggregate(tbase=Sum('idpersonnel__salbase'))
+        
+        mont_primes = listeperiode.aggregate(tprimes=Sum('primes'))
+        mont_brut = listeperiode.aggregate(tbrut=Sum('salbrut'))
+        mont_avance = listeperiode.aggregate(tavances=Sum('avance_paie'))
+        mont_net = listeperiode.aggregate(tnet=Sum('salnet'))
+        
+        total_salbase = 0
+        total_primes = 0
+        total_salbrut = 0
+        total_avance = 0
+        total_salnet = 0
+        
+        if mont_base['tbase'] is not None:
+            total_salbase = mont_base['tbase']
+        else:
+            total_salbase = 0
+        
+        if mont_primes['tprimes'] is not None:
+            total_primes = mont_primes['tprimes']
+        else:
+            total_primes = 0
+        
+        if mont_brut['tbrut'] is not None:
+            total_salbrut = mont_brut['tbrut']
+        else:
+            total_salbrut = 0
+        
+        if mont_avance['tavances'] is not None:
+            total_avance = mont_avance['tavances']
+        else:
+            total_avance = 0
+        
+        if mont_net['tnet'] is not None:
+            total_salnet = mont_net['tnet']
+        else:
+            total_salnet = 0
+    
+    soldec = affichersoldecaisse()  # Je recupère le dernier solde caisse après l'opération
+    
+    an = AnneeScolaire.objects.all().order_by('id')
+    
+    paginesalaire = Paginator(listeperiode, 20)
+    numpagesalaire = request.GET.get('page')
+    listeperiode = paginesalaire.get_page(numpagesalaire)
+    
+    context = {'salaire_periode': listeperiode, 'total_salbase': total_salbase, 'total_primes': total_primes, 'total_salbrut': total_salbrut, 'total_avance': total_avance, 'total_salnet': total_salnet, 'solde_caisse': soldec, 'annee': an, 'query_string': query_string, 'ddebut': debut, 'dfin': fin,}
+
+    return render(request, 'gPersonnel/liste_salaire.html', context)
+
     
 
 @action_requise('personnel_salaire')
@@ -812,9 +898,9 @@ def modifiersalaire(request, idsal):
         mois = request.POST.get('mois_paie')
         date_paiement = parse_date(request.POST.get('date_paiement', ''))
 
-        if date_paiement is None:
-            messages.error(request, "La date de paiement est invalide.")
-            return redirect('modifiersalaire', sal.id)
+        # if date_paiement is None:
+        #     messages.error(request, "La date de paiement est invalide.")
+        #     return redirect('modifiersalaire', sal.id)
 
         try:
             primes = to_decimal(request.POST.get('primes'))
@@ -838,12 +924,12 @@ def modifiersalaire(request, idsal):
         # Salaire de base selon la catégorie
         if emp.type_personnel == TYPE_PERSONNEL[0][0]: # Quand c'est Vacataire
             salbase = Decimal(nbre_heure) * taux_horaire
-        else:  # Permanent
+        elif emp.type_personnel == TYPE_PERSONNEL[1][0]:  # Permanent
             salbase = emp.salbase
             nbre_heure = 0
             taux_horaire = Decimal('0')
 
-        salbrut = (salbase + primes + mont_hsupp) - avances
+        salbrut = salbase + primes + mont_hsupp - avances
         salnet = salbrut - cotis
 
         sal.idpersonnel = emp

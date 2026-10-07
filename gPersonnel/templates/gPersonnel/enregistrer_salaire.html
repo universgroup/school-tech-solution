@@ -185,7 +185,27 @@
                 const $mhs = $('#id_mnt_hsupp');   
 
                 function num(v) {
-                    const n = parseFloat(String(v).replace(/\s/g, '').replace(',', '.'));
+                    let s = String(v).replace(/[\s\u00a0\u202f]/g, '');
+                    if (s === '' || s === '-') { return 0; }
+
+                    const lastDot = s.lastIndexOf('.');
+                    const lastComma = s.lastIndexOf(',');
+
+                    if (lastDot !== -1 && lastComma !== -1) {
+                        // Les deux présents : le dernier est le séparateur décimal
+                        s = (lastDot > lastComma)
+                            ? s.replace(/,/g, '')                    // 3,500,000.00
+                            : s.replace(/\./g, '').replace(',', '.'); // 3.500.000,00
+                    } else if (lastComma !== -1) {
+                        // Virgule seule : décimale si "xx,5" ou "xx,50", sinon milliers
+                        const p = s.split(',');
+                        s = (p.length === 2 && p[1].length <= 2) ? p[0] + '.' + p[1] : s.replace(/,/g, '');
+                    } else if (s.split('.').length > 2) {
+                        // Plusieurs points : ce sont des milliers
+                        s = s.replace(/\./g, '');
+                    }
+
+                    const n = parseFloat(s);
                     return isNaN(n) ? 0 : n;
                 }
 
@@ -197,16 +217,16 @@
 
                 
                 function calculer() {
-                    let base;
-                    if ($type.val() === 'Vacataire') {
-                        base = num($nbh.val()) * num($th.val());
-                        $base.val(base.toFixed(2));
-                    } else {
-                        base = num($base.val());
-                    }
-                    const brut = (base + num($prime.val()) + num($mhs.val())) - num($av.val());
-                    $brut.val(brut.toFixed(2));
-                    $net.val((brut - num($coti.val())).toFixed(2));
+                        let base;
+                        if ($type.val() === 'Vacataire') {
+                            base = num($nbh.val()) * num($th.val());
+                            $base.val(base.toFixed(2));
+                        } else {
+                            base = num($base.val());
+                        }
+                        const brut = (base + num($prime.val()) + num($mhs.val())) - num($av.val());
+                        $brut.val(brut.toFixed(2));
+                        $net.val((brut - num($coti.val())).toFixed(2));
                 }
 
                 

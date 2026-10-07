@@ -72,7 +72,7 @@
                     <div class="col-md-4">
                         <div class="form-group">                            
                             <label for="id_datepaie">Date Paiement</label>
-                            <input type="text" name="date_paiement" id="id_datepaie" value="{{sal.date_paiement|date:'j-n-Y'}}" class="form-control">
+                            <input type="text" name="date_paiement" id="id_datepaie" value="{{sal.date_paiement|date:'Y-n-j'}}" class="form-control">
                         </div>
                     </div>
 
@@ -236,8 +236,36 @@
                 const $mhs = $('#id_mnt_hsupp');   
 
                 function num(v) {
-                    const n = parseFloat(String(v).replace(/\s/g, '').replace(',', '.'));
+                    let s = String(v).replace(/[\s\u00a0\u202f]/g, '');
+                    if (s === '' || s === '-') { return 0; }
+
+                    const lastDot = s.lastIndexOf('.');
+                    const lastComma = s.lastIndexOf(',');
+
+                    if (lastDot !== -1 && lastComma !== -1) {
+                        // Les deux présents : le dernier est le séparateur décimal
+                        s = (lastDot > lastComma)
+                            ? s.replace(/,/g, '')                    // 3,500,000.00
+                            : s.replace(/\./g, '').replace(',', '.'); // 3.500.000,00
+                    } else if (lastComma !== -1) {
+                        // Virgule seule : décimale si "xx,5" ou "xx,50", sinon milliers
+                        const p = s.split(',');
+                        s = (p.length === 2 && p[1].length <= 2) ? p[0] + '.' + p[1] : s.replace(/,/g, '');
+                    } else if (s.split('.').length > 2) {
+                        // Plusieurs points : ce sont des milliers
+                        s = s.replace(/\./g, '');
+                    }
+
+                    const n = parseFloat(s);
                     return isNaN(n) ? 0 : n;
+                }
+
+                // Affichage lisible : 4120000 -> "4,120,000.00" (même format que Django)
+                function fmt(n) {
+                    return Number(n).toLocaleString('en-US', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
                 }
 
                 function majStatutChamps() {
@@ -247,40 +275,19 @@
                 }
 
                 
-                // function calculer() {
-                //     let base;
-                //     if ($type.val() === 'Vacataire') {
-                //         base = num($nbh.val()) * num($th.val());
-                //         $base.val(base.toFixed(2));
-                //     } else {
-                //         base = num($base.val());
-                //     }
-                //     const brut = (base + num($prime.val()) + num($mhs.val())) - num($av.val());
-                //     $brut.val(brut.toFixed(2));
-                //     $net.val((brut - num($coti.val())).toFixed(2));
-                // }
-
                 function calculer() {
-                        let base;
-
-                        // 1️⃣  Base : idem que Python
-                        if ($type.val() === 'Vacataire') {
-                            base = num($nbh.val()) * num($th.val());
-                            $base.val(base.toFixed(2));
-                        } else {
-                            base = num($base.val());
-                        }
-
-                        // 2️⃣  Brut  = base + primes + heures supp   (⚠️  PAS les avances)
-                        const brut = base + num($prime.val()) + num($mhs.val());
-                        $brut.val(brut.toFixed(2));
-
-                        // 3️⃣  Net   = brut - avances - cotisations
-                        const net = brut - num($av.val()) - num($coti.val());
-                        $net.val(net.toFixed(2));
+                    let base;
+                    if ($type.val() === 'Vacataire') {
+                        base = num($nbh.val()) * num($th.val());
+                        $base.val(fmt(base));
+                    } else {
+                        base = num($base.val());
                     }
-
-                
+                    const brut = (base + num($prime.val()) + num($mhs.val())) - num($av.val());
+                    $brut.val(fmt(brut));
+                    $net.val(fmt(brut - num($coti.val())));
+                }
+                                
                 function chargerInfos(resetHeures) {
                     if (!$emp.val()) { return; }
                     $.ajax({
@@ -295,7 +302,7 @@
                             $("#id_prenom_emp").val(data.prenom);
                             $("#id_contact").val(data.contact);
                             $type.val(data.type_employe);
-                            $av.val(data.avances.toFixed(2));
+                            $av.val(fmt(data.avances));
                             $("#id_detail_paie").val(
                                 'Paiement du salaire de ' + data.nom + ' ' + data.prenom +
                                 ', Contact : ' + data.contact + ', Catégorie : ' + data.type_employe
@@ -303,9 +310,9 @@
 
 
                             if (resetHeures) {
-                                $base.val(data.salbase.toFixed(2));
+                                $base.val(fmt(data.salbase));
                                 $nbh.val(0);
-                                $th.val(0);
+                                $th.val(fmt(0));
                             }
                             majStatutChamps();
                             calculer();
@@ -333,6 +340,11 @@
                 // Recalcul en direct
                 // et dans l'écoute des champs :
                 $nbh.add($th).add($prime).add($coti).add($mhs).on('input', calculer);
+
+                // Mise en forme des montants saisis, à la sortie du champ
+                $th.add($prime).add($coti).add($mhs).on('blur', function () {
+                        $(this).val(fmt(num($(this).val())));
+                    });
 
                 // État initial de la page (sans écraser les valeurs enregistrées)
                 majStatutChamps();

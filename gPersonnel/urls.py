@@ -15,6 +15,7 @@ urlpatterns = [
 
     path('enregistrersalaire/', enregistrersalaire, name='enregistrersalaire'),
     path('listesalairemensuel/',listemensuellesalaire,name='listesalairemensuel'),
+    path('listesalaireperiode/',listeperiodiquesalaire, name='listesalaireperiode'),
     path('editionsalaire/<int:idsal>', editersalaire, name='editionsalaire'),
     path('afficherdetailsalaire/<int:idsal>', detailssalaire, name='afficherdetailsalaire'),
     path('modifiersalaire/<int:idsal>', modifiersalaire, name='modifiersalaire'),

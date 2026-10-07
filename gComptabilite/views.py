@@ -1135,7 +1135,8 @@ def recupaiementscolarite(request, idetat, nom_tranche, mont_paye):
 
 @action_requise('menu_comptabilite')
 def imprimerecuscolarite(request, idetat, nom_tranche, mont_paye):
-    return HttpResponseRedirect(reverse('recupaiementscolarite',args=(idetat,nom_tranche,str(mont_paye),)))
+    return HttpResponseRedirect(reverse('recupaiementscolarite',
+                                        args=(idetat,nom_tranche,str(mont_paye),)))
 
 @action_requise('menu_comptabilite')
 def listepaiementmensuel(request):
