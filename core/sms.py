@@ -14,13 +14,15 @@ def normaliser_numero_gn(numero):
     if not numero:
         return None
     chiffres = re.sub(r'\D', '', numero)  # retire espaces, tirets, '+', etc.
+
     if chiffres.startswith('224'):
-        return chiffres
-    if chiffres.startswith('0'):
+        chiffres = chiffres[3:]  # on retire l'indicatif pour valider le reste
+    elif chiffres.startswith('0'):
         chiffres = chiffres[1:]
+
     if len(chiffres) == 9:
         return f"224{chiffres}"
-    return None  # numéro invalide
+    return None  # numéro invalide, quelle que soit sa forme d'origine
 
 
 def envoyer_sms_masse(destinataires_contexte, template_message, sender_name="E CHAMPIONS"):

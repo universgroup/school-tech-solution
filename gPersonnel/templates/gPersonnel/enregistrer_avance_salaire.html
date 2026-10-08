@@ -1,19 +1,23 @@
 {% extends "base.html" %}
+{% load static %}
 {% block titre_page %} GESTION DES AVANCES SUR SALAIRE {% endblock %}
 {% load crispy_forms_tags %}
-
+{% block titre_formulaire %} FICHE DE BON DE PAIEMENT {% endblock %}
+{% block fil_ariane %}Personnel / Avance salaire / Nouveau {% endblock %}
  {% block titre_cadre %}
-PAYEMENT AVANCE SUR SALAIRE
+  ENREGISTRER UN BON DE PAIEMENT
  {% endblock %}
+
+
  {% block formulaire %}
-    <div class="row">
-        <div class="col-lg-8">
-            <div class="card m-b-30">
-                <form action="" method="POST">
+  
+        <form action="" method="POST" class="needs-validation" autocomplete="on" id="favancesalaire">
 
                     {% csrf_token %}
 
-                    <div class="row">
+                <div class="card-body">   
+                    
+                    <div class="row g-3">
                         <div class="col-md-6">
                             <div class="form-group">
                                 {{form.anscolaire|as_crispy_field}}
@@ -28,136 +32,208 @@ PAYEMENT AVANCE SUR SALAIRE
 
                     </div>
 
-                    <div class="row">
-                        <div class="col-lg-12">
+                    <div class="row g-3">
+                        <div class="col-md-6">
                             <div class="form-group">
                                 {{form.idpersonnel|as_crispy_field}}
                             </div>
                         </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="id_nom_emp">Nom Famille</label>
+                                <input type="text" id="id_nom_emp" class="form-control" title="Affiche le nom de famille de l'employé" readonly>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="row">
-                        <div class="col-lg-12">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="id_prenom">Prénoms</label>
+                                <input type="text" id="id_prenom" class="form-control" title="Affiche le prénom de l'employé" readonly>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="id_contact">Contact</label>
+                                <input type="text" id="id_contact" class="form-control" title="Affiche le contact de l'employé" readonly>
+                            </div>
+                        </div>
+
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label for="id_type_emp">Catégorie</label>
+                                <input type="text" id="id_type_emp" class="form-control" title="Affiche la catégorie de l'employé" readonly>
+                            </div>
+                        </div>
+
+                        <div class="col-md-2">
+                            <div class="form-group text-center">                                
+                                <label for="photo_employe">Photo</label><br>
+                                <img id="photo_employe" src="{% static 'assets/dist/img/avatar5.png' %}" 
+                                    width="95" height="95" style="border-radius: 50%; object-fit: cover; border: 2px solid #ddd;">                                
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-12">
                             <div class="form-group">
                                 {{form.intitule|as_crispy_field}}
                             </div>
                         </div>
                     </div>
 
-                    <div class="row">
-                        <div class="col-lg-12">
+                    <div class="row g-3">
+                        <div class="col-md-6">
                             <div class="form-group">
                                 {{form.montant_avance|as_crispy_field}}
                             </div>
                         </div>
-                    </div>
 
-                    <div class="row">
-                        <div class="col-lg-6">
+                        <div class="col-md-6">
                             <div class="form-group">
-                                <button type="submit" class="btn btn-success btn-lg"><span class="glyphicon glyphicon-plus"></span>Enregistrer</button>
-                                <button type="reset" class="btn btn-warning btn-lg"><span class="glyphicon glyphicon-refresh"></span>Annuler</button>
+                                {{form.date_avance|as_crispy_field}}
                             </div>
                         </div>
                     </div>
-
-                </form>
-
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="totalavance">Montant total avancé</label>
-                            {% if total_avance %}
-                            <input type="text" id="totalavance" name="total_avance" value="{{ total_avance | floatformat:'2g' }}" class="form-control" readonly style="color:red;">
-                            {% else %}
-                            <input type="text" name="total_avance" value="0" class="form-control" readonly style="color:red;">
-                            {% endif %}
-                        </div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="id_soldecais">Solde caisse disponible</label>
-                            {% if soldec %}
-                            <input type="text" id="id_soldecais" name="soldecaisse" value="{{ soldec | floatformat:'2g' }}" class="form-control" readonly style="color:red;">
-                            {% else %}
-                            <input type="text" name="soldecaisse" value="0" class="form-control" readonly style="color:red;">
-                            {% endif %}
-                        </div>
-                    </div>
-
                 </div>
 
-            </div>
 
-        </div>
-    </div>
+                <div class="card-footer text-center">
+                    <button type="submit" class="btn btn-success btn-md"> Valider &nbsp; <i class="fa-sharp fa-solid fa-check"></i></button>
+                    <button type="reset" class="btn btn-warning btn-md">Annuler &nbsp; <i class="fas fa-refresh"></i></button>
+                    <a href="{% url 'listeavancemensuelle' %}" class="btn btn-primary btn-md" target="_self" title="Affiche la liste mensuelle des avances sur salaire">Retour &nbsp; <i class="fas fa-arrow-circle-left"></i></a>
+                </div>    
 
-    <br><br>
+        </form>
+    
+  {% endblock %}
 
-    <div class="table-responsive">
-        <table id="bootstrapdatatable" class="table table-striped table-bordered" width="100%">
-        <thead>
-            <tr>
-                <th>ID Employé</th>
-                <th>Nom Famille</th>
-                <th>Prénoms</th>
-                <th>Catégorie</th>
-                <th>Intitulé opération</th>
-                <th>Montant Avancé</th>
-                <th>Mois</th>
-                <th>Date opération</th>
-                <th>Année scolaire</th>
-                <th>ID avance</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for av in avsal %}
-            <tr>
-                <td>{{av.idpersonnel.id}}</td>
-                <td>{{av.idpersonnel.nom_personnel | upper}}</td>
-                <td>{{av.idpersonnel.prenom_personnel}}</td>
-                <td>{{av.idpersonnel.type_personnel}}</td>
-                <td>{{av.intitule}}</td>
-                <td>{{av.montant_avance|floatformat:'2g'}}</td>
-                <td>{{av.mois_avance}}</td>
-                <td>{{av.date_avance|date:'j-n-Y'}}</td>
-                <td>{{av.anscolaire}}</td>
-                <td>{{av.id}}</td>
+  {% block javascript %}
 
-                <td>
-                    <a class="btn btn-sm btn-primary" href="/afficherdetailavancesalaire/{{av.id}}"><span class="glyphicon glyphicon-eye-open">Voir</span></a>
-                    <a class="btn btn-sm btn-info" href="/editionavancesalaire/{{av.id}}"><span class="glyphicon glyphicon-pencil">Modifier</span></a>
-                    <a class="btn btn-sm btn-danger" href="/suppavancesalaire/{{av.id}}"><span class="glyphicon glyphicon-remove">Supprimer</span></a>
-                    <a class="btn btn-sm btn-secondary" href="{% url 'imprimerecuavancesalaire' av.id %}" target="_blank" ><span class="glyphicon glyphicon-print">Reçu</span></a>
-                </td>
+        <script>
 
-            </tr>
+            var defaultPhoto = "{% static 'assets/dist/img/avatar5.png' %}";
 
-            {% endfor %}
-        </tbody>
-    </table>
+            // Cette fonction permet d'afficher les infos de l'employe sélectionné
+            $("#id_employe").change(function(){
+                var idemp = $(this).val();
+                var libelle = 'Paiement de bon pour' + ' ';
+                
+                $.ajax({
+                        url: "{% url 'chargerinfosemploye' %}",
+                        data: { 'idemploye': idemp },
+                        success: function(data){
+                            libelle += data.nom + ' ' + data.prenom + ' ' + ', Contact :'+ ' ' + data.contact + ' ' + ', Catégorie :' + ' ' + data.type_employe;
+                            $("#id_nom_emp").val(data.nom);
+                            $("#id_prenom").val(data.prenom);
+                            $("#id_contact").val(data.contact);
+                            $("#id_type_emp").val(data.type_employe);
+                            $("#id_intitule").val(libelle);
 
-        <div class="pagination">
-        <span class="step-links">
-            {% if avsal.has_previous %}
-                <a href="?page=1">&laquo; 1</a>
-                <a href="?page={{ avsal.previous_page_number }}"><span class="glyphicon glyphicon-backward"></span>Précédent</a>
-            {% endif %}
-
-            <span class="current">
-                Page {{ avsal.number }} sur {{ avsal.paginator.num_pages }}
-            </span>
-
-            {% if avsal.has_next %}
-                <a href="?page={{ avsal.next_page_number }}"><span class="glyphicon glyphicon-forward"></span>Suivant</a>
-                <a href="?page={{ avsal.paginator.num_pages }}">Dernier &raquo;</a>
-            {% endif %}
-        </span>
-    </div>
+                            if(data.photo_employe){
+                                $("#photo_employe").attr("src", "/media/" + data.photo_employe);
+                            } else {
+                                $("#photo_employe").attr("src", defaultPhoto);
+                            }
+                            }
+                        });
+            });
 
 
-    </div>
+            document.getElementById('favancesalaire').addEventListener('submit', function (e) {
+                e.preventDefault();
 
- {% endblock %}
+                // Ouverture immédiate, dans le contexte du clic → pas bloqué par le navigateur
+                // puis on reprend aussitôt le focus sur l'onglet d'origine pour que
+                // l'utilisateur voie les toasts de progression/succès
+                
+                const nouvelOnglet = window.open('', '_blank');
+                window.focus(); // Maintient l'onglet d'origine, celui du formulaire ouvert pour voir les messages toast avant l'ouverture du nouvel onglet
+
+                const formData = new FormData(this);
+                
+
+                fetch(this.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {'X-Requested-With': 'XMLHttpRequest'}
+                })
+                .then(response => response.json())
+                .then(data => {
+                        if (data.success) {
+
+                            // Toast de feedback immédiat pendant le traitement
+                            afficherMessage('info', 'Chargement du bon de paiement...');
+                            
+                            afficherMessage('success', data.message);  // message de paiement immédiat
+
+                            
+
+                            // On récupère le PDF nous-même pour pouvoir lire le header de statut email
+                            return fetch(data.recu_url).then(recuResponse => {
+                                const statutEmailBrut = recuResponse.headers.get('X-Statut-Email');
+                                if (statutEmailBrut) {
+                                    const statutemail = decodeURIComponent(statutEmailBrut);
+                                    const [type, ...reste] = statutemail.split(':');
+                                    afficherMessage(type, reste.join(':'));
+                                }
+                                return recuResponse.blob();
+                            }).then(blob => {
+                                const blobUrl = URL.createObjectURL(blob);
+                                // Petit délai volontaire pour laisser le temps de lire
+                                // les toasts avant que le focus ne bascule sur le PDF
+                                setTimeout(() => {
+                                    nouvelOnglet.location.href = blobUrl;
+                                }, 2500);
+                            });
+
+                        }
+                        else {
+                            nouvelOnglet.close();
+                            afficherMessage('error', data.error || "Une erreur est survenue.");
+                        }
+                    })
+                .catch(() => {
+                    nouvelOnglet.close();
+                    afficherMessage('error', "Erreur réseau, veuillez réessayer.");
+                });
+            });
+
+            // Permet de filtrer les employes chargés dans la dropdownlist
+
+            $("#id_employe").select2({
+                placeholder: "Sélectionnez",
+                allowClear: true,
+                width: 'resolve',
+                language: {
+                    noResults: function () {
+                        return "Aucun employé trouvé";
+                    },
+                    searching: function () {
+                        return "Recherche en cours...";
+                    }
+                },
+                width: '100%'
+            });
+
+            $('#favancesalaire').on('reset', function () {
+                // setTimeout : l'événement "reset" est déclenché AVANT que le navigateur
+                // ne remette les champs à zéro, il faut donc attendre la fin du reset natif.
+                setTimeout(function () {
+                    $('#id_employe').val(null).trigger('change');
+                }, 0);
+            });
+
+
+
+
+        </script>
+
+
+  {% endblock %}
+

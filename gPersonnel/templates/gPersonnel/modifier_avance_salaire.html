@@ -1,63 +1,184 @@
 {% extends "base.html" %}
-{% block titre_page %} EDITION DES AVANCES SUR SALAIRE {% endblock %}
-{% block titre_cadre %}
-EDITION D'UNE AVANCE SUR SALAIRE
-{% endblock %}
+{% load static %}
+{% block titre_page %} MIS A JOUR {% endblock %}
+{% load crispy_forms_tags %}
+{% block titre_formulaire %} FICHE DE BON DE PAIEMENT {% endblock %}
+{% block fil_ariane %}Personnel / Avance salaire / Mise à jour {% endblock %}
+ {% block titre_cadre %}
+  EDITION D'UN BON DE PAIEMENT
+ {% endblock %}
 
 {% block formulaire %}
 
-<div class="row">
-    <div class="col-lg-6">
-        <div class="card m-b-30">
-            <form class="post-form" action="/modifieravancesalaire/{{avsal.id}}" method="POST">
+        <form class="needs-validation" action="{% url 'modifieravancesalaire' avsal.id %}" method="post" id="favance">
 
                 {% csrf_token %}
 
-                <div class="row">
-                    <div class="col-lg-6">
-                        <div class="card m-b-30">
+            <div class="card-body">   
+                 <div class="row g-3">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="Idavsal">ID</label>
+                            <input type="text" id="Idavsal" value="{{avsal.id}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                 </div>
 
-                            <label for="Idavsal">ID Avance</label>
-                            <input type="text" id="Idavsal" maxlength="10" value="{{avsal.id}}" class="form-control" required readonly>
-                            
+                 <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="form-group">                            
                             <label for="id_intitule">Intitulé</label>
-                            <input type="text" name="intitule" id="id_intitule" maxlength="100"  value="{{avsal.intitule}}" class="form-control" required>
+                            <input type="text" name="intitule" id="id_intitule" value="{{avsal.intitule}}" class="form-control">
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_montavance">Montant avance</label>
+                            <input type="text" name="montant_avance" id="id_montavance" value="{{avsal.montant_avance|floatformat:'2g'}}" class="form-control">
+                        </div>
+                    </div>
+                 </div>
 
+                 <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="form-group">                                                     
+                            <label for="id_moisavance">Mois</label>
+                            <select id="id_moisavance" name="mois_avance" class="form-control">
+                                <option value="{{avsal.mois_avance}}" selected>{{avsal.get_mois_avance_display|capfirst}}</option>
+                                
+                                {% for mois in moisavance %}
+                                <option value="{{mois.0}}">{{mois.1}}</option>
+                                {% endfor %}
 
-                            <label for="id_mntavance">Montant Avancé</label>
-                            <input type="text" name="montant_avance" id="id_mntavance" maxlength="30"  value="{{avsal.montant_avance}}" class="form-control" required>
-                            
-                                                      
-                            <label for="id_moisavance">Mois Avancé</label>
-                            <input type="text" name="mois_avance" id="id_moisavance" maxlength="15"  value="{{avsal.mois_avance}}" class="form-control" required>
-                            
-                                                        
-                            <label for="id_anneescolaire">Année scolaire</label>
-                            <input type="text" name="annee_scolaire" id="id_type_pers" maxlength="15"  value="{{avsal.anscolaire}}" class="form-control" readonly>
-                            
-                            <label for="id_pers">Employé</label>
-                            <input type="text" name="idpersonnel" id="id_pers" maxlength="15"  value="{{avsal.idpersonnel}}" class="form-control" readonly>
-
+                            </select>
                         </div>
                     </div>
 
-                </div>
+                    <div class="col-md-6">
+                        <div class="form-group">                          
+                            <label for="id_dateavance">Date avance</label>
+                            <input type="text" name="date_avance" id="id_dateavance" value="{{avsal.date_avance|date:'Y-n-j'}}" class="form-control">
+                        </div>
+                    </div>
+                 </div>
 
-
-
-                <div class="row">
-                    <div class="col-lg-6">
-                        <button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-pencil">Modifier</span></button>
-                        <a href="/ajouteravancesalaire/" target="_self" class="btn btn-secondary"><span class="glyphicon glyphicon-arrow-left">Retour</span></a>
+                 <div class="row g-3">
+                    <div class="col-md-3">
+                        <div class="form-group">                            
+                            <label for="id_anneescolaire">Année scolaire</label>
+                            <select id="id_anneescolaire" name="annee_scolaire" class="form-control">
+                                <option value="{{avsal.anscolaire.id}}" selected>{{avsal.anscolaire.descript_annee}}</option>
+                                {% for ane in annee %}
+                                <option value="{{ane.id}}">{{ane.descript_annee}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="id_employe">ID Employé</label>
+                            <input type="text" name="idpersonnel" id="id_employe" value="{{avsal.idpersonnel.id}}" class="form-control" readonly>
+                        </div>
                     </div>
 
-                </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="id_nom">Nom famille</label>
+                            <input type="text" name="nom_personnel" id="id_nom" value="{{avsal.idpersonnel.nom_personnel}}" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="id_prenom">Prénoms</label>
+                            <input type="text" name="prenom_personnel" id="id_prenom" value="{{avsal.idpersonnel.prenom_personnel}}" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                 </div>
+
+            </div>
+            
+
+            <div class="card-footer text-center">
+                <button type="submit" class="btn btn-success btn-md">Modifier &nbsp;<i class="fas fa-edit"></i></button>
+                <a href="{% url 'listeavancemensuelle' %}" target="_self" class="btn btn-primary btn-md" title="Affiche la liste des avances mensuelles">Retour &nbsp; <i class="fa fa-arrow-circle-left"></i></a>
+            </div>
 
 
-            </form>
-        </div>
+      </form>
 
-    </div>
-</div>
+{% endblock %}
+
+{% block javascript %}
+
+<script>
+
+            $(document).ready(function () {
+                    // Au clic sur le champ date, changer le type en "date" pour permettre la modification
+                    $('#id_dateavance').on('click', function () {
+                        $(this).attr('type', 'date');
+                        $(this).focus();
+                    });
+
+                    // Quand on quitte le champ, reformater en texte lisible
+                    $('#id_dateavance').on('blur', function () {
+                        if ($(this).val() !== '') {
+                            $(this).attr('type', 'text');
+                            $(this).val(formatted);
+                        }
+                    });
+                });
+            
+            $(document).ready(function() {
+                $('#id_montavance').on('click', function() {
+                    $(this).attr('type', 'number');
+                });
+            });
+
+            // Permet de convertir les montants affichés du texte en numerique pour eviter la troncature et faire une opération correcte dans la fonction calculerScolarite
+            function nettoyerMontant(valeur) {
+
+                if (!valeur) return 0;
+                var str = valeur.toString().trim();
+
+                var lastComma = str.lastIndexOf(",");
+                var lastDot = str.lastIndexOf(".");
+
+                if (lastComma > -1 && lastDot > -1) {
+                    // Les deux séparateurs présents : le dernier rencontré est forcément le décimal
+                    if (lastComma > lastDot) {
+                        // 300.000,00 -> format français
+                        str = str.replace(/\./g, "").replace(",", ".");
+                    } else {
+                        // 300,000.00 -> format anglo-saxon
+                        str = str.replace(/,/g, "");
+                    }
+                } else if (lastComma > -1) {
+                    // Seule la virgule présente : décimale si 1-2 chiffres après, sinon milliers
+                    var decimales = str.length - lastComma - 1;
+                    str = decimales <= 2 ? str.replace(",", ".") : str.replace(/,/g, "");
+                } else if (lastDot > -1) {
+                    // Seul le point présent : décimale si 1-2 chiffres après, sinon milliers
+                    var decimales2 = str.length - lastDot - 1;
+                    if (decimales2 > 2) {
+                        str = str.replace(/\./g, "");
+                    }
+                    // sinon : déjà un point décimal valide, on ne touche à rien
+                }
+
+                return parseFloat(str) || 0;
+            }
+
+            $("#favance").on("submit", function() {
+            $("#id_montavance").val(nettoyerMontant($("#id_montavance").val()).toFixed(2));
+            });
+             
+
+
+
+</script>
 
 {% endblock %}

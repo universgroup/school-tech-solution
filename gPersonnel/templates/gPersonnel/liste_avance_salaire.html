@@ -1,54 +1,54 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-     {% load static %}
-     {% load permissions_tags %}
-    <meta charset="utf-8">
-    <title>LISTE GENERALE DES INSCRITS PAR CLASSE</title>
-    <!-- Tell the browser to be responsive to screen width -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static %}
+    {% load permissions_tags %}
+  <meta charset="utf-8">
+  <title>SITUATION GLOBALE DES AVANCES SUR SALAIRE</title>
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    {% include "partials/pwa_meta.html" %}
-    
-    <!--Favicon-->
-    {% if logo_ecole %}
-    <link rel="icon" type="image/png" href="{{ logo_ecole.url }}">
-    {% endif %}
+  {% include "partials/pwa_meta.html" %}
 
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="{% static 'assets/plugins/fontawesome-free/css/all.min.css' %}">
-    <!-- Ionicons -->
-    <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
-    <!-- Theme style -->
-    <link rel="stylesheet" href="{% static 'assets/dist/css/adminlte.min.css' %}">
-    <!-- Google Font: Source Sans Pro -->
-    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+  <!--Favicon-->
+  {% if logo_ecole %}
+  <link rel="icon" type="image/png" href="{{ logo_ecole.url }}">
+  {% endif %}
 
-    <!--begin::Third Party Plugin(OverlayScrollbars)-->
-    <link rel="stylesheet" href="{% static 'assets/plugins/overlayScrollbars/css/OverlayScrollbars.min.css' %}"/>
-    <link href="{% static 'fontawesomefree/css/all.min.css' %}" rel="stylesheet" type="text/css">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="{% static 'assets/plugins/fontawesome-free/css/all.min.css' %}">
+  <!-- Ionicons -->
+  <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="{% static 'assets/dist/css/adminlte.min.css' %}">
+  <!-- Google Font: Source Sans Pro -->
+  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
 
-    <!-- DataTables -->
-    <link rel="stylesheet" href="{% static 'assets/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
-    <link rel="stylesheet" href="{% static 'assets/plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
-    <link rel="stylesheet" href="{% static 'assets/plugins/datatables-buttons/css/buttons.bootstrap4.min.css' %}">
+  <!--begin::Third Party Plugin(OverlayScrollbars)-->
+  <link rel="stylesheet" href="{% static 'assets/plugins/overlayScrollbars/css/OverlayScrollbars.min.css' %}"/>
+  <link href="{% static 'fontawesomefree/css/all.min.css' %}" rel="stylesheet" type="text/css">
 
-    <!--begin::Third Party Plugin(Bootstrap Icons)-->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"/>
+  <!-- DataTables -->
+  <link rel="stylesheet" href="{% static 'assets/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
+  <link rel="stylesheet" href="{% static 'assets/plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
+  <link rel="stylesheet" href="{% static 'assets/plugins/datatables-buttons/css/buttons.bootstrap4.min.css' %}">
 
-    <!-- Ce style est mis pour les boutons d'exportation en excel et PDF de la datatable-->
-    <link rel="stylesheet" href="{% static 'assets/css/datatablesbuttons.css' %}">
+  <!--begin::Third Party Plugin(Bootstrap Icons)-->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"/>
 
-    <!-- Style du template dashboard à applique sur tous les autres templates-->
-    <link rel="stylesheet" href="{% static 'assets/css/dashboard.css' %}">
-  
+  <!-- Ce style est mis pour les boutons d'exportation en excel et PDF de la datatable-->
+  <link rel="stylesheet" href="{% static 'assets/css/datatablesbuttons.css' %}">
+
+  <!-- Style du template dashboard à applique sur tous les autres templates-->
+  <link rel="stylesheet" href="{% static 'assets/css/dashboard.css' %}">
+
 </head>
 <body class="hold-transition sidebar-mini">
     
- <div class="wrapper">
+  <div class="wrapper">
   <!-- Navbar -->
-
-      <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+    
+    <nav class="main-header navbar navbar-expand navbar-white navbar-light">
     <!-- Left navbar links -->
     <ul class="navbar-nav">
       <li class="nav-item">
@@ -225,7 +225,7 @@
     
     <!-- Année scolaire / session -->
     <div class="navbar-text ml-auto mr-3 mr-lg-5 d-none d-md-inline-block" style="color: #4f46e5; font-weight: bold; font-size: 0.85rem;">
-      ANNEE SCOLAIRE : {{ annee_scolaire }} &nbsp;&nbsp; SESSION : {{ session_scolaire }}
+     ANNEE SCOLAIRE : {{ annee_scolaire }} &nbsp;&nbsp; SESSION : {{ session_scolaire }}
     </div>
 
     <ul class="navbar-nav ml-auto">       
@@ -571,7 +571,7 @@
               </p>
             </a>
 
-            <ul class="nav nav-treeview">
+              <ul class="nav nav-treeview">
 
                 {% peut request.user 'periode_gerer' as ok_periodes %}
 
@@ -678,6 +678,7 @@
           </li>
      
         </ul>
+        
       </nav>
       <!-- /.sidebar-menu -->
     </div>
@@ -691,12 +692,12 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1>SITUATION DES INSCRITS PAR CLASSE</h1>
+            <h1>SITUATION DES AVANCES ACCORDEES</h1>
           </div>
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="{% url 'accueil' %}" title="Tableau de bord">Accueil</a></li>
-              <li class="breadcrumb-item active">Situation des inscrits</li>
+              <li class="breadcrumb-item active">Situation avances sur salaire</li>
             </ol>
           </div>
         </div>
@@ -712,119 +713,93 @@
             <!-- jquery validation -->
             <div class="card card-primary">
               <div class="card-header filtres-header">
+                                    
+                        <h2 class="card-title mb-0 filtres-titre">Filtrez la situation des avances sur salaire</h2>
+                            
+                        
+                        <form class="filtres-form" action="{% url 'filtreavancesalaire' %}" method="GET">
 
-                <h2 class="card-title mb-0 filtres-titre">Filtrez la liste des élèves inscrits à la scolarité</h2>
+                              <div class="filtres-champs">
 
-                <form class="filtres-form" action="{% url 'filtrerlisteinscrits' %}" method="GET" id="flisteinscrits" data-classe-url="{% url 'chargerlisteclasse' %}">
-                    
-                  <div class="filtres-champs">
+                                  <div class="filtres-selects">
 
-                      <div class="filtres-selects">
+                                    <div class="filtre-group">                                      
+                                        <label for="idannee" class="mr-2 mb-0">Année scolaire</label>
+                                        <select class="form-control form-control-sm select-modern" name="nom_annee" id="idannee" title="Sélectionnez une année scolaire pour afficher les opérations effectuées">
+                                            <option value="" selected>Sélectionnez</option>
+                                            {% for an in annee %}
+                                            <option value="{{ an.id }}">{{ an.descript_annee }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
 
-                        <div class="filtre-group">
-                            <label for="idannee" class="mr-2 mb-0">Année scolaire</label>
-                            <select class="form-control form-control-sm select-modern" name="annee_scolaire" id="idannee" title="Sélectionnez une année scolaire pour afficher la liste des élèves inscrits">
-                                <option value="" selected>Sélectionnez</option>
-                                {% for an in ans %}
-                                <option value="{{an.id}}">{{an.descript_annee}}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
+                                    <div class="filtre-group">
+                                        <label for="datedebut" class="mr-2 mb-0">Période du : </label>
+                                        <input type="date" id="datedebut" name="ddebut" class="form-control form-control-sm input-modern">
+                                    </div>
 
-                        <div class="filtre-group">
-                            <label for="cbocycle" class="mr-2 mb-0">Cycle</label>
-                            <select class="form-control form-control-sm select-modern" name="cycle" id="cbocycle">
-                                <option value="" selected>Selectionnez</option>
-                                {% for cl in cycles %}
-                                <option value="{{cl.id}}">{{cl.cycle}}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
 
-                        <div class="filtre-group">
-                            <label for="cboclasse" class="mr-2 mb-0">Classe</label>
-                            <select class="form-control form-control-sm select-modern" name="id_classe" id="cboclasse">
-                                <option value="" selected>Selectionnez</option>
-                            </select>
-                        </div>
+                                    <div class="filtre-group">
+                                        <label for="datefin" class="mr-2 mb-0">au : </label>
+                                        <input type="date" id="datefin" name="dfin" class="form-control form-control-sm input-modern">
+                                    </div>
 
-                      </div>
+                                  </div>
+                                  
+                                  <div class="filtres-actions">
+ 
+                                        <button type="submit" class="btn btn-secondary btn-md mr-2" title="Filtrer la liste des avances de salaire par année scolaire et/ou période">Rechercher &nbsp; <i class="fas fa-search"></i></button>
 
-                      <div class="filtres-actions">
-                          
-                          <button type="submit" id="btn_rechercher" class="btn btn-secondary btn-md mr-2" title="Filtrer la liste des élèves par année scolaire et cycle">Rechercher &nbsp;<i class="fas fa-search"></i></button>
-                          
-                            <a href="{% url  'chargeranneecourante' %}" target="_self" class="btn btn-warning btn-md mr-3" title="Actualiser la liste des inscrits">Actualiser &nbsp;<i class="fas fa-refresh"></i></a>
-                         
-                            <a href="{% url 'registrematricule' %}" class="btn btn-info btn-md mr-2" target="_self" title="Afficher le Registre de matricule"><i class="fas fa-list-ol mr-1"></i> Registre matricule</a>
-                  
-                            <a href="{% url 'enregistrereleve' %}" class="btn btn-success btn-md" target="_self" title="Cliquez ici pour inscrire un élève">Nouvelle inscription &nbsp;<i class="fas fa-graduation-cap"></i></a>
-                      </div>
+                                        <a href="{% url 'listeavancemensuelle' %}" target="_self" title="Actualiser la liste des avances sur salaire" class="btn btn-warning btn-md mr-3">Actualiser &nbsp;<i class="fas fa-refresh"></i></a>
 
-                   </div>
+                                        <a href="{% url 'valideravancesalaire' %}" class="btn btn-success btn-md" target="_self" title="Cliquez ici pour enregistrer une avance sur salaire">Enregistrer une avance &nbsp;<i class="fa-brands fa-cc-amazon-pay"></i></a>
 
-                   
-                </form>
+                                  </div>
 
+                                  <div class="filtres-situation">
+
+                                    {% if avancemois %}
+                                      <h5 class="situation-titre">
+                                          Situation globale des avances du mois de &nbsp;: &nbsp;{{ mois_actuel }}
+                                      </h5>
+                                    {% elif avance_periode %}
+                                      <h5 class="situation-titre">
+                                          Situation globale des avances de la période du &nbsp;: &nbsp;
+                                          {{ ddebut|date:'Y-n-j' }} &nbsp; au &nbsp;: &nbsp; {{ dfin|date:'Y-n-j' }}
+                                      </h5>
+                                    {% endif %}
+
+                                  </div>
+
+
+                               </div>
+
+                            </form>
+                
             </div>
               <!-- /.card-header -->
 
         <div class="card-body">
-
-
-        {% if listeinscrits %}
-        
-             <table id="listeinscritsannee" class="dt-school">
+        {% if avance_periode %}
+             <table id="liste_avance_periode" class="dt-school">
                     <thead>
                 
                         <tr>
-                                <th>Statut</th>
-                                <th>Matricule</th>
-                                <th>Nom Famille</th>
-                                <th>Prénom(s)</th>
-                                <th>Sexe</th>
-                                <th>Prénom(s) Père</th>
-                                <th>Prénom(s) & Nom Mère</th>
-                                <th>Prénom(s) & Nom Tuteur</th>
-                                <th>Contact père</th>
-                                <th>Contact mère</th>
-                                <th>Email père</th>
-                                <th class="no-export">Email mère</th>
-                                <th>Profession père</th>
-                                <th class="no-export">Profession mère</th>
-                                <th>Personne contact</th>
-                                <th>Adresse</th>
-                                <th>Ecole d'origine</th>
-                                <th class="no-export">Photo ID</th>
-                                <th>Date naissance</th>
-                                <th>Lieu naissance</th>
-                                <th>Date entrée</th>
-                                <th>Pays naissance</th>
-                                <th>Classe</th>
-                                <th>Cycle</th>
+                                <th>ID Personnel</th>
+                                <th>Nom famille</th>
+                                <th>Prénoms</th>
+                                <th>Contact</th>
+                                <th>Catégorie</th>
+                                <th>Désignation opération</th>
+                                <th>Mois</th>
+                                <th>Date opération</th>
+                                <th>Montant avancé</th>
                                 <th>Année scolaire</th>
-                                <th>Date inscription</th>
-                                <th>ID Inscription</th>
+                                <th>ID</th>
                                 <th class="no-export">Actions</th>
                         </tr>
-                        <!-- Ligne de filtres, une case par colonne -->
+
                         <tr class="filters">
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
                                 <th></th>
                                 <th></th>
                                 <th></th>
@@ -842,414 +817,286 @@
                     </thead>
                     <tbody>
                     
-                        {% for le in listeinscrits %}
-                                          <tr>
-                                              <td>{{le.etat_inscription}}</td>
-                                              <td>{{le.mateleve.matricule}}</td>
-                                              <td>{{le.mateleve.nom}}</td>
-                                              <td>{{le.mateleve.prenom}}</td>
-                                              <td>{{le.mateleve.sexe_eleve}}</td>
-                                              <td>{{le.mateleve.pere}}</td>
-                                              <td>{{le.mateleve.mere}}</td>
-                                              <td>{{le.mateleve.tuteur}}</td>
-                                              <td>{{le.mateleve.contact_pere}}</td>
-                                              <td>{{le.mateleve.contact_mere}}</td>
-                                              <td>{{le.mateleve.email_pere}}</td>
-                                              <td class="no-export">{{le.mateleve.email_mere}}</td>
-                                              <td>{{le.mateleve.profes_pere}}</td>
-                                              <td class="no-export">{{le.mateleve.profes_mere}}</td>
-                                              <td>{{le.mateleve.personne_contact}}</td>
-                                              <td>{{le.mateleve.adresse}}</td>
-                                              <td>{{le.mateleve.ecole_origine}}</td>
+                        {% for av in avance_periode %}
+                                <tr>
+                                    <td>{{av.idpersonnel.id}}</td>
+                                    <td>{{av.idpersonnel.nom_personnel}}</td>
+                                    <td>{{av.idpersonnel.prenom_personnel}}</td>
+                                    <td>{{av.idpersonnel.contact_personnel}}</td>
+                                    <td>{{av.idpersonnel.type_personnel}}</td>
+                                    <td>{{av.intitule}}</td>
+                                    <td>{{av.get_mois_avance_display|capfirst}}</td>
+                                    <td>{{av.date_avance|date:'j-n-Y'}}</td>
+                                    <td>{{av.montant_avance|floatformat:'2g'}}</td>
+                                    <td>{{av.anscolaire }}</td>
+                                    <td>{{av.id}}</td>
+                                    <td class="no-export">
+                                        <a class="btn btn-primary" href="{% url 'afficherdetailavancesalaire' av.id %}" title="Voir/Afficher" target="_self"><i class="fa-solid fa-eye fa-sm"></i></a>
+                                        <a class="btn btn-info" href="{% url 'editionavancesalaire' av.id %}" title="Modifier/Editer" target="_self"><i class="fa-solid fa-edit fa-sm"></i></a>
 
-                                              {% if le.mateleve.photo_eleve %}
-                                              <td class="no-export">
-                                                    <a href="{{ le.mateleve.photo_eleve.url }}" target="_blank" title="Agrandir la photo de l'élève">
-                                                        <img src="{{le.mateleve.photo_eleve.url}}" width="40px">
-                                                    </a>
-                                              </td>
-                                              {% else %}
-                                              <td class="no-export">Photo indisponible</td>
-                                              {% endif %}
+                                        {% peut request.user 'menu_administration' as ok_admin %}
 
-                                              <td>{{le.mateleve.datenaissance|date:'j-n-Y'}}</td>
-                                              <td>{{le.mateleve.lieu_naissance}}</td>
-                                              <td>{{le.mateleve.date_arrivee|date:'j-n-Y'}}</td>
-                                              <td>{{le.mateleve.pays_naissance}}</td>
-                                              <td>{{le.idclasse}}</td>
-                                              <td>{{le.idcycle}}</td>
-                                              <td>{{le.annee_scolaire}}</td>
-                                              <td>{{le.date_inscription|date:'j-n-Y'}}</td>
-                                              <td>{{le.id}}</td>
-                                              <td class="no-export">
-                                                  <a class="btn btn-primary" href="{% url 'afficherdetailsinscription' le.id %}" title="Voir/Afficher"><i class="fa fa-eye fa-sm"></i></a>
-                                                  <a class="btn btn-info" href="{% url 'editioninscription' le.id %}" title="Modifier/Editer"><i class="fa fa-edit fa-sm"></i></a>
-
-                                                  {% peut request.user 'menu_administration' as ok_admin %}
-
-                                                  {% if ok_admin %}
-                                                  <a class="btn btn-danger" href=" {% url 'suppinscription' le.id %}" title="Supprimer"><i class="fa fa-remove fa-sm"></i></a>
-                                                  {% endif %}
-                                                  <a class="btn btn-secondary" target="_blank" href="{% url 'imprimerecuinscription' le.id %}" title="Imprimer le recu d'inscription"><i class="fa fa-print fa-sm"></i></a>
-
-                                                  <a class="btn btn-dark" target="_blank" href="{% url 'imprimerbadgeeleve' le.id %}" title="Imprimer le badge de l'élève"><i class="fas fa-id-card fa-sm"></i></a>
-
-                                              </td>
-
-                                          </tr>
-
-                                      {% endfor %}
+                                        {% if ok_admin %}
+                                        <a class="btn btn-danger" href="{% url 'supprimeravancesalaire' av.id %}" title="Supprimer" target="_self"><i class="fa-solid fa-remove fa-sm"></i></a>
+                                        {% endif %}
+                                        <a class="btn btn-secondary" href="{% url 'imprimerecuavancesalaire' av.id %}" title="Imprimer le bon de paiement" target="_blank"><i class="fa-solid fa-print fa-sm"></i></a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
 
                     </tbody>
                     <tfoot>
                         <tr>
-                            <th>Statut</th>
-                            <th>Matricule</th>
-                            <th>Nom Famille</th>
-                            <th>Prénom(s)</th>
-                            <th>Sexe</th>
-                            <th>Prénom(s) Père</th>
-                            <th>Prénom(s) & Nom Mère</th>
-                            <th>Prénom(s) & Nom Tuteur</th>
-                            <th>Contact père</th>
-                            <th>Contact mère</th>
-                            <th>Email père</th>
-                            <th class="no-export">Email mère</th>
-                            <th>Profession père</th>
-                            <th class="no-export">Profession mère</th>
-                            <th>Personne contact</th>
-                            <th>Adresse</th>
-                            <th>Ecole d'origine</th>
-                            <th class="no-export">Photo ID</th>
-                            <th>Date naissance</th>
-                            <th>Lieu naissance</th>
-                            <th>Date entrée</th>
-                            <th>Pays naissance</th>
-                            <th>Classe</th>
-                            <th>Cycle</th>
+                            <th>ID Personnel</th>
+                            <th>Nom famille</th>
+                            <th>Prénoms</th>
+                            <th>Contact</th>
+                            <th>Catégorie</th>
+                            <th>Désignation opération</th>
+                            <th>Mois</th>
+                            <th>Date opération</th>
+                            <th>Montant avancé</th>
                             <th>Année scolaire</th>
-                            <th>Date inscription</th>
-                            <th>ID Inscription</th>
+                            <th>ID</th>
                             <th class="no-export">Actions</th>
                         </tr>
                    </tfoot>
             </table>
 
             <div class="row mt-3 mb-2">
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <div class="form-group">
-                        <label for="effgarcons">Effectif total garçons</label>
-                        {% if effectif_total_garcons %}
-                        <input type="text" id="effgarcons" name="effectif_total_garcons" value="{{ effectif_total_garcons }}" class="form-control form-control-sm input-modern" readonly style="color:red; font-size: 12pt; font-weight: bold;">
+                        <label for="totalavance">Totat Montant avancé</label>
+                        {% if total_avance %}
+                        <input type="text" id="totalavance" name="total_avance"
+                            value="{{ total_avance|floatformat:'2g' }}"
+                            class="form-control form-control-sm input-modern" readonly
+                            style="color:red; font-weight:bold; font-size:12pt;">
                         {% else %}
-                        <input type="text" name="effectif_total_garcons" value="0" class="form-control form-control-sm input-modern" readonly style="color:red; font-size: 12pt; font-weight: bold;">
+                        <input type="text" name="total_avance" value="0"
+                            class="form-control form-control-sm input-modern" readonly
+                            style="color:red; font-weight:bold; font-size:12pt;">
                         {% endif %}
                     </div>
                 </div>
            
-
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <div class="form-group">
-                        <label for="eff_filles">Effectif total filles</label>
-                        {% if effectif_total_filles %}
-                        <input type="text" id="eff_filles" name="effectif_total_filles" value="{{ effectif_total_filles }}" class="form-control form-control-sm input-modern" readonly style="color:red; font-size: 12pt; font-weight: bold;">
+                        <label for="totalsolde">Solde disponible</label>
+                        {% if solde_dispo %}
+                        <input type="text" id="totalsolde" name="total_solde"
+                            value="{{ solde_dispo|floatformat:'2g' }}"
+                            class="form-control form-control-sm input-modern" readonly
+                            style="color:red; font-weight:bold; font-size:12pt;">
                         {% else %}
-                        <input type="text" name="effectif_total_filles" value="0" class="form-control form-control-sm input-modern" readonly style="color:red; font-size: 12pt; font-weight: bold;">
-                        {% endif %}
-                    </div>
-                </div>
-
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label for="efftotal">Effectif total</label>
-                        {% if effectif_total %}
-                        <input type="text" id="efftotal" name="effectif_total" value="{{ effectif_total }}" class="form-control form-control-sm input-modern" readonly style="color:red; font-size: 12pt; font-weight: bold;">
-                        {% else %}
-                        <input type="text" name="effectif_total" value="0" class="form-control form-control-sm input-modern" readonly style="color:red; font-size: 12pt; font-weight: bold;">
+                        <input type="text" name="total_solde" value="0"
+                            class="form-control form-control-sm input-modern" readonly
+                            style="color:red; font-weight:bold; font-size:12pt;">
                         {% endif %}
                     </div>
                 </div>
             </div>
 
             <div class="row">
-              <div class="col-md-8">
-                      <nav aria-label="">
-                          <ul class="pagination">
+                <div class="col-md-8">
+                    <div class="text-center">
 
-                              {% if listeinscrits.has_previous %}
+                        <nav aria-label="">
+                            <ul class="pagination">
 
-                              <li class="page-item">
-                                  <a class="page-link" href="?page=1&{{ query_string }}">1</a>
-                              </li>
-                              <li class="page-item">
-                                  <a class="page-link" href="?page={{ listeinscrits.previous_page_number }}&{{ query_string }}"><i class="fa-solid fa-backward fa-sm"></i>&nbsp; Précédent</a>
-                              </li>
+                                {% if avance_periode.has_previous %}
 
-                              {% endif %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1&{{ query_string }}">1</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ avance_periode.previous_page_number }}&{{ query_string }}"><i class="fa-solid fa-backward fa-sm"></i>&nbsp; Précédent</a>
+                                </li>
 
-                              <li class="page-item active" aria-current="page">
-                                  <a class="page-link" href="#">
-                                      Page {{ listeinscrits.number }} sur {{ listeinscrits.paginator.num_pages }}
-                                  </a>
-                              </li>
+                                {% endif %}
 
-                              {% if listeinscrits.has_next %}
+                                <li class="page-item active" aria-current="page">
+                                    <a class="page-link" href="#">
+                                        Page {{ avance_periode.number }} sur {{ avance_periode.paginator.num_pages }}
+                                    </a>
+                                </li>
 
-                              <li class="page-item">
-                                  <a class="page-link" href="?page={{ listeinscrits.next_page_number }}&{{ query_string }}"><i class="fa-solid fa-forward fa-sm"></i>&nbsp; Suivant</a>
-                              </li>
+                                {% if avance_periode.has_next %}
 
-                              <li class="page-item">
-                                  <a class="page-link" href="?page={{ listeinscrits.paginator.num_pages }}&{{ query_string }}"><i class="fa-solid fa-step-forward fa-sm"></i>&nbsp; Dernier</a>
-                              </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ avance_periode.next_page_number }}&{{ query_string }}"><i class="fa-solid fa-forward fa-sm"></i>&nbsp; Suivant</a>
+                                </li>
 
-                              {% endif %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ avance_periode.paginator.num_pages }}&{{ query_string }}"><i class="fa-solid fa-step-forward fa-sm"></i>&nbsp; Dernier</a>
+                                </li>
 
-                          </ul>
-                      </nav>
-              </div>
-          </div>
+                                {% endif %}
 
-        {% elif listeeleves %}
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
 
-          <table id="listeinscritmensuel" class="dt-school">
+        {% elif avancemois %}
+
+            <table id="liste_avance_mensuelle" class="dt-school">
                     <thead>
-                
                         <tr>
-                                <th>Statut</th>
-                                <th>Matricule</th>
-                                <th>Nom Famille</th>
-                                <th>Prénom(s)</th>
-                                <th>Sexe</th>
-                                <th>Prénom(s) Père</th>
-                                <th>Prénom(s) & Nom Mère</th>
-                                <th>Prénom(s) & Nom Tuteur</th>
-                                <th>Contact père</th>
-                                <th>Contact mère</th>
-                                <th>Email père</th>
-                                <th class="no-export">Email mère</th>
-                                <th>Profession père</th>
-                                <th class="no-export">Profession mère</th>
-                                <th>Personne contact</th>
-                                <th>Adresse</th>
-                                <th>Ecole d'origine</th>
-                                <th class="no-export">Photo ID</th>
-                                <th>Date naissance</th>
-                                <th>Lieu naissance</th>
-                                <th>Date entrée</th>
-                                <th>Pays naissance</th>
-                                <th>Classe</th>
-                                <th>Cycle</th>
-                                <th>Année scolaire</th>
-                                <th>Date inscription</th>
-                                <th>ID Inscription</th>
-                                <th class="no-export">Actions</th>
+                            <th>ID Personnel</th>
+                            <th>Nom famille</th>
+                            <th>Prénoms</th>
+                            <th>Contact</th>
+                            <th>Catégorie</th>
+                            <th>Désignation opération</th>
+                            <th>Mois</th>
+                            <th>Date opération</th>
+                            <th>Montant avancé</th>
+                            <th>Année scolaire</th>
+                            <th>ID</th>
+                            <th class="no-export">Actions</th>
                         </tr>
 
-                        <!-- Ligne de filtres, une case par colonne -->
                         <tr class="filters">
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
                         </tr>
-
                     </thead>
                     <tbody>
-                    
-                        {% for le in listeeleves %}
-                                          <tr>
-                                              <td>{{le.etat_inscription}}</td>
-                                              <td>{{le.mateleve.matricule}}</td>
-                                              <td>{{le.mateleve.nom}}</td>
-                                              <td>{{le.mateleve.prenom}}</td>
-                                              <td>{{le.mateleve.sexe_eleve}}</td>
-                                              <td>{{le.mateleve.pere}}</td>
-                                              <td>{{le.mateleve.mere}}</td>
-                                              <td>{{le.mateleve.tuteur}}</td>
-                                              <td>{{le.mateleve.contact_pere}}</td>
-                                              <td>{{le.mateleve.contact_mere}}</td>
-                                              <td>{{le.mateleve.email_pere}}</td>
-                                              <td class="no-export">{{le.mateleve.email_mere}}</td>
-                                              <td>{{le.mateleve.profes_pere}}</td>
-                                              <td class="no-export">{{le.mateleve.profes_mere}}</td>
-                                              <td>{{le.mateleve.personne_contact}}</td>
-                                              <td>{{le.mateleve.adresse}}</td>
-                                              <td>{{le.mateleve.ecole_origine}}</td>
+                        {% for av in avancemois %}
+                                <tr>
+                                    <td>{{av.idpersonnel.id}}</td>
+                                    <td>{{av.idpersonnel.nom_personnel}}</td>
+                                    <td>{{av.idpersonnel.prenom_personnel}}</td>
+                                    <td>{{av.idpersonnel.contact_personnel}}</td>
+                                    <td>{{av.idpersonnel.type_personnel}}</td>
+                                    <td>{{av.intitule}}</td>
+                                    <td>{{av.get_mois_avance_display|capfirst}}</td>
+                                    <td>{{av.date_avance|date:'j-n-Y'}}</td>
+                                    <td>{{av.montant_avance|floatformat:'2g'}}</td>
+                                    <td>{{av.anscolaire }}</td>
+                                    <td>{{av.id}}</td>
+                                    <td class="no-export">
+                                        <a class="btn btn-primary" href="{% url 'afficherdetailavancesalaire' av.id %}" title="Voir/Afficher" target="_self"><i class="fa-solid fa-eye fa-sm"></i></a>
+                                        <a class="btn btn-info" href="{% url 'editionavancesalaire' av.id %}" title="Modifier/Editer" target="_self"><i class="fa-solid fa-edit fa-sm"></i></a>
 
-                                              {% if le.mateleve.photo_eleve %}
-                                              <td class="no-export">
-                                                    <a href="{{ le.mateleve.photo_eleve.url }}" target="_blank" title="Agrandir la photo de l'élève">
-                                                        <img src="{{le.mateleve.photo_eleve.url}}" width="40px">
-                                                    </a>
-                                              </td>
-                                              {% else %}
-                                              <td class="no-export">Photo indisponible</td>
-                                              {% endif %}
+                                        {% peut request.user 'menu_administration' as ok_admin %}
 
-                                              <td>{{le.mateleve.datenaissance|date:'j-n-Y'}}</td>
-                                              <td>{{le.mateleve.lieu_naissance}}</td>
-                                              <td>{{le.mateleve.date_arrivee|date:'j-n-Y'}}</td>
-                                              <td>{{le.mateleve.pays_naissance}}</td>
-                                              <td>{{le.idclasse}}</td>
-                                              <td>{{le.idcycle}}</td>
-                                              <td>{{le.annee_scolaire}}</td>
-                                              <td>{{le.date_inscription|date:'j-n-Y'}}</td>
-                                              <td>{{le.id}}</td>
-                                              <td class="no-export">
-                                                  <a class="btn btn-primary" href="{% url 'afficherdetailsinscription' le.id %}" title="Voir/Afficher"><i class="fa fa-eye fa-sm"></i></a>
-                                                  <a class="btn btn-info" href="{% url 'editioninscription' le.id %}" title="Modifier/Editer"><i class="fa fa-edit fa-sm"></i></a>
-
-                                                  {% peut request.user 'menu_administration' as ok_admin %}
-
-                                                  {% if ok_admin %}
-                                                  <a class="btn btn-danger" href=" {% url 'suppinscription' le.id %}" title="Supprimer"><i class="fa fa-remove fa-sm"></i></a>
-                                                  {% endif %}
-                                                  <a class="btn btn-secondary" target="_blank" href="{% url 'imprimerecuinscription' le.id %}" title="Imprimer le recu d'inscription"><i class="fa fa-print fa-sm"></i></a>
-
-                                                  <a class="btn btn-dark" target="_blank" href="{% url 'imprimerbadgeeleve' le.id %}" title="Imprimer le badge de l'élève"><i class="fas fa-id-card fa-sm"></i></a>
-
-                                              </td>
-
-                                          </tr>
-
-                                      {% endfor %}
-
+                                        {% if ok_admin %}
+                                        <a class="btn btn-danger" href="{% url 'supprimeravancesalaire' av.id %}" title="Supprimer" target="_self"><i class="fa-solid fa-remove fa-sm"></i></a>
+                                        {% endif %}
+                                        <a class="btn btn-secondary" href="{% url 'imprimerecuavancesalaire' av.id %}" title="Imprimer le bon de paiement" target="_blank"><i class="fa-solid fa-print fa-sm"></i></a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
                     </tbody>
                     <tfoot>
                         <tr>
-                            <th>Statut</th>
-                            <th>Matricule</th>
-                            <th>Nom Famille</th>
-                            <th>Prénom(s)</th>
-                            <th>Sexe</th>
-                            <th>Prénom(s) Père</th>
-                            <th>Prénom(s) & Nom Mère</th>
-                            <th>Prénom(s) & Nom Tuteur</th>
-                            <th>Contact père</th>
-                            <th>Contact mère</th>
-                            <th>Email père</th>
-                            <th class="no-export">Email mère</th>
-                            <th>Profession père</th>
-                            <th class="no-export">Profession mère</th>
-                            <th>Personne contact</th>
-                            <th>Adresse</th>
-                            <th>Ecole d'origine</th>
-                            <th class="no-export">Photo ID</th>
-                            <th>Date naissance</th>
-                            <th>Lieu naissance</th>
-                            <th>Date entrée</th>
-                            <th>Pays naissance</th>
-                            <th>Classe</th>
-                            <th>Cycle</th>
+                            <th>ID Personnel</th>
+                            <th>Nom famille</th>
+                            <th>Prénoms</th>
+                            <th>Contact</th>
+                            <th>Catégorie</th>
+                            <th>Désignation opération</th>
+                            <th>Mois</th>
+                            <th>Date opération</th>
+                            <th>Montant avancé</th>
                             <th>Année scolaire</th>
-                            <th>Date inscription</th>
-                            <th>ID Inscription</th>
+                            <th>ID</th>
                             <th class="no-export">Actions</th>
                         </tr>
-                   </tfoot>
+                    </tfoot>
             </table>
 
             <div class="row mt-3 mb-2">
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <div class="form-group">
-                        <label for="effgarcons">Effectif total garçons</label>
-                        {% if effectif_total_garcons %}
-                        <input type="text" id="effgarcons" name="effectif_total_garcons" value="{{ effectif_total_garcons }}" class="form-control form-control-sm input-modern" readonly style="color:red; font-size: 12pt; font-weight: bold;">
+                        <label for="totalavance">Totat Montant avancé</label>
+                        {% if total_avance %}
+                        <input type="text" id="totalavance" name="total_avance"
+                            value="{{ total_avance|floatformat:'2g' }}"
+                            class="form-control form-control-sm input-modern" readonly
+                            style="color:red; font-weight:bold; font-size:12pt;">
                         {% else %}
-                        <input type="text" name="effectif_total_garcons" value="0" class="form-control form-control-sm input-modern" readonly style="color:red; font-size: 12pt; font-weight: bold;">
+                        <input type="text" name="total_avance" value="0"
+                            class="form-control form-control-sm input-modern" readonly
+                            style="color:red; font-weight:bold; font-size:12pt;">
                         {% endif %}
                     </div>
                 </div>
            
-
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <div class="form-group">
-                        <label for="eff_filles">Effectif total filles</label>
-                        {% if effectif_total_filles %}
-                        <input type="text" id="eff_filles" name="effectif_total_filles" value="{{ effectif_total_filles }}" class="form-control form-control-sm input-modern" readonly style="color:red; font-size: 12pt; font-weight: bold;">
+                        <label for="totalsolde">Solde disponible</label>
+                        {% if solde_dispo %}
+                        <input type="text" id="totalsolde" name="total_solde"
+                            value="{{ solde_dispo|floatformat:'2g' }}"
+                            class="form-control form-control-sm input-modern" readonly
+                            style="color:red; font-weight:bold; font-size:12pt;">
                         {% else %}
-                        <input type="text" name="effectif_total_filles" value="0" class="form-control form-control-sm input-modern" readonly style="color:red; font-size: 12pt; font-weight: bold;">
-                        {% endif %}
-                    </div>
-                </div>
-
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label for="efftotal">Effectif total</label>
-                        {% if effectif_total %}
-                        <input type="text" id="efftotal" name="effectif_total" value="{{ effectif_total }}" class="form-control form-control-sm input-modern" readonly style="color:red; font-size: 12pt; font-weight: bold;">
-                        {% else %}
-                        <input type="text" name="effectif_total" value="0" class="form-control form-control-sm input-modern" readonly style="color:red; font-size: 12pt; font-weight: bold;">
+                        <input type="text" name="total_solde" value="0"
+                            class="form-control form-control-sm input-modern" readonly
+                            style="color:red; font-weight:bold; font-size:12pt;">
                         {% endif %}
                     </div>
                 </div>
             </div>
+            
 
             <div class="row">
-              <div class="col-md-8">
-                      <nav aria-label="">
-                          <ul class="pagination">
+                <div class="col-md-8">
+                    <div class="text-center">
+                        <nav aria-label="">
+                            <ul class="pagination">
 
-                              {% if listeeleves.has_previous %}
+                                {% if avancemois.has_previous %}
 
-                              <li class="page-item">
-                                  <a class="page-link" href="?page=1">1</a>
-                              </li>
-                              <li class="page-item">
-                                  <a class="page-link" href="?page={{ listeeleves.previous_page_number }}"><i class="fa-solid fa-backward fa-sm"></i>&nbsp; Précédent</a>
-                              </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1">1</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ avancemois.previous_page_number }}"><i class="fa-solid fa-backward fa-sm"></i>&nbsp; Précédent</a>
+                                </li>
 
-                              {% endif %}
+                                {% endif %}
 
-                              <li class="page-item active" aria-current="page">
-                                  <a class="page-link" href="#">
-                                      Page {{ listeeleves.number }} sur {{ listeeleves.paginator.num_pages }}
-                                  </a>
-                              </li>
+                                <li class="page-item active" aria-current="page">
+                                    <a class="page-link" href="#">
+                                        Page {{ avancemois.number }} sur {{ avancemois.paginator.num_pages }}
+                                    </a>
+                                </li>
 
-                              {% if listeeleves.has_next %}
+                                {% if avancemois.has_next %}
 
-                              <li class="page-item">
-                                  <a class="page-link" href="?page={{ listeeleves.next_page_number }}"><i class="fa-solid fa-forward fa-sm"></i>&nbsp; Suivant</a>
-                              </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ avancemois.next_page_number }}"><i class="fa-solid fa-forward fa-sm"></i>&nbsp; Suivant</a>
+                                </li>
 
-                              <li class="page-item">
-                                  <a class="page-link" href="?page={{ listeeleves.paginator.num_pages }}"><i class="fa-solid fa-step-forward fa-sm"></i>&nbsp; Dernier</a>
-                              </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ avancemois.paginator.num_pages }}"><i class="fa-solid fa-step-forward fa-sm"></i>&nbsp; Dernier</a>
+                                </li>
 
-                              {% endif %}
+                                {% endif %}
 
-                          </ul>
-                      </nav>
-              </div>
-          </div>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            
 
-       {% endif %}
+        {% endif %}
         
         </div>
             <!-- /.card-body -->
@@ -1284,7 +1131,7 @@
 </div>
 <!-- ./wrapper -->
 
-<!-- Fenetre modale permettant a l'utiliateur de modifier sa photo de profil-->
+  <!-- Fenetre modale permettant a l'utiliateur de modifier sa photo de profil-->
 <div class="modal fade" id="modalPhotoProfil" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -1372,134 +1219,103 @@
 {% include "partials/pwa_sw.html" %}
 
 <script>
-  
+
   $(function () {
-    function initDataTableAvecFiltres(selector) {
-        var table = $(selector).DataTable({
-            "paging": false,
-            "lengthChange": true,
-            "lengthMenu": [10, 25, 50, 100],
-            "ordering": true,
-            "info": true,
-            "scrollX":true,
-            "scrollCollapse": true,
-            "searching": true,
-            "autoWidth": true,
-            "orderCellsTop": true,   // empêche le tri de cibler la ligne de filtres
-            "language": {
+      function initDataTableAvecFiltres(selector) {
+          var table = $(selector).DataTable({
+              "paging": false,
+              "lengthChange": true,
+              "lengthMenu": [10, 25, 50, 100],
+              "ordering": true,
+              "info": true,
+              "scrollX":true,
+              "scrollCollapse": true,
+              "searching": true,
+              "autoWidth": true,
+              "orderCellsTop": true,   // empêche le tri de cibler la ligne de filtres
+              "language": {
                     "search": "Recherche globale :",
                     "searchPlaceholder": "Rechercher une valeur...",
                     "info": "Affichage de _START_ à _END_ sur _TOTAL_ éléments",
                     "infoEmpty": "Aucun élément à afficher",
                     "infoFiltered": "(filtré depuis _MAX_ éléments au total)"
               },
-            "columnDefs": [
-                  { targets: [0, 4], width: "50px" },   // Statut, Sexe
-                  { targets: [1], width: "80px" },     // Matricule
-              ],
-            "dom": //'Blfrtip',   // B = Boutons, placés juste au-dessus du tableau, avant l/f (longueur/recherche)
-            "<'row'<'col-12 col-md-6'l><'col-12 col-md-6'f>>" +   // ligne 1 : longueur (gauche) + recherche (droite)
-            "<'row'<'col-sm-12 text-right export-buttons-row'B>>" +  // ligne 2 : boutons Excel/PDF, alignés à droite
-            "rt" +                                   // r = processing, t = le tableau lui-même
-            "<'row'<'col-sm-5'i><'col-sm-7'p>>",     // ligne finale : info + pagination
-            "buttons": [
-            {
-              extend: 'excelHtml5',
-              text: '<i class="fa fa-file-excel"></i> Export Excel',
-              titleAttr: 'Télécharger la liste des élèves au format Excel',
-              className: 'btn btn-success btn-sm mr-1',
-              title: 'Situation des inscrits de l\'annee scolaire en cours',
-              exportOptions: {
+              "columnDefs": [
+                    { targets: [0, 4], width: "50px" },   // Statut, Sexe
+                    { targets: [1], width: "80px" },     // Matricule
+                ],
+              "dom": //'Blfrtip',   // B = Boutons, placés juste au-dessus du tableau, avant l/f (longueur/recherche)
+              "<'row'<'col-12 col-md-6'l><'col-12 col-md-6'f>>" +   // ligne 1 : longueur (gauche) + recherche (droite)
+              "<'row'<'col-sm-12 text-right export-buttons-row'B>>" +  // ligne 2 : boutons Excel/PDF, alignés à droite
+              "rt" +                                   // r = processing, t = le tableau lui-même
+              "<'row'<'col-sm-5'i><'col-sm-7'p>>",     // ligne finale : info + pagination
+              "buttons": [
+              {
+                extend: 'excelHtml5',
+                text: '<i class="fa fa-file-excel"></i> Export Excel',
+                titleAttr: 'Télécharger la situation des avances au format Excel',
+                className: 'btn btn-success btn-sm mr-1',
+                title: 'Situation des avances sur salaire de l\'année scolaire',
+                exportOptions: {
+                        columns: ':not(.no-export)',
+                    }
+              },
+              {
+                extend: 'pdfHtml5',
+                text: '<i class="fa fa-file-pdf"></i> Export PDF',
+                titleAttr: 'Télécharger la situation des avances au format PDF',
+                className: 'btn btn-danger btn-sm',
+                title: 'Situation des avances sur salaire de l\'année scolaire',
+                orientation: 'landscape',
+                pageSize: 'A4',
+                exportOptions: {
                       columns: ':not(.no-export)',
-                  }
-            },
-            {
-              extend: 'pdfHtml5',
-              text: '<i class="fa fa-file-pdf"></i> Export PDF',
-              titleAttr: 'Télécharger la liste des élèves au format PDF',
-              className: 'btn btn-danger btn-sm',
-              title: 'Situation des inscrits de l\'annee scolaire en cours ',
-              orientation: 'landscape',
-              pageSize: 'A4',
-              exportOptions: {
-                    columns: ':not(.no-export)',
-                },
-                customize: function (doc) {
-                    // Force toutes les colonnes à se partager équitablement la largeur de la page
-                    doc.content[1].table.widths = Array(doc.content[1].table.body[0].length).fill('*');
+                  },
+                  customize: function (doc) {
+                      // Force toutes les colonnes à se partager équitablement la largeur de la page
+                      doc.content[1].table.widths = Array(doc.content[1].table.body[0].length).fill('*');
 
-                    // Réduit la taille de police pour que le contenu tienne mieux
-                    doc.defaultStyle.fontSize = 2;
-                    doc.styles.tableHeader.fontSize = 3;
+                      // Réduit la taille de police pour que le contenu tienne mieux
+                      doc.defaultStyle.fontSize = 2;
+                      doc.styles.tableHeader.fontSize = 3;
 
-                    // Réduit les marges de page pour gagner de la place
-                    doc.pageMargins = [10, 20, 10, 20];
+                      // Réduit les marges de page pour gagner de la place
+                      doc.pageMargins = [10, 20, 10, 20];
+                        }
+              }
+            ]
+            });
+
+
+          // Génère un champ de recherche par colonne, sur la ligne .filters
+          table.columns().every(function (index) {
+              var column = this;
+              var cell = $('.filters th').eq(index);
+
+              // Pas de filtre sur la colonne Actions ou toute colonne marquée no-export
+              if (cell.closest('table').find('thead tr:first th').eq(index).hasClass('no-export')) {
+                  return;
+              }
+
+              var input = $('<input type="text" placeholder="Filtrer..." />')
+                  .appendTo(cell)
+                  .on('keyup change clear', function () {
+                      if (column.search() !== this.value) {
+                          column.search(this.value).draw();
                       }
-            }
-          ]
+                  });
           });
 
+          return table;
+      }
 
-        // Génère un champ de recherche par colonne, sur la ligne .filters
-        table.columns().every(function (index) {
-            var column = this;
-            var cell = $('.filters th').eq(index);
-
-            // Pas de filtre sur la colonne Actions ou toute colonne marquée no-export
-            if (cell.closest('table').find('thead tr:first th').eq(index).hasClass('no-export')) {
-                return;
-            }
-
-            var input = $('<input type="text" placeholder="Filtrer..." />')
-                .appendTo(cell)
-                .on('keyup change clear', function () {
-                    if (column.search() !== this.value) {
-                        column.search(this.value).draw();
-                    }
-                });
-        });
-
-        return table;
-    }
-
-    initDataTableAvecFiltres('#listeinscritsannee');
-    initDataTableAvecFiltres('#listeinscritmensuel');
-});
-
-
-  // Cette fonction javascript (JQuery) m'a permis de filtrer les classes selon le cycle choisi
-    $("#cbocycle").change(function(){
-        var url = $("#flisteinscrits").attr("data-classe-url");
-        var idcycle = $(this).val();
-
-        $.ajax({
-            url:url,
-            data:{
-                'idcycle':idcycle
-            },
-            success:function(data){
-                $("#cboclasse").html(data);
-            }
-
-
-        });
+      initDataTableAvecFiltres('#liste_avance_periode');
+      initDataTableAvecFiltres('#liste_avance_mensuelle');
     });
 
-    // Cette fonction javascript (JQuery) m'a permis de masquer le tableau d'affichage au chargement de la page
-    $("window").on("load",function(){
-        $('#listeinscritsannee').hide();
-    });
-
-    // Cette fonction me permet d'afficher le tableau d'affichage auparavant masqué lors du chargement
-  $("#btn_rechercher").click(function(){
-    $('#listeinscritsannee').show();
-  });
-
-</script> 
+</script>   
 
 
 </body>
 </html>
-
-
 

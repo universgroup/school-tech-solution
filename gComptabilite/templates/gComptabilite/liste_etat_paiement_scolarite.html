@@ -151,10 +151,10 @@
             <a id="dropdownSubMenu6" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle">Personnel</a>
             <ul aria-labelledby="dropdownSubMenu6" class="dropdown-menu border-0 shadow">
               <li><a href="{% url 'listegeneralepersonnel' %}" class="dropdown-item">Enregistrer un employé</a></li>
-              <li><a href="#" class="dropdown-item">Enregistrer une avance sur salaire</a></li>
-              <li><a href="#" class="dropdown-item">Paiement des salaires</a></li>
+              <li><a href="{% url 'listeavancemensuelle' %}" class="dropdown-item">Enregistrer une avance sur salaire</a></li>
+              <li><a href="{% url 'listesalairemensuel' %}" class="dropdown-item">Paiement des salaires</a></li>
               <li><a href="#" class="dropdown-item">Suivi des absences</a></li>
-              <li><a href="#" class="dropdown-item">Liste des employés</a></li>
+              <li><a href="{% url 'impressionlistepersonnel' %}" class="dropdown-item">Liste des employés</a></li>
             </ul>
       </li>
 
@@ -222,20 +222,10 @@
     </ul>
 
     <!-- SEARCH FORM -->
-    <form class="form-inline ml-3 d-none d-lg-flex">
-      <div class="input-group input-group-sm">
-        <input class="form-control form-control-navbar" type="search" placeholder="Rechercher..." aria-label="Search">
-        <div class="input-group-append">
-          <button class="btn btn-navbar" type="button">
-            <i class="fas fa-search"></i>
-          </button>
-        </div>
-      </div>
-    </form>
-
+    
     <!-- Année scolaire / session -->
-    <div class="navbar-text mx-3 d-none d-md-inline-block" style="color: #4f46e5; font-weight: bold; font-size: 0.85rem;">
-        ANNEE SCOLAIRE : {{ annee_scolaire }} &nbsp;&nbsp; SESSION : {{ session_scolaire }}
+    <div class="navbar-text ml-auto mr-3 mr-lg-5 d-none d-md-inline-block" style="color: #4f46e5; font-weight: bold; font-size: 0.85rem;">
+      ANNEE SCOLAIRE : {{ annee_scolaire }} &nbsp;&nbsp; SESSION : {{ session_scolaire }}
     </div>
 
     <ul class="navbar-nav ml-auto">       
@@ -540,13 +530,13 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="#" class="nav-link" title="Permet de saisir les avances sur salaire accordées aux employés">
+                <a href="{% url 'listeavancemensuelle' %}" class="nav-link" title="Permet de saisir les avances sur salaire accordées aux employés">
                   <i class="fas fa-sack-dollar">&nbsp;</i>
                   <p>Ajouter bon paiement</p>                  
                 </a>
               </li>
               <li class="nav-item">
-                <a href="#" class="nav-link" title="Permet de saisir les salaires mensuels versés aux employés">
+                <a href="{% url 'listesalairemensuel' %}" class="nav-link" title="Permet de saisir les salaires mensuels versés aux employés">
                   <i class="fas fa-hand-holding-dollar">&nbsp;</i>
                   <p>Paiement salaires </p>                  
                 </a>
@@ -558,7 +548,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="#" class="nav-link" title="Permet d'imprimer la liste générale du personnel">
+                <a href="{% url 'impressionlistepersonnel' %}" class="nav-link" title="Permet d'imprimer la liste générale du personnel">
                   <i class="fa-solid fa-users">&nbsp;</i>
                   <p>Liste employés</p>                  
                 </a>
@@ -963,9 +953,9 @@
                     <div class="form-group">
                         <label for="id_total_t1">Total première tranche</label>
                         {% if total_tranche1 %}
-                        <input type="text" id="id_total_t1" name="total_tranche1" value="{{ total_tranche1|floatformat:'2g' }}" class="form-control" readonly style="color:red; font-weight: bold; font-size: 12pt;">
+                        <input type="text" id="id_total_t1" name="total_tranche1" value="{{ total_tranche1|floatformat:'2g' }}" class="form-control form-control-sm input-modern" readonly style="color:red; font-weight: bold; font-size: 12pt;">
                         {% else %}
-                        <input type="text" id="id_total_t1" name="total_tranche1" value="0" class="form-control" readonly style="color:red; font-weight: bold; font-size: 12pt;">
+                        <input type="text" id="id_total_t1" name="total_tranche1" value="0" class="form-control form-control-sm input-modern" readonly style="color:red; font-weight: bold; font-size: 12pt;">
                         {% endif %}
                     </div>
                 </div>
@@ -975,9 +965,9 @@
                     <div class="form-group">
                         <label for="id_total_t2">Total deuxième tranche</label>
                         {% if total_tranche2 %}
-                        <input type="text" id="id_total_t2" name="total_tranche2" value="{{ total_tranche2|floatformat:'2g' }}" class="form-control" readonly style="color:red; font-weight: bold; font-size: 12pt;">
+                        <input type="text" id="id_total_t2" name="total_tranche2" value="{{ total_tranche2|floatformat:'2g' }}" class="form-control form-control-sm input-modern" readonly style="color:red; font-weight: bold; font-size: 12pt;">
                         {% else %}
-                        <input type="text" id="id_total_t2" name="total_tranche2" value="0" class="form-control" readonly style="color:red; font-weight: bold; font-size: 12pt;">
+                        <input type="text" id="id_total_t2" name="total_tranche2" value="0" class="form-control form-control-sm input-modern" readonly style="color:red; font-weight: bold; font-size: 12pt;">
                         {% endif %}
                     </div>
                 </div>
@@ -986,9 +976,9 @@
                     <div class="form-group">
                         <label for="id_total_annuel">Total paiement annuel</label>
                         {% if total_paiement_annuel %}
-                        <input type="text" id="id_total_annuel" name="total_paie_annuel" value="{{ total_paiement_annuel|floatformat:'2g' }}" class="form-control" readonly style="color:red; font-weight: bold; font-size: 12pt;">
+                        <input type="text" id="id_total_annuel" name="total_paie_annuel" value="{{ total_paiement_annuel|floatformat:'2g' }}" class="form-control form-control-sm input-modern" readonly style="color:red; font-weight: bold; font-size: 12pt;">
                         {% else %}
-                        <input type="text" id="id_total_annuel" name="total_paie_annuel" value="0" class="form-control" readonly style="color:red; font-weight: bold; font-size: 12pt;">
+                        <input type="text" id="id_total_annuel" name="total_paie_annuel" value="0" class="form-control form-control-sm input-modern" readonly style="color:red; font-weight: bold; font-size: 12pt;">
                         {% endif %}
                     </div>
                 </div>
@@ -997,9 +987,9 @@
                     <div class="form-group">
                         <label for="id_total_reste">Total reliquat</label>
                         {% if total_reste_a_payer %}
-                        <input type="text" id="id_total_reste" name="total_reste_a_payer" value="{{ total_reste_a_payer|floatformat:'2g' }}" class="form-control" readonly style="color:red; font-weight: bold; font-size: 12pt;">
+                        <input type="text" id="id_total_reste" name="total_reste_a_payer" value="{{ total_reste_a_payer|floatformat:'2g' }}" class="form-control form-control-sm input-modern" readonly style="color:red; font-weight: bold; font-size: 12pt;">
                         {% else %}
-                        <input type="text" id="id_total_reste" name="total_reste_a_payer" value="0" class="form-control" readonly style="color:red; font-weight: bold; font-size: 12pt;">
+                        <input type="text" id="id_total_reste" name="total_reste_a_payer" value="0" class="form-control form-control-sm input-modern" readonly style="color:red; font-weight: bold; font-size: 12pt;">
                         {% endif %}
                     </div>
                 </div>
@@ -1222,9 +1212,9 @@
                     <div class="form-group">
                         <label for="id_total_t1">Total première tranche</label>
                         {% if total_tranche1 %}
-                        <input type="text" id="id_total_t1" name="total_tranche1" value="{{ total_tranche1|floatformat:'2g' }}" class="form-control" readonly style="color:red; font-weight: bold; font-size: 12pt;">
+                        <input type="text" id="id_total_t1" name="total_tranche1" value="{{ total_tranche1|floatformat:'2g' }}" class="form-control form-control-sm input-modern" readonly style="color:red; font-weight: bold; font-size: 12pt;">
                         {% else %}
-                        <input type="text" id="id_total_t1" name="total_tranche1" value="0" class="form-control" readonly style="color:red; font-weight: bold; font-size: 12pt;">
+                        <input type="text" id="id_total_t1" name="total_tranche1" value="0" class="form-control form-control-sm input-modern" readonly style="color:red; font-weight: bold; font-size: 12pt;">
                         {% endif %}
                     </div>
                 </div>
@@ -1234,9 +1224,9 @@
                     <div class="form-group">
                         <label for="id_total_t2">Total deuxième tranche</label>
                         {% if total_tranche2 %}
-                        <input type="text" id="id_total_t2" name="total_tranche2" value="{{ total_tranche2|floatformat:'2g' }}" class="form-control" readonly style="color:red; font-weight: bold; font-size: 12pt;">
+                        <input type="text" id="id_total_t2" name="total_tranche2" value="{{ total_tranche2|floatformat:'2g' }}" class="form-control form-control-sm input-modern" readonly style="color:red; font-weight: bold; font-size: 12pt;">
                         {% else %}
-                        <input type="text" id="id_total_t2" name="total_tranche2" value="0" class="form-control" readonly style="color:red; font-weight: bold; font-size: 12pt;">
+                        <input type="text" id="id_total_t2" name="total_tranche2" value="0" class="form-control form-control-sm input-modern" readonly style="color:red; font-weight: bold; font-size: 12pt;">
                         {% endif %}
                     </div>
                 </div>
@@ -1245,9 +1235,9 @@
                     <div class="form-group">
                         <label for="id_total_paie_annuel">Total paiement annuel</label>
                         {% if total_paiement_annuel %}
-                        <input type="text" id="id_total_paie_annuel" name="total_paiement_annuel" value="{{ total_paiement_annuel|floatformat:'2g' }}" class="form-control" readonly style="color:red; font-weight: bold; font-size: 12pt;">
+                        <input type="text" id="id_total_paie_annuel" name="total_paiement_annuel" value="{{ total_paiement_annuel|floatformat:'2g' }}" class="form-control form-control-sm input-modern" readonly style="color:red; font-weight: bold; font-size: 12pt;">
                         {% else %}
-                        <input type="text" id="id_total_paie_annuel" name="total_paiement_annuel" value="0" class="form-control" readonly style="color:red; font-weight: bold; font-size: 12pt;">
+                        <input type="text" id="id_total_paie_annuel" name="total_paiement_annuel" value="0" class="form-control form-control-sm input-modern" readonly style="color:red; font-weight: bold; font-size: 12pt;">
                         {% endif %}
                     </div>
                 </div>
@@ -1256,9 +1246,9 @@
                     <div class="form-group">
                         <label for="id_total_reste">Total reliquat</label>
                         {% if total_reste_a_payer %}
-                        <input type="text" id="id_total_reste" name="total_reste_a_payer" value="{{ total_reste_a_payer|floatformat:'2g' }}" class="form-control" readonly style="color:red; font-weight: bold; font-size: 12pt;">
+                        <input type="text" id="id_total_reste" name="total_reste_a_payer" value="{{ total_reste_a_payer|floatformat:'2g' }}" class="form-control form-control-sm input-modern" readonly style="color:red; font-weight: bold; font-size: 12pt;">
                         {% else %}
-                        <input type="text" id="id_total_reste" name="total_reste_a_payer" value="0" class="form-control" readonly style="color:red; font-weight: bold; font-size: 12pt;">
+                        <input type="text" id="id_total_reste" name="total_reste_a_payer" value="0" class="form-control form-control-sm input-modern" readonly style="color:red; font-weight: bold; font-size: 12pt;">
                         {% endif %}
                     </div>
                 </div>

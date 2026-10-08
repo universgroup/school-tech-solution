@@ -667,7 +667,7 @@ def recuinscription(request, idinsc):
                     {'email': data[9], 'tel': data[12]},  # mère
                     ]
         emails_valides = [p['email'] for p in parents if p['email']]
-        tel_sans_email = [p['tel'] for p in parents if not p['email'] and p['tel']]
+        tel_valides = [p['tel'] for p in parents if p['tel']]
 
         if not ins.mail_envoye_inscription: # Verifie si l'email n'a pas encore été envoyé alors il y procède sinon pas d'envoi de mail
             if emails_valides:
@@ -704,7 +704,7 @@ def recuinscription(request, idinsc):
 
         # ── ENVOI SMS (parents sans email) ──
         if not ins.sms_envoye_inscription:
-            if tel_sans_email:
+            if tel_valides:
                 try:
                     destinataires_contexte = [
                         (tel, {
@@ -713,12 +713,13 @@ def recuinscription(request, idinsc):
                             'prenom': ins.mateleve.prenom,
                             'classe': ins.idclasse,
                             'ecole': data_ecole[8],
+                            'mont_inscription': data[11],
                         })
-                        for tel in tel_sans_email
+                        for tel in tel_valides
                     ]
                     template_message = (
-                        "Inscription confirmée pour  {prenom} {nom} matricule {matricule} classe {classe}. "
-                        "Service Scolarité : {ecole}."
+                        "Inscription confirmée pour {prenom} {nom} matricule {matricule} classe {classe} Montant payé {mont_inscription} . \n"
+                        "Service Scolarité : \n {ecole}."
                     )
                     envoyes, echecs = envoyer_sms_masse(
                         destinataires_contexte,
@@ -1088,7 +1089,7 @@ def recureinscription(request, idinsc):
                     {'email': data[9], 'tel': data[12]},  # mère
                     ]
         emails_valides = [p['email'] for p in parents if p['email']]
-        tel_sans_email = [p['tel'] for p in parents if not p['email'] and p['tel']]
+        tel_valides = [p['tel'] for p in parents if p['tel']]
 
         if not ins.mail_envoye_inscription: # Verifie si l'email n'a pas encore été envoyé alors il y procède sinon pas d'envoi de mail
             if emails_valides:
@@ -1125,7 +1126,7 @@ def recureinscription(request, idinsc):
 
         # ── ENVOI SMS (parents sans email) ──
         if not ins.sms_envoye_inscription:
-            if tel_sans_email:
+            if tel_valides:
                 try:
                     destinataires_contexte = [
                         (tel, {
@@ -1134,12 +1135,13 @@ def recureinscription(request, idinsc):
                             'prenom': ins.mateleve.prenom,
                             'classe': ins.idclasse,
                             'ecole': data_ecole[8],
+                            'mont_inscription': data[11],
                         })
-                        for tel in tel_sans_email
+                        for tel in tel_valides
                     ]
                     template_message = (
-                        "Reinscription confirmée pour  {prenom} {nom} matricule {matricule} classe {classe}. "
-                        "Service Scolarité : {ecole}."
+                        "Reinscription confirmée pour {prenom} {nom} matricule {matricule} classe {classe} Montant payé {mont_inscription} . \n"
+                        "Service Scolarité : \n {ecole}."
                     )
                     envoyes, echecs = envoyer_sms_masse(
                         destinataires_contexte,

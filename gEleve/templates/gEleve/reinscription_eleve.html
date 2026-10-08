@@ -165,9 +165,7 @@
         });
       
     });
-</script>
 
-<script>
     var defaultPhoto = "{% static 'assets/dist/img/avatar.png' %}";
 
     // Cette fonction permet d'afficher les infos de l'élève sélectionné
@@ -268,6 +266,14 @@
                 }
             },
             width: '100%'
+        });
+
+        $('#finscription').on('reset', function () {
+            // setTimeout : l'événement "reset" est déclenché AVANT que le navigateur
+            // ne remette les champs à zéro, il faut donc attendre la fin du reset natif.
+            setTimeout(function () {
+                $('#cbomateleve').val(null).trigger('change');
+            }, 0);
         });
 
 </script>

@@ -154,7 +154,7 @@
               <li><a href="#" class="dropdown-item">Enregistrer une avance sur salaire</a></li>
               <li><a href="#" class="dropdown-item">Paiement des salaires</a></li>
               <li><a href="#" class="dropdown-item">Suivi des absences</a></li>
-              <li><a href="#" class="dropdown-item">Liste des employés</a></li>
+              <li><a href="{% url 'impressionlistepersonnel' %}" class="dropdown-item">Liste des employés</a></li>
             </ul>
       </li>
 
@@ -222,20 +222,10 @@
     </ul>
 
     <!-- SEARCH FORM -->
-    <form class="form-inline ml-3 d-none d-lg-flex">
-      <div class="input-group input-group-sm">
-        <input class="form-control form-control-navbar" type="search" placeholder="Rechercher..." aria-label="Search">
-        <div class="input-group-append">
-          <button class="btn btn-navbar" type="button">
-            <i class="fas fa-search"></i>
-          </button>
-        </div>
-      </div>
-    </form>
-
+    
     <!-- Année scolaire / session -->
-    <div class="navbar-text mx-3 d-none d-md-inline-block" style="color: #4f46e5; font-weight: bold; font-size: 0.85rem;">
-        ANNEE SCOLAIRE : {{ annee_scolaire }} &nbsp;&nbsp; SESSION : {{ session_scolaire }}
+    <div class="navbar-text ml-auto mr-3 mr-lg-5 d-none d-md-inline-block" style="color: #4f46e5; font-weight: bold; font-size: 0.85rem;">
+      ANNEE SCOLAIRE : {{ annee_scolaire }} &nbsp;&nbsp; SESSION : {{ session_scolaire }}
     </div>
 
     <ul class="navbar-nav ml-auto">       
@@ -539,13 +529,13 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="#" class="nav-link" title="Permet de saisir les avances sur salaire accordées aux employés">
+                <a href="{% url 'listeavancemensuelle' %}" class="nav-link" title="Permet de saisir les avances sur salaire accordées aux employés">
                   <i class="fas fa-sack-dollar">&nbsp;</i>
                   <p>Ajouter bon paiement</p>                  
                 </a>
               </li>
               <li class="nav-item">
-                <a href="#" class="nav-link" title="Permet de saisir les salaires mensuels versés aux employés">
+                <a href="{% url 'listesalairemensuel' %}" class="nav-link" title="Permet de saisir les salaires mensuels versés aux employés">
                   <i class="fas fa-hand-holding-dollar">&nbsp;</i>
                   <p>Paiement salaires </p>                  
                 </a>
@@ -557,7 +547,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="#" class="nav-link" title="Permet d'imprimer la liste générale du personnel">
+                <a href="{% url 'impressionlistepersonnel' %}" class="nav-link" title="Permet d'imprimer la liste générale du personnel">
                   <i class="fa-solid fa-users">&nbsp;</i>
                   <p>Liste employés</p>                  
                 </a>

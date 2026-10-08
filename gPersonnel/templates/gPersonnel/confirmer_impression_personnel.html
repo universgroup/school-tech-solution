@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% block titre_page %} GESTION DU PERSONNEL {% endblock %}
+{% block titre_formulaire %} IMPRESSION DE LA LISTE DU PERSONNEL {% endblock %}
+{% block fil_ariane %}Personnel / Liste des employés / Impression {% endblock %}
+{% block titre_cadre %}
+  IMPRIMER LA LISTE DU PERSONNEL
+{% endblock %}
+
+{% block formulaire %}
+
+    <style>
+    #fimpressionpersonnel select.form-control {
+        height: auto !important;
+        min-height: 38px;
+        padding-top: .4rem !important;
+        padding-bottom: .4rem !important;
+        line-height: 1.5 !important;
+    }
+    #fimpressionpersonnel table td {
+        vertical-align: middle;
+    }
+    </style>
+
+<form method="GET" target="_blank" id="fimpressionpersonnel" action="{% url 'rapportgeneral' %}"
+      data-url-general="{% url 'rapportgeneral' %}"
+      data-url-categorie="{% url 'rapportcategorie' %}">
+
+    <div class="card-body">
+
+        <div class="alert alert-info" role="alert">
+            <i class="fas fa-info-circle"></i>
+            Choisissez le type de liste et l'année scolaire, puis cliquez sur « Aperçu »
+            pour ouvrir le document dans un nouvel onglet.
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <table class="table table-bordered table-sm">
+                    <tbody>
+                        <tr>
+                            <th class="w-50 align-middle">
+                                <label for="id_type_liste" class="mb-0">Type de liste <span class="text-danger">*</span></label>
+                            </th>
+                            <td>
+                                <select name="type_liste" id="id_type_liste" class="form-control form-control-sm" required>
+                                    <option value="" selected>Sélectionnez</option>
+                                    <option value="1">Générale</option>
+                                    <option value="2">Catégorie</option>
+                                </select>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th class="align-middle">
+                                <label for="id_annee" class="mb-0">Année scolaire <span class="text-danger">*</span></label>
+                            </th>
+                            <td>
+                                <select name="annee" id="id_annee" class="form-control form-control-sm" required>
+                                    <option value="" selected>Sélectionnez</option>
+                                    {% for an in annee %}
+                                    <option value="{{ an.id }}">{{ an.descript_annee }}</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                        </tr>
+
+                        <tr id="ligne_categorie" class="table-success" style="display:none;">
+                            <th class="align-middle">
+                                <label for="id_categorie" class="mb-0">Catégorie <span class="text-danger">*</span></label>
+                            </th>
+                            <td>
+                                <select name="categorie" id="id_categorie" class="form-control form-control-sm" disabled>
+                                    <option value="" selected>Sélectionnez</option>
+                                    {% for categ in categorie_emp %}
+                                    <option value="{{categ.0}}">{{categ.1}}</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="card-footer text-center">
+        <button type="submit" class="btn btn-primary btn-md" title="Ouvrir l'aperçu dans un nouvel onglet pour l'imprimer">
+            Aperçu &nbsp; <i class="fas fa-print"></i>
+        </button>
+        <a href="{% url 'listegeneralepersonnel' %}" target="_self"
+        class="btn btn-secondary btn-md" title="Retourner à la liste sans imprimer">
+            Annuler &nbsp; <i class="fas fa-times"></i>
+        </a>
+    </div>
+
+</form>
+
+{% endblock %}
+
+{% block javascript %}
+
+    <script>
+
+        (function () {
+            var form  = document.getElementById('fimpressionpersonnel');
+            var type  = document.getElementById('id_type_liste');
+            var ligne = document.getElementById('ligne_categorie');
+            var categ = document.getElementById('id_categorie');
+
+            function maj() {
+                var parCateg = (type.value === "2");
+                ligne.style.display = parCateg ? '' : 'none';
+                categ.required = parCateg;
+                categ.disabled = !parCateg;   // désactivé = non envoyé dans l'URL
+                if (!parCateg) { categ.value = ''; }
+                form.action = parCateg ? form.dataset.urlCategorie : form.dataset.urlGeneral;
+            }
+
+            type.addEventListener('change', maj);
+            maj();
+        })();
+</script>
+
+
+{% endblock %}

@@ -1,84 +1,183 @@
 {% extends "base.html" %}
-{% block titre_page %} EDITION DES SALAIRES {% endblock %}
-{% block titre_cadre %}
-DETAILS D'UN SALAIRE
-{% endblock %}
+{% block titre_page %} CONSULTATION {% endblock %}
+{% load crispy_forms_tags %}
+{% block titre_formulaire %} FICHE INDIVIDUELLE DE SALAIRE {% endblock %}
+{% block fil_ariane %}Personnel / Salaires / Consultation {% endblock %}
+ {% block titre_cadre %}
+  CONSULTER UN BULLETIN DE SALAIRE
+ {% endblock %}
+
 
 {% block formulaire %}
 
-<div class="row">
-    <div class="col-lg-6">
-        <div class="card m-b-30">
-            <form class="post-form" action="" method="POST">
+        <form class="needs-validation" action="" method="get">
 
                 {% csrf_token %}
 
-                <div class="row">
-                    <div class="col-lg-6">
-                        <div class="card m-b-30">
-
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-12">
+                        <div class="form-group">
                             <label for="IDsal">ID salaire</label>
-                            <input type="text" id="IDsal" maxlength="10" value="{{sal.id}}" class="form-control" readonly>
-                            
-                            <label for="id_datepaie">Date Paiement</label>
-                            <input type="text" name="date_paiement" id="id_datepaie" maxlength="15"  value="{{sal.date_paiement}}" class="form-control" readonly>
-                            
-                            <label for="id_nbr_heure">Nombre Heure</label>
-                            <input type="text" name="nbre_heure" id="id_nbr_heure" maxlength="10"  value="{{sal.nbre_heure}}" class="form-control" readonly>
-                            
-                            <label for="id_anscol">Année scolaire</label>
-                            <input type="text" name="anneescolaire" id="id_anscol" maxlength="12"  value="{{sal.anneescolaire}}" class="form-control" readonly>
-                            
-                            <label for="id_mois_paie">Mois payé</label>
-                            <input type="text" name="mois_paie" id="id_mois_paie" maxlength="10"  value="{{sal.mois_paie}}" class="form-control" readonly>
-                            
-                            <label for="id_detail_paie">Détails Paiement</label>
-                            <input type="text" name="detail_paiement" id="id_detail_paie" maxlength="50"  value="{{sal.detail_paiement}}" class="form-control" readonly>
-                            
-                            <label for="id_taux_horaire">Taux Horaire</label>
-                            <input type="text" name="taux_horaire" id="id_taux_horaire" maxlength="10"  value="{{sal.taux_horaire}}" class="form-control" readonly>
-                            
-                            <label for="id_avance_paie">Montant des avances</label>
-                            <input type="text" name="avance_paie" id="id_avance_paie" maxlength="15"  value="{{sal.avance_paie}}" class="form-control" readonly>
-                            
-                            <label for="id_prime">Montant des primes</label>
-                            <input type="text" name="primes" id="id_prime" maxlength="15"  value="{{sal.primes}}" class="form-control" readonly>
-                            
-                            <label for="id_salb ">Salaire Brut</label>
-                            <input type="text" name="salbrut" id="id_salb" maxlength="15"  value="{{sal.salbrut}}" class="form-control" readonly>
-                            
-                            <label for="id_coti_social">Cotisation Sociale</label>
-                            <input type="text" name="cotis_sociale" id="id_coti_social" maxlength="15"  value="{{sal.cotis_sociale}}" class="form-control" readonly>
-                            
-                            <label for="id_salnet">Salaire Net</label>
-                            <input type="text" name="salnet" id="id_salnet" maxlength="15"  value="{{sal.salnet}}" class="form-control" readonly>
-                            
-                            <label for="id_nb_hsupp">Nbre Heure Supp</label>
-                            <input type="text" name="nb_hsupp" id="id_nb_hsupp" maxlength="15"  value="{{sal.nb_hsupp}}" class="form-control" readonly>
-                            
-                            <label for="id_mnt_hsupp">Montant Heure Supp</label>
-                            <input type="text" name="mont_hsupp" id="id_mnt_hsupp" maxlength="15"  value="{{sal.mont_hsupp}}" class="form-control" readonly>
-                            
-                            <label for="id_idpersonnel">Employé</label>
-                            <input type="text" name="idpersonnel" id="id_idpersonnel" maxlength="15"  value="{{sal.idpersonnel}}" class="form-control" readonly>
+                            <input type="text" id="IDsal" value="{{sal.id}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>
 
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="form-group">                            
+                            <label for="id_datepaie">Date Paiement</label>
+                            <input type="text" name="date_paiement" id="id_datepaie" value="{{sal.date_paiement|date:'j-n-Y'}}" class="form-control" readonly>
                         </div>
                     </div>
 
-                </div>
-
-                <div class="row">
-                    <div class="col-lg-6">
-                        <a href="/ajoutersalaire/" target="_self" class="btn btn-sm btn-secondary"><span class="glyphicon glyphicon-arrow-left">Retour</span></a>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="id_anscol">Année scolaire</label>
+                            <input type="text" name="anneescolaire" id="id_anscol" value="{{sal.anneescolaire}}" class="form-control" readonly>
+                        </div>
                     </div>
 
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="id_mois_paie">Mois payé</label>
+                            <input type="text" name="mois_paie" id="id_mois_paie" value="{{sal.get_mois_paie_display|capfirst}}" class="form-control" readonly>
+                        </div>
+                    </div>
                 </div>
 
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="id_nbr_heure">Nombre heure enseignée</label>
+                            <input type="text" name="nbre_heure" id="id_nbr_heure" value="{{sal.nbre_heure}}" class="form-control" readonly>
+                        </div>
+                    </div>
 
-            </form>
-        </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="id_taux_horaire">Taux horaire</label>
+                            <input type="text" name="taux_horaire" id="id_taux_horaire" value="{{sal.taux_horaire|floatformat:'2g'}}" class="form-control" readonly>
+                        </div>
+                    </div>
 
-    </div>
-</div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="id_salbase">Salaire de base</label>
+                            <input type="text" name="salbase" id="id_salbase" value="{{sal.idpersonnel.salbase|floatformat:'2g'}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="id_avance_paie">Montant des avances</label>
+                            <input type="text" name="avance_paie" id="id_avance_paie" value="{{sal.avance_paie|floatformat:'2g'}}" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="id_prime">Montant des primes</label>
+                            <input type="text" name="primes" id="id_prime" value="{{sal.primes|floatformat:'2g'}}" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="id_salb ">Salaire brut</label>
+                            <input type="text" name="salbrut" id="id_salb" value="{{sal.salbrut|floatformat:'2g'}}" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="id_coti_social">Cotisation sociale</label>
+                            <input type="text" name="cotis_sociale" id="id_coti_social" value="{{sal.cotis_sociale|floatformat:'2g'}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_detail_paie">Détails paiement</label>
+                            <input type="text" name="detail_paiement" id="id_detail_paie" value="{{sal.detail_paiement}}" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_salnet">Salaire net</label>
+                            <input type="text" name="salnet" id="id_salnet" value="{{sal.salnet|floatformat:'2g'}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_nb_hsupp">Heures supp</label>
+                            <input type="text" name="nb_hsupp" id="id_nb_hsupp" value="{{sal.nb_hsupp}}" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_mnt_hsupp">Montant heure supp</label>
+                            <input type="text" name="mont_hsupp" id="id_mnt_hsupp" value="{{sal.mont_hsupp|floatformat:'2g'}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_idpersonnel">ID employé</label>
+                            <input type="text" name="idpersonnel" id="id_idpersonnel" value="{{sal.idpersonnel.id}}" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_nom_emp">Nom famille</label>
+                            <input type="text" name="nom_famille" id="id_nom_emp" value="{{sal.idpersonnel.nom_personnel}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="id_prenom">Prénoms</label>
+                            <input type="text" name="prenom_emp" id="id_prenom" value="{{sal.idpersonnel.prenom_personnel}}" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="id_contact">Contact</label>
+                            <input type="text" name="contact_personnel" id="id_contact" value="{{sal.idpersonnel.contact_personnel}}" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="id_type_emp">Catégorie</label>
+                            <input type="text" name="type_personnel" id="id_type_emp" value="{{sal.idpersonnel.type_personnel}}" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>                        
+
+            </div>
+
+            <div class="card-footer text-center">
+                <a href="{% url 'listesalairemensuel' %}" target="_self" class="btn btn-md btn-primary">Retour &nbsp; <i class="fas fa-arrow-circle-left"></i></a>
+            </div>
+
+
+        </form>
 
 {% endblock %}

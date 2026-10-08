@@ -23,19 +23,19 @@ CONTRAT_CHOICES = (
 )
 
 MOIS_CHOICES = (
-    ('Selectionnez','Sélectionnez'), # 0
-    ('janvier','janvier'), # 1
-    ('fevrier','fevrier'), # 2
-    ('mars','mars'), # 3
-    ('avril','avril'), # 4
-    ('mai','mai'), # 5
-    ('juin','juin'), # 6
-    ('juillet','juillet'), # 7
-    ('aout','août'), # 8
-    ('septembre','septembre'), # 9
-    ('octobre','octobre'), # 10
-    ('novembre','novembre'), # 11
-    ('decembre','décembre') # 12
+    ('','Sélectionnez'), # 0
+    ('1','janvier'), # 1
+    ('2','février'), # 2
+    ('3','mars'), # 3
+    ('4','avril'), # 4
+    ('5','mai'), # 5
+    ('6','juin'), # 6
+    ('7','juillet'), # 7
+    ('8','août'), # 8
+    ('9','septembre'), # 9
+    ('10','octobre'), # 10
+    ('11','novembre'), # 11
+    ('12','décembre') # 12
 )
 
 STATUT_MATRIMONIAL = (
@@ -78,7 +78,7 @@ class Personnel(models.Model):
 
 class AvanceSalaire(models.Model):
     montant_avance = models.DecimalField(max_digits=15, decimal_places=2, default=0)
-    intitule = models.TextField()
+    intitule = models.TextField(blank=True)
     date_avance = models.DateField()
     mois_avance = models.CharField(max_length=15, default=MOIS_CHOICES[1][0], choices=MOIS_CHOICES)
     anscolaire = models.ForeignKey(AnneeScolaire, on_delete=models.CASCADE)
@@ -128,9 +128,9 @@ class Salaire(models.Model):
     taux_horaire = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     avance_paie = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     primes = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    salbrut = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    salbrut = models.DecimalField(max_digits=15, decimal_places=2, default=0)
     cotis_sociale = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    salnet = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    salnet = models.DecimalField(max_digits=15, decimal_places=2, default=0)
     nb_hsupp = models.IntegerField(default=0)
     mont_hsupp = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     idpersonnel = models.ForeignKey(Personnel, on_delete=models.CASCADE)
