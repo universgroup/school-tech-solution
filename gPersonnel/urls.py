@@ -12,6 +12,7 @@ urlpatterns = [
     path('rapport/personnel/general/', rapportgeneralpersonnel, name='rapportgeneral'),
     path('rapport/personnel/categorie/', rapportpersonnelcategorie, name='rapportcategorie'),
     path('chargerinfosemploye/', chargerinfoemploye, name='chargerinfosemploye'),
+    path('impressionlistepersonnel/', confirmerimpressionliste, name='impressionlistepersonnel'),
 
     path('enregistrersalaire/', enregistrersalaire, name='enregistrersalaire'),
     path('listesalairemensuel/',listemensuellesalaire,name='listesalairemensuel'),
@@ -24,6 +25,7 @@ urlpatterns = [
     path('imprimerbulletinsalaire/<int:idsal>', imprimebulletinsalaire, name='imprimerbulletinsalaire'),
     path('chargerinfospersonnel/', charger_infospersonnel, name='chargerinfospersonnel'),
     path('confirmerimpression/<int:id>', confirmerimpression, name='confirmerimpression'),
+    
 
     path('valideravancesalaire/', valideravancesalaire, name='valideravancesalaire'),
     path('listeavancemensuelle/', listeavancesalaire, name='listeavancemensuelle'),

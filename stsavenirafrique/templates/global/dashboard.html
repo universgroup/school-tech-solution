@@ -160,7 +160,7 @@
               <li><a href="{% url 'listeavancemensuelle' %}" class="dropdown-item">Enregistrer une avance sur salaire</a></li>
               <li><a href="{% url 'listesalairemensuel' %}" class="dropdown-item">Paiement des salaires</a></li>
               <li><a href="#" class="dropdown-item">Suivi des absences</a></li>
-              <li><a href="#" class="dropdown-item">Liste des employés</a></li>
+              <li><a href="{% url 'impressionlistepersonnel' %}" class="dropdown-item">Liste des employés</a></li>
             </ul>
       </li>
 
@@ -230,8 +230,8 @@
     <!-- SEARCH FORM -->
     
     <!-- Année scolaire / session -->
-    <div class="navbar-text mx-3 d-none d-md-inline-block" style="color: #4f46e5; font-weight: bold; font-size: 0.85rem;">
-        ANNEE SCOLAIRE : {{ annee_scolaire }} &nbsp;&nbsp; SESSION : {{ session_scolaire }}
+    <div class="navbar-text ml-auto mr-3 mr-lg-5 d-none d-md-inline-block" style="color: #4f46e5; font-weight: bold; font-size: 0.85rem;">
+      ANNEE SCOLAIRE : {{ annee_scolaire }} &nbsp;&nbsp; SESSION : {{ session_scolaire }}
     </div>
 
     <ul class="navbar-nav ml-auto">       
@@ -554,7 +554,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="#" class="nav-link" title="Permet d'imprimer la liste générale du personnel">
+                <a href="{% url 'impressionlistepersonnel' %}" class="nav-link" title="Permet d'imprimer la liste générale du personnel">
                   <i class="fa-solid fa-users">&nbsp;</i>
                   <p>Liste employés</p>                  
                 </a>

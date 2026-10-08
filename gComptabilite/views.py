@@ -28,6 +28,7 @@ from reportlab.platypus import (BaseDocTemplate, PageTemplate, Frame, NextPageTe
 from reportlab.platypus import Table as RLTable  # évite le conflit de nom avec votre "Table" du tableau principal
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.enums import TA_RIGHT # TA_CENTER, 
+from xml.sax.saxutils import escape
 
 from PIL import Image
 
@@ -1464,6 +1465,14 @@ def generer_rapport_paiement_scolarite(request, data_ecole, annee, cycle, classe
         entetes = ['N°', 'Matricule', 'Prénoms', 'Nom', tranche_name, 'Montant payé', 'Reste à payer', 'Date paiement']
         table_data = [entetes]
 
+        style_cellule = ParagraphStyle(
+            'CelluleTab',
+            parent=getSampleStyleSheet()['Normal'],
+            fontName='Helvetica',
+            fontSize=8,
+            leading=9.5,   # interligne serré pour garder une hauteur de ligne proche de l'actuelle
+        )
+
         for i, etat in enumerate(etatpaie, start=1):
 
             # Détermination de la tranche
@@ -1484,8 +1493,8 @@ def generer_rapport_paiement_scolarite(request, data_ecole, annee, cycle, classe
             table_data.append([
                 str(i),
                 etat.mateleve.matricule,
-                etat.mateleve.prenom,
-                etat.mateleve.nom,
+                Paragraph(escape(str(etat.mateleve.prenom or '')), style_cellule),
+                Paragraph(escape(str(etat.mateleve.nom or '')), style_cellule),
                 '{:,}'.format(montant_tranche),
                 '{:,}'.format(paye),
                 '{:,}'.format(reste),
@@ -1517,9 +1526,12 @@ def generer_rapport_paiement_scolarite(request, data_ecole, annee, cycle, classe
                 '{:,}'.format(total_reste),
                 ''
             ])
+
+        # Si « Matricule » est trop serré avec des matricules plus longs, passez-le à 2,0 cm et retirez 0,2 cm à « Prénoms ».
         
-        
-        col_widths = [1.2*cm, 2.2*cm, 3.0*cm, 3.0*cm, 2.8*cm, 2.8*cm, 2.8*cm, 2.5*cm]
+        # col_widths = [1.2*cm, 2.2*cm, 3.0*cm, 3.0*cm, 2.8*cm, 2.8*cm, 2.8*cm, 2.5*cm]
+        col_widths = [0.9*cm, 1.8*cm, 3.35*cm, 3.35*cm, 2.8*cm, 2.8*cm, 2.8*cm, 2.5*cm]
+
         table = Table(table_data, repeatRows=1, colWidths=col_widths)
 
         style = TableStyle([

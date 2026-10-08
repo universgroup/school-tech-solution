@@ -544,6 +544,11 @@ def rapportpersonnelcategorie(request):
         titre="REGISTRE DU PERSONNEL PAR CATEGORIE", categorie=categorie)
 
 
+@action_requise('personnel_gerer')
+def confirmerimpressionliste(request):
+    ans = AnneeScolaire.objects.all().order_by('id')
+    return render(request, 'gPersonnel/confirmer_impression_personnel.html', dict(categorie_emp=TYPE_PERSONNEL,annee=ans))
+
 # Cette fonction est utilisée au niveau du template de gestion des avances sur salaire
 @action_requise('personnel_gerer')
 def chargerinfoemploye(request):
