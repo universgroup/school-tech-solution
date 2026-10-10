@@ -270,7 +270,7 @@ def listeinfosecole(request):
     infos = {}
     infos = Ecole.objects.none()
 
-    infos = Ecole.objects.all()
+    infos = Ecole.objects.all().order_by('id')
     pagineecole = Paginator(infos, 5)
     numpageecole = request.GET.get('page')
     infos = pagineecole.get_page(numpageecole)
