@@ -318,57 +318,63 @@ def modifierinscription(request, idins, mat):
         cl = Classe.objects.get(id=idclas)
         cy = CycleScolaire.objects.get(id=idcy)
 
-        # J'enregistre maintenant ces ID dans la table Inscription
-        inscri.annee_scolaire = an
-        inscri.idclasse = cl
-        inscri.idcycle = cy
-        
         # Je modifie ensuite l'année scolaire, le cycle et la classe de la même façon dans la table EtatPaiement
-        etatpaie = EtatPaiementTranche.objects.select_related('anneescolaire','mateleve').get(mateleve=mat,anneescolaire=an)
-        etatpaie.idclasse = cl
-        etatpaie.idcycle = cy
+        etatpaie = EtatPaiementTranche.objects.select_related('anneescolaire','mateleve','idclasse','idcycle').filter(Q(mateleve__exact=mat),Q(anneescolaire__exact=an))
 
-        if inscri.etat_inscription == ETAT_INSCRIPTION[0][0]: # Inscrit
-            etatpaie.inscription = cl.frais_inscription
+        if etatpaie.count()>1:
+            messages.error(request,'Etat de paiement double constaté pour cet élève. Modification non effectuée.')
+            return redirect('modifieinscription', idins=inscri.id, mat=mat)
         else:
-            etatpaie.inscription = cl.frais_reinscription
+            # J'enregistre maintenant ces ID dans la table Inscription
+            inscri.annee_scolaire = an
+            inscri.idclasse = cl
+            inscri.idcycle = cy
 
-        inscri.save() # Je valide ici son inscription
-        etatpaie.save() # Je valide ensuite son etat de paiement
+            etatp = EtatPaiementTranche.objects.select_related('anneescolaire','mateleve','idclasse','idcycle').get(mateleve=mat,anneescolaire=an)
+            etatp.idclasse = cl
+            etatp.idcycle = cy
 
-        dnais = request.POST.get('datenaiss')
-        dentree = request.POST.get('date_entree')
+            if inscri.etat_inscription == ETAT_INSCRIPTION[0][0]: # Inscrit
+                etatp.inscription = cl.frais_inscription
+            else:
+                etatp.inscription = cl.frais_reinscription
 
-        el = Eleve.objects.get(matricule=mat)
-        el.nom = request.POST.get('nom')
-        el.prenom = request.POST.get('prenom')
-        el.sexe_eleve = request.POST.get('sexe_eleve')
-        el.pere = request.POST.get('pere')
-        el.mere = request.POST.get('mere')
-        el.tuteur = request.POST.get('tuteur')
-        el.contact_pere = request.POST.get('contact_pere')
-        el.contact_mere = request.POST.get('contact_mere')
-        el.email_pere = request.POST.get('email_pere')
-        el.email_mere = request.POST.get('email_mere')
-        el.profes_pere = request.POST.get('profes_pere')
-        el.profes_mere = request.POST.get('profes_mere')
-        el.personne_contact = request.POST.get('personne_contact')
-        el.adresse = request.POST.get('adresse')
-        el.ecole_origine = request.POST.get('ecole_origine')
-        el.datenaissance = datetime.strptime(dnais,'%Y-%m-%d')
-        el.lieu_naissance = request.POST.get('lieunais')
-        el.date_arrivee = datetime.strptime(dentree,'%Y-%m-%d')
-        el.pays_naissance = request.POST.get('pays_naiss')
+            inscri.save() # Je valide ici son inscription
+            etatp.save() # Je valide ensuite son etat de paiement
 
-        if request.FILES.get('photoel'):
-            el.photo_eleve = request.FILES.get('photoel')
- 
-        el.save()
+            dnais = request.POST.get('datenaiss')
+            dentree = request.POST.get('date_entree')
 
-        if etatins == ETAT_INSCRIPTION[0][0]:
-            return redirect('chargeranneecourante') # Il est routé vers la liste des inscrits de l'année scolaire courante
-        else:
-            return redirect('listereinscritsanneecourante') # Il est routé vers la liste des reinscrits de l'année scolaire courante dans le cas contraire
+            el = Eleve.objects.get(matricule=mat)
+            el.nom = request.POST.get('nom')
+            el.prenom = request.POST.get('prenom')
+            el.sexe_eleve = request.POST.get('sexe_eleve')
+            el.pere = request.POST.get('pere')
+            el.mere = request.POST.get('mere')
+            el.tuteur = request.POST.get('tuteur')
+            el.contact_pere = request.POST.get('contact_pere')
+            el.contact_mere = request.POST.get('contact_mere')
+            el.email_pere = request.POST.get('email_pere')
+            el.email_mere = request.POST.get('email_mere')
+            el.profes_pere = request.POST.get('profes_pere')
+            el.profes_mere = request.POST.get('profes_mere')
+            el.personne_contact = request.POST.get('personne_contact')
+            el.adresse = request.POST.get('adresse')
+            el.ecole_origine = request.POST.get('ecole_origine')
+            el.datenaissance = datetime.strptime(dnais,'%Y-%m-%d')
+            el.lieu_naissance = request.POST.get('lieunais')
+            el.date_arrivee = datetime.strptime(dentree,'%Y-%m-%d')
+            el.pays_naissance = request.POST.get('pays_naiss')
+
+            if request.FILES.get('photoel'):
+                el.photo_eleve = request.FILES.get('photoel')
+
+            el.save()
+
+            if etatins == ETAT_INSCRIPTION[0][0]:
+                return redirect('chargeranneecourante') # Il est routé vers la liste des inscrits de l'année scolaire courante
+            else:
+                return redirect('listereinscritsanneecourante') # Il est routé vers la liste des reinscrits de l'année scolaire courante dans le cas contraire
     else:
 
         if etatins == ETAT_INSCRIPTION[0][0]:

@@ -3,6 +3,9 @@ from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, Pass
 
 from .models import Utilisateur, NIVEAU_ACCES_CHOICES
 from django.core.exceptions import ValidationError
+import re
+
+EMAIL_PATTERN = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
 
 class ConnexionForm(AuthenticationForm):
     username = forms.EmailField(
@@ -36,7 +39,7 @@ class CreationUtilisateurForm(UserCreationForm):
             'username': forms.TextInput(attrs={'class':'form-control','placeholder':'Nom utilisateur','title':'Tapez votre nom d\'utilisateur'}),
             'first_name': forms.TextInput(attrs={'class':'form-control','placeholder':'Prénom(s)', 'title':'Tapez votre prénom(s)'}),
             'last_name': forms.TextInput(attrs={'class':'form-control','placeholder':'Nom famille', 'title':'Tapez votre nom de famille'}),
-            'email': forms.EmailInput(attrs={'class':'form-control','placeholder': 'Ex: contact@universtechgroup.com','pattern': "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}", 'title': 'Saisissez un email correct!'}),
+            'email': forms.EmailInput(attrs={'class':'form-control','placeholder': 'Ex: contact@universtechgroup.com', 'title': 'Saisissez un email correct!'}),
             'password1': forms.PasswordInput(attrs={'class':'form-control','title':'Tapez un mot de passe d\'au moins 8 caractères composé de lettres, chiffres, majuscules, minuscule et de caractères spéciaux'}),
             'password2': forms.PasswordInput(attrs={'class':'form-control','title':'Retapez le même mot de passe'}),
             'photo_profil' : forms.FileInput(attrs={'class': 'd-none', 'accept': 'image/*','title': 'Importez une photo de profil','id':'id_photo_user', 'onchange': 'previewPhotoProfil(this)'}),
@@ -49,6 +52,12 @@ class CreationUtilisateurForm(UserCreationForm):
         if password1 and password2 and password1 != password2:
             raise ValidationError('Les deux mots de passe ne correspondent pas.', code='password_mismatch')
         return password2
+
+    def clean_email_user(self):
+        email = self.cleaned_data.get('email')
+        if email and not re.match(EMAIL_PATTERN, email):
+            raise ValidationError("Format d'email invalide pour l'utilisateur.")
+        return email
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -69,7 +78,7 @@ class MotDePasseOublieForm(PasswordResetForm):
     """
     email = forms.EmailField(
         label="Adresse e-mail",
-        widget=forms.EmailInput(attrs={'id':'idemail',"placeholder": " ",'pattern':"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}",'class': 'form-control floating-input'}),
+        widget=forms.EmailInput(attrs={'id':'idemail',"placeholder": " ",'pattern':r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}",'class': 'form-control floating-input'}),
         # placeholder=" " (espace) est nécessaire pour que le CSS floating-label
         # détecte un champ "rempli" via :not(:placeholder-shown), comme sur login.html
     )
